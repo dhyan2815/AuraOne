@@ -19,16 +19,16 @@ const Login = () => {
       setError(err.message);
     }
   };
-  
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <form onSubmit={handleLogin} className="bg-white p-6 rounded shadow-md w-80">
-        <h2 className="text-xl mb-4">Login</h2>
+    <div className="min-h-screen flex items-center dark:bg-gray-900 justify-center bg-gray-100">
+      <form onSubmit={handleLogin} className="bg-white p-6 rounded shadow-md w-80 dark:bg-gray-800 ">
+        <h2 className="text-xl mb-4 text-center">Hey, Dhyan let me know if its you.</h2>
         {error && <p className="text-red-500 text-sm">{error}</p>}
         <input
           type="email"
           placeholder="Email"
-          className="w-full border px-3 py-2 mb-2"
+          className="w-full border px-3 py-2 mb-2 dark:border-none dark:bg-gray-900"
           value={email}
           onChange={e => setEmail(e.target.value)}
           required
@@ -36,7 +36,7 @@ const Login = () => {
         <input
           type="password"
           placeholder="Password"
-          className="w-full border px-3 py-2 mb-4"
+          className="w-full border px-3 py-2 mb-4 dark:border-none dark:bg-gray-900"
           value={password}
           onChange={e => setPassword(e.target.value)}
           required
