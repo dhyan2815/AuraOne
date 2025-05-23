@@ -1,4 +1,3 @@
-// src/pages/Login.tsx
 import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../services/firebase";
@@ -21,29 +20,44 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center dark:bg-gray-900 justify-center bg-gray-100">
-      <form onSubmit={handleLogin} className="bg-white p-6 rounded shadow-md w-80 dark:bg-gray-800 ">
-        <h2 className="text-xl mb-4 text-center">Hey, Dhyan let me know if its you.</h2>
-        {error && <p className="text-red-500 text-sm">{error}</p>}
-        <input
-          type="email"
-          placeholder="Email"
-          className="w-full border px-3 py-2 mb-2 dark:border-none dark:bg-gray-900"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          className="w-full border px-3 py-2 mb-4 dark:border-none dark:bg-gray-900"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-          required
-        />
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4">
+      <form
+        onSubmit={handleLogin}
+        className="w-full max-w-md bg-white dark:bg-gray-800 p-4 rounded-xl shadow-md space-y-4"
+      >
+        <div className="font-semibold text-center space-y-1">
+          <h2 className="text-2xl font-semibold text-center text-gray-800 dark:text-gray-100">
+            Welcome back,
+            Dhyan 👋<br />
+          </h2>
+          <p className="text-sm font-semibold text-center text-gray-400 dark:text-gray-300">
+            How shall Aura help you today?</p>
+        </div>
+
+        {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+
+        <div className="space-y-4">
+          <input
+            type="email"
+            placeholder="Email"
+            className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+
         <button
           type="submit"
-          className="bg-blue-600 text-white px-4 py-2 w-full rounded"
+          className="w-full py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors"
         >
           Login
         </button>
