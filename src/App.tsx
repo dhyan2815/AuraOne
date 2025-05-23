@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { MoonIcon, SunIcon } from 'lucide-react';
-import Layout from './components/Layout';
+import Layout from './components/structure/Layout';
 import Dashboard from './pages/Dashboard';
 import Notes from './pages/Notes';
 import NotePage from './pages/NotePage';
@@ -10,15 +10,18 @@ import Calendar from './pages/Calendar';
 import Settings from './pages/Settings';
 import { useAuth } from './hooks/useAuth';
 import Login from './pages/Login';
+import Loader from './components/ui/Loader';
 
 function App() {
 
+  // Set theme: light || dark
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     const savedTheme = localStorage.getItem('theme');
     return (savedTheme as 'light' | 'dark') || 
            (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
   });
 
+  // Store theme in localStorage
   useEffect(() => {
     if (theme === 'dark') {
       document.documentElement.classList.add('dark');
@@ -28,16 +31,14 @@ function App() {
     localStorage.setItem('theme', theme);
   }, [theme]);
 
+  // Theme Changes
   const toggleTheme = () => {
     setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
   };
 
+  // Loader is displayed when logging..
   const {user, loading} = useAuth();
-
-  // Loader
-  if (loading) return <div className="flex items-center justify-center h-screen w-screen">
-    <div className="w-10 h-10 border-4 border-darkblue border-t-transparent rounded-full animate-spin"></div>
-  </div>
+  if (loading) return <Loader/>;
 
   return (
     <>
@@ -55,8 +56,8 @@ function App() {
       <Routes>
         {!user ? (
           <>
-            <Route path='*' element={<Navigate to='/login' replace />} />
             <Route path='/login' element={<Login />} />
+            <Route path='*' element={<Navigate to='/login' replace />} />
           </>
         ) : (
           <Route path="/" element={<Layout />}>

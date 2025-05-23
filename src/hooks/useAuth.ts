@@ -1,10 +1,13 @@
 // src/hooks/useAuth.ts
 import { useEffect, useState } from "react";
-import { onAuthStateChanged, User } from "firebase/auth";
+import { onAuthStateChanged, signOut, User } from "firebase/auth";
 import { auth } from "../services/firebase";
 
 export const useAuth = () => {
+
+  // initially user is set to null
   const [user, setUser] = useState<User | null>(null);
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -15,5 +18,11 @@ export const useAuth = () => {
     return () => unsubscribe();
   }, []);
 
-  return { user, loading };
+  // logout function
+  const logout = async () => {
+    await signOut(auth);
+    setUser(null)
+  }
+
+  return { user, loading, logout };
 };

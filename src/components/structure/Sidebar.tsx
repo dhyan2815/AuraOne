@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { useNavigate, NavLink } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   FileText, 
@@ -10,9 +10,11 @@ import {
   X,
   MicIcon, 
   MessagesSquare,
-  Sparkles
+  Sparkles,
+  LogOut,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '../../hooks/useAuth';
 
 const Sidebar = () => {
   const [expanded, setExpanded] = useState(true);
@@ -25,11 +27,20 @@ const Sidebar = () => {
     setIsListening(!isListening);
   };
 
+  // Logout Logic
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login');
+  }
+
   const menuItems = [
     { path: '/dashboard', icon: <LayoutDashboard size={20} />, label: 'Dashboard' },
     { path: '/notes', icon: <FileText size={20} />, label: 'Notes' },
     { path: '/tasks', icon: <CheckSquare size={20} />, label: 'Tasks' },
     { path: '/calendar', icon: <CalendarIcon size={20} />, label: 'Calendar' },
+    { path: '/login', icon: <LogOut size={20} />, label: 'LogOut', onclick: handleLogout }
   ];
 
   return (
@@ -75,7 +86,7 @@ const Sidebar = () => {
                         : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
                     }`
                   }
-                  onClick={closeSidebar}
+                  onClick={item.onclick ? item.onclick : ()=> navigate(item.path)} //will redirect to remaining paths
                 >
                   <span className="mr-3">{item.icon}</span>
                   <span>{item.label}</span>
