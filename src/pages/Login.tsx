@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../services/firebase";
+import { auth } from "../../dist/services/firebase";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
@@ -27,11 +27,12 @@ const Login = () => {
       >
         <div className="font-semibold text-center space-y-1">
           <h2 className="text-2xl font-semibold text-center text-gray-800 dark:text-gray-100">
-            Welcome back,
-            Dhyan 👋<br />
+            Welcome back, Dhyan 👋
+            <br />
           </h2>
           <p className="text-sm font-semibold text-center text-gray-400 dark:text-gray-300">
-            How shall Aura help you today?</p>
+            How shall Aura help you today?
+          </p>
         </div>
 
         {error && <p className="text-red-500 text-sm text-center">{error}</p>}

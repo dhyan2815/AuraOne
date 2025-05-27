@@ -1,20 +1,20 @@
-import { useState } from 'react';
-import { useNavigate, NavLink } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  FileText, 
-  CheckSquare, 
-  Calendar as CalendarIcon, 
-  Settings as SettingsIcon, 
-  Menu, 
+import { useState } from "react";
+import { useNavigate, NavLink } from "react-router-dom";
+import {
+  LayoutDashboard,
+  FileText,
+  CheckSquare,
+  Calendar as CalendarIcon,
+  Settings as SettingsIcon,
+  Menu,
   X,
-  MicIcon, 
+  MicIcon,
   MessagesSquare,
   Sparkles,
   LogOut,
-} from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '../../hooks/useAuth';
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "../../../dist/hooks/useAuth";
 
 const Sidebar = () => {
   const [expanded, setExpanded] = useState(true);
@@ -22,7 +22,7 @@ const Sidebar = () => {
 
   const toggleSidebar = () => setExpanded(!expanded);
   const closeSidebar = () => setExpanded(true);
-  
+
   const toggleVoiceRecognition = () => {
     setIsListening(!isListening);
   };
@@ -32,33 +32,42 @@ const Sidebar = () => {
   const { logout } = useAuth();
   const handleLogout = async () => {
     await logout();
-    navigate('/login');
-  }
+    navigate("/login");
+  };
 
   const menuItems = [
-    { path: '/dashboard', icon: <LayoutDashboard size={20} />, label: 'Dashboard' },
-    { path: '/notes', icon: <FileText size={20} />, label: 'Notes' },
-    { path: '/tasks', icon: <CheckSquare size={20} />, label: 'Tasks' },
-    { path: '/calendar', icon: <CalendarIcon size={20} />, label: 'Calendar' },
-    { path: '/login', icon: <LogOut size={20} />, label: 'LogOut', onclick: handleLogout }
+    {
+      path: "/dashboard",
+      icon: <LayoutDashboard size={20} />,
+      label: "Dashboard",
+    },
+    { path: "/notes", icon: <FileText size={20} />, label: "Notes" },
+    { path: "/tasks", icon: <CheckSquare size={20} />, label: "Tasks" },
+    { path: "/calendar", icon: <CalendarIcon size={20} />, label: "Calendar" },
+    {
+      path: "/login",
+      icon: <LogOut size={20} />,
+      label: "LogOut",
+      onclick: handleLogout,
+    },
   ];
 
   return (
     <>
       {expanded && (
-        <div 
-          className="fixed inset-0 bg-black/50 z-20 md:hidden" 
+        <div
+          className="fixed inset-0 bg-black/50 z-20 md:hidden"
           onClick={closeSidebar}
         />
       )}
-      
-      <button 
+
+      <button
         className="fixed top-4 left-4 z-30 md:hidden bg-white dark:bg-slate-800 rounded-md p-2 shadow-md"
         onClick={toggleSidebar}
       >
         {expanded ? <X size={24} /> : <Menu size={24} />}
       </button>
-      
+
       <AnimatePresence>
         <motion.aside
           initial={{ x: -280 }}
@@ -73,34 +82,36 @@ const Sidebar = () => {
                 <h1 className="text-xl font-bold">AuraOne</h1>
               </div>
             </div>
-            
+
             <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
               {menuItems.map((item) => (
                 <NavLink
                   key={item.path}
                   to={item.path}
-                  className={({ isActive }) => 
+                  className={({ isActive }) =>
                     `flex items-center px-2 py-2 rounded-md transition-colors ${
-                      isActive 
-                        ? 'bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-100' 
-                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
+                      isActive
+                        ? "bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-100"
+                        : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
                     }`
                   }
-                  onClick={item.onclick ? item.onclick : ()=> navigate(item.path)} //will redirect to remaining paths
+                  onClick={
+                    item.onclick ? item.onclick : () => navigate(item.path)
+                  } //will redirect to remaining paths
                 >
                   <span className="mr-3">{item.icon}</span>
                   <span>{item.label}</span>
                 </NavLink>
               ))}
             </nav>
-            
+
             <div className="p-4 border-t border-slate-200 dark:border-slate-700">
               <div className="flex justify-around mb-4">
-                <button 
+                <button
                   className={`p-2.5 rounded-full transition-colors ${
-                    isListening 
-                      ? 'bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300'
-                      : 'bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600'
+                    isListening
+                      ? "bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300"
+                      : "bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600"
                   }`}
                   onClick={toggleVoiceRecognition}
                   title="Voice commands"
@@ -110,17 +121,17 @@ const Sidebar = () => {
                 <NavLink
                   to="/chat"
                   className="p-2.5 rounded-full bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
-                  title="AI Chat"
+                  title="Chat with AI"
                 >
                   <MessagesSquare size={20} />
                 </NavLink>
                 <NavLink
                   to="/settings"
-                  className={({ isActive }) => 
+                  className={({ isActive }) =>
                     `p-2.5 rounded-full transition-colors ${
-                      isActive 
-                        ? 'bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300'
-                        : 'bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600'
+                      isActive
+                        ? "bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300"
+                        : "bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600"
                     }`
                   }
                   title="Settings"
