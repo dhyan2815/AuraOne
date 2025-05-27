@@ -1,29 +1,43 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PlusIcon, Search, GridIcon, ListIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import NoteCard from '../components/notes/NoteCard';
 import { motion } from 'framer-motion';
+import { getAllNotes } from '../../dist/hooks/useNotes';
 
-// Mock data
-const mockNotes = [
-  { id: '1', title: 'Project Ideas', content: 'List of potential new projects to work on', createdAt: '2023-06-10T14:30:00Z', tags: ['work', 'ideas'] },
-  { id: '2', title: 'Meeting Notes', content: 'Notes from the team meeting on product roadmap', createdAt: '2023-06-12T09:15:00Z', tags: ['work', 'meeting'] },
-  { id: '3', title: 'Recipe: Pasta Carbonara', content: 'Ingredients and steps for making pasta carbonara', createdAt: '2023-06-08T18:45:00Z', tags: ['recipe', 'food'] },
-  { id: '4', title: 'Books to Read', content: 'Collection of book recommendations from friends', createdAt: '2023-06-05T20:30:00Z', tags: ['personal', 'books'] },
-  { id: '5', title: 'Workout Plan', content: 'Weekly exercise routine with specific workouts for each day', createdAt: '2023-06-01T07:20:00Z', tags: ['fitness', 'health'] },
-];
+interface Note {
+  id: string;
+  title: string;
+  content: string;
+  tags: string[];
+}
 
 const Notes = () => {
+
+
+  const [notes, setNotes] = useState<Note[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   
+  useEffect(() => {
+    const fetchNotes = async () => {
+      try {
+        const data = await getAllNotes();
+        setNotes(data);
+      } catch(error) {
+        console.error("Failed to fetch notes: ", error)
+      }
+    };
+    fetchNotes();
+  }, []);
+
   const filteredNotes = searchQuery 
-    ? mockNotes.filter(note => 
+    ? notes.filter(note => 
         note.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
         note.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
         note.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
       )
-    : mockNotes;
+    : notes;
 
   const container = {
     hidden: { opacity: 0 },
