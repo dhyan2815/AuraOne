@@ -26,7 +26,6 @@ const WeatherWidget = () => {
         setLoading(true);
         setError(null);
 
-        // Get current location
         const position = await new Promise<GeolocationPosition>(
           (resolve, reject) => {
             navigator.geolocation.getCurrentPosition(resolve, reject);
@@ -35,7 +34,6 @@ const WeatherWidget = () => {
 
         const { latitude, longitude } = position.coords;
 
-        // Fetch current weather
         const currentWeatherResponse = await fetch(
           `${API_CONFIG.WEATHER_CURRENT_API_URL}?lat=${latitude}&lon=${longitude}&units=metric&appid=${API_CONFIG.WEATHER_API_KEY}`
         );
@@ -46,7 +44,6 @@ const WeatherWidget = () => {
 
         const currentWeather = await currentWeatherResponse.json();
 
-        // Fetch 5-day forecast
         const forecastResponse = await fetch(
           `${API_CONFIG.WEATHER_FORECAST_API_URL}?lat=${latitude}&lon=${longitude}&units=metric&appid=${API_CONFIG.WEATHER_API_KEY}`
         );
@@ -57,7 +54,6 @@ const WeatherWidget = () => {
 
         const forecastData = await forecastResponse.json();
 
-        // Process forecast data to get daily averages
         const dailyForecast = forecastData.list
           .reduce((acc: any[], item: any) => {
             const date = new Date(item.dt * 1000).toLocaleDateString();
@@ -78,7 +74,7 @@ const WeatherWidget = () => {
           temperature: Math.round(currentWeather.main.temp),
           condition: currentWeather.weather[0].main,
           humidity: currentWeather.main.humidity,
-          windSpeed: Math.round(currentWeather.wind.speed * 2.237), // Convert m/s to mph
+          windSpeed: Math.round(currentWeather.wind.speed * 2.237),
           forecast: dailyForecast.map((day: any) => ({
             day: new Date(day.dt * 1000).toLocaleDateString("en-US", {
               weekday: "short",
@@ -95,7 +91,6 @@ const WeatherWidget = () => {
         setLoading(false);
       }
     };
-
     fetchWeather();
   }, []);
 

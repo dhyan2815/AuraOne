@@ -87,17 +87,17 @@ const NewsWidget = () => {
 
   return (
     <div className="space-y-4">
-      {news.map((item) => (
+      {news.slice(0, 3).map((item) => (
         <a
           key={item.id}
           href={item.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="block hover:bg-slate-50 dark:hover:bg-slate-800/50 -mx-4 px-4 py-2 rounded-md transition-colors"
+          className="block hover:bg-slate-50 dark:hover:bg-slate-800/50 -mx-4 px-3 py-1 rounded-md transition-colors"
         >
           <div className="flex justify-between items-start">
             <div>
-              <h4 className="font-medium">{item.title}</h4>
+              <h4 className="text-lg">{item.title}</h4>
               <div className="flex items-center mt-1 text-sm text-slate-600 dark:text-slate-400">
                 <span>{item.source}</span>
                 <span className="mx-2">•</span>
