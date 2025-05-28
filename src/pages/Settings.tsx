@@ -200,21 +200,21 @@ const Settings = () => {
                 <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400">
                   Version
                 </h3>
-                <p>1.0.0</p>
+                <p>1.3.2</p>
               </div>
 
               <div>
                 <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400">
                   Created By
                 </h3>
-                <p>Your Name</p>
+                <p>Dhyan Patel</p>
               </div>
 
               <div>
                 <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400">
                   Last Updated
                 </h3>
-                <p>June 15, 2023</p>
+                <p>28th May 2025</p>
               </div>
             </div>
           </div>

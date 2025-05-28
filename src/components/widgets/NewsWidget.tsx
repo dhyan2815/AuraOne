@@ -22,7 +22,8 @@ const NewsWidget = () => {
         setError(null);
 
         const response = await fetch(
-          `${API_CONFIG.NEWS_API_URL}/news?apikey=${API_CONFIG.NEWS_API_KEY}&language=en&category=technology`
+          // `${API_CONFIG.NEWS_API_URL}/news?apikey=${API_CONFIG.NEWS_API_KEY}&language=en&category=technology`
+          `${API_CONFIG.NEWS_API_URL}/news?apikey=${API_CONFIG.NEWS_API_KEY}&country=in&language=en`
         );
 
         if (!response.ok) {
