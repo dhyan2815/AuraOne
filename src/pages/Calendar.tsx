@@ -12,7 +12,7 @@ import {
   isSameDay,
   isToday,
 } from "date-fns";
-import { useEvents } from "../../dist/hooks/useEvents";
+import { useEvents } from "../hooks/useEvents";
 
 const Calendar = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date());

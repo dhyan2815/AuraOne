@@ -18,7 +18,7 @@ import {
   updateNote,
   deleteNote as deleteNoteFromDb,
   getNoteById,
-} from "../../dist/hooks/useNotes";
+} from "../hooks/useNotes";
 
 interface Note {
   id: string;
@@ -51,7 +51,9 @@ const NotePage = () => {
     content: "",
     onUpdate: ({ editor }) => {
       // Update note content when editor changes
-      setNote((prev: any) => (prev ? { ...prev, content: editor.getHTML() } : prev));
+      setNote((prev: any) =>
+        prev ? { ...prev, content: editor.getHTML() } : prev
+      );
     },
   });
 

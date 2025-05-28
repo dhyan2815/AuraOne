@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { getTasks, updateTask, Task } from "../../../dist/hooks/useTasks";
+import { getTasks, updateTask, Task } from "../../hooks/useTasks";
 
 const TasksWidget = () => {
   const [tasks, setTasks] = useState<Task[]>([]);

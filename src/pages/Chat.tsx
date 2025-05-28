@@ -2,8 +2,8 @@
 import { useState, useEffect, useRef } from "react";
 import { Send, ArrowLeft, Sparkles, Bot, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { generateGeminiResponse } from "../../dist/config/api";
-import { db } from "../../dist/services/firebase";
+import { generateGeminiResponse } from "../config/api";
+import { db } from "../services/firebase";
 import {
   collection,
   addDoc,
@@ -12,7 +12,7 @@ import {
   orderBy,
   onSnapshot,
 } from "firebase/firestore";
-import { useAuth } from "../../dist/hooks/useAuth";
+import { useAuth } from "../hooks/useAuth";
 
 type Message = {
   id?: string;
@@ -133,7 +133,10 @@ const Chat = () => {
             onClick={() => navigate(-1)}
             className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
           >
-            <ArrowLeft size={20} className="text-slate-600 dark:text-slate-400" />
+            <ArrowLeft
+              size={20}
+              className="text-slate-600 dark:text-slate-400"
+            />
           </button>
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center">
@@ -164,7 +167,8 @@ const Chat = () => {
                   Start a conversation
                 </h3>
                 <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
-                  Ask me anything! I'm here to help you with questions, creative tasks, or just have a friendly chat.
+                  Ask me anything! I'm here to help you with questions, creative
+                  tasks, or just have a friendly chat.
                 </p>
               </div>
             </div>
@@ -212,8 +216,14 @@ const Chat = () => {
                     <div className="flex items-center gap-1">
                       <div className="flex space-x-1">
                         <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"></div>
-                        <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
-                        <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+                        <div
+                          className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"
+                          style={{ animationDelay: "0.1s" }}
+                        ></div>
+                        <div
+                          className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"
+                          style={{ animationDelay: "0.2s" }}
+                        ></div>
                       </div>
                       <span className="text-sm text-slate-500 ml-2">
                         Aura is thinking...

@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
-import { PlusIcon, Search, GridIcon, ListIcon } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import NoteCard from '../components/notes/NoteCard';
-import { motion } from 'framer-motion';
-import { getAllNotes } from '../../dist/hooks/useNotes';
+import { useState, useEffect } from "react";
+import { PlusIcon, Search, GridIcon, ListIcon } from "lucide-react";
+import { Link } from "react-router-dom";
+import NoteCard from "../components/notes/NoteCard";
+import { motion } from "framer-motion";
+import { getAllNotes } from "../hooks/useNotes";
 
 interface Note {
   id: string;
@@ -13,29 +13,30 @@ interface Note {
 }
 
 const Notes = () => {
-
-
   const [notes, setNotes] = useState<Note[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  
+  const [searchQuery, setSearchQuery] = useState("");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+
   useEffect(() => {
     const fetchNotes = async () => {
       try {
         const data = await getAllNotes();
         setNotes(data);
-      } catch(error) {
-        console.error("Failed to fetch notes: ", error)
+      } catch (error) {
+        console.error("Failed to fetch notes: ", error);
       }
     };
     fetchNotes();
   }, []);
 
-  const filteredNotes = searchQuery 
-    ? notes.filter(note => 
-        note.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        note.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        note.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+  const filteredNotes = searchQuery
+    ? notes.filter(
+        (note) =>
+          note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          note.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          note.tags.some((tag) =>
+            tag.toLowerCase().includes(searchQuery.toLowerCase())
+          )
       )
     : notes;
 
@@ -44,24 +45,27 @@ const Notes = () => {
     show: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.05
-      }
-    }
+        staggerChildren: 0.05,
+      },
+    },
   };
 
   const item = {
     hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 }
+    show: { opacity: 1, y: 0 },
   };
 
   return (
     <div>
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <h1 className="text-3xl font-semibold">Notes</h1>
-        
+
         <div className="flex items-center gap-5">
           <div className="relative flex-1 md:w-64">
-            <Search className="absolute flex-1 left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+            <Search
+              className="absolute flex-1 left-3 top-1/2 -translate-y-1/2 text-slate-400"
+              size={18}
+            />
             <input
               type="text"
               placeholder="  Search notes..."
@@ -70,22 +74,30 @@ const Notes = () => {
               className="input pl-9 w-full"
             />
           </div>
-          
+
           <div className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-md p-1">
             <button
-              className={`p-1.5 rounded ${viewMode === 'grid' ? 'bg-white dark:bg-slate-700 shadow-sm' : ''}`}
-              onClick={() => setViewMode('grid')}
+              className={`p-1.5 rounded ${
+                viewMode === "grid"
+                  ? "bg-white dark:bg-slate-700 shadow-sm"
+                  : ""
+              }`}
+              onClick={() => setViewMode("grid")}
             >
               <GridIcon size={18} />
             </button>
             <button
-              className={`p-1.5 rounded ${viewMode === 'list' ? 'bg-white dark:bg-slate-700 shadow-sm' : ''}`}
-              onClick={() => setViewMode('list')}
+              className={`p-1.5 rounded ${
+                viewMode === "list"
+                  ? "bg-white dark:bg-slate-700 shadow-sm"
+                  : ""
+              }`}
+              onClick={() => setViewMode("list")}
             >
               <ListIcon size={18} />
             </button>
           </div>
-          
+
           <Link to="/notes/new" className="button-primary">
             <PlusIcon size={18} className="mr-1" />
             New Note
@@ -95,23 +107,26 @@ const Notes = () => {
 
       {filteredNotes.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-64 text-center">
-          <p className="text-slate-500 dark:text-slate-400 mb-4">No notes found</p>
+          <p className="text-slate-500 dark:text-slate-400 mb-4">
+            No notes found
+          </p>
           <Link to="/notes/new" className="button-primary">
             <PlusIcon size={18} className="mr-1" />
             Create your first note
           </Link>
         </div>
       ) : (
-        <motion.div 
+        <motion.div
           variants={container}
           initial="hidden"
           animate="show"
-          className={viewMode === 'grid' 
-            ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" 
-            : "flex flex-col gap-4"
+          className={
+            viewMode === "grid"
+              ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+              : "flex flex-col gap-4"
           }
         >
-          {filteredNotes.map(note => (
+          {filteredNotes.map((note) => (
             <motion.div key={note.id} variants={item}>
               <NoteCard note={note} viewMode={viewMode} />
             </motion.div>

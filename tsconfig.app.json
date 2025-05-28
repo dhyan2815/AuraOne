@@ -20,5 +20,5 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "dist/services", "dist/hooks", "dist/config"]
+  "include": ["src", "src/services", "src/hooks", "src/config"]
 }

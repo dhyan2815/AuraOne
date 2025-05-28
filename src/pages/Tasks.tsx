@@ -13,7 +13,7 @@ import {
   addTask as addTaskToDB,
   updateTask as updateTaskInDB,
   Task,
-} from "../../dist/hooks/useTasks";
+} from "../hooks/useTasks";
 
 const Tasks = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -169,7 +169,9 @@ const Tasks = () => {
             <motion.div key={task.id} variants={item}>
               <TaskItem
                 task={task}
-                onToggleComplete={() => handleToggleComplete(task.id, !task.completed)}
+                onToggleComplete={() =>
+                  handleToggleComplete(task.id, !task.completed)
+                }
               />
             </motion.div>
           ))}

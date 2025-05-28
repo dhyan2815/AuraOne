@@ -8,7 +8,7 @@ import NotePage from "./pages/NotePage";
 import Tasks from "./pages/Tasks";
 import Calendar from "./pages/Calendar";
 import Settings from "./pages/Settings";
-import { useAuth } from "../dist/hooks/useAuth";
+import { useAuth } from "./hooks/useAuth";
 import Login from "./pages/Login";
 import Loader from "./components/ui/Loader";
 import Chat from "./pages/Chat";

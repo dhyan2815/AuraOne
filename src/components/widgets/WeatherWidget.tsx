@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { MapPin, Droplets, Wind, Thermometer } from "lucide-react";
-import { API_CONFIG } from "../../../dist/config/api";
+import { API_CONFIG } from "../../config/api";
 
 interface WeatherData {
   location: string;

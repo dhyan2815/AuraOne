@@ -14,7 +14,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAuth } from "../../../dist/hooks/useAuth";
+import { useAuth } from "../../hooks/useAuth";
 
 const Sidebar = () => {
   const [expanded, setExpanded] = useState(true);
