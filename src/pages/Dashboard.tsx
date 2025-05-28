@@ -6,13 +6,10 @@ import NewsWidget from '../components/widgets/NewsWidget';
 import TasksWidget from '../components/widgets/TasksWidget';
 import CalendarWidget from '../components/widgets/CalendarWidget';
 import { motion } from 'framer-motion';
-import { useAuth } from '../hooks/useAuth';
 
 const Dashboard = () => {
   const [greeting, setGreeting] = useState('');
   
-  const {user} = useAuth();
-
   useEffect(() => {
     const hour = new Date().getHours();
     if (hour < 12) setGreeting('Good morning');
@@ -39,9 +36,9 @@ const Dashboard = () => {
     <div>
       <div className="mb-6">
         <h1 className="text-3xl font-semibold">
-          {greeting}{user?.displayName ? `, ${user.displayName}` : ''}
+          {greeting} Dhyan
         </h1>
-        <p className="text-slate-600 dark:text-slate-400 mt-1">Here's your overview for today</p>
+        <p className="text-slate-600 dark:text-slate-400 mt-1">Here's your overview for today!</p>
       </div>
       
       <motion.div 
