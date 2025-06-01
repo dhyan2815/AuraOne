@@ -11,12 +11,13 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { useEditor, EditorContent } from "@tiptap/react";
+import Placeholder from "@tiptap/extension-placeholder";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import {
   createNote,
   updateNote,
-  deleteNote as deleteNoteFromDb,
+  deleteNote,
   getNoteById,
 } from "../hooks/useNotes";
 
@@ -31,12 +32,12 @@ interface Note {
 }
 
 const NotePage = () => {
-  const [note, setNote] = useState<Note | any>(null);
-  const { id } = useParams();
+  const [note, setNote] = useState<Note | null>(null);
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [title, setTitle] = useState("");
+  const [title, setTitle] = useState<string>("");
   const [tags, setTags] = useState<string[]>([]);
-  const [newTag, setNewTag] = useState("");
+  const [newTag, setNewTag] = useState<string>("");
   const [starred, setStarred] = useState(false);
   const [pinned, setPinned] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -44,27 +45,31 @@ const NotePage = () => {
   const editor = useEditor({
     extensions: [
       StarterKit,
+      Placeholder.configure({
+        placeholder: "Write your note here...",
+      }),
       Link.configure({
         openOnClick: false,
       }),
     ],
     content: "",
     onUpdate: ({ editor }) => {
-      // Update note content when editor changes
-      setNote((prev: any) =>
-        prev ? { ...prev, content: editor.getHTML() } : prev
-      );
+      if (editor) {
+        setNote((prev: Note | null) =>
+          prev ? { ...prev, content: editor.getHTML() } : prev
+        );
+      }
     },
   });
 
-  // Fetch note data
   useEffect(() => {
-    if (!editor) return;
     const fetchNote = async () => {
+      if (!editor) return;
       setLoading(true);
 
       if (id === "new") {
-        const newNote = {
+        // Initialize a new empty note with all properties
+        const newNote: Note = {
           id: "new",
           title: "Untitled Note",
           content: "",
@@ -73,32 +78,38 @@ const NotePage = () => {
           pinned: false,
           starred: false,
         };
-        setNote(newNote);
+        setNote(newNote); // This is now correct
         setTitle(newNote.title);
         setTags(newNote.tags);
         setPinned(false);
         setStarred(false);
-        editor?.commands.setContent("");
-      } else {
+        editor?.commands.setContent(""); // Set empty content for the editor
+      } else if (id) {
+        // Fetch an existing note from the database
         const foundNote = await getNoteById(id);
         if (foundNote) {
-          setNote(foundNote);
-          setTitle(foundNote.title);
-          setTags(foundNote.tags);
-          setPinned(foundNote.pinned);
-          setStarred(foundNote.starred);
+          const typedNote = foundNote as Note; // Add type assertion
+          setNote(typedNote);
+          setTitle(typedNote.title);
+          setTags(typedNote.tags || []); // Provide fallback for arrays
+          setPinned(typedNote.pinned || false); // Provide fallback for booleans
+          setStarred(typedNote.starred || false);
         } else {
-          navigate("/notes");
+          navigate("/notes"); // If no note found, redirect
         }
+      } else {
+        navigate("/notes"); //handle case where the id is undefined
       }
 
       setLoading(false);
     };
 
-    fetchNote();
+    if (editor) {
+      fetchNote();
+    }
+    
   }, [id, editor, navigate]);
 
-  //to sync editor content once it's ready
   useEffect(() => {
     if (editor && note?.content !== undefined) {
       editor.commands.setContent(note.content);
@@ -107,29 +118,30 @@ const NotePage = () => {
 
   const handleSave = async () => {
     const newData = {
+      id: note?.id || "",
       title,
       tags,
       content: editor?.getHTML() || "",
-      createdAt: note.createdAt || new Date().toISOString(),
+      createdAt: note?.createdAt || new Date().toISOString(),
       pinned,
       starred,
     };
 
     try {
-      if (note.id === "new") {
+      if (note?.id === "new") {
         await createNote(newData);
-      } else {
+      } else if (note?.id) {
         await updateNote(note.id, newData);
       }
       navigate("/notes");
-    } catch (errr) {
-      console.error("failed to save note: ", errr);
+    } catch (err) {
+      console.error("failed to save note: ", err);
     }
   };
 
   const handleDelete = async () => {
-    if (note.id !== "new") {
-      await deleteNoteFromDb(note.id);
+    if (note?.id && note?.id !== "new") {
+      await deleteNote(note.id);
     }
     navigate("/notes");
   };
@@ -237,7 +249,7 @@ const NotePage = () => {
         {tags.map((tag) => (
           <div
             key={tag}
-            className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-full px-3 py-1"
+            className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-full px-3 py-1 "
           >
             <span className="text-sm">{tag}</span>
             <button
@@ -267,7 +279,7 @@ const NotePage = () => {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-card p-4 min-h-[300px]">
+      <div className="bg-white dark:bg-slate-800 rounded-lg dark:shadow-xl shadow-card p-4 min-h-[300px]">
         {editor && (
           <div className="prose prose-slate dark:prose-invert max-w-none">
             <EditorContent editor={editor} />

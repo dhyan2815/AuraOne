@@ -75,7 +75,7 @@ const Sidebar = () => {
           transition={{ duration: 0.3, ease: "easeInOut" }}
           className={`fixed inset-y-0 left-0 z-20 w-64 bg-white dark:bg-slate-800 shadow-lg md:shadow-none md:static md:translate-x-0`}
         >
-          <div className="flex flex-col h-full">
+          <div className="flex flex-col h-full dark:shadow-xl">
             <div className="flex items-center justify-center h-16 border-b border-slate-200 dark:border-slate-700">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-6 h-6 text-primary-600" />
