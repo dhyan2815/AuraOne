@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Save, RefreshCw, Info } from "lucide-react";
+import { Save, RefreshCw } from "lucide-react";
 
 const Settings = () => {
   // Appearance settings
