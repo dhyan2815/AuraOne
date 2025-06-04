@@ -23,6 +23,7 @@
     "@radix-ui/react-toast": "^1.1.5",
     "@radix-ui/react-tooltip": "^1.0.7",
     "@tiptap/extension-link": "^2.2.1",
+    "@tiptap/extension-placeholder": "^2.12.0",
     "@tiptap/pm": "^2.2.1",
     "@tiptap/react": "^2.2.1",
     "@tiptap/starter-kit": "^2.2.1",
