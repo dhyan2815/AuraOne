@@ -6,16 +6,35 @@ import NewsWidget from '../components/widgets/NewsWidget';
 import TasksWidget from '../components/widgets/TasksWidget';
 import CalendarWidget from '../components/widgets/CalendarWidget';
 import { motion } from 'framer-motion';
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from "../services/firebase";
 
 const Dashboard = () => {
   const [greeting, setGreeting] = useState('');
   
+  // To set greetings as per the day
   useEffect(() => {
     const hour = new Date().getHours();
     if (hour < 12) setGreeting('Good morning');
     else if (hour < 18) setGreeting('Good afternoon');
     else setGreeting('Good evening');
   }, []);
+
+  // To fetch the user's name
+  const [userName, setUserName] = useState('');
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const user = auth.currentUser;
+      if (user) {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists()) {
+          setUserName(userDoc.data().name);
+        }
+      }
+    };
+    fetchUserData();
+  }, []);
+
 
   const container = {
     hidden: { opacity: 0 },
@@ -36,7 +55,7 @@ const Dashboard = () => {
     <div>
       <div className="mb-6">
         <h1 className="text-3xl font-semibold">
-          {greeting} Dhyan
+          {greeting} {userName}
         </h1>
         <p className="text-slate-600 dark:text-slate-400 mt-1">Here's your overview for today!</p>
       </div>
