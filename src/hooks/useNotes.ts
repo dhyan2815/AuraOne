@@ -1,4 +1,3 @@
-// src/services/noteService.ts
 import { db } from "../services/firebase";
 import {
   collection,
@@ -10,30 +9,30 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 
-const notesRef = collection(db, "notes");
+const getUserNotesCollection = (userId: string) => collection(db, "users", userId, "notes");
 
-export const getAllNotes = async () => {
-  const snapshot = await getDocs(notesRef);
+export const getAllNotes = async (userId : string) => {
+  const snapshot = await getDocs(getUserNotesCollection(userId));
   return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 };
 
-export const getNoteById = async (id: string) => {
-  const docRef = doc(db, "notes", id);
+export const getNoteById = async (userId : string, id: string) => {
+  const docRef = doc(db, "users", userId, "notes", id);
   const snapshot = await getDoc(docRef);
   return snapshot.exists() ? { id: snapshot.id, ...snapshot.data() } : null;
 };
 
-export const createNote = async (note: any) => {
-  const docRef = await addDoc(notesRef, note);
+export const createNote = async (userId : string, note: any) => {
+  const docRef = await addDoc(getUserNotesCollection(userId), note);
   return { id: docRef.id, ...note };
 };
 
-export const updateNote = async (id: string, note: any) => {
-  const docRef = doc(db, "notes", id);
+export const updateNote = async (userId : string, id: string, note: any) => {
+  const docRef = doc(db, "users", userId, "notes", id);
   await updateDoc(docRef, note);
 };
 
-export const deleteNote = async (id: string) => {
-  const docRef = doc(db, "notes", id);
+export const deleteNote = async (userId : string, id: string) => {
+  const docRef = doc(db, "users", userId, "notes", id);
   await deleteDoc(docRef);
 };

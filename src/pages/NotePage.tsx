@@ -20,6 +20,7 @@ import {
   deleteNote,
   getNoteById,
 } from "../hooks/useNotes";
+import { useAuth } from "../hooks/useAuth";
 
 interface Note {
   id: string;
@@ -41,6 +42,8 @@ const NotePage = () => {
   const [starred, setStarred] = useState(false);
   const [pinned, setPinned] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  const {user} = useAuth();
 
   const editor = useEditor({
     extensions: [
@@ -64,10 +67,11 @@ const NotePage = () => {
 
   useEffect(() => {
     const fetchNote = async () => {
-      if (!editor) return;
+      if (!editor || !user) return;
       setLoading(true);
 
       if (id === "new") {
+
         // Initialize a new empty note with all properties
         const newNote: Note = {
           id: "new",
@@ -78,32 +82,36 @@ const NotePage = () => {
           pinned: false,
           starred: false,
         };
-        setNote(newNote); // This is now correct
+        setNote(newNote); 
         setTitle(newNote.title);
         setTags(newNote.tags);
         setPinned(false);
         setStarred(false);
-        editor?.commands.setContent(""); // Set empty content for the editor
+        editor?.commands.setContent("");
+
       } else if (id) {
+
         // Fetch an existing note from the database
-        const foundNote = await getNoteById(id);
+        const foundNote = await getNoteById(user.uid, id);
+
         if (foundNote) {
-          const typedNote = foundNote as Note; // Add type assertion
+          const typedNote = foundNote as Note; 
           setNote(typedNote);
           setTitle(typedNote.title);
-          setTags(typedNote.tags || []); // Provide fallback for arrays
-          setPinned(typedNote.pinned || false); // Provide fallback for booleans
+          setTags(typedNote.tags || []); 
+          setPinned(typedNote.pinned || false); 
           setStarred(typedNote.starred || false);
+          editor.commands.setContent(typedNote.content || "");
         } else {
           navigate("/notes"); // If no note found, redirect
         }
       } else {
         navigate("/notes"); //handle case where the id is undefined
       }
-
-      setLoading(false);
     };
 
+    setLoading(false);
+    
     if (editor) {
       fetchNote();
     }
@@ -117,7 +125,10 @@ const NotePage = () => {
   }, [editor, note?.content]);
 
   const handleSave = async () => {
-    const newData = {
+
+    if (!user || !editor) return;
+
+    const newData: Note = {
       id: note?.id || "",
       title,
       tags,
@@ -128,10 +139,13 @@ const NotePage = () => {
     };
 
     try {
+      if (!user) return;
       if (note?.id === "new") {
-        await createNote(newData);
+        const newId = await createNote(user.uid, newData);
+        navigate(`/notes/${newId}`) //redirect to new note page
       } else if (note?.id) {
-        await updateNote(note.id, newData);
+        await updateNote(user.uid, note.id, newData);
+        navigate(`/notes/${note.id}`) //stays on the same note
       }
       navigate("/notes");
     } catch (err) {
@@ -140,8 +154,9 @@ const NotePage = () => {
   };
 
   const handleDelete = async () => {
+    if (!user) return;
     if (note?.id && note?.id !== "new") {
-      await deleteNote(note.id);
+      await deleteNote(user.uid, note.id);
     }
     navigate("/notes");
   };

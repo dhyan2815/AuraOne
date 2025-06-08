@@ -9,11 +9,14 @@ export interface EventType {
   date: Date;
 }
 
-export const useEvents = (): EventType[] => {
+export const useEvents = (userId : string): EventType[] => {
   const [events, setEvents] = useState<EventType[]>([]);
 
   useEffect(() => {
-    const unsub = onSnapshot(collection(db, "events"), (snapshot) => {
+
+    if (!userId) return;
+
+    const unsub = onSnapshot(collection(db, "users", userId, "events"), (snapshot) => {
       const fetched = snapshot.docs.map((doc) => {
         const data = doc.data();
         return {
@@ -27,7 +30,7 @@ export const useEvents = (): EventType[] => {
     });
 
     return () => unsub();
-  }, []);
+  }, [userId]);
 
   return events;
 };

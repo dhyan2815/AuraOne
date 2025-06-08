@@ -17,23 +17,23 @@ export interface Task {
   priority: "low" | "medium" | "high";
 }
 
-const tasksCollection = collection(db, "tasks");
+const getUserTasksCollection = (userId : string) => collection(db, "users", userId, "tasks");
 
-export const getTasks = async (): Promise<Task[]> => {
-  const snapshot = await getDocs(tasksCollection);
+export const getTasks = async (userId : string): Promise<Task[]> => {
+  const snapshot = await getDocs(getUserTasksCollection(userId));
   return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Task));
 };
 
-export const addTask = async (task: Omit<Task, "id">) => {
-  await addDoc(tasksCollection, task);
+export const addTask = async (userId : string, task: Omit<Task, "id">) => {
+  await addDoc(getUserTasksCollection(userId), task);
 };
 
-export const updateTask = async (id: string, updates: Partial<Task>) => {
-  const ref = doc(db, "tasks", id);
+export const updateTask = async (userId : string, id: string, updates: Partial<Task>) => {
+  const ref = doc(db, "users", userId, "tasks", id);
   await updateDoc(ref, updates);
 };
 
-export const deleteTask = async (id: string) => {
-  const ref = doc(db, "tasks", id);
+export const deleteTask = async (userId : string, id: string) => {
+  const ref = doc(db, "users", userId, "tasks", id);
   await deleteDoc(ref);
 };

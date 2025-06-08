@@ -1,22 +1,30 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { getTasks, updateTask, Task } from "../../hooks/useTasks";
+import { useAuth } from "../../hooks/useAuth";
 
 const TasksWidget = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
 
+  const { user } = useAuth();
+
   // Fetch tasks
   useEffect(() => {
-    const fetchTasks = async () => {
-      const fetched = await getTasks();
-      setTasks(fetched);
-    };
-    fetchTasks();
-  }, []);
+    if (user) {
+      const fetchTasks = async () => {
+        const fetched = await getTasks(user.uid);
+        setTasks(fetched);
+      };
+      fetchTasks();
+    }
+  }, [user]);
 
   const handleToggleComplete = async (id: string, completed: boolean) => {
-    await updateTask(id, { completed });
-    const updated = await getTasks();
+
+    if (!user) return;
+
+    await updateTask(user.uid, id, { completed });
+    const updated = await getTasks(user.uid);
     setTasks(updated);
   };
 
@@ -55,13 +63,12 @@ const TasksWidget = () => {
                 <p className="text-sm font-medium">{task.title}</p>
                 <div className="mt-1">
                   <span
-                    className={`inline-block px-2 py-0.5 text-xs font-medium rounded-full ${
-                      task.priority === "high"
+                    className={`inline-block px-2 py-0.5 text-xs font-medium rounded-full ${task.priority === "high"
                         ? "bg-error-100 text-error-800 dark:bg-error-900/30 dark:text-error-300"
                         : task.priority === "medium"
-                        ? "bg-warning-100 text-warning-800 dark:bg-warning-900/30 dark:text-warning-300"
-                        : "bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-300"
-                    }`}
+                          ? "bg-warning-100 text-warning-800 dark:bg-warning-900/30 dark:text-warning-300"
+                          : "bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-300"
+                      }`}
                   >
                     {task.priority.charAt(0).toUpperCase() +
                       task.priority.slice(1)}

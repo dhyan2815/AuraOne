@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import NoteCard from "../components/notes/NoteCard";
 import { motion } from "framer-motion";
 import { getAllNotes } from "../hooks/useNotes";
+import { useAuth } from "../hooks/useAuth";
 
 interface Note {
   id: string;
@@ -17,17 +18,20 @@ const Notes = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
+  const {user} = useAuth();
+
   useEffect(() => {
     const fetchNotes = async () => {
       try {
-        const data = await getAllNotes();
+        if (!user) return;
+        const data = await getAllNotes(user.uid);
         setNotes(data);
       } catch (error) {
         console.error("Failed to fetch notes: ", error);
       }
     };
     fetchNotes();
-  }, []);
+  }, [user]);
 
   const filteredNotes = searchQuery
     ? notes.filter(
