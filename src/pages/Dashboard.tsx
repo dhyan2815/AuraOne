@@ -66,25 +66,25 @@ const Dashboard = () => {
         animate="show"
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
       >
-        <motion.div variants={item} className="lg:col-span-2">
+        <motion.div variants={item} className="lg:col-span-2 dark:shadow-xl">
           <Card title="Weather" className="h-full">
             <WeatherWidget />
           </Card>
         </motion.div>
         
-        <motion.div variants={item}>
+        <motion.div variants={item} className='dark:shadow-xl dark:hover:shadow-2xl transition-transform-30'>
           <Card title="Tasks" actionIcon={<PlusIcon size={16} />} actionLabel="New task" actionHref="/tasks">
             <TasksWidget />
           </Card>
         </motion.div>
         
-        <motion.div variants={item}>
+        <motion.div variants={item} className='dark:shadow-xl dark:hover:shadow-2xl transition-transform-30'>
           <Card title="Calendar" actionLabel="View all" actionHref="/calendar">
             <CalendarWidget />
           </Card>
         </motion.div>
         
-        <motion.div variants={item} className="lg:col-span-2">
+        <motion.div variants={item} className="lg:col-span-2 dark:shadow-xl dark:hover:shadow-2xl transition-transform-30">
           <Card title="Latest News" actionLabel="More news">
             <NewsWidget />
           </Card>

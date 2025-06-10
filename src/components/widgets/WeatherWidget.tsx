@@ -119,16 +119,16 @@ const WeatherWidget = () => {
   return (
     <div>
       <div className="flex flex-col md:flex-row items-center justify-between mb-4">
-        <div className="text-center md:text-left mb-4 md:mb-0">
-          <div className="flex items-center justify-center md:justify-start text-sm text-slate-600 dark:text-slate-400 mb-1">
-            <MapPin size={14} className="mr-1" />
+        <div className="text-center md:text-left mb-4 md:mb-0 ">
+          <div className="flex items-center justify-center md:justify-start text-xl text-slate-600 dark:text-slate-400 mb-1">
+            <MapPin size={30} className="mr-1" />
             {weather.location}
           </div>
           <div className="flex items-center">
             <span className="text-4xl font-semibold">
               {weather.temperature}°
             </span>
-            <span className="ml-2 text-slate-600 dark:text-slate-400">
+            <span className="ml-2 text-slate-600 dark:text-slate-400 text-3xl">
               {weather.condition}
             </span>
           </div>
@@ -137,7 +137,7 @@ const WeatherWidget = () => {
         <div className="flex gap-4">
           <div className="flex flex-col items-center">
             <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 mb-1">
-              <Droplets size={20} />
+              <Droplets size={30} />
             </div>
             <div className="text-sm text-slate-600 dark:text-slate-400">
               {weather.humidity}%
@@ -149,7 +149,7 @@ const WeatherWidget = () => {
 
           <div className="flex flex-col items-center">
             <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 mb-1">
-              <Wind size={20} />
+              <Wind size={30} />
             </div>
             <div className="text-sm text-slate-600 dark:text-slate-400">
               {weather.windSpeed} mph
@@ -161,7 +161,7 @@ const WeatherWidget = () => {
 
           <div className="flex flex-col items-center">
             <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 mb-1">
-              <Thermometer size={20} />
+              <Thermometer size={30} />
             </div>
             <div className="text-sm text-slate-600 dark:text-slate-400">
               68°/54°
