@@ -3,7 +3,7 @@ import { PlusIcon, Search, GridIcon, ListIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import NoteCard from "../components/notes/NoteCard";
 import { motion } from "framer-motion";
-import { getAllNotes } from "../hooks/useNotes";
+import { listenToNotes } from "../hooks/useNotes"; // 🔄 switched from getAllNotes
 import { useAuth } from "../hooks/useAuth";
 
 interface Note {
@@ -18,19 +18,16 @@ const Notes = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
-  const {user} = useAuth();
+  const { user } = useAuth();
 
   useEffect(() => {
-    const fetchNotes = async () => {
-      try {
-        if (!user) return;
-        const data = await getAllNotes(user.uid);
-        setNotes(data);
-      } catch (error) {
-        console.error("Failed to fetch notes: ", error);
-      }
-    };
-    fetchNotes();
+    if (!user) return;
+
+    const unsubscribe = listenToNotes(user.uid, (fetchedNotes) => {
+      setNotes(fetchedNotes as Note[]);
+    });
+
+    return () => unsubscribe(); // 🔁 Clean up real-time listener
   }, [user]);
 
   const filteredNotes = searchQuery

@@ -53,9 +53,9 @@ function App() {
         aria-label="Toggle theme"
       >
         {theme === "light" ? (
-          <MoonIcon className="h-3 w-3" />
+          <MoonIcon className="h-2 w-2" />
         ) : (
-          <SunIcon className="h-3 w-3" />
+          <SunIcon className="h-2 w-2" />
         )}
       </button>
       <Routes>
