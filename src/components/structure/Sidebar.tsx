@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../../hooks/useAuth";
+import toast from "react-hot-toast";
 
 const Sidebar = () => {
   const [expanded, setExpanded] = useState(true);
@@ -32,6 +33,7 @@ const Sidebar = () => {
   const { logout } = useAuth();
   const handleLogout = async () => {
     await logout();
+    toast.success("Log out successfully")
     navigate("/login");
   };
 

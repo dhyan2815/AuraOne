@@ -1,6 +1,7 @@
 // NotesPage.tsx
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import toast from 'react-hot-toast';
 import {
   ArrowLeft,
   Tag,
@@ -143,15 +144,15 @@ const NotePage = () => {
           createdAt: new Date().toISOString(),
         };
         const newId = await createNote(user.uid, newNoteData)
-        console.log("New Note created sucessfully");
+        toast.success("New Note created Successfully");
         navigate(`/notes/${newId}`, { replace: true });
       } else {
         await updateNote(user.uid, note.id, noteData);
         navigate("/notes");
-        console.log("Note Updated sucessfully")
+        toast.success("Note Updated sucessfully");
       }
     } catch (err) {
-      console.error("failed to save note: ", err);
+      toast.error("failed to save note");
     }
   };
 
@@ -166,11 +167,10 @@ const NotePage = () => {
 
     try {
       await deleteNote(user.uid, note.id);
-      console.log("Note deleted successfully");
+      toast.success("Note deleted successfully");
       navigate("/notes"); // Only after actual deletion
     } catch (error) {
-      console.error("Delete failed: ", error);
-      alert(error.message || "Deletion of note failed.");
+      toast.error("Deletion of note failed");
     }
   };
 

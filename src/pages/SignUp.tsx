@@ -4,6 +4,7 @@ import { auth, db } from "../services/firebase";
 import { doc, setDoc } from "firebase/firestore";
 import { useNavigate, Link } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
+import toast from "react-hot-toast";
 
 const SignUp = () => {
     const navigate = useNavigate();
@@ -33,6 +34,7 @@ const SignUp = () => {
         } catch (err: any) {
             setError(err.message);
         }
+        toast.success("Registration Successfull")
         navigate("/dashboard"); // Redirect to dashboard after successful signup!
     };
 
