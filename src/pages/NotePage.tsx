@@ -1,5 +1,7 @@
+// NotesPage.tsx
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import toast from 'react-hot-toast';
 import {
   ArrowLeft,
   Tag,
@@ -20,6 +22,7 @@ import {
   deleteNote,
   getNoteById,
 } from "../hooks/useNotes";
+import { useAuth } from "../hooks/useAuth";
 
 interface Note {
   id: string;
@@ -42,6 +45,9 @@ const NotePage = () => {
   const [pinned, setPinned] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  const { user } = useAuth();
+
+  // Initialize Tiptap editor
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -54,6 +60,7 @@ const NotePage = () => {
     ],
     content: "",
     onUpdate: ({ editor }) => {
+      // Update note content state
       if (editor) {
         setNote((prev: Note | null) =>
           prev ? { ...prev, content: editor.getHTML() } : prev
@@ -63,89 +70,111 @@ const NotePage = () => {
   });
 
   useEffect(() => {
+    // Fetch note on mount
     const fetchNote = async () => {
-      if (!editor) return;
-      setLoading(true);
-
-      if (id === "new") {
-        // Initialize a new empty note with all properties
-        const newNote: Note = {
-          id: "new",
-          title: "Untitled Note",
-          content: "",
-          createdAt: new Date().toISOString(),
-          tags: [],
-          pinned: false,
-          starred: false,
-        };
-        setNote(newNote); // This is now correct
-        setTitle(newNote.title);
-        setTags(newNote.tags);
-        setPinned(false);
-        setStarred(false);
-        editor?.commands.setContent(""); // Set empty content for the editor
-      } else if (id) {
-        // Fetch an existing note from the database
-        const foundNote = await getNoteById(id);
-        if (foundNote) {
-          const typedNote = foundNote as Note; // Add type assertion
-          setNote(typedNote);
-          setTitle(typedNote.title);
-          setTags(typedNote.tags || []); // Provide fallback for arrays
-          setPinned(typedNote.pinned || false); // Provide fallback for booleans
-          setStarred(typedNote.starred || false);
-        } else {
-          navigate("/notes"); // If no note found, redirect
-        }
-      } else {
-        navigate("/notes"); //handle case where the id is undefined
+      if (!editor || !user) {
+        setLoading(false);
+        return;
       }
 
-      setLoading(false);
+      try {
+        if (id === "new") {
+          // Create new note defaults
+          const newNote: Note = {
+            id: "new",
+            title: "Untitled Note",
+            content: "",
+            createdAt: new Date().toISOString(),
+            tags: [],
+            pinned: false,
+            starred: false,
+          };
+          setNote(newNote);
+          setTitle(newNote.title); // This will now work
+          setTags(newNote.tags);
+          setPinned(false);
+          setStarred(false);
+          editor?.commands.setContent("");
+        } else if (id) {
+          // Fetch existing note
+          const foundNote = await getNoteById(user.uid, id);
+          if (foundNote) {
+            const typedNote = foundNote as Note;
+            setNote(typedNote);
+            setTitle(typedNote.title);
+            setTags(typedNote.tags || []);
+            setPinned(typedNote.pinned || false);
+            setStarred(typedNote.starred || false);
+            editor.commands.setContent(typedNote.content || "");
+          } else {
+            navigate("/notes");
+          }
+        }
+      } finally {
+        setLoading(false);
+      }
     };
 
-    if (editor) {
-      fetchNote();
-    }
-    
-  }, [id, editor, navigate]);
+    fetchNote();
+  }, [id, editor, user]);
 
   useEffect(() => {
+    // Sync editor with note content
     if (editor && note?.content !== undefined) {
       editor.commands.setContent(note.content);
     }
   }, [editor, note?.content]);
 
+  // Save or update note
   const handleSave = async () => {
-    const newData = {
-      id: note?.id || "",
-      title,
+    if (!user || !editor) return;
+
+    const noteData = {
+      title: title.trim() || "Untitled Note",
       tags,
-      content: editor?.getHTML() || "",
-      createdAt: note?.createdAt || new Date().toISOString(),
+      content: editor.getHTML(),
       pinned,
       starred,
     };
 
     try {
-      if (note?.id === "new") {
-        await createNote(newData);
-      } else if (note?.id) {
-        await updateNote(note.id, newData);
+      if (note?.id === "new" || !note?.id) {
+        const newNoteData = {
+          ...noteData,
+          createdAt: new Date().toISOString(),
+        };
+        const newId = await createNote(user.uid, newNoteData)
+        toast.success("New Note created Successfully");
+        navigate(`/notes/${newId}`, { replace: true });
+      } else {
+        await updateNote(user.uid, note.id, noteData);
+        navigate("/notes");
+        toast.success("Note Updated sucessfully");
       }
-      navigate("/notes");
     } catch (err) {
-      console.error("failed to save note: ", err);
+      toast.error("failed to save note");
     }
   };
 
+  // Delete current note
   const handleDelete = async () => {
-    if (note?.id && note?.id !== "new") {
-      await deleteNote(note.id);
+    if (!user || !note?.id || note.id === "new") {
+      navigate("/notes");
+      return;
     }
-    navigate("/notes");
+
+    if (!window.confirm("Are you sure you want to delete this Note?")) return;
+
+    try {
+      await deleteNote(user.uid, note.id);
+      toast.success("Note deleted successfully");
+      navigate("/notes"); // Only after actual deletion
+    } catch (error) {
+      toast.error("Deletion of note failed");
+    }
   };
 
+  // Add new tag
   const addTag = () => {
     if (newTag.trim() && !tags.includes(newTag.trim())) {
       setTags([...tags, newTag.trim()]);
@@ -153,19 +182,23 @@ const NotePage = () => {
     }
   };
 
+  // Remove a tag
   const removeTag = (tagToRemove: string) => {
     setTags(tags.filter((tag) => tag !== tagToRemove));
   };
 
+  // Toggle starred state
   const toggleStarred = () => {
     setStarred(!starred);
   };
 
+  // Toggle pinned state
   const togglePinned = () => {
     setPinned(!pinned);
   };
 
   if (loading) {
+    // Loading spinner and message
     return (
       <div className="flex flex-col items-center justify-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
@@ -177,9 +210,13 @@ const NotePage = () => {
   }
 
   return (
+    // Page container
     <div>
+      {/* Header section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+        {/* Title and date */}
         <div className="flex items-center">
+          {/* Back button */}
           <button
             onClick={() => navigate("/notes")}
             className="mr-3 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
@@ -187,6 +224,7 @@ const NotePage = () => {
             <ArrowLeft size={20} />
           </button>
           <div>
+            {/* Note title input */}
             <input
               type="text"
               value={title}
@@ -194,6 +232,7 @@ const NotePage = () => {
               className="text-3xl font-semibold bg-transparent border-0 outline-none w-full"
               placeholder="Note title"
             />
+            {/* Creation date display */}
             {note?.createdAt && (
               <div className="flex items-center text-sm text-slate-500 dark:text-slate-400 mt-1">
                 <Calendar size={14} className="mr-1" />
@@ -203,36 +242,39 @@ const NotePage = () => {
           </div>
         </div>
 
+        {/* Action buttons */}
         <div className="flex items-center space-x-2">
+          {/* Star toggle */}
           <button
             onClick={toggleStarred}
-            className={`p-2 rounded-full ${
-              starred
-                ? "text-warning-500"
-                : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-            }`}
+            className={`p-2 rounded-full ${starred
+              ? "text-warning-500"
+              : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+              }`}
             aria-label={starred ? "Unstar note" : "Star note"}
           >
             <Star size={20} fill={starred ? "currentColor" : "none"} />
           </button>
 
+          {/* Pin toggle */}
           <button
             onClick={togglePinned}
-            className={`p-2 rounded-full ${
-              pinned
-                ? "text-primary-500"
-                : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-            }`}
+            className={`p-2 rounded-full ${pinned
+              ? "text-primary-500"
+              : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+              }`}
             aria-label={pinned ? "Unpin note" : "Pin note"}
           >
             <Pin size={20} />
           </button>
 
+          {/* Save button */}
           <button onClick={handleSave} className="button-primary">
             <Save size={18} className="mr-1" />
             Save
           </button>
 
+          {/* Delete button */}
           <button
             onClick={handleDelete}
             className="p-2 rounded-full text-slate-400 hover:text-error-600 dark:hover:text-error-400"
@@ -243,15 +285,18 @@ const NotePage = () => {
         </div>
       </div>
 
+      {/* Tag input section */}
       <div className="mb-6 flex flex-wrap items-center gap-2">
         <Tag size={16} className="text-slate-500 dark:text-slate-400" />
 
+        {/* Existing tags */}
         {tags.map((tag) => (
           <div
             key={tag}
             className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-full px-3 py-1 "
           >
             <span className="text-sm">{tag}</span>
+            {/* Remove tag button */}
             <button
               onClick={() => removeTag(tag)}
               className="ml-1 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
@@ -261,6 +306,7 @@ const NotePage = () => {
           </div>
         ))}
 
+        {/* New tag input */}
         <div className="flex">
           <input
             type="text"
@@ -270,6 +316,7 @@ const NotePage = () => {
             placeholder="Add tag..."
             className="bg-transparent border-0 outline-none text-sm"
           />
+          {/* Add tag button */}
           <button
             onClick={addTag}
             className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 text-sm font-medium"
@@ -279,8 +326,10 @@ const NotePage = () => {
         </div>
       </div>
 
+      {/* Editor section */}
       <div className="bg-white dark:bg-slate-800 rounded-lg dark:shadow-xl shadow-card p-4 min-h-[300px]">
         {editor && (
+          // Tiptap content area
           <div className="prose prose-slate dark:prose-invert max-w-none">
             <EditorContent editor={editor} />
           </div>

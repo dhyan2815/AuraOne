@@ -12,6 +12,7 @@ import { useAuth } from "./hooks/useAuth";
 import Login from "./pages/Login";
 import Loader from "./components/ui/Loader";
 import Chat from "./pages/Chat";
+import SignUp from "./pages/SignUp";
 
 function App() {
   // Set theme: light || dark
@@ -52,16 +53,17 @@ function App() {
         aria-label="Toggle theme"
       >
         {theme === "light" ? (
-          <MoonIcon className="h-3 w-3" />
+          <MoonIcon className="h-2 w-2" />
         ) : (
-          <SunIcon className="h-3 w-3" />
+          <SunIcon className="h-2 w-2" />
         )}
       </button>
       <Routes>
         {!user ? (
           <>
             <Route path="/login" element={<Login />} />
-            <Route path="*" element={<Navigate to="/login" replace />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="*" element={<Navigate to="/signup" replace />} />
           </>
         ) : (
           <Route path="/" element={<Layout />}>

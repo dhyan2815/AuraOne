@@ -1,4 +1,3 @@
-// src/pages/Chat.tsx
 import { useState, useEffect, useRef } from "react";
 import { Send, ArrowLeft, Sparkles, Bot, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -40,7 +39,7 @@ const Chat = () => {
   useEffect(() => {
     if (!user) return;
 
-    const messagesRef = collection(db, "users", user.uid, "chats");
+    const messagesRef = collection(db, "chatusers", user.uid, "chats");
     const q = query(messagesRef, orderBy("createdAt"));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -55,7 +54,7 @@ const Chat = () => {
   const handleSend = async () => {
     if (!input.trim() || !user) return;
 
-    const messagesRef = collection(db, "users", user.uid, "chats");
+    const messagesRef = collection(db, "chatusers", user.uid, "chats");
 
     const userMessage: Message = {
       role: "user",

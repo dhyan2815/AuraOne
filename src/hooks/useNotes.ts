@@ -1,39 +1,59 @@
-// src/services/noteService.ts
 import { db } from "../services/firebase";
 import {
   collection,
-  getDocs,
-  doc,
   getDoc,
   addDoc,
   updateDoc,
   deleteDoc,
+  doc,
+  onSnapshot,
 } from "firebase/firestore";
 
-const notesRef = collection(db, "notes");
+// Helper to get user's notes collection
+const getUserNotesCollection = (userId: string) =>
+  collection(db, "users", userId, "notes");
 
-export const getAllNotes = async () => {
-  const snapshot = await getDocs(notesRef);
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+// Real-time listener
+export const listenToNotes = (
+  userId: string,
+  onNotesChange: (notes: any[]) => void
+) => {
+  const unsubscribe = onSnapshot(getUserNotesCollection(userId), (snapshot) => {
+    const notes = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    onNotesChange(notes);
+  });
+
+  return unsubscribe; // Call in cleanup
 };
 
-export const getNoteById = async (id: string) => {
-  const docRef = doc(db, "notes", id);
+//  Fetch single note
+export const getNoteById = async (userId: string, id: string) => {
+  const docRef = doc(db, "users", userId, "notes", id);
   const snapshot = await getDoc(docRef);
   return snapshot.exists() ? { id: snapshot.id, ...snapshot.data() } : null;
 };
 
-export const createNote = async (note: any) => {
-  const docRef = await addDoc(notesRef, note);
+//  Create note
+export const createNote = async (userId: string, note: any) => {
+  const docRef = await addDoc(getUserNotesCollection(userId), note);
   return { id: docRef.id, ...note };
 };
 
-export const updateNote = async (id: string, note: any) => {
-  const docRef = doc(db, "notes", id);
+//  Update note
+export const updateNote = async (userId: string, id: string, note: any) => {
+  const docRef = doc(db, "users", userId, "notes", id);
   await updateDoc(docRef, note);
 };
 
-export const deleteNote = async (id: string) => {
-  const docRef = doc(db, "notes", id);
-  await deleteDoc(docRef);
+//  Delete note (with verification)
+export const deleteNote = async (userId: string, id: string) => {
+  try {
+    const docRef = doc(db, "users", userId, "notes", id);
+    const docSnap = await getDoc(docRef);
+    if (!docSnap.exists()) throw new Error("Note not found");
+    await deleteDoc(docRef);
+  } catch (error) {
+    console.error("❌ Delete failed:", error);
+    throw error;
+  }
 };
