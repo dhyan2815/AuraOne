@@ -1,3 +1,4 @@
+// components/widgets/TasksWidget.tsx
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { getTasks, updateTask, Task } from "../../hooks/useTasks";
@@ -8,7 +9,7 @@ const TasksWidget = () => {
 
   const { user } = useAuth();
 
-  // Fetch tasks
+  // Fetch tasks on component mount
   useEffect(() => {
     if (user) {
       const fetchTasks = async () => {
@@ -19,21 +20,22 @@ const TasksWidget = () => {
     }
   }, [user]);
 
-  const handleToggleComplete = async (id: string, completed: boolean) => {
-
+  // Event handler to toggle task completion status
+  const handleToggleComplete = async (id: string, completed: string) => {
     if (!user) return;
 
-    await updateTask(user.uid, id, { completed });
+    const newStatus = completed === "completed" ? "due" : "completed";
+    await updateTask(user.uid, id, { completed : newStatus });
     const updated = await getTasks(user.uid);
     setTasks(updated);
   };
 
   // Filter only incomplete tasks and limit to 3
-  const displayTasks = tasks.filter((task) => !task.completed).slice(0, 3);
+  const displayTasks = tasks.filter((task) => task.completed !== "completed").slice(0, 3);
 
   // Count of remaining tasks
   const remainingTasksCount =
-    tasks.filter((task) => !task.completed).length - displayTasks.length;
+    tasks.filter((task) => task.completed !== "completed").length - displayTasks.length;
 
   return (
     <div className="space-y-3">
@@ -53,10 +55,11 @@ const TasksWidget = () => {
         <>
           {displayTasks.map((task) => (
             <div key={task.id} className="flex items-start gap-3">
+              {/* Task completion toggle */}
               <input
                 type="checkbox"
-                checked={task.completed}
-                onChange={() => handleToggleComplete(task.id, !task.completed)}
+                checked={task.completed === "completed"}
+                onChange={() => handleToggleComplete(task.id, task.completed)}
                 className="mt-1 h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-600"
               />
               <div>

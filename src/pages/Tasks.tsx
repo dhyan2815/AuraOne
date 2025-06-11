@@ -1,3 +1,4 @@
+// pages/Tasks.tsx
 import { useState, useEffect } from "react";
 import {
   PlusIcon,
@@ -23,7 +24,7 @@ const Tasks = () => {
   const [description, setDescription] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [priority, setPriority] = useState('');
-  const [completed, setCompleted] = useState(false);
+  const [completed, setCompleted] = useState<'completed' | 'due'>('due');
 
 
   // Authenticate user
@@ -37,19 +38,19 @@ const Tasks = () => {
       setTasks(fetchedTasks);
     };
     fetchData();
-  }, []);
+  }, [user]);
 
-  // event to handle add task
+  // Event handler to add a new task
   const handleAddTask = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTask.trim() || !user) return;
 
     const task: Omit<Task, "id"> = {
       title: newTask,
-      description: "",
-      dueDate: "",
-      completed: false,
-      priority: "medium",
+      description: description,
+      dueDate: dueDate,
+      completed: completed,
+      priority: priority,
     };
 
     // Debugging:1
@@ -61,21 +62,26 @@ const Tasks = () => {
     const updatedTasks = await getTasks(user.uid);
     setTasks(updatedTasks);
     setNewTask("");
+    setDescription("");
+    setDueDate("");
+    setPriority("");
+    setCompleted("due");
   };
 
-  // will trigger when the task is completed
-  const handleToggleComplete = async (id: string, completed: boolean) => {
+  // Event handler to toggle task completion status
+  const handleToggleComplete = async (id: string, completed: string) => {
     if (!user) return;
-    await updateTaskInDB(user.uid, id, { completed });
+    const newStatus = completed === "completed" ? "due" : "completed";
+    await updateTaskInDB(user.uid, id, { completed: newStatus });
     const updatedTasks = await getTasks(user.uid);
     setTasks(updatedTasks);
   };
 
-  // filter method of task type
+  // Filter method of task type
   const filteredTasks = tasks.filter((task) => {
     if (filter === "all") return true;
-    if (filter === "completed") return task.completed;
-    if (filter === "pending") return !task.completed;
+    if (filter === "completed") return task.completed === "completed";
+    if (filter === "pending") return task.completed === "due";
     return true;
   });
 
@@ -97,7 +103,7 @@ const Tasks = () => {
   return (
     <div>
       {/* Header Section */}
-      <div className="mb-6">
+      <div className="mb-3">
         <h1 className="text-3xl font-semibold">Tasks</h1>
         <p className="text-slate-600 dark:text-slate-400 mt-1">
           Manage your tasks and stay organized
@@ -105,9 +111,9 @@ const Tasks = () => {
       </div>
 
       {/* Task Addition Section */}
-      <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-4 mb-6">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-2 mb-4">
         {/* Form to Add Task */}
-        <form onSubmit={handleAddTask} className="flex flex-col  gap-3">
+        <form onSubmit={handleAddTask} className="flex flex-col gap-3">
           <div className="flex gap-2">
             {/* Title input */}
             <input
@@ -117,11 +123,6 @@ const Tasks = () => {
               placeholder="Add a new task..."
               className="input flex-1"
             />
-            {/* Add Task Button */}
-            <button type="submit" className="button-primary">
-              <PlusIcon size={18} className="mr-1" />
-              Add
-            </button>
           </div>
           <div className="flex gap-2">
             {/* Task Description input */}
@@ -131,6 +132,8 @@ const Tasks = () => {
               placeholder="Task description..."
               className="input  flex-1"
             />
+          </div>
+          <div className="flex gap-2 justify-evenly">
             {/* Due Data input */}
             <input
               type="date"
@@ -152,45 +155,53 @@ const Tasks = () => {
             </select>
 
             {/* Task completed ? */}
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={completed}
-                onChange={(e) => setCompleted(e.target.checked)}
-                className="form-checkbox h-3 w-3 rounded-md"
-              />
-              Mark as completed
-            </label>
+            <select
+              value={completed}
+              onChange={(e) => setCompleted(e.target.value)}
+              className="input"
+            >
+              <option value="due" >Mark as Completed</option>
+              <option value="completed">Yes</option>
+              <option value="due">No</option>
+            </select>
+            {/* Add Task Button */}
+            <button type="submit" className="button-primary">
+              <PlusIcon size={18} className="mr-1" />
+              Add
+            </button>
           </div>
         </form>
       </div>
 
       {/* Task Filter Section */}
       <div className="flex flex-wrap gap-3 mb-6">
+        {/* All tasks filter */}
         <button
           className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium ${filter === "all"
-              ? "bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-100"
-              : "bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300"
+            ? "bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-100"
+            : "bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300"
             }`}
           onClick={() => setFilter("all")}
         >
           <FilterIcon size={16} />
           All
         </button>
+        {/* Pending tasks filter */}
         <button
           className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium ${filter === "pending"
-              ? "bg-warning-100 dark:bg-warning-900 text-warning-800 dark:text-warning-100"
-              : "bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300"
+            ? "bg-warning-100 dark:bg-warning-900 text-warning-800 dark:text-warning-100"
+            : "bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300"
             }`}
           onClick={() => setFilter("pending")}
         >
           <Clock size={16} />
           Pending
         </button>
+        {/* Completed tasks filter */}
         <button
           className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium ${filter === "completed"
-              ? "bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-100"
-              : "bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300"
+            ? "bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-100"
+            : "bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300"
             }`}
           onClick={() => setFilter("completed")}
         >
@@ -233,7 +244,7 @@ const Tasks = () => {
               <TaskItem
                 task={task}
                 onToggleComplete={() =>
-                  handleToggleComplete(task.id, !task.completed)
+                  handleToggleComplete(task.id, task.completed)
                 }
               />
             </motion.div>
