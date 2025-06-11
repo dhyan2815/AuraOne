@@ -83,7 +83,7 @@ const Calendar = () => {
             {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
               <div
                 key={day}
-                className="h-10 flex items-center justify-center text-sm font-medium text-slate-500 dark:text-slate-400"
+                className="h-10 flex items-center justify-center text-base font-medium text-slate-500 dark:text-slate-400"
               >
                 {day}
               </div>

@@ -14,6 +14,7 @@ export interface Task {
   title: string;
   description: string;
   dueDate: string;
+  dueTime: string;
   completed: "completed" | "due";
   priority: "low" | "medium" | "high";
 }

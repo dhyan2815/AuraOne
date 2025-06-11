@@ -49,7 +49,7 @@ function App() {
     <>
       <button
         onClick={toggleTheme}
-        className="fixed right-4 top-2 z-50 rounded-full bg-slate-200 dark:bg-slate-700 p-2 shadow-md transition-colors hover:bg-slate-300 dark:hover:bg-slate-600"
+        className="fixed right-4 bottom-4 z-50 rounded-full bg-slate-200 dark:bg-slate-700 p-2 shadow-md transition-colors hover:bg-slate-300 dark:hover:bg-slate-600"
         aria-label="Toggle theme"
       >
         {theme === "light" ? (

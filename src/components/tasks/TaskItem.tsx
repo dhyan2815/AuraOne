@@ -8,6 +8,7 @@ interface Task {
   title: string;
   description: string;
   dueDate: string;
+  dueTime: string;
   completed: "completed" | "due";
   priority: 'low' | 'medium' | 'high';
 }
@@ -15,6 +16,8 @@ interface Task {
 interface TaskItemProps {
   task: Task;
   onToggleComplete: () => void;
+  onEdit: (id: string) => void; 
+  onDelete: (id: string) => void; 
 }
 
 const priorityColors = {
@@ -23,7 +26,7 @@ const priorityColors = {
   high: 'bg-error-100 text-error-800 dark:bg-error-900/30 dark:text-error-300',
 };
 
-const TaskItem = ({ task, onToggleComplete }: TaskItemProps) => {
+const TaskItem = ({ task, onToggleComplete, onEdit, onDelete }: TaskItemProps) => {
   const [showActions, setShowActions] = useState(false);
 
   // Format the due date
@@ -73,6 +76,7 @@ const TaskItem = ({ task, onToggleComplete }: TaskItemProps) => {
           )}
 
           <div className="flex flex-wrap items-center gap-3 mt-2 text-xs">
+            {/* For due date */}
             {task.dueDate && (
               <div className={`flex items-center ${
                 isOverdue
@@ -80,6 +84,23 @@ const TaskItem = ({ task, onToggleComplete }: TaskItemProps) => {
                   : 'text-slate-500 dark:text-slate-400'
               }`}>
                 <Calendar size={14} className="mr-1" />
+                {formattedDueDate}
+                {isOverdue && (
+                  <span className="ml-1 font-medium">
+                    (Overdue)
+                  </span>
+                )}
+              </div>
+            )}
+
+            {/* For due time */}
+            {task.dueTime && (
+              <div className={`flex items-center ${
+                isOverdue
+                ? 'text-error-600 dark:text-error-400'
+                : 'text-error-500 dark:text-error-400'
+              }`}>
+                <Calendar size={14} className='mr-1' />
                 {formattedDueDate}
                 {isOverdue && (
                   <span className="ml-1 font-medium">
@@ -104,13 +125,14 @@ const TaskItem = ({ task, onToggleComplete }: TaskItemProps) => {
             <MoreVertical size={18} />
           </button>
 
+          {/* Edit and Delete Action utility */}
           {showActions && (
             <div className="absolute right-0 top-8 w-36 bg-white dark:bg-slate-800 rounded-md shadow-dropdown border border-slate-200 dark:border-slate-700 py-1 z-10">
-              <button className="flex items-center w-full px-3 py-2 text-sm text-left hover:bg-slate-100 dark:hover:bg-slate-700">
+              <button onClick={()=> onEdit(task.id)} className="flex items-center w-full px-3 py-2 text-sm text-left hover:bg-slate-100 dark:hover:bg-slate-700">
                 <Edit2 size={14} className="mr-2" />
                 Edit
               </button>
-              <button className="flex items-center w-full px-3 py-2 text-sm text-left text-error-600 hover:bg-slate-100 dark:hover:bg-slate-700">
+              <button onClick={()=> onDelete(task.id)} className="flex items-center w-full px-3 py-2 text-sm text-left text-error-600 hover:bg-slate-100 dark:hover:bg-slate-700">
                 <Trash2 size={14} className="mr-2" />
                 Delete
               </button>

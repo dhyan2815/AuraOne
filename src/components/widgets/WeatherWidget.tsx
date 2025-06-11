@@ -139,10 +139,10 @@ const WeatherWidget = () => {
             <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 mb-1">
               <Droplets size={30} />
             </div>
-            <div className="text-sm text-slate-600 dark:text-slate-400">
+            <div className="text-base text-slate-600 dark:text-slate-400">
               {weather.humidity}%
             </div>
-            <div className="text-xs text-slate-500 dark:text-slate-500">
+            <div className="text-base text-slate-500 dark:text-slate-500">
               Humidity
             </div>
           </div>
