@@ -36,7 +36,7 @@ export const getNoteById = async (userId: string, id: string) => {
 //  Create note
 export const createNote = async (userId: string, note: any) => {
   const docRef = await addDoc(getUserNotesCollection(userId), note);
-  return { id: docRef.id, ...note };
+  return { id: docRef.id, ...note, createdAt: new Date().toISOString() };
 };
 
 //  Update note
