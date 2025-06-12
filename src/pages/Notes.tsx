@@ -3,7 +3,7 @@ import { PlusIcon, Search, GridIcon, ListIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import NoteCard from "../components/notes/NoteCard";
 import { motion } from "framer-motion";
-import { listenToNotes } from "../hooks/useNotes"; // 🔄 switched from getAllNotes
+import { listenToNotes } from "../hooks/useNotes";
 import { useAuth } from "../hooks/useAuth";
 
 interface Note {
@@ -27,7 +27,7 @@ const Notes = () => {
       setNotes(fetchedNotes as Note[]);
     });
 
-    return () => unsubscribe(); // 🔁 Clean up real-time listener
+    return () => unsubscribe();
   }, [user]);
 
   const filteredNotes = searchQuery
@@ -127,7 +127,7 @@ const Notes = () => {
               : "flex flex-col gap-4"
           }
         >
-          {filteredNotes.map((note) => (
+          {filteredNotes.map((note: Note) => (
             <motion.div key={note.id} variants={item}>
               <NoteCard note={note} viewMode={viewMode} />
             </motion.div>

@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { useEditor, EditorContent } from "@tiptap/react";
-import Placeholder from "@tiptap/extension-placeholder";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import {
@@ -51,9 +50,6 @@ const NotePage = () => {
   const editor = useEditor({
     extensions: [
       StarterKit,
-      Placeholder.configure({
-        placeholder: "Write your note here...",
-      }),
       Link.configure({
         openOnClick: false,
       }),
@@ -94,7 +90,7 @@ const NotePage = () => {
           setTags(newNote.tags);
           setPinned(false);
           setStarred(false);
-          editor?.commands.setContent("");
+          editor.commands.setContent("");
         } else if (id) {
           // Fetch existing note
           const foundNote = await getNoteById(user.uid, id);
@@ -116,12 +112,12 @@ const NotePage = () => {
     };
 
     fetchNote();
-  }, [id, editor, user]);
+  }, [id, editor, user, navigate]);
 
   useEffect(() => {
     // Sync editor with note content
-    if (editor && note?.content !== undefined) {
-      editor.commands.setContent(note.content);
+    if (editor && note?.content !== undefined && editor.getHTML() !== note.content) {
+      editor.commands.setContent(note.content, false);
     }
   }, [editor, note?.content]);
 
@@ -132,7 +128,7 @@ const NotePage = () => {
     const noteData = {
       title: title.trim() || "Untitled Note",
       tags,
-      content: editor.getHTML(),
+      content: editor.getText(),
       pinned,
       starred,
     };
@@ -286,7 +282,7 @@ const NotePage = () => {
       </div>
 
       {/* Tag input section */}
-      <div className="mb-6 flex flex-wrap items-center gap-2">
+      <div className="mb-3 flex flex-wrap items-center gap-2">
         <Tag size={16} className="text-slate-500 dark:text-slate-400" />
 
         {/* Existing tags */}
@@ -295,7 +291,7 @@ const NotePage = () => {
             key={tag}
             className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-full px-3 py-1 "
           >
-            <span className="text-sm">{tag}</span>
+            <span className="text-base">{tag}</span>
             {/* Remove tag button */}
             <button
               onClick={() => removeTag(tag)}
@@ -314,20 +310,26 @@ const NotePage = () => {
             onChange={(e) => setNewTag(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && addTag()}
             placeholder="Add tag..."
-            className="bg-transparent border-0 outline-none text-sm"
+            className="bg-transparent border-0 outline-none text-base"
           />
           {/* Add tag button */}
           <button
             onClick={addTag}
-            className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 text-sm font-medium"
+            className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 text-base font-medium"
           >
             Add
           </button>
         </div>
+        {/* Write your notes here */}
+        <div className="pl-5 text-gray-500 border-0 outline-none text-lg">
+          <label htmlFor="Notes">Tap anywhere below to start writing ⬇️</label>
+        </div>
       </div>
 
+
+
       {/* Editor section */}
-      <div className="bg-white dark:bg-slate-800 rounded-lg dark:shadow-xl shadow-card p-4 min-h-[300px]">
+      <div className="bg-white dark:bg-slate-800 rounded-lg dark:shadow-xl shadow-card p-2  min-h-[300px]">
         {editor && (
           // Tiptap content area
           <div className="prose prose-slate dark:prose-invert max-w-none">
