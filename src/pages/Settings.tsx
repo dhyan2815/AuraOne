@@ -143,7 +143,7 @@ const Settings = () => {
 
               <div>
                 <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                  Last Updated
+                  Created On
                 </h3>
                 <p>28th May 2025</p>
               </div>
