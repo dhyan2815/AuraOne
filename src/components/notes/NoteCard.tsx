@@ -26,9 +26,10 @@ const NoteCard = ({ note, viewMode }: NoteCardProps) => {
             <div className="flex-1 min-w-0">
               <h3 className="text-lg font-medium truncate">{note.title}</h3>
               <div
-                className="text-slate-600 dark:text-slate-400 line-clamp-3 mb-4 prose prose-slate dark:prose-invert max-w-none"
-                dangerouslySetInnerHTML={{ __html: note.content }}
-              ></div>
+                className="text-slate-600 dark:text-slate-400 line-clamp-3 mb-4"
+              >
+                {note.content}
+              </div>
             </div>
 
             <div className="flex items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
@@ -62,9 +63,10 @@ const NoteCard = ({ note, viewMode }: NoteCardProps) => {
         <div className="flex-1">
           <h3 className="text-lg font-medium mb-2">{note.title}</h3>
           <div
-            className="text-slate-600 dark:text-slate-400 line-clamp-1 prose prose-slate dark:prose-invert max-w-none"
-            dangerouslySetInnerHTML={{ __html: note.content }}
-          ></div> 
+            className="text-slate-600 dark:text-slate-400 line-clamp-3"
+          >
+            {note.content}  
+          </div> 
         </div>
 
         <div className="flex items-center justify-between text-sm text-slate-500 dark:text-slate-400 mt-auto pt-4 border-t border-slate-100 dark:border-slate-700">

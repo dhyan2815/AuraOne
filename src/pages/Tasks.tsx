@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import {
   PlusIcon,
-  Calendar,
   Clock,
   FilterIcon,
   CheckCheck,
@@ -17,6 +16,7 @@ import {
   Task,
 } from "../hooks/useTasks";
 import { useAuth } from "../hooks/useAuth";
+import toast from "react-hot-toast";
 
 const Tasks = () => {
   // State for managing tasks, new task input, editing state, filter, description, due date, due time, priority, and completion status
@@ -27,8 +27,7 @@ const Tasks = () => {
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState("");
   const [dueTime, setDueTime] = useState("");
-  const [priority, setPriority] = useState("");
-  const [completed, setCompleted] = useState<"completed" | "due">("due");
+  const [priority, setPriority] = useState("No Priority");
 
   const { user } = useAuth();
 
@@ -37,8 +36,8 @@ const Tasks = () => {
     if (!user) return;
     const fetchData = async () => {
       try {
-      const fetchedTasks = await getTasks(user.uid);
-      setTasks(fetchedTasks);
+        const fetchedTasks = await getTasks(user.uid);
+        setTasks(fetchedTasks);
       } catch (error) {
         console.error("Error fetching tasks:", error);
       }
@@ -57,23 +56,25 @@ const Tasks = () => {
       description: description,
       dueDate: dueDate,
       dueTime: dueTime,
-      completed: completed,
       priority: priority,
+      completed: 'due' // Default
     };
 
-    try {
-      await addTaskToDB(user.uid, task);
-    const updatedTasks = await getTasks(user.uid);
-    setTasks(updatedTasks);
+    const resetState = () => {
       setNewTask("");
       setDescription("");
       setDueDate("");
       setDueTime("");
       setPriority("");
-      setCompleted("due");
-    } catch (error) {
-      console.error("Error adding task:", error);
-  }
+    };
+    try {
+      const newTaskRef = await addTaskToDB(user.uid, task);
+      setTasks(prev => [...prev, {...task, id: newTaskRef.id }])
+      resetState();
+      toast.success("New Task Added Successfully");
+    } catch(error) {
+      console.error("Error adding task: ", error)
+    }
   };
 
   // Function to handle editing a task
@@ -86,7 +87,6 @@ const Tasks = () => {
       setDueDate(taskToEdit.dueDate || "");
       setDueTime(taskToEdit.dueTime || "");
       setPriority(taskToEdit.priority || "");
-      setCompleted(taskToEdit.completed);
     }
   };
 
@@ -100,35 +100,38 @@ const Tasks = () => {
       description: description,
       dueDate: dueDate,
       dueTime: dueTime,
-      completed: completed,
       priority: priority,
-  };
+    };
 
     try {
       await updateTaskInDB(user.uid, editingTaskId, task);
-      const updatedTasks = await getTasks(user.uid);
-      setTasks(updatedTasks);
+      setTasks(prev => prev.map(t =>
+        t.id === editingTaskId ? { ...t, ...task } : t
+      ));
       setNewTask("");
       setDescription("");
       setDueDate("");
       setDueTime("");
       setPriority("");
-      setCompleted("due");
       setEditingTaskId(null);
+      toast.success("Task Updated Sucessfully");
     } catch (error) {
       console.error("Error updating task:", error);
     }
-};
+  };
 
   // Function to handle deleting a task
   const handleDeleteTask = async (id: string) => {
     if (!user) return;
-    try {
-      await deleteTaskFromDB(user.uid, id);
-      const updatedTasks = await getTasks(user.uid);
-      setTasks(updatedTasks);
-    } catch (error) {
-      console.error("Error deleting task:", error);
+    if (window.confirm("Are you sure you want to delete this task?")) {
+      try {
+        await deleteTaskFromDB(user.uid, id);
+        const updatedTasks = await getTasks(user.uid);
+        toast.success("Task Deleted Successfully");
+        setTasks(updatedTasks);
+      } catch (error) {
+        console.error("Error deleting task:", error);
+      }
     }
   };
 
@@ -225,18 +228,10 @@ const Tasks = () => {
               onChange={(e) => setPriority(e.target.value)}
               className="input text-sm"
             >
-              <option value="" disabled>Select priority</option>
+              <option value=" ">Priority</option>
               <option value="high">High</option>
               <option value="medium">Medium</option>
               <option value="low">Low</option>
-            </select>
-            <select
-              value={completed}
-              onChange={(e) => setCompleted(e.target.value as "completed" | "due")}
-              className="input text-sm"
-            >
-              <option value="due">No</option>
-              <option value="completed">Yes</option>
             </select>
             <button type="submit" className="button-primary text-sm">
               {editingTaskId ? (
@@ -255,41 +250,35 @@ const Tasks = () => {
       {/* Task filter buttons */}
       <div className="flex flex-wrap gap-3 mb-6">
         <button
-          className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium ${
-            filter === "all"
+          key="due-date-filter"
+          className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium ${filter === "all"
               ? "bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-100"
               : "bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300"
-          }`}
+            }`}
           onClick={() => setFilter("all")}
         >
           <FilterIcon size={16} />
           All
         </button>
         <button
-          className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium ${
-            filter === "pending"
+          className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium ${filter === "pending"
               ? "bg-warning-100 dark:bg-warning-900 text-warning-800 dark:text-warning-100"
               : "bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300"
-          }`}
+            }`}
           onClick={() => setFilter("pending")}
         >
           <Clock size={16} />
           Pending
         </button>
         <button
-          className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium ${
-            filter === "completed"
+          className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium ${filter === "completed"
               ? "bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-100"
               : "bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300"
-          }`}
+            }`}
           onClick={() => setFilter("completed")}
         >
           <CheckCheck size={16} />
           Completed
-        </button>
-        <button className="flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
-          <Calendar size={16} />
-          Due date
         </button>
       </div>
 
@@ -325,7 +314,7 @@ const Tasks = () => {
               <TaskItem
                 task={task}
                 onToggleComplete={() =>
-                  handleToggleComplete(task.id, task.completed)
+                  handleToggleComplete(task.id, task.completed || 'due')
                 }
                 onEdit={() => handleEditTask(task.id)}
                 onDelete={() => handleDeleteTask(task.id)}

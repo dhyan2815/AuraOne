@@ -1,7 +1,6 @@
 // components/tasks/TaskItem.tsx
-import { useState } from 'react';
 import { format } from 'date-fns';
-import { Calendar, MoreVertical, Edit2, Trash2 } from 'lucide-react';
+import { Calendar, Trash2, Pencil } from 'lucide-react';
 
 interface Task {
   id: string;
@@ -16,8 +15,8 @@ interface Task {
 interface TaskItemProps {
   task: Task;
   onToggleComplete: () => void;
-  onEdit: (id: string) => void; 
-  onDelete: (id: string) => void; 
+  onEdit: (id: string) => void;
+  onDelete: (id: string) => void;
 }
 
 const priorityColors = {
@@ -27,24 +26,22 @@ const priorityColors = {
 };
 
 const TaskItem = ({ task, onToggleComplete, onEdit, onDelete }: TaskItemProps) => {
-  const [showActions, setShowActions] = useState(false);
 
   // Format the due date
   const formattedDueDate = task.dueDate
     ? format(new Date(task.dueDate), 'MMM d, yyyy')
     : '';
 
-  // Check if the task is overdue
-  const isOverdue = task.dueDate && new Date(task.dueDate) < new Date() && task.completed === "due";
+  // Check if the task is overdue by Time and its Date
+  const isOverdue = task.dueDate && new Date(`${task.dueDate}T${task.dueTime}`) < new Date() && task.completed === "due";
 
   return (
-    <div className={`bg-white dark:bg-slate-800 rounded-lg border ${
-      isOverdue
+    <div className={`bg-white dark:bg-slate-800 rounded-lg border ${isOverdue
         ? 'border-error-300 dark:border-error-800'
         : task.completed === "completed"
           ? 'border-success-300 dark:border-success-800'
           : 'border-slate-200 dark:border-slate-700'
-    } shadow-sm p-4`}>
+      } shadow-sm p-4`}>
       <div className="flex items-start gap-3">
         <div className="pt-0.5">
           {/* Task completion toggle */}
@@ -56,88 +53,77 @@ const TaskItem = ({ task, onToggleComplete, onEdit, onDelete }: TaskItemProps) =
           />
         </div>
 
-        <div className="flex-1 min-w-0">
-          <h4 className={`font-medium ${
-            task.completed === "completed"
-              ? 'line-through text-slate-500 dark:text-slate-400'
-              : ''
-          }`}>
-            {task.title}
-          </h4>
+        <div className="flex-1 min-w-0 justify-between">
+          <div className="flex items-center justify-between">
+            <div>
+              {/* Task Title */}
+              <h4 className={`font-medium ${task.completed === "completed"
+                  ? 'line-through text-slate-500 dark:text-slate-400'
+                  : ''
+                }`}>
+                {task.title}
+              </h4>
 
-          {task.description && (
-            <p className={`text-sm mt-1 ${
-              task.completed === "completed"
-                ? 'line-through text-slate-400 dark:text-slate-500'
-                : 'text-slate-600 dark:text-slate-400'
-            }`}>
-              {task.description}
-            </p>
-          )}
+              {/* Task Description */}
+              {task.description && (
+                <p className={`text-sm mt-1 ${task.completed === "completed"
+                    ? 'line-through text-slate-400 dark:text-slate-500'
+                    : 'text-slate-600 dark:text-slate-400'
+                  }`}>
+                  {task.description}
+                </p>
+              )}
 
-          <div className="flex flex-wrap items-center gap-3 mt-2 text-xs">
-            {/* For due date */}
-            {task.dueDate && (
-              <div className={`flex items-center ${
-                isOverdue
-                  ? 'text-error-600 dark:text-error-400'
-                  : 'text-slate-500 dark:text-slate-400'
-              }`}>
-                <Calendar size={14} className="mr-1" />
-                {formattedDueDate}
-                {isOverdue && (
-                  <span className="ml-1 font-medium">
-                    (Overdue)
-                  </span>
+              <div className="flex flex-wrap items-center gap-3 mt-2 text-xs">
+                {/* For due date */}
+                {task.dueDate && (
+                  <div className={`flex items-center ${isOverdue
+                      ? 'text-error-600 dark:text-error-400'
+                      : 'text-slate-500 dark:text-slate-400'
+                    }`}>
+                    <Calendar size={14} className="mr-1" />
+                    {formattedDueDate}
+                    {isOverdue && (
+                      <span className="ml-1 font-medium">
+                        (Overdue)
+                      </span>
+                    )}
+                  </div>
                 )}
-              </div>
-            )}
 
-            {/* For due time */}
-            {task.dueTime && (
-              <div className={`flex items-center ${
-                isOverdue
-                ? 'text-error-600 dark:text-error-400'
-                : 'text-error-500 dark:text-error-400'
-              }`}>
-                <Calendar size={14} className='mr-1' />
-                {formattedDueDate}
-                {isOverdue && (
-                  <span className="ml-1 font-medium">
-                    (Overdue)
-                  </span>
+                {/* For due time */}
+                {task.dueTime && (
+                  <div className={`flex items-center ${isOverdue
+                      ? 'text-error-600 dark:text-error-400'
+                      : 'text-error-500 dark:text-error-400'
+                    }`}>
+                    <Calendar size={14} className='mr-1' />
+                    {task.dueTime}
+                    {isOverdue && (
+                      <span className="ml-1 font-medium">
+                        (Overdue)
+                      </span>
+                    )}
+                  </div>
                 )}
-              </div>
-            )}
 
-            <div className={`px-2 py-0.5 rounded-full ${priorityColors[task.priority]}`}>
-              {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)} priority
+                {/* Display Priority */}
+                <div className={`px-2 py-0.5 rounded-full ${priorityColors[task.priority]}`}>
+                  {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)} priority
+                </div>
+              </div>
+            </div>
+
+            {/* Edit and Delete button */}
+            <div className="flex items-center gap-2">
+              <button onClick={() => onEdit(task.id)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full">
+                <Pencil size={18} />
+              </button>
+              <button onClick={() => onDelete(task.id)} className="p-2 text-error-600 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full">
+                <Trash2 size={18} />
+              </button>
             </div>
           </div>
-        </div>
-
-        <div className="relative">
-          {/* More actions button */}
-          <button
-            onClick={() => setShowActions(!showActions)}
-            className="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700"
-          >
-            <MoreVertical size={18} />
-          </button>
-
-          {/* Edit and Delete Action utility */}
-          {showActions && (
-            <div className="absolute right-0 top-8 w-36 bg-white dark:bg-slate-800 rounded-md shadow-dropdown border border-slate-200 dark:border-slate-700 py-1 z-10">
-              <button onClick={()=> onEdit(task.id)} className="flex items-center w-full px-3 py-2 text-sm text-left hover:bg-slate-100 dark:hover:bg-slate-700">
-                <Edit2 size={14} className="mr-2" />
-                Edit
-              </button>
-              <button onClick={()=> onDelete(task.id)} className="flex items-center w-full px-3 py-2 text-sm text-left text-error-600 hover:bg-slate-100 dark:hover:bg-slate-700">
-                <Trash2 size={14} className="mr-2" />
-                Delete
-              </button>
-            </div>
-          )}
         </div>
       </div>
     </div>
