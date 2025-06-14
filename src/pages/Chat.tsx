@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Send, ArrowLeft, Sparkles, Bot, User } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Send, Sparkles, Bot, User } from "lucide-react";
 import { generateGeminiResponse } from "../config/api";
 import { db } from "../services/firebase";
 import {
@@ -25,7 +24,7 @@ const Chat = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const [loadingTimer, setLoadingTimer] = useState<NodeJS.Timeout | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -67,7 +66,11 @@ const Chat = () => {
     });
 
     setInput("");
-    setLoading(true);
+    
+    const timer = setTimeout(() => {
+      setLoading(true);
+    }, 300) //300ms delay
+    setLoadingTimer(timer);
 
     try {
       const aiResponse = await generateGeminiResponse(userMessage.content);
@@ -83,8 +86,22 @@ const Chat = () => {
       });
     } catch (error) {
       console.error("Error generating AI response:", error);
+
+      // Add an error message to the chat
+      const errorMessage: Message = {
+        role: "ai",
+        content: "Sorry, I couldn't process your request. Please try again later.",
+      };
+      await addDoc(messagesRef, {
+        ...errorMessage,
+        createdAt: serverTimestamp(),
+      });
     } finally {
       setLoading(false);
+      if (loadingTimer) {
+        clearTimeout(loadingTimer);
+        setLoadingTimer(null);
+      }
     }
   };
 
@@ -99,44 +116,11 @@ const Chat = () => {
     );
   }
 
-  if (!user) {
-    return (
-      <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
-        <div className="text-center p-8 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
-          <div className="w-10 h-70 bg-primary-100 dark:bg-primary-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Sparkles className="w-8 h-8 text-primary-600" />
-          </div>
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
-            Authentication Required
-          </h3>
-          <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">
-            Please log in to start chatting with your AI assistant
-          </p>
-          <button
-            onClick={() => navigate("/login")}
-            className="px-6 py-2.5 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-lg transition-colors"
-          >
-            Go to Login
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)] bg-slate-50 dark:bg-slate-900">
       {/* Header */}
       <div className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 py-3">
         <div className="flex items-center gap-3">
-          <button
-            onClick={() => navigate(-1)}
-            className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-          >
-            <ArrowLeft
-              size={20}
-              className="text-slate-600 dark:text-slate-400"
-            />
-          </button>
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center">
               <Sparkles className="w-4 h-4 text-white" />
