@@ -5,6 +5,7 @@ import { doc, setDoc } from "firebase/firestore";
 import { useNavigate, Link } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import toast from "react-hot-toast";
+import {SignUpPicture} from "../assets/flat-illustration-1.jpg"
 
 const SignUp = () => {
     const navigate = useNavigate();
@@ -43,7 +44,7 @@ const SignUp = () => {
         <div className="md:flex md:w-full md:max-w-screen-xl lg:max-w-screen-2xl">
             {/* Image Section (Left) */}
             <div className="md:w-1/2 flex items-center justify-center">
-                <img src="public\flat-illustration-1.jpg" alt="signup art" className="w-full h-auto object-cover" />
+                <img src={SignUpPicture} alt="signup art" className="w-full h-auto object-cover" />
             </div>
 
             {/* Sign-Up Form Section (Right) */}
