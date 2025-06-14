@@ -4,6 +4,7 @@ import { auth } from "../services/firebase";
 import { useNavigate, Link } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import toast from "react-hot-toast";
+import { LoginPicture } from "../assets/flat-illustration-1.jpg";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -31,7 +32,7 @@ const Login = () => {
         {/* Image section */}
         <div className="md:w-1/2 flex items-center justify-center">
           <img
-            src="public\flat-illustration-1.jpg"
+            src={LoginPicture}
             alt="login-art"
             className="w-full h-auto object-cover"
           />
