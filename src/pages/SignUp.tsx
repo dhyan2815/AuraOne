@@ -43,7 +43,7 @@ const SignUp = () => {
         <div className="md:flex md:w-full md:max-w-screen-xl lg:max-w-screen-2xl">
             {/* Image Section (Left) */}
             <div className="md:w-1/2 flex items-center justify-center">
-                <img src="dist\flat-illustration-1.jpg" alt="signup art" className="w-full h-auto object-cover" />
+                <img src="public\flat-illustration-1.jpg" alt="signup art" className="w-full h-auto object-cover" />
             </div>
 
             {/* Sign-Up Form Section (Right) */}
