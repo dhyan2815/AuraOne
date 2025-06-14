@@ -31,7 +31,7 @@ const Login = () => {
         {/* Image section */}
         <div className="md:w-1/2 flex items-center justify-center">
           <img
-            src="dist\flat-illustration-1.jpg"
+            src="public\flat-illustration-1.jpg"
             alt="login-art"
             className="w-full h-auto object-cover"
           />
