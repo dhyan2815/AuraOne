@@ -3,6 +3,8 @@ name: Node CI # The name of the workflow
 on: # Define when the workflow will run
   push: # Trigger the workflow on push events
     branches: [ "main" ] # Only when pushing to the "main" branch
+  pull_request: # Trigger the workflow on pull request events
+    branches: [ "main" ] # Only for pull requests targeting the "main" branch
 
 jobs: # Define the jobs that will run
   build: # Define a job named "build"
@@ -23,3 +25,6 @@ jobs: # Define the jobs that will run
 
       - name: Run Tests # Run the tests
         run: npm test # Run the "npm test" script defined in package.json
+
+      - name: Build Project # Build the project
+        run: npm run build # Run the "npm run build" script defined in package.json
