@@ -1,0 +1,25 @@
+name: Node CI # The name of the workflow
+
+on: # Define when the workflow will run
+  push: # Trigger the workflow on push events
+    branches: [ "main" ] # Only when pushing to the "main" branch
+
+jobs: # Define the jobs that will run
+  build: # Define a job named "build"
+
+    runs-on: ubuntu-latest # Specify the runner (virtual environment)
+
+    steps: # Define the steps to be executed in the job
+      - name: Checkout code # A descriptive name for the step
+        uses: actions/checkout@v3 # Use the "checkout" action to clone the repository
+
+      - name: Use Node.js 16 # Set up Node.js
+        uses: actions/setup-node@v3 # Use the "setup-node" action
+        with:
+          node-version: 16 # Specify the Node.js version
+
+      - name: Install Dependencies # Install project dependencies
+        run: npm install # Run the "npm install" command
+
+      - name: Run Tests # Run the tests
+        run: npm test # Run the "npm test" script defined in package.json
