@@ -1,13 +1,16 @@
 import { useState, useEffect, useRef } from "react";
-import { Send, Sparkles, Bot, User } from "lucide-react";
+import { Send, Sparkles, Bot, User, SquarePen } from "lucide-react";
 import { generateGeminiResponse } from "../config/api";
 import { db } from "../services/firebase";
 import {
   collection,
   addDoc,
   serverTimestamp,
+  getDocs,
+  setDoc,
   query,
   orderBy,
+  doc,
   onSnapshot,
 } from "firebase/firestore";
 import { useAuth } from "../hooks/useAuth";
@@ -26,19 +29,51 @@ const Chat = () => {
   const [loading, setLoading] = useState(false);
   const [loadingTimer, setLoadingTimer] = useState<NodeJS.Timeout | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [sessions, setSessions] = useState<{ id: string; name: string }[]>([]);
+  const [selectedSession, setSelectedSession] = useState<string | null>(null);
+
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  // Scroll to bottom whenever messages change
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
+  // Fetch messages from Firestore when user is authenticated
   useEffect(() => {
     if (!user) return;
 
-    const messagesRef = collection(db, "users", user.uid, "chats");
+    const sessionsRef = collection(db, "users", user.uid, "sessions");
+    getDocs(sessionsRef).then((snapshot) => {
+      const sessionList = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        name: doc.data().name || `Chat ${doc.id}`,
+      }));
+      setSessions(sessionList);
+
+      // Select the first session automatically
+      if (sessionList.length > 0 && !selectedSession) {
+        setSelectedSession(sessionList[0].id);
+      }
+    });
+  }, [user]);
+
+  // listens for messages in the current session
+  useEffect(() => {
+    if (!user || !selectedSession) return;
+
+    const messagesRef = collection(
+      db,
+      "users",
+      user.uid,
+      "sessions",
+      selectedSession,
+      "messages"
+    );
+
     const q = query(messagesRef, orderBy("createdAt"));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -48,18 +83,28 @@ const Chat = () => {
     });
 
     return unsubscribe;
-  }, [user]);
+  }, [user, selectedSession]);
 
+  // Function to handle sending messages
   const handleSend = async () => {
-    if (!input.trim() || !user) return;
+    if (!input.trim() || !user || !selectedSession) return;
 
-    const messagesRef = collection(db, "users", user.uid, "chats");
+    const messagesRef = collection(
+      db,
+      "users",
+      user.uid,
+      "sessions",
+      selectedSession,
+      "messages"
+    );
 
+    // Create a user message object
     const userMessage: Message = {
       role: "user",
       content: input.trim(),
     };
 
+    // Clear the input field
     await addDoc(messagesRef, {
       ...userMessage,
       createdAt: serverTimestamp(),
@@ -67,6 +112,7 @@ const Chat = () => {
 
     setInput("");
 
+    // Clear any existing loading timer
     const timer = setTimeout(() => {
       setLoading(true);
     }, 300) //300ms delay
@@ -105,6 +151,35 @@ const Chat = () => {
     }
   };
 
+  // function for creating a new session
+  const createNewSession = async () => {
+    if (!user) return;
+
+    const newSessionRef = doc(collection(db, "users", user.uid, "sessions"));
+    const sessionId = newSessionRef.id;
+    const sessionName = `Chat ${sessions.length + 1}`;
+
+    await setDoc(newSessionRef, {
+      name: sessionName,
+      createdAt: serverTimestamp(),
+    });
+
+    setSessions((prev) => [...prev, { id: sessionId, name: sessionName }]);
+    setSelectedSession(sessionId);
+    setMessages([]);
+    setInput("");
+  };
+
+  // function to render clean plain text 
+  function cleanTextOnly(text: string): string {
+    return text
+      .replace(/\*\*(.*?)\*\*/g, "$1")   // remove bold
+      .replace(/^\s*\*\s+/gm, "- ")       // replace * bullets with dashes
+      .replace(/\n{2,}/g, "\n\n")         // normalize new lines
+      .trim();
+  }
+
+  // If auth is loading, show a loading spinner
   if (authLoading) {
     return (
       <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
@@ -142,15 +217,15 @@ const Chat = () => {
         <div className="h-full overflow-y-auto px-2 py-2">
           {messages.length === 0 ? (
             <div className="flex items-center justify-center h-full">
-              {/* <div className="text-center"> */}
-              <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-2">
-                Start a conversation with Aura!
-              </h3>
-              <p className="text-slate-600 dark:text-slate-400 text-sm whitespace-nowrap overflow-hidden text-ellipsis leading-relaxed">
-                Ask me anything! I'm here to help you with questions, creative
-                tasks, or just have a friendly chat.
-              </p>
-              {/* </div> */}
+              <div className="text-center">
+                <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-2">
+                  Start a conversation with Aura!
+                </h3>
+                <p className="text-slate-600 dark:text-slate-400 text-sm whitespace-nowrap overflow-hidden text-ellipsis leading-relaxed">
+                  Ask me anything! I'm here to help you with questions, creative
+                  tasks, or just have a friendly chat.
+                </p>
+              </div>
             </div>
           ) : (
             <div className="space-y-3 max-w-4xl mx-auto">
@@ -167,13 +242,13 @@ const Chat = () => {
                   )}
 
                   <div
-                    className={`max-w-[75%] p-2 rounded-xl text-[14px] leading-snug ${msg.role === "user"
+                    className={`max-w-[75%] p-2 rounded-xl text-[16px] leading-snug ${msg.role === "user"
                       ? "bg-primary-600 text-white rounded-br-md"
-                      : "bg-white text-slate-900 dark:text-slate-100 dark:bg-gray-700 border-slate-200 rounded-bl-md"
+                      : "bg-gray-100 text-slate-900 dark:text-slate-100 dark:bg-gray-700 border-slate-200 rounded-bl-md"
                       }`}
                   >
                     <div className="whitespace-pre-wrap break-words">
-                      {msg.content}
+                      {cleanTextOnly(msg.content)}
                     </div>
                   </div>
 
@@ -190,16 +265,16 @@ const Chat = () => {
                   <div className="w-7 h-7 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center flex-shrink-0">
                     <Bot className="w-[14px] h-[14px] text-white" />
                   </div>
-                  <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl rounded-bl-md px-3 py-2 text-[15px] leading-snug">
+                  <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl rounded-bl-md px-1 py-1 text-[15px] leading-snug">
                     <div className="flex items-center gap-1">
                       <div className="flex space-x-1">
-                        <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"></div>
+                        <div className="w-1 h-1 bg-slate-400 rounded-full animate-bounce"></div>
                         <div
-                          className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"
+                          className="w-1 h-1 bg-slate-400 rounded-full animate-bounce"
                           style={{ animationDelay: "0.1s" }}
                         ></div>
                         <div
-                          className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"
+                          className="w-1 h-1 bg-slate-400 rounded-full animate-bounce"
                           style={{ animationDelay: "0.2s" }}
                         ></div>
                       </div>
@@ -216,11 +291,38 @@ const Chat = () => {
         </div>
       </div>
 
-      {/* Input */}
-      <div className="dark:bg-slate-800 border-slate-200 dark:border-slate-700 px-1 py-1">
-        <div className="max-w-3xl mx-auto">
+      <div className="px-1 py-1">
+        <div className="max-w-5xl mx-auto">
           <div className="flex items-end gap-3">
-            <div className="flex-1">
+
+            {/* New Chat */}
+            <div className="mb-1 w-2/7">
+              <button
+                onClick={createNewSession}
+                className="w-full px-1 py-1 dark:border-slate-600 rounded-lg text-base text-slate-900 dark:text-slate-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <SquarePen size={22} />
+              </button>
+            </div>
+
+            {/* Chat Sessions */}
+            <div className="mb-1 w-2/7">
+              <select
+                className="w-full px-1 py-1 dark:bg-slate-800 rounded-lg text-base text-slate-900 dark:text-white"
+                value={selectedSession ?? ""}
+                onChange={(e) => setSelectedSession(e.target.value)}
+              >
+                <option value="" disabled>Select Chat</option>
+                {sessions.map((session) => (
+                  <option key={session.id} value={session.id}>
+                    {session.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Input */}
+            <div className="flex-1 w-4/7">
               <textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
