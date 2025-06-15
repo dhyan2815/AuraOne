@@ -100,7 +100,7 @@ const Sidebar = () => {
                 <Sparkles className="w-6 h-6 text-primary-600" />
                 <div className="block">
                   <h1 className="text-xl font-bold">AuraOne</h1>
-                  <p className="text-center text-gray-600 dark:text-gray-400">{userName}</p>
+                  <p className="text-start text-gray-600 dark:text-gray-400">{userName}</p>
                 </div>
               </div>
             </div>

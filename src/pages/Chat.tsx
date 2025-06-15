@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Send, Sparkles, Bot, User, SquarePen } from "lucide-react";
+import { Send, Sparkles, Bot, User, SquarePen, Trash2 } from "lucide-react";
 import { generateGeminiResponse } from "../config/api";
 import { db } from "../services/firebase";
 import {
@@ -12,8 +12,10 @@ import {
   orderBy,
   doc,
   onSnapshot,
+  deleteDoc,
 } from "firebase/firestore";
 import { useAuth } from "../hooks/useAuth";
+import toast from "react-hot-toast";
 
 type Message = {
   id?: string;
@@ -170,6 +172,54 @@ const Chat = () => {
     setInput("");
   };
 
+  // function to delete current session
+  const deleteCurrentSession = async () => {
+    if (!user || !selectedSession) return;
+
+    // Confirm deletion
+    const confirmed = window.confirm("Are you sure you want to delete this session?");
+    toast.success("Session deleted successfully!")
+    if (!confirmed) return;
+
+    try {
+      // 1. Delete all messages in the session
+      const messagesRef = collection(
+        db,
+        "users",
+        user.uid,
+        "sessions",
+        selectedSession,
+        "messages"
+      );
+
+      const messagesSnapshot = await getDocs(messagesRef);
+      const deletePromises = messagesSnapshot.docs.map((doc) =>
+        deleteDoc(doc.ref)
+      );
+      await Promise.all(deletePromises);
+
+      // 2. Delete the session document
+      const sessionRef = doc(db, "users", user.uid, "sessions", selectedSession);
+      await deleteDoc(sessionRef);
+
+      // 3. Update local state
+      const updatedSessions = sessions.filter((s) => s.id !== selectedSession);
+      setSessions(updatedSessions);
+
+      // 4. Switch to another session (if any), or clear
+      if (updatedSessions.length > 0) {
+        setSelectedSession(updatedSessions[0].id);
+      } else {
+        setSelectedSession(null);
+        setMessages([]);
+      }
+
+      setInput("");
+    } catch (error) {
+      console.error("Failed to delete session:", error);
+    }
+  };
+
   // function to render clean plain text 
   function cleanTextOnly(text: string): string {
     return text
@@ -295,8 +345,8 @@ const Chat = () => {
         <div className="max-w-5xl mx-auto">
           <div className="flex items-end gap-3">
 
-            {/* New Chat */}
-            <div className="mb-1 w-2/7">
+            {/* New Chat Session */}
+            <div className="mb-1 w-2/9">
               <button
                 onClick={createNewSession}
                 className="w-full px-1 py-1 dark:border-slate-600 rounded-lg text-base text-slate-900 dark:text-slate-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
@@ -305,8 +355,18 @@ const Chat = () => {
               </button>
             </div>
 
+            {/* Delete current Chat Session */}
+            <div className="mb-1 w-2/9">
+              <button
+                onClick={deleteCurrentSession}
+                className="w-full px-1 py-1 dark:border-slate-600 rounded-lg text-base text-slate-900 dark:text-slate-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Trash2 size={21} />
+              </button>
+            </div>
+
             {/* Chat Sessions */}
-            <div className="mb-1 w-2/7">
+            <div className="mb-1 w-2/9">
               <select
                 className="w-full px-1 py-1 dark:bg-slate-800 rounded-lg text-base text-slate-900 dark:text-white"
                 value={selectedSession ?? ""}
@@ -322,7 +382,7 @@ const Chat = () => {
             </div>
 
             {/* Input */}
-            <div className="flex-1 w-4/7">
+            <div className="flex-1 w-4/9">
               <textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
