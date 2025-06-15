@@ -38,7 +38,7 @@ const Chat = () => {
   useEffect(() => {
     if (!user) return;
 
-    const messagesRef = collection(db, "chatusers", user.uid, "chats");
+    const messagesRef = collection(db, "users", user.uid, "chats");
     const q = query(messagesRef, orderBy("createdAt"));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -53,7 +53,7 @@ const Chat = () => {
   const handleSend = async () => {
     if (!input.trim() || !user) return;
 
-    const messagesRef = collection(db, "chatusers", user.uid, "chats");
+    const messagesRef = collection(db, "users", user.uid, "chats");
 
     const userMessage: Message = {
       role: "user",
@@ -66,7 +66,7 @@ const Chat = () => {
     });
 
     setInput("");
-    
+
     const timer = setTimeout(() => {
       setLoading(true);
     }, 300) //300ms delay
@@ -117,13 +117,13 @@ const Chat = () => {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)] bg-slate-50 dark:bg-slate-900">
+    <div className="flex flex-col h-[calc(100vh-2rem)] dark:bg-slate-800">
       {/* Header */}
-      <div className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 py-3">
+      <div className="flex justify-center dark:bg-slate-800 dark:border-slate-700 pb-2">
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-white" />
+          <div className="flex justify-center gap-2">
+            <div className="w-5 h-5 bg-gradient-to-br from-primary-500 to-primary-600 rounded-md flex justify-center items-center">
+              <Sparkles className="w-3 h-3 text-white" />
             </div>
             <div>
               <h1 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
@@ -139,43 +139,38 @@ const Chat = () => {
 
       {/* Chat Messages */}
       <div className="flex-1 overflow-hidden">
-        <div className="h-full overflow-y-auto px-4 py-4">
+        <div className="h-full overflow-y-auto px-2 py-2">
           {messages.length === 0 ? (
             <div className="flex items-center justify-center h-full">
-              <div className="text-center max-w-md">
-                <div className="w-20 h-20 bg-gradient-to-br from-primary-100 to-primary-200 dark:from-primary-900/20 dark:to-primary-800/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Sparkles className="w-10 h-10 text-primary-600" />
-                </div>
-                <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-2">
-                  Start a conversation
-                </h3>
-                <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
-                  Ask me anything! I'm here to help you with questions, creative
-                  tasks, or just have a friendly chat.
-                </p>
-              </div>
+              {/* <div className="text-center"> */}
+              <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-2">
+                Start a conversation with Aura!
+              </h3>
+              <p className="text-slate-600 dark:text-slate-400 text-sm whitespace-nowrap overflow-hidden text-ellipsis leading-relaxed">
+                Ask me anything! I'm here to help you with questions, creative
+                tasks, or just have a friendly chat.
+              </p>
+              {/* </div> */}
             </div>
           ) : (
-            <div className="space-y-4 max-w-4xl mx-auto">
+            <div className="space-y-3 max-w-4xl mx-auto">
               {messages.map((msg, idx) => (
                 <div
                   key={msg.id || idx}
-                  className={`flex gap-3 ${
-                    msg.role === "user" ? "justify-end" : "justify-start"
-                  }`}
+                  className={`flex gap-2 ${msg.role === "user" ? "justify-end" : "justify-start"
+                    }`}
                 >
                   {msg.role === "ai" && (
-                    <div className="w-7 h-7 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                      <Bot className="w-[14px] h-[14px] text-white" />
+                    <div className="w-4 h-4 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center mt-1">
+                      <Sparkles className="w-[15px] h-[15px] text-white" />
                     </div>
                   )}
 
                   <div
-                    className={`max-w-[55%] px-3 py-2 rounded-xl text-[15px] leading-snug ${
-                      msg.role === "user"
-                        ? "bg-primary-600 text-white rounded-br-md"
-                        : "bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-700 rounded-bl-md"
-                    }`}
+                    className={`max-w-[75%] p-2 rounded-xl text-[14px] leading-snug ${msg.role === "user"
+                      ? "bg-primary-600 text-white rounded-br-md"
+                      : "bg-white text-slate-900 dark:text-slate-100 dark:bg-gray-700 border-slate-200 rounded-bl-md"
+                      }`}
                   >
                     <div className="whitespace-pre-wrap break-words">
                       {msg.content}
@@ -183,7 +178,7 @@ const Chat = () => {
                   </div>
 
                   {msg.role === "user" && (
-                    <div className="w-7 h-7 bg-slate-600 dark:bg-slate-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                    <div className="w-4 h-4 bg-slate-600 dark:bg-slate-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                       <User className="w-[14px] h-[14px] text-white" />
                     </div>
                   )}
@@ -222,33 +217,33 @@ const Chat = () => {
       </div>
 
       {/* Input */}
-      <div className="bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 px-4 py-4">
-        <div className="max-w-4xl mx-auto">
+      <div className="dark:bg-slate-800 border-slate-200 dark:border-slate-700 px-1 py-1">
+        <div className="max-w-3xl mx-auto">
           <div className="flex items-end gap-3">
-            <div className="flex-1 relative">
-              <input
-                type="text"
+            <div className="flex-1">
+              <textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) =>
-                  e.key === "Enter" && !e.shiftKey && handleSend()
-                }
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSend();
+                  }
+                }}
                 placeholder="Type your message..."
                 disabled={loading}
-                className="w-full px-4 py-3 pr-12 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-base placeholder:text-slate-500 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-1 py-1 mt-1 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-base placeholder:text-slate-500 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed resize-none"
+                rows={1}
               />
             </div>
             <button
               onClick={handleSend}
               disabled={loading || !input.trim()}
-              className="p-3 bg-primary-600 hover:bg-primary-700 disabled:bg-slate-300 dark:disabled:bg-slate-600 text-white rounded-lg transition-colors disabled:cursor-not-allowed flex items-center justify-center min-w-[48px]"
+              className="px-1 py-1 mb-1 bg-primary-600 hover:bg-primary-700 disabled:bg-slate-300 dark:disabled:bg-slate-600 text-white rounded-lg transition-colors disabled:cursor-not-allowed flex items-center justify-center min-w-[50px]"
             >
-              <Send size={18} />
+              <Send size={21} />
             </button>
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 text-center">
-            Press Enter to send • Shift + Enter for new line
-          </p>
         </div>
       </div>
     </div>
