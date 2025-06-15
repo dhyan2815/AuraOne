@@ -159,7 +159,7 @@ const Chat = () => {
 
     const newSessionRef = doc(collection(db, "users", user.uid, "sessions"));
     const sessionId = newSessionRef.id;
-    const sessionName = `Chat ${sessions.length + 1}`;
+    const sessionName = `Chat Session ${sessions.length + 1}`;
 
     await setDoc(newSessionRef, {
       name: sessionName,
@@ -170,6 +170,7 @@ const Chat = () => {
     setSelectedSession(sessionId);
     setMessages([]);
     setInput("");
+    toast.success("New session created successfully!");
   };
 
   // function to delete current session
@@ -269,11 +270,10 @@ const Chat = () => {
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
                 <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-2">
-                  Start a conversation with Aura!
+                  With Great Powers Comes Great Responsibilities
                 </h3>
-                <p className="text-slate-600 dark:text-slate-400 text-sm whitespace-nowrap overflow-hidden text-ellipsis leading-relaxed">
-                  Ask me anything! I'm here to help you with questions, creative
-                  tasks, or just have a friendly chat.
+                <p className="text-slate-600 dark:text-slate-400 text-base whitespace-nowrap overflow-hidden text-ellipsis leading-relaxed">
+                  Tap <SquarePen size={17} className="inline" /> to Unleash yourself with the Power of Aura . .
                 </p>
               </div>
             </div>
@@ -372,7 +372,7 @@ const Chat = () => {
                 value={selectedSession ?? ""}
                 onChange={(e) => setSelectedSession(e.target.value)}
               >
-                <option value="" disabled>Select Chat</option>
+                <option value="" disabled>Chat History</option>
                 {sessions.map((session) => (
                   <option key={session.id} value={session.id}>
                     {session.name}
