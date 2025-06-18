@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { MapPin, Droplets, Wind, Thermometer } from "lucide-react";
-import { API_CONFIG } from "../../config/api";
+import { MapPin, Droplets, Wind, Thermometer } from "lucide-react"; // Importing icons
+import { API_CONFIG } from "../../config/api"; // Importing API configuration
 
+// Defining the structure of the weather data
 interface WeatherData {
   location: string;
   temperature: number;
@@ -15,45 +16,54 @@ interface WeatherData {
   }>;
 }
 
+// Weather Widget Component
 const WeatherWidget = () => {
-  const [weather, setWeather] = useState<WeatherData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
+  const [weather, setWeather] = useState<WeatherData | null>(null); // Weather data
+  const [loading, setLoading] = useState(true); // Loading state
+  const [error, setError] = useState<string | null>(null); // Error message
+
+  // useEffect hook to fetch weather data on component mount
   useEffect(() => {
     const fetchWeather = async () => {
       try {
-        setLoading(true);
-        setError(null);
+        setLoading(true); // Set loading to true before fetching data
+        setError(null); // Clear any previous errors
 
+        // Get current position using geolocation API
         const position = await new Promise<GeolocationPosition>(
           (resolve, reject) => {
             navigator.geolocation.getCurrentPosition(resolve, reject);
           }
         );
 
-        const { latitude, longitude } = position.coords;
+        const { latitude, longitude } = position.coords; // Extract latitude and longitude
 
+        // Fetch current weather data
         const currentWeatherResponse = await fetch(
           `${API_CONFIG.WEATHER_CURRENT_API_URL}?lat=${latitude}&lon=${longitude}&units=metric&appid=${API_CONFIG.WEATHER_API_KEY}`
         );
 
+        // Throw error if fetching current weather data fails
         if (!currentWeatherResponse.ok) {
           throw new Error("Failed to fetch weather data");
         }
 
-        const currentWeather = await currentWeatherResponse.json();
+        const currentWeather = await currentWeatherResponse.json(); // Parse current weather data
 
+        // Fetch forecast data
         const forecastResponse = await fetch(
           `${API_CONFIG.WEATHER_FORECAST_API_URL}?lat=${latitude}&lon=${longitude}&units=metric&appid=${API_CONFIG.WEATHER_API_KEY}`
         );
 
+        // Throw error if fetching forecast data fails
         if (!forecastResponse.ok) {
           throw new Error("Failed to fetch forecast data");
         }
 
-        const forecastData = await forecastResponse.json();
+        const forecastData = await forecastResponse.json(); // Parse forecast data
 
+        // Process forecast data to get daily forecast
         const dailyForecast = forecastData.list
           .reduce((acc: any[], item: any) => {
             const date = new Date(item.dt * 1000).toLocaleDateString();
@@ -67,8 +77,9 @@ const WeatherWidget = () => {
             }
             return acc;
           }, [])
-          .slice(0, 5);
+          .slice(0, 5); // Get the first 5 days
 
+        // Set weather data
         setWeather({
           location: currentWeather.name,
           temperature: Math.round(currentWeather.main.temp),
@@ -94,6 +105,7 @@ const WeatherWidget = () => {
     fetchWeather();
   }, []);
 
+  // Render loading state
   if (loading) {
     return (
       <div className="flex justify-center items-center h-32">
@@ -106,6 +118,7 @@ const WeatherWidget = () => {
     );
   }
 
+  // Render error state
   if (error) {
     return (
       <div className="text-center py-6">
@@ -114,81 +127,90 @@ const WeatherWidget = () => {
     );
   }
 
+  // Render nothing if weather data is null
   if (!weather) return null;
 
+  // Render weather data
   return (
     <div>
-      <div className="flex flex-col md:flex-row items-center justify-between mb-4">
-        <div className="text-center md:text-left mb-4 md:mb-0 ">
-          <div className="flex items-center justify-center md:justify-start text-xl text-slate-600 dark:text-slate-400 mb-1">
-            <MapPin size={30} className="mr-1" />
+      <div className="flex flex-col md:flex-row items-center justify-evenly mb-2">
+
+        {/* Weather location, temperature and condition */}
+        <div className="text-center md:text-left mb-2 md:mb-0 ">
+          <div className="flex items-center justify-center md:justify-start text-lg text-slate-600 dark:text-slate-400 mb-2">
+            <MapPin size={22} className="mr-1 mb-1" />
             {weather.location}
           </div>
           <div className="flex items-center">
-            <span className="text-4xl font-semibold">
+            <span className="text-2xl font-semibold">
               {weather.temperature}°
             </span>
-            <span className="ml-2 text-slate-600 dark:text-slate-400 text-3xl">
+            <span className="ml-2 text-slate-600 dark:text-slate-400 text-xl">
               {weather.condition}
             </span>
           </div>
         </div>
 
-        <div className="flex gap-4">
+        {/* Weather humidity */}
+        <div className="flex gap-8">
           <div className="flex flex-col items-center">
-            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 mb-1">
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 mb-1">
               <Droplets size={30} />
             </div>
-            <div className="text-base text-slate-600 dark:text-slate-400">
+            <div className="text-base font-bold text-slate-600 dark:text-slate-400">
               {weather.humidity}%
             </div>
-            <div className="text-base text-slate-500 dark:text-slate-500">
+            <div className="text-sm text-slate-500 dark:text-slate-500">
               Humidity
             </div>
           </div>
 
+          {/* Weather windspeed */}
           <div className="flex flex-col items-center">
-            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 mb-1">
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 mb-1">
               <Wind size={30} />
             </div>
-            <div className="text-base text-slate-600 dark:text-slate-400">
+            <div className="text-base font-bold text-slate-600 dark:text-slate-400">
               {weather.windSpeed} mph
             </div>
-            <div className="text-base text-slate-500 dark:text-slate-500">
+            <div className="text-sm text-slate-500 dark:text-slate-500">
               Wind
             </div>
           </div>
 
+          {/* Weather temperature */}
           <div className="flex flex-col items-center">
-            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 mb-1">
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 mb-1">
               <Thermometer size={30} />
             </div>
-            <div className="text-base text-slate-600 dark:text-slate-400">
-              68°/54°
+            <div className="text-base font-bold text-slate-600 dark:text-slate-400">
+              24°/35°
             </div>
-            <div className="text-base text-slate-500 dark:text-slate-500">
+            <div className="text-sm text-slate-500 dark:text-slate-500">
               Min/Max
             </div>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-5 gap-2 text-center pt-3 border-t border-slate-100 dark:border-slate-700">
+      {/* Days weather temperature */}
+      <div className="grid grid-cols-5 gap-x-0 text-center pt-1 border-slate-100 dark:border-slate-700">
         {weather.forecast.map((day, index) => (
           <div key={index} className="flex flex-col items-center">
-            <div className="font-medium">{day.day}</div>
-            <div className="text-2xl my-1">
+            <div className="font-large">{day.day}</div>
+            <div className="text-4xl">
               {day.condition === "Clear"
                 ? "☀️"
                 : day.condition === "Clouds"
-                ? "☁️"
-                : day.condition === "Rain"
-                ? "🌧️"
-                : day.condition === "Snow"
-                ? "❄️"
-                : "🌤️"}
+                  ? "☁️"
+                  : day.condition === "Rain"
+                    ? "🌧️"
+                    : day.condition === "Snow"
+                      ? "❄️"
+                      : "🌤️"
+              }
             </div>
-            <div className="text-sm">{day.temp}°</div>
+            <div className="text-base font-bold text-slate-600 dark:text-slate-400">{day.temp}°</div>
           </div>
         ))}
       </div>

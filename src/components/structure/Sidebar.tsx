@@ -149,34 +149,47 @@ const Sidebar = () => {
             </nav>
 
             <div className="p-4 border-slate-200 dark:border-slate-700">
-              <div className="flex justify-around mb-4 gap-x-1">
-                <button
-                  onClick={toggleTheme}
-                  className="p-2.5 rounded-full bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
-                  aria-label="Toggle theme"
-                >
-                  {theme === "light" ? (
-                    <MoonIcon size={20} />
-                  ) : (
-                    <SunIcon size={20} />
-                  )}
-                </button>
-                <NavLink
-                  to="/chat"
-                  className={({ isActive }) =>
-                    `p-2.5 rounded-full transition-colors ${isActive
-                      ? "bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300"
-                      : "bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600"
-                    }`
-                  }
-                  title="Chat with AI"
-                >
-                  <MessagesSquare size={20} />
-                </NavLink>
+              <div className="flex justify-around mb-2 gap-x-1">
+
+                {/* Theme */}
+                <div className="flex-1">
+                  <button
+                    onClick={toggleTheme}
+                    className="flex p-2.5 mb-1 rounded-full bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+                    aria-label="Toggle theme"
+                  >
+                    {theme === "light" ? (
+                      <MoonIcon size={20} />
+                    ) : (
+                      <SunIcon size={20} />
+                    )}
+                  </button>
+                  <span className="text-sm flex justify-center text-slate-600 dark:text-slate-300">Theme</span>
+                </div>
+
+                {/* Aura Assitant */}
+                <div className="flex-1">
+                  <NavLink
+                    to="/chat"
+                    className={({ isActive }) =>
+                      `flex mb-1 p-2.5 rounded-full transition-colors ${isActive
+                        ? "bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300"
+                        : "bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600"
+                      }`
+                    }
+                    title="Chat with AI"
+                  >
+                    <MessagesSquare size={20} />
+                  </NavLink>
+                  <span className="text-sm flex justify-center text-slate-600 dark:text-slate-300">Aura</span>
+                </div>
+
+                {/* Settings */}
+                <div className="flex-1">
                 <NavLink
                   to="/settings"
                   className={({ isActive }) =>
-                    `p-2.5 rounded-full transition-colors ${isActive
+                    `flex p-2.5 mb-1 rounded-full transition-colors ${isActive
                       ? "bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300"
                       : "bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600"
                     }`
@@ -185,6 +198,9 @@ const Sidebar = () => {
                 >
                   <SettingsIcon size={20} />
                 </NavLink>
+                  <span className="text-sm flex justify-center text-slate-600 dark:text-slate-300">Settings</span>
+                </div>
+
               </div>
             </div>
           </div>
