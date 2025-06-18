@@ -27,8 +27,8 @@ const Card = ({
       onClick={onClick}
     >
       {title && (
-        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-700">
-          <h3 className="font-medium">{title}</h3>
+        <div className="flex items-center justify-between px-2 py-1 border-slate-100 dark:border-slate-700">
+          <h3 className="text-2xl ml-1">{title}</h3>
           
           {actionLabel && (
             actionHref ? (
@@ -53,7 +53,7 @@ const Card = ({
         </div>
       )}
       
-      <div className="p-4">
+      <div className="p-3">
         {children}
       </div>
     </div>
