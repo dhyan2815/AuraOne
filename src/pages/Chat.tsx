@@ -1,21 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import { Send, Sparkles, Bot, User, SquarePen, Trash2 } from "lucide-react";
-import { generateGeminiResponse } from "../config/api";
+import { generateGeminiResponse } from "../services/generateGeminiResponse";
 import { db } from "../services/firebase";
-import {
-  collection,
-  addDoc,
-  serverTimestamp,
-  getDocs,
-  setDoc,
-  query,
-  orderBy,
-  doc,
-  onSnapshot,
-  deleteDoc,
-} from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, getDocs, setDoc, query, orderBy, doc, onSnapshot, deleteDoc } from "firebase/firestore";
 import { useAuth } from "../hooks/useAuth";
 import toast from "react-hot-toast";
+import { parseGeminiCommand } from "../utils/parseGeminiCommand";
+import { createNote, deleteNote } from "../hooks/useNotes";
+import { addTask, deleteTask, getTasks } from "../hooks/useTasks";
 
 type Message = {
   id?: string;
@@ -33,7 +25,6 @@ const Chat = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [sessions, setSessions] = useState<{ id: string; name: string }[]>([]);
   const [selectedSession, setSelectedSession] = useState<string | null>(null);
-
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -91,6 +82,8 @@ const Chat = () => {
   const handleSend = async () => {
     if (!input.trim() || !user || !selectedSession) return;
 
+    const content = input.trim();
+
     const messagesRef = collection(
       db,
       "users",
@@ -100,13 +93,8 @@ const Chat = () => {
       "messages"
     );
 
-    // Create a user message object
-    const userMessage: Message = {
-      role: "user",
-      content: input.trim(),
-    };
+    const userMessage: Message = { role: "user", content };
 
-    // Clear the input field
     await addDoc(messagesRef, {
       ...userMessage,
       createdAt: serverTimestamp(),
@@ -114,34 +102,68 @@ const Chat = () => {
 
     setInput("");
 
-    // Clear any existing loading timer
-    const timer = setTimeout(() => {
-      setLoading(true);
-    }, 300) //300ms delay
+    const timer = setTimeout(() => setLoading(true), 300);
     setLoadingTimer(timer);
 
     try {
-      const aiResponse = await generateGeminiResponse(userMessage.content);
+      //  Parse & Execute Gemini Command
+      const { action, payload } = parseGeminiCommand(content);
+      let resultText = "";
 
-      const aiMessage: Message = {
-        role: "ai",
-        content: aiResponse,
-      };
+      switch (action) {
 
-      await addDoc(messagesRef, {
-        ...aiMessage,
-        createdAt: serverTimestamp(),
-      });
+        case "createNote":
+          await createNote(user.uid, {
+            title: payload.title,
+            content: payload.content || "",
+            createdAt: new Date().toISOString(),
+          });
+          resultText = `Note "${payload.title}" created ✅`;
+          break;
+
+        case "deleteNote":
+          await deleteNote(user.uid, payload.id);
+          resultText = `Note deleted 🗑️`;
+          break;
+
+        case "createTask":
+          await addTask(user.uid, {
+            title: payload.title,
+            description: payload.description || "",
+            dueDate: payload.dueDate || "",
+            dueTime: payload.dueTime || "",
+            completed: "due",
+            priority: "medium",
+          });
+          resultText = `Task "${payload.title}" created ✅`;
+          break;
+
+        case "deleteTask":
+          await deleteTask(user.uid, payload.id);
+          resultText = `Task deleted 🗑️`;
+          break;
+
+        case "listTasks":
+          const tasks = await getTasks(user.uid);
+          if (tasks.length === 0) {
+            resultText = "No tasks found 📭";
+          } else {
+            resultText = "Your Tasks:\n" + tasks.map((t) => `- ${t.title}`).join("📝 \n");
+          }
+          break;
+
+        default:
+          resultText = await generateGeminiResponse(content);
+          break;
+      }
+
+      const aiMessage: Message = { role: "ai", content: resultText };
+      await addDoc(messagesRef, { ...aiMessage, createdAt: serverTimestamp() });
     } catch (error) {
-      console.error("Error generating AI response:", error);
-
-      // Add an error message to the chat
-      const errorMessage: Message = {
-        role: "ai",
-        content: "Sorry, I couldn't process your request. Please try again later.",
-      };
+      console.error("Error:", error);
       await addDoc(messagesRef, {
-        ...errorMessage,
+        role: "ai",
+        content: "Error: I couldn't process your request ⚠️",
         createdAt: serverTimestamp(),
       });
     } finally {
