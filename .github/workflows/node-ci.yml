@@ -1,4 +1,4 @@
-name: Node CI # The name of the workflow
+name: CI - Test & Build
 
 on: # Define when the workflow will run
   push: # Trigger the workflow on push events
