@@ -3,7 +3,8 @@ name: CD - Firebase Deployment
 on:
   push:
     branches:
-      - main
+      - "**"
+  pull_request:
 
 jobs:
   deploy:
@@ -42,5 +43,5 @@ jobs:
         with:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
           firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
-          channelId: live
+          channelId: ${{ github.event_name == 'pull_request' && format('PR-{0}', github.event.pull_request.number) || 'live' }}
           projectId: aura-one1
