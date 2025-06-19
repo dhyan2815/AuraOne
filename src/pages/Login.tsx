@@ -12,10 +12,12 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   // Login logic
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoggingIn(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
       toast.success("Logged In Successfully")
@@ -23,6 +25,9 @@ const Login = () => {
       navigate("/dashboard");
     } catch (err: any) {
       setError(err.message);
+      toast.error(`Login Failed: ${err.message}`)
+    } finally {
+      setIsLoggingIn(false);
     }
   };
 
@@ -42,7 +47,7 @@ const Login = () => {
         <div className="md:w-1/2 flex items-center justify-center">
           <form
             onSubmit={handleLogin}
-            className="w-full max-w-md bg-white p-4 rounded-xl shadow-lg space-y-4"
+            className="w-full max-w-md bg-white p-4 rounded-xl space-y-4"
           >
             <div className="font-semibold text-center space-y-1">
               <h2 className="text-2xl font-semibold text-center text-gray-800">
@@ -95,8 +100,9 @@ const Login = () => {
             <button
               type="submit"
               className="w-full py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors"
+              disabled={isLoggingIn}
             >
-              Login
+              {isLoggingIn ? 'Logging In...' : 'Login'}
             </button>
 
             {/* For new user? */}
