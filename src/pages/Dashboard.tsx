@@ -10,9 +10,10 @@ import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from "../services/firebase";
 
 const Dashboard = () => {
+
   const [greeting, setGreeting] = useState('');
-  
-  // To set greetings as per the day
+
+  // to set the greeting based on the current hour
   useEffect(() => {
     const hour = new Date().getHours();
     if (hour < 12) setGreeting('Good morning');
@@ -20,11 +21,13 @@ const Dashboard = () => {
     else setGreeting('Good evening');
   }, []);
 
-  // To fetch the user's name
+  // Initialize state for the user's name
   const [userName, setUserName] = useState('');
+
+  // to fetch the user's name from Firebase
   useEffect(() => {
     const fetchUserData = async () => {
-      const user = auth.currentUser;
+      const user = auth.currentUser; // Check if a user is logged in
       if (user) {
         const userDoc = await getDoc(doc(db, 'users', user.uid));
         if (userDoc.exists()) {
@@ -36,6 +39,7 @@ const Dashboard = () => {
   }, []);
 
 
+  // Define animation variants for the container
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -46,6 +50,7 @@ const Dashboard = () => {
     }
   };
 
+  // Define animation variants for the items
   const item = {
     hidden: { opacity: 0, y: 20 },
     show: { opacity: 1, y: 0 }
@@ -53,14 +58,16 @@ const Dashboard = () => {
 
   return (
     <div>
+      {/* greeting and user name */}
       <div className="mb-6">
         <h1 className="text-3xl font-semibold">
           {greeting} {userName}
         </h1>
         <p className="text-slate-600 dark:text-slate-400 mt-1">Here's your overview for today!</p>
       </div>
-      
-      <motion.div 
+
+      {/* Motion div container for the widgets */}
+      <motion.div
         variants={container}
         initial="hidden"
         animate="show"
@@ -71,19 +78,22 @@ const Dashboard = () => {
             <WeatherWidget />
           </Card>
         </motion.div>
-        
+
+        {/* Tasks Widget */}
         <motion.div variants={item} className='dark:shadow-xl dark:hover:shadow-2xl transition-transform-30'>
           <Card title="Tasks" actionIcon={<PlusIcon size={16} />} actionLabel="New task" actionHref="/tasks">
             <TasksWidget />
           </Card>
         </motion.div>
-        
+
+        {/* Calendar Widget */}
         <motion.div variants={item} className='dark:shadow-xl dark:hover:shadow-2xl transition-transform-30'>
           <Card title="Calendar" actionLabel="View all" actionHref="/calendar">
             <CalendarWidget />
           </Card>
         </motion.div>
-        
+
+        {/* News Widget */}
         <motion.div variants={item} className="lg:col-span-2 dark:shadow-xl dark:hover:shadow-2xl transition-transform-30">
           <Card title="Latest News" actionLabel="More news">
             <NewsWidget />

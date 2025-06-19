@@ -14,26 +14,21 @@ const SignUp = () => {
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState("");
+    const [isSigningUp, setIsSigningUp] = useState(false);
 
     const handleSignUp = async (e: React.FormEvent) => {
+
         e.preventDefault();
+        setIsSigningUp(true);
         try {
-            const userCredentails = await createUserWithEmailAndPassword(
-                auth,
-                email,
-                password
-            );
+            const userCredentails = await createUserWithEmailAndPassword(auth,email, password);
             const user = userCredentails.user;
 
-            await setDoc(doc(db, "users", user.uid), {
-                name,
-                email,
-                password,
-                createdAt: new Date(),
-            });
+            await setDoc(doc(db, "users", user.uid), { name, email, password, createdAt: new Date()});
             console.log("User Registered with Name: ", name);
         } catch (err: any) {
             setError(err.message);
+            toast.error(`Registration Failed: ${err.message}`)
         }
         toast.success("Registration Successfull")
         navigate("/dashboard"); // Redirect to dashboard after successful signup!
@@ -51,7 +46,7 @@ const SignUp = () => {
             <div className="md:w-1/2 flex items-center justify-center">
                 <form
                     onSubmit={handleSignUp}
-                    className="w-full max-w-md bg-white p-4 rounded-xl shadow-lg space-y-4"
+                    className="w-full max-w-md bg-white p-4 rounded-xl space-y-4"
                 >
                     <div className="font-semibold text-center space-y-1">
                         <h2 className="text-2xl font-semibold text-center text-gray-800 ">
@@ -109,8 +104,9 @@ const SignUp = () => {
                     <button
                         type="submit"
                         className="w-full py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors"
+                        disabled={isSigningUp}
                     >
-                        Sign Up
+                        {isSigningUp ? 'Signing Up..' : 'Sign Up'}
                     </button>
 
                     {/* Existing User? */}
