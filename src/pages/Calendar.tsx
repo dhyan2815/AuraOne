@@ -56,7 +56,7 @@ const Calendar = () => {
 
   return (
     <div>
-<h1 className="text-3xl mb-2">Events</h1>
+      <h1 className="text-3xl mb-2">Events</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 space-y-3">
 
@@ -224,143 +224,87 @@ const Calendar = () => {
         </div>
 
         {/* Add events - Section */}
-        <div className="bg-white dark:bg-slate-800 rounded-lg dark:shadow-xl shadow-card p-4 light:border">
-          <h3 className="font-medium mb-1">
-            {format(selectedDate, "MMMM d, yyyy")} Events
-          </h3>
+        <div className="bg-white dark:bg-slate-800 rounded-lg dark:shadow-xl shadow-card p-2 pt-2 light:border">
+          {/* Header with Date and Add Event Button */}
+          <div className="flex justify-around items-center mb-3">
+            <h3 className="font-medium text-lg">
+              {format(selectedDate, "MMMM d, yyyy")} Events
+            </h3>
+            <button
+              onClick={() => setShowAddForm(true)} 
+              className="p-0 px-1 py-1 m-0  button-primary flex items-center"
+            >
+              <PlusIcon size={16} className="mr-1" />
+              Add Event
+            </button>
+          </div>
 
-          {eventsForSelectedDate.length === 0 ? (
-            <div className="text-center py-6">
-              {/* Add Event Section - Displayed when no events are found */}
-              <div className="add-event-section">
-                <button
-                  onClick={() => setShowAddForm(true)}
-                  className="button-primary"
+          {/* Event List */}
+          <div id="events-list" className="space-y-2">
+            {eventsForSelectedDate.length === 0 ? (
+              <p className="text-slate-500 dark:text-slate-400 text-sm text-center py-3">
+                No events scheduled.
+              </p>
+            ) : (
+              eventsForSelectedDate.sort((a, b)=> a.time.localeCompare(b.time)).map((event) => (
+                <div
+                  key={event.id}
+                  className="flex justify-between px-3 py-2 rounded-md bg-slate-100 dark:bg-slate-700"
                 >
-                  <PlusIcon size={16} className="mr-1" />
-                  Add Event
+                  <h4 className="font-medium">{event.title}</h4>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    {event.time}
+                  </p>
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* Add Event Form */}
+          {showAddForm && (
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                if (!newEventTitle || !newEventTime || !user?.uid) return;
+
+                await addEvent(user.uid, newEventTitle, newEventTime, selectedDate);
+                setShowAddForm(false);
+                setNewEventTitle("");
+                setNewEventTime("");
+              }}
+              className="mt-4 space-y-2"
+            >
+              <input
+                type="text"
+                placeholder="Event title"
+                value={newEventTitle}
+                onChange={(e) => setNewEventTitle(e.target.value)}
+                className="w-full p-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800"
+                required
+              />
+              <input
+                type="time"
+                value={newEventTime}
+                onChange={(e) => setNewEventTime(e.target.value)}
+                className="w-full p-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800"
+                required
+              />
+              <div className="flex space-x-2">
+                <button type="submit" className="button-primary">
+                  Save
                 </button>
-
-                {/* Inline form */}
-                {showAddForm && (
-                  <form
-                    onSubmit={async (e) => {
-                      e.preventDefault();
-                      if (!newEventTitle || !newEventTime || !user?.uid) return;
-
-                      await addEvent(user.uid, newEventTitle, newEventTime, selectedDate);
-                      setShowAddForm(false);
-                      setNewEventTitle("");
-                      setNewEventTime("");
-                    }}
-                    className="mt-4 space-y-2"
-                  >
-                    <input
-                      type="text"
-                      placeholder="Event title"
-                      value={newEventTitle}
-                      onChange={(e) => setNewEventTitle(e.target.value)}
-                      className="w-full p-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800"
-                      required
-                    />
-                    <input
-                      type="time"
-                      value={newEventTime}
-                      onChange={(e) => setNewEventTime(e.target.value)}
-                      className="w-full p-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800"
-                      required
-                    />
-                    <div className="flex space-x-2">
-                      <button type="submit" className="button-primary">
-                        Save
-                      </button>
-                      <button
-                        type="button"
-                        className="button-secondary"
-                        onClick={() => setShowAddForm(false)}
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </form>
-                )}
-              </div>
-            </div>
-          ) : (
-            // Render the list of events for the selected date
-            <>
-              <div id="events-list" className="space-y-3">
-                {eventsForSelectedDate.map((event) => (
-                  <div
-                    key={event.id}
-                    className="p-3 rounded-md bg-slate-50 dark:bg-slate-800/50"
-                  >
-                    <h4 className="font-medium">{event.title}</h4>
-                    <p className="text-sm text-slate-600 dark:text-slate-400">
-                      {event.time}
-                    </p>
-                  </div>
-                ))}
-              </div>
-
-              {/* Add Event Section - Displayed when events are found */}
-              <div className="add-event-section">
                 <button
-                  onClick={() => setShowAddForm(true)}
-                  className="button-primary"
+                  type="button"
+                  className="button-secondary"
+                  onClick={() => setShowAddForm(false)}
                 >
-                  <PlusIcon size={16} className="mr-1" />
-                  Add Event
+                  Cancel
                 </button>
-
-                {/* Inline form */}
-                {showAddForm && (
-                  <form
-                    onSubmit={async (e) => {
-                      e.preventDefault();
-                      if (!newEventTitle || !newEventTime || !user?.uid) return;
-
-                      await addEvent(user.uid, newEventTitle, newEventTime, selectedDate);
-                      setShowAddForm(false);
-                      setNewEventTitle("");
-                      setNewEventTime("");
-                    }}
-                    className="mt-4 space-y-2"
-                  >
-                    <input
-                      type="text"
-                      placeholder="Event title"
-                      value={newEventTitle}
-                      onChange={(e) => setNewEventTitle(e.target.value)}
-                      className="w-full p-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800"
-                      required
-                    />
-                    <input
-                      type="time"
-                      value={newEventTime}
-                      onChange={(e) => setNewEventTime(e.target.value)}
-                      className="w-full p-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800"
-                      required
-                    />
-                    <div className="flex space-x-2">
-                      <button type="submit" className="button-primary">
-                        Save
-                      </button>
-                      <button
-                        type="button"
-                        className="button-secondary"
-                        onClick={() => setShowAddForm(false)}
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </form>
-                )}
               </div>
-            </>
+            </form>
           )}
         </div>
-
+        
       </div>
 
     </div>

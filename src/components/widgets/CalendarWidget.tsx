@@ -18,7 +18,7 @@ const CalendarWidget = () => {
   // Custom hook to fetch events
   const events = useEvents(user?.uid || "");
 
-
+  // Memoized events for the selected date
   const eventsForSelectedDate = useMemo(
     () => events.filter((event) => isSameDay(event.date, selectedDate)),
     [events, selectedDate]
