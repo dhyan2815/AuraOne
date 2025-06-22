@@ -1,10 +1,23 @@
 import { useState, useMemo } from "react";
 import { format, addDays, isSameDay } from "date-fns";
 import { useEvents } from "../../hooks/useEvents";
+import { addEvent } from "../../utils/addEvent";
+import { useAuth } from "../../hooks/useAuth";
 
 const CalendarWidget = () => {
+
+  // State variables for add event form visibility and data
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const events = useEvents();
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newEventTitle, setNewEventTitle] = useState("");
+  const [newEventTime, setNewEventTime] = useState("");
+
+  // user authentication
+  const { user } = useAuth();
+
+  // Custom hook to fetch events
+  const events = useEvents(user?.uid || "");
+
 
   const eventsForSelectedDate = useMemo(
     () => events.filter((event) => isSameDay(event.date, selectedDate)),
@@ -25,35 +38,31 @@ const CalendarWidget = () => {
             <button
               key={day.getTime()}
               onClick={() => setSelectedDate(day)}
-              className={`flex flex-col items-center justify-center min-w-[4rem] h-16 rounded-lg border transition-colors ${
-                isSelected
+              className={`flex flex-col items-center justify-center min-w-[4rem] h-16 rounded-lg border transition-colors ${isSelected
                   ? "bg-primary-100 border-primary-300 dark:bg-primary-900/30 dark:border-primary-800"
                   : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
-              }`}
+                }`}
             >
               <span
-                className={`text-xs font-medium ${
-                  isToday
-                    ? "text-primary-600 dark:text-primary-400"
-                    : "text-slate-500 dark:text-slate-400"
-                }`}
+                className={`text-xs font-medium ${isToday
+                  ? "text-primary-600 dark:text-primary-400"
+                  : "text-slate-500 dark:text-slate-400"
+                  }`}
               >
                 {format(day, "EEE")}
               </span>
               <span
-                className={`text-lg font-bold mt-1 ${
-                  isSelected ? "text-primary-700 dark:text-primary-300" : ""
-                }`}
+                className={`text-lg font-bold mt-1 ${isSelected ? "text-primary-700 dark:text-primary-300" : ""
+                  }`}
               >
                 {format(day, "d")}
               </span>
               {hasEvents && (
                 <div
-                  className={`w-1 h-1 rounded-full mt-1 ${
-                    isSelected
-                      ? "bg-primary-500"
-                      : "bg-slate-400 dark:bg-slate-500"
-                  }`}
+                  className={`w-1 h-1 rounded-full mt-1 ${isSelected
+                    ? "bg-primary-500"
+                    : "bg-slate-400 dark:bg-slate-500"
+                    }`}
                 />
               )}
             </button>
@@ -61,19 +70,66 @@ const CalendarWidget = () => {
         })}
       </div>
 
-      <div className="space-y-3">
-        {eventsForSelectedDate.length === 0 ? (
+      <div className="space-y-2">
+        {eventsForSelectedDate.length === 0 && !showAddForm ? (
           <div className="text-center py-6">
             <p className="text-slate-500 dark:text-slate-400">
-              Event Scheduling Coming Soon!
-              {/* {format(selectedDate, 'MMM d, yyyy')} */}
+              {format(selectedDate, 'MMM d, yyyy')}
             </p>
+            <button
+              className="button-primary mt-2"
+              onClick={() => setShowAddForm(true)}
+            >
+              Add Event
+            </button>
           </div>
+        ) : showAddForm ? (
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              if (!newEventTitle || !newEventTime || !user?.uid) return;
+
+              await addEvent(user.uid, newEventTitle, newEventTime, selectedDate);
+              setNewEventTitle("");
+              setNewEventTime("");
+              setShowAddForm(false);
+            }}
+            className="space-y-2"
+          >
+            <input
+              type="text"
+              placeholder="Event title"
+              value={newEventTitle}
+              onChange={(e) => setNewEventTitle(e.target.value)}
+              className="w-full p-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800"
+              required
+            />
+            <input
+              type="time"
+              value={newEventTime}
+              onChange={(e) => setNewEventTime(e.target.value)}
+              className="w-full p-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800"
+              required
+            />
+            <div className="flex space-x-2">
+              <button type="submit" className="button-primary">
+                Save
+              </button>
+              <button
+                type="button"
+                className="button-secondary"
+                onClick={() => setShowAddForm(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
         ) : (
+
           eventsForSelectedDate.map((event) => (
             <div
               key={event.id}
-              className="flex items-start p-3 rounded-md bg-slate-50 dark:bg-slate-800/50"
+              className="flex items-start rounded-md bg-slate-50 dark:bg-slate-800/50"
             >
               <div className="flex-1 min-w-0">
                 <h4 className="font-medium">{event.title}</h4>
