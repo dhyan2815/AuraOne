@@ -14,7 +14,7 @@ AuraOne is a smart personal assistant designed for comprehensive task, notes, ev
 ## 💫 Features
 
 - User Authentication
-- Personalized LLM (Work In Progress)
+- Aura Assistant (LLM) (In Progress)
 - Task Management
 - Events & Calenders
 - News Aggregation
