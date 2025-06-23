@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { ArrowLeft, ArrowRight, PlusIcon } from "lucide-react";
+import { ArrowLeft, ArrowRight, PlusIcon, Trash2 } from "lucide-react";
 import {
   format,
   addDays,
@@ -11,9 +11,9 @@ import {
   isSameDay,
   isToday,
 } from "date-fns";
-import { useEvents } from "../hooks/useEvents";
-import { addEvent } from "../utils/addEvent";
+import { useEvents, addEvent, deleteEvent } from "../hooks/useEvents";
 import { useAuth } from "../hooks/useAuth";
+import toast from "react-hot-toast";
 
 const Calendar = () => {
   // State variables for managing calendar and event data
@@ -53,6 +53,22 @@ const Calendar = () => {
 
   // Create an array to display the next 7 days
   const next7Days = Array.from({ length: 7 }, (_, i) => addDays(new Date(), i));
+
+  // Handler to delete an event
+  const handleDeleteEvent = async (eventId: string) => {
+    if (!user?.uid) {
+      console.error("User id is missing")
+      return;
+    }
+    const confirmDelete = window.confirm('Are you sure you want to delete this event?');
+    if (!confirmDelete) return;
+    try {
+      await deleteEvent(user.uid, eventId);
+      toast.success("Event deleted");
+    } catch (err) {
+      toast.error("Error deleting event")
+    }
+  };
 
   return (
     <div>
@@ -231,7 +247,7 @@ const Calendar = () => {
               {format(selectedDate, "MMMM d, yyyy")} Events
             </h3>
             <button
-              onClick={() => setShowAddForm(true)} 
+              onClick={() => setShowAddForm(true)}
               className="p-0 px-1 py-1 m-0  button-primary flex items-center"
             >
               <PlusIcon size={16} className="mr-1" />
@@ -246,16 +262,26 @@ const Calendar = () => {
                 No events scheduled.
               </p>
             ) : (
-              eventsForSelectedDate.sort((a, b)=> a.time.localeCompare(b.time)).map((event) => (
+              eventsForSelectedDate.sort((a, b) => a.time.localeCompare(b.time)).map((event) => (
                 <div
                   key={event.id}
-                  className="flex justify-between px-3 py-2 rounded-md bg-slate-100 dark:bg-slate-700"
+                  className="flex justify-between items-center px-3 py-2 rounded-md bg-slate-100 dark:bg-slate-700"
                 >
-                  <h4 className="font-medium">{event.title}</h4>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
-                    {event.time}
-                  </p>
+                  <div className="event-title-and-time">
+                    <h4 className="font-medium">{event.title}</h4>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">
+                      {event.time}
+                    </p>
+                  </div>
+
+                  <button
+                    className="text-gray-500 hover:text-red-700"
+                    onClick={() => handleDeleteEvent(event.id)}
+                  >
+                    <Trash2 className="inline" size={17} />
+                  </button>
                 </div>
+
               ))
             )}
           </div>
@@ -304,7 +330,7 @@ const Calendar = () => {
             </form>
           )}
         </div>
-        
+
       </div>
 
     </div>

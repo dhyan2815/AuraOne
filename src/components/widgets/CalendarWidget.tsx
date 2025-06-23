@@ -1,7 +1,6 @@
 import { useState, useMemo } from "react";
 import { format, addDays, isSameDay } from "date-fns";
-import { useEvents } from "../../hooks/useEvents";
-import { addEvent } from "../../utils/addEvent";
+import { useEvents, addEvent } from "../../hooks/useEvents";
 import { useAuth } from "../../hooks/useAuth";
 
 const CalendarWidget = () => {
