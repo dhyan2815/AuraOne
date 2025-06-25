@@ -84,7 +84,7 @@ const Sidebar = () => {
     },
     { path: "/notes", icon: <FileText size={20} />, label: "Notes" },
     { path: "/tasks", icon: <CheckSquare size={20} />, label: "Tasks" },
-    { path: "/calendar", icon: <CalendarIcon size={20} />, label: "Calendar" },
+    { path: "/events", icon: <CalendarIcon size={20} />, label: "Events" },
     {
       path: "/login",
       icon: <LogOut size={20} />,

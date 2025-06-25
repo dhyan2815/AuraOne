@@ -88,7 +88,7 @@ const Dashboard = () => {
 
         {/* Calendar Widget */}
         <motion.div variants={item} className='dark:shadow-xl dark:hover:shadow-2xl transition-transform-30'>
-          <Card title="Calendar" actionLabel="View all" actionHref="/calendar">
+          <Card title="Events" actionLabel="View all" actionHref="/events">
             <CalendarWidget />
           </Card>
         </motion.div>
