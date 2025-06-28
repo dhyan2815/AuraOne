@@ -88,7 +88,7 @@ const NewsWidget = () => {
 
   return (
     <div className="space-y-4">
-      {news.slice(0, 3).map((item) => (
+      {news.slice(0, 5).map((item) => (
         <a
           key={item.id}
           href={item.url}

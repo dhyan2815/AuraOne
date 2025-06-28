@@ -50,5 +50,23 @@ export function parseGeminiCommand(input: string): {
     };
   }
 
+  // Create Event
+  if (text.startsWith("create event")) {
+    const match = text.match(/create event (.+)/i);
+    return {
+      action: "createEvent",
+      payload: { title: match?.[1]?.trim() || "Untitled Event" },
+    };
+  }
+
+  // Delete Event
+  if (text.startsWith("delete event")) {
+    const match = text.match(/delete event (.+)/i);
+    return {
+      action: "deleteEvent",
+      payload: { id: match?.[1]?.trim() },
+    };
+  }
+
   return { action: "default", payload: { input } };
 }

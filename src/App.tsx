@@ -35,7 +35,7 @@ function App() {
             <Route path="notes" element={<Notes />} />
             <Route path="notes/:id" element={<NotePage />} />
             <Route path="tasks" element={<Tasks />} />
-            <Route path="calendar" element={<Calendar />} />
+            <Route path="events" element={<Calendar />} />
             <Route path="chat" element={<Chat />} />
             <Route path="settings" element={<Settings />} />
           </Route>
