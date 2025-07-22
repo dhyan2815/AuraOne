@@ -43,55 +43,70 @@ const Login = () => {
           />
         </div>
 
-        {/* Login form */}
-        <div className="md:w-1/2 flex items-center justify-center">
+        {/* Login form styled to match the reference image */}
+        <div className="md:w-1/2 flex items-center justify-center bg-white">
           <form
             onSubmit={handleLogin}
-            className="w-full max-w-md bg-white p-4 rounded-xl space-y-4"
+            className="w-full px-8 py-9 rounded-2xl space-y-7"
+            style={{ minWidth: 340 }}
+            autoComplete="off"
           >
-            <div className="font-semibold text-center space-y-1">
-              <h2 className="text-2xl font-semibold text-center text-gray-800">
-                Welcome back 👋
-                <br />
-              </h2>
-              <p className="text-sm font-semibold text-center text-gray-400">
-                Let’s login into your account..
-              </p>
+            {/* Logo and Brand (optional, can be replaced with your logo) */}
+            <div className="flex items-center">
+              <span className="font-bold text-2xl text-indigo-700 tracking-wide">AuraOne</span>
             </div>
+            {/* Heading */}
+            <h2 className="text-3xl font-bold text-gray-900 mb-1">Greetings,<br />Welcome Back!</h2>
+            <p className="text-gray-500 text-base mb-4">
+              Please sign in to continue to your workspace.
+            </p>
 
             {/* Display error */}
             {error && (
               <p className="text-red-500 text-sm text-center">{error}</p>
             )}
 
-            <div className="space-y-4">
-              {/* Input Email */}
+            {/* Email Input */}
+            <div>
+              <label htmlFor="email" className="block text-gray-700 text-sm font-medium mb-1">
+                Email
+              </label>
               <input
+                id="email"
                 type="email"
-                placeholder="Email"
-                className="w-full px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="name@gmail.com"
+                className="w-full px-4 py-2 rounded-md border border-gray-300 bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                autoComplete="username"
               />
-              {/* Password Input */}
-              <div className="relative w-full">
+            </div>
+
+            {/* Password Input */}
+            <div>
+              <label htmlFor="password" className="block text-gray-700 text-sm font-medium mb-1">
+                Password
+              </label>
+              <div className="relative">
                 <input
+                  id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Password"
-                  className="w-full px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="********"
+                  className="w-full px-4 py-2 rounded-md border border-gray-300 bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  autoComplete="current-password"
                 />
-                {/* Password Visbility */}
                 <button
                   type="button"
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
                   onClick={() => setShowPassword((prev) => !prev)}
                   tabIndex={-1}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                 >
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
             </div>
@@ -99,20 +114,20 @@ const Login = () => {
             {/* Login Button */}
             <button
               type="submit"
-              className="w-full py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors"
+              className="w-full py-2 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-base transition-colors shadow-sm"
               disabled={isLoggingIn}
             >
-              {isLoggingIn ? 'Logging In...' : 'Login'}
+              {isLoggingIn ? 'Signing In...' : 'Sign In'}
             </button>
 
             {/* For new user? */}
-            <p className="text-base text-center text-gray-600">
-              New to Aura?{" "}
+            <p className="text-sm text-center text-gray-500 mt-4">
+              Don&apos;t have an account?{" "}
               <Link
                 to="/signup"
-                className="text-blue-600 hover:underline"
+                className="text-indigo-600 font-semibold hover:underline"
               >
-                Sign Up here!
+                Sign Up
               </Link>
             </p>
           </form>

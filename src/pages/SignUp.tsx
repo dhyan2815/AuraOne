@@ -21,10 +21,10 @@ const SignUp = () => {
         e.preventDefault();
         setIsSigningUp(true);
         try {
-            const userCredentails = await createUserWithEmailAndPassword(auth,email, password);
+            const userCredentails = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredentails.user;
 
-            await setDoc(doc(db, "users", user.uid), { name, email, password, createdAt: new Date()});
+            await setDoc(doc(db, "users", user.uid), { name, email, password, createdAt: new Date() });
             console.log("User Registered with Name: ", name);
         } catch (err: any) {
             setError(err.message);
@@ -35,94 +35,117 @@ const SignUp = () => {
     };
 
     return (
-         <div className="signup min-h-screen flex items-center justify-center px-4">
-        <div className="md:flex md:w-full md:max-w-screen-xl lg:max-w-screen-2xl">
-            {/* Image Section (Left) */}
-            <div className="md:w-1/2 flex items-center justify-center">
-                <img src={SignUpPicture} alt="signup art" className="w-full h-auto object-cover" />
-            </div>
+        <div className="signup min-h-screen flex items-center justify-center px-4">
+            <div className="md:flex md:w-full md:max-w-screen-xl lg:max-w-screen-2xl">
+                {/* Image Section (Left) */}
+                <div className="md:w-1/2 flex items-center justify-center">
+                    <img src={SignUpPicture} alt="signup art" className="w-full h-auto object-cover" />
+                </div>
 
-            {/* Sign-Up Form Section (Right) */}
-            <div className="md:w-1/2 flex items-center justify-center">
-                <form
-                    onSubmit={handleSignUp}
-                    className="w-full max-w-md bg-white p-4 rounded-xl space-y-4"
-                >
-                    <div className="font-semibold text-center space-y-1">
-                        <h2 className="text-2xl font-semibold text-center text-gray-800 ">
-                            Join Aura ✨
-                        </h2>
-                        <p className="text-sm font-semibold text-center text-gray-400 ">
-                            Let’s create your account to begin
-                        </p>
-                    </div>
+                <div className="md:w-1/2 flex items-center justify-center bg-white">
+                    <form
+                        onSubmit={handleSignUp}
+                        className="w-full px-8 py-9 rounded-2xl space-y-7"
+                        style={{ minWidth: 340 }}
+                        autoComplete="off"
+                    >
+                        {/* Logo and Brand (optional, consistent with Login) */}
+                        <div className="flex items-center">
+                            <span className="font-bold text-2xl text-indigo-700 tracking-wide">AuraOne</span>
+                        </div>
 
-                    {/* display error */}
-                    {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+                        {/* Heading */}
+                        <h2 className="text-3xl font-bold text-gray-900 mb-1">Create your AuraOne account</h2>
+                        <p className="text-gray-500 text-base mb-4">Sign up to access your workspace and get started.</p>
 
-                    <div className="space-y-4">
-                        {/* Name input */}
-                        <input
-                            type="text"
-                            placeholder="Name"
-                            className="w-full px-4 py-2 rounded-md border border-gray-300 bg-white  text-gray-900  focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                        />
-                        {/* Email input */}
-                        <input
-                            type="email"
-                            placeholder="Email"
-                            className="w-full px-4 py-2 rounded-md border border-gray-300 bg-white  text-gray-900  focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                        />
-                        {/* Password Input */}
-                        <div className="relative w-full">
+                        {/* Display error */}
+                        {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+
+                        {/* Name Input */}
+                        <div>
+                            <label htmlFor="name" className="block text-gray-700 text-sm font-medium mb-1">
+                                Name
+                            </label>
                             <input
-                                type={showPassword ? "text" : "password"}
-                                placeholder="Password"
-                                className="w-full px-4 py-2 rounded-md border border-gray-300 bg-white  text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
+                                id="name"
+                                type="text"
+                                placeholder="Your name"
+                                className="w-full px-4 py-2 rounded-md border border-gray-300 bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
                                 required
                             />
-                            {/* Password Visbility */}
-                            <button
-                                type="button"
-                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 "
-                                onClick={() => setShowPassword((prev) => !prev)}
-                                tabIndex={-1}
-                            >
-                                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                            </button>
                         </div>
-                    </div>
 
-                    {/* Sign Up button */}
-                    <button
-                        type="submit"
-                        className="w-full py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors"
-                        disabled={isSigningUp}
-                    >
-                        {isSigningUp ? 'Signing Up..' : 'Sign Up'}
-                    </button>
+                        {/* Email Input */}
+                        <div>
+                            <label htmlFor="email" className="block text-gray-700 text-sm font-medium mb-1">
+                                Email
+                            </label>
+                            <input
+                                id="email"
+                                type="email"
+                                placeholder="name@gmail.com"
+                                className="w-full px-4 py-2 rounded-md border border-gray-300 bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                                autoComplete="username"
+                            />
+                        </div>
 
-                    {/* Existing User? */}
-                    <p className="text-base text-center text-gray-600">
-                        Already a part of Aura?{" "}
-                        <Link
-                            to="/login"
-                            className="text-blue-600 hover:underline"
+                        {/* Password Input */}
+                        <div>
+                            <label htmlFor="password" className="block text-gray-700 text-sm font-medium mb-1">
+                                Password
+                            </label>
+                            <div className="relative">
+                                <input
+                                    id="password"
+                                    type={showPassword ? "text" : "password"}
+                                    placeholder="********"
+                                    className="w-full px-4 py-2 rounded-md border border-gray-300 bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                    autoComplete="new-password"
+                                />
+                                <button
+                                    type="button"
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                                    onClick={() => setShowPassword((prev) => !prev)}
+                                    tabIndex={-1}
+                                    aria-label={showPassword ? "Hide password" : "Show password"}
+                                >
+                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Sign Up Button */}
+                        <button
+                            type="submit"
+                            className="w-full py-2 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-base transition-colors shadow-sm"
+                            disabled={isSigningUp}
                         >
-                            Login here
-                        </Link>
-                    </p>
-                </form>
+                            {isSigningUp ? 'Signing Up...' : 'Sign Up'}
+                        </button>
+
+                        {/* Existing User? */}
+                        <p className="text-sm text-center text-gray-500 mt-4">
+                            Already a part of Aura?{" "}
+                            <Link
+                                to="/login"
+                                className="text-indigo-600 font-semibold hover:underline"
+                            >
+                                Login here
+                            </Link>
+                        </p>
+                    </form>
+                </div>
+
             </div>
         </div>
-    </div>
     );
 };
 
