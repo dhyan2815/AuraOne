@@ -11,6 +11,7 @@ lerna-debug.log*
 .env
 .env.*
 
+.cursor/
 node_modules
 dist
 dist-ssr
