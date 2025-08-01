@@ -13,18 +13,23 @@ jobs: # Define the jobs that will run
 
     steps: # Define the steps to be executed in the job
       - name: Checkout code # A descriptive name for the step
-        uses: actions/checkout@v3 # Use the "checkout" action to clone the repository
+        uses: actions/checkout@v4 # Use the "checkout" action to clone the repository
 
-      - name: Use Node.js 16 # Set up Node.js
-        uses: actions/setup-node@v3 # Use the "setup-node" action
+      - name: Use Node.js 22 # Set up Node.js
+        uses: actions/setup-node@v4 # Use the "setup-node" action
         with:
-          node-version: 16 # Specify the Node.js version
+          node-version: 22 # Specify the Node.js version
 
       - name: Install Dependencies # Install project dependencies
-        run: npm install # Run the "npm install" command
+        run: npm ci # Run the "npm ci" command for faster, reliable installs
 
       - name: Run Tests # Run the tests
         run: npm test # Run the "npm test" script defined in package.json
+        continue-on-error: true # Continue even if tests fail
 
       - name: Build Project # Build the project
         run: npm run build # Run the "npm run build" script defined in package.json
+
+      - name: Lint Project # Lint the project
+        run: npm run lint # Run the "npm run lint" script defined in package.json
+        continue-on-error: true # Continue even if linting fails

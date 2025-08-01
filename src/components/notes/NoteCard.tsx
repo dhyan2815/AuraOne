@@ -38,7 +38,7 @@ const NoteCard = ({ note, viewMode }: NoteCardProps) => {
                 {formattedDate}
               </div>
 
-              {note.tags.length > 0 && (
+              {note.tags?.length > 0 && (
                 <div className="flex items-center">
                   <Tag size={14} className="mr-1" />
                   <span className="max-w-[150px] truncate">
@@ -75,7 +75,7 @@ const NoteCard = ({ note, viewMode }: NoteCardProps) => {
             {formattedDate}
           </div>
 
-          {note.tags.length > 0 && (
+          {note.tags?.length > 0 && (
             <div className="flex items-center">
               <Tag size={14} className="mr-1" />
               <span className="max-w-[100px] truncate">

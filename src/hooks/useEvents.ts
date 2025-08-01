@@ -1,11 +1,13 @@
 // hooks/useEvents.tsx
+// hooks/useEvents.ts
 import { useEffect, useState } from "react";
 import {
   collection,
   onSnapshot,
-  addDoc,
   deleteDoc,
-  doc
+  getDocs,
+  doc,
+  addDoc,
 } from "firebase/firestore";
 import { db } from "../services/firebase";
 
@@ -14,7 +16,7 @@ export interface EventType {
   id: string;
   title: string;
   time: string;
-  date: Date;
+  date: string; // Store as ISO string
 }
 
 // Hook to fetch events
@@ -42,6 +44,24 @@ export const useEvents = (userId: string): EventType[] => {
   }, [userId]);
 
   return events;
+};
+
+// Function to fetch events
+export const getEvents = async (userId: string): Promise<EventType[]> => {
+  if (!userId) throw new Error("User not authenticated");
+
+  const eventsCollection = collection(db, "users", userId, "events");
+  const snapshot = await getDocs(eventsCollection);
+
+  return snapshot.docs.map((doc) => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      title: data.title,
+      time: data.time,
+      date: data.date,
+    };
+  }) as EventType[];
 };
 
 // Function to add an event

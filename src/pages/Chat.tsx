@@ -1,13 +1,10 @@
-import { useState, useEffect, useRef } from "react";
-import { Send, Sparkles, Bot, User, SquarePen, Trash2 } from "lucide-react";
-import { generateGeminiResponse } from "../services/generateGeminiResponse";
-import { db } from "../services/firebase";
-import { collection, addDoc, serverTimestamp, getDocs, setDoc, query, orderBy, doc, onSnapshot, deleteDoc } from "firebase/firestore";
+import { collection, getDocs, onSnapshot, orderBy, query} from "firebase/firestore";
+import { Bot, Send, Sparkles, SquarePen, Trash2, User } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../hooks/useAuth";
-import toast from "react-hot-toast";
-import { parseGeminiCommand } from "../utils/parseGeminiCommand";
-import { createNote, deleteNote } from "../hooks/useNotes";
-import { addTask, deleteTask, getTasks } from "../hooks/useTasks";
+import { db } from "../services/firebase";
+import { handleSendMessage } from '../services/chatHandler';
+import { createNewSession, deleteCurrentSession } from "../services/chatSessionService";
 
 type Message = {
   id?: string;
@@ -54,6 +51,20 @@ const Chat = () => {
     });
   }, [user]);
 
+  // Function to handle sending messages
+  const handleSend = () => {
+    handleSendMessage({
+      input,
+      user,
+      selectedSession,
+      db,
+      setInput,
+      setLoading,
+      setLoadingTimer,
+      loadingTimer,
+    });
+  };
+
   // listens for messages in the current session
   useEffect(() => {
     if (!user || !selectedSession) return;
@@ -74,174 +85,36 @@ const Chat = () => {
         snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Message))
       );
     });
-
     return unsubscribe;
   }, [user, selectedSession]);
 
-  // Function to handle sending messages
-  const handleSend = async () => {
-    if (!input.trim() || !user || !selectedSession) return;
+  //call create session
+const handleCreateNewSession = async () => {
+  await createNewSession(
+    db,
+    user,
+    sessions,
+    setSessions,
+    setSelectedSession,
+    setMessages,
+    setInput
+  );
+};
 
-    const content = input.trim();
+//call delete session
+const handleDeleteCurrentSession = async () => {
+  await deleteCurrentSession(
+    db,
+    user,
+    selectedSession,
+    sessions,
+    setSessions,
+    setSelectedSession,
+    setMessages,
+    setInput
+  );
+};
 
-    const messagesRef = collection(
-      db,
-      "users",
-      user.uid,
-      "sessions",
-      selectedSession,
-      "messages"
-    );
-
-    const userMessage: Message = { role: "user", content };
-
-    await addDoc(messagesRef, {
-      ...userMessage,
-      createdAt: serverTimestamp(),
-    });
-
-    setInput("");
-
-    const timer = setTimeout(() => setLoading(true), 300);
-    setLoadingTimer(timer);
-
-    try {
-      //  Parse & Execute Gemini Command
-      const { action, payload } = parseGeminiCommand(content);
-      let resultText = "";
-
-      switch (action) {
-
-        case "createNote":
-          await createNote(user.uid, {
-            title: payload.title,
-            content: payload.content || "",
-            createdAt: new Date().toISOString(),
-          });
-          resultText = `Note "${payload.title}" created ✅`;
-          break;
-
-        case "deleteNote":
-          await deleteNote(user.uid, payload.id);
-          resultText = `Note deleted 🗑️`;
-          break;
-
-        case "createTask":
-          await addTask(user.uid, {
-            title: payload.title,
-            description: payload.description || "",
-            dueDate: payload.dueDate || "",
-            dueTime: payload.dueTime || "",
-            completed: "due",
-            priority: "medium",
-          });
-          resultText = `Task "${payload.title}" created ✅`;
-          break;
-
-        case "deleteTask":
-          await deleteTask(user.uid, payload.id);
-          resultText = `Task deleted 🗑️`;
-          break;
-
-        case "listTasks":
-          const tasks = await getTasks(user.uid);
-          if (tasks.length === 0) {
-            resultText = "No tasks found 📭";
-          } else {
-            resultText = "Your Tasks:\n" + tasks.map((t) => `- ${t.title}`).join("📝 \n");
-          }
-          break;
-
-        default:
-          resultText = await generateGeminiResponse(content);
-          break;
-      }
-
-      const aiMessage: Message = { role: "ai", content: resultText };
-      await addDoc(messagesRef, { ...aiMessage, createdAt: serverTimestamp() });
-    } catch (error) {
-      console.error("Error:", error);
-      await addDoc(messagesRef, {
-        role: "ai",
-        content: "Error: I couldn't process your request ⚠️",
-        createdAt: serverTimestamp(),
-      });
-    } finally {
-      setLoading(false);
-      if (loadingTimer) {
-        clearTimeout(loadingTimer);
-        setLoadingTimer(null);
-      }
-    }
-  };
-
-  // function for creating a new session
-  const createNewSession = async () => {
-    if (!user) return;
-
-    const newSessionRef = doc(collection(db, "users", user.uid, "sessions"));
-    const sessionId = newSessionRef.id;
-    const sessionName = `Chat Session ${sessions.length + 1}`;
-
-    await setDoc(newSessionRef, {
-      name: sessionName,
-      createdAt: serverTimestamp(),
-    });
-
-    setSessions((prev) => [...prev, { id: sessionId, name: sessionName }]);
-    setSelectedSession(sessionId);
-    setMessages([]);
-    setInput("");
-    toast.success("New session created successfully!");
-  };
-
-  // function to delete current session
-  const deleteCurrentSession = async () => {
-    if (!user || !selectedSession) return;
-
-    // Confirm deletion
-    const confirmed = window.confirm("Are you sure you want to delete this session?");
-    toast.success("Session deleted successfully!")
-    if (!confirmed) return;
-
-    try {
-      // 1. Delete all messages in the session
-      const messagesRef = collection(
-        db,
-        "users",
-        user.uid,
-        "sessions",
-        selectedSession,
-        "messages"
-      );
-
-      const messagesSnapshot = await getDocs(messagesRef);
-      const deletePromises = messagesSnapshot.docs.map((doc) =>
-        deleteDoc(doc.ref)
-      );
-      await Promise.all(deletePromises);
-
-      // 2. Delete the session document
-      const sessionRef = doc(db, "users", user.uid, "sessions", selectedSession);
-      await deleteDoc(sessionRef);
-
-      // 3. Update local state
-      const updatedSessions = sessions.filter((s) => s.id !== selectedSession);
-      setSessions(updatedSessions);
-
-      // 4. Switch to another session (if any), or clear
-      if (updatedSessions.length > 0) {
-        setSelectedSession(updatedSessions[0].id);
-      } else {
-        setSelectedSession(null);
-        setMessages([]);
-      }
-
-      setInput("");
-    } catch (error) {
-      console.error("Failed to delete session:", error);
-    }
-  };
 
   // function to render clean plain text 
   function cleanTextOnly(text: string): string {
@@ -370,7 +243,7 @@ const Chat = () => {
             {/* New Chat Session */}
             <div className="mb-1 w-2/9">
               <button
-                onClick={createNewSession}
+                onClick={handleCreateNewSession}
                 className="w-full px-1 py-1 dark:border-slate-600 rounded-lg text-base text-slate-900 dark:text-slate-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <SquarePen size={22} />
@@ -380,7 +253,7 @@ const Chat = () => {
             {/* Delete current Chat Session */}
             <div className="mb-1 w-2/9">
               <button
-                onClick={deleteCurrentSession}
+                onClick={handleDeleteCurrentSession}
                 className="w-full px-1 py-1 dark:border-slate-600 rounded-lg text-base text-slate-900 dark:text-slate-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Trash2 size={21} />
