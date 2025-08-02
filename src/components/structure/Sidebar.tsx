@@ -151,21 +151,30 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.2 }}
-                    className="flex justify-center items-center flex-1"
+                    className="flex justify-between items-center w-full"  
                   >
                     <Sparkles className="w-5 h-5 text-primary-600 flex-shrink-0" />
+                    <button
+                      onClick={onToggleCollapse}
+                      className="md:flex p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                      aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+                    >
+                      {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+                    </button>
                   </motion.div>
                 )}
               </AnimatePresence>
               
-              {/* Collapse/Expand Button */}
-              <button
-                onClick={onToggleCollapse}
-                className="hidden md:flex p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-                aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-              >
-                {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
-              </button>
+              {/* Collapse/Expand Button - Only show when expanded */}
+              {!isCollapsed && (
+                <button
+                  onClick={onToggleCollapse}
+                  className="hidden md:flex p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                  aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+                >
+                  {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+                </button>
+              )}
             </div>
 
             {/* Navigation */}
@@ -211,7 +220,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
                 <div className={`${isCollapsed ? 'flex justify-center' : 'flex-1'}`}>
                   <button
                     onClick={toggleTheme}
-                    className="flex p-2 rounded-full bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+                    className="flex p-3 rounded-full bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
                     aria-label="Toggle theme"
                     title={isCollapsed ? "Theme" : undefined}
                   >
@@ -241,7 +250,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
                   <NavLink
                     to="/chat"
                     className={({ isActive }) =>
-                      `flex p-2 rounded-full transition-colors ${
+                      `flex p-3 rounded-full transition-colors ${
                         isActive
                           ? "bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300"
                           : "bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600"
@@ -271,7 +280,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
                   <NavLink
                     to="/settings"
                     className={({ isActive }) =>
-                      `flex p-2 rounded-full transition-colors ${
+                      `flex p-3 rounded-full transition-colors ${
                         isActive
                           ? "bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300"
                           : "bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600"

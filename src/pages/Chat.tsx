@@ -140,7 +140,7 @@ const handleDeleteCurrentSession = async () => {
   return (
     <div className="flex flex-col h-[calc(100vh-2rem)] dark:bg-slate-800">
       {/* Header */}
-      <div className="flex justify-center dark:bg-slate-800 dark:border-slate-700 pb-2">
+      <div className="flex justify-center dark:bg-slate-800 dark:border-slate-700 pt-1 pb-2">
         <div className="flex items-center gap-3">
           <div className="flex justify-center gap-2">
             <div className="w-5 h-5 bg-gradient-to-br from-primary-500 to-primary-600 rounded-md flex justify-center items-center">
