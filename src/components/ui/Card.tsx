@@ -27,8 +27,8 @@ const Card = ({
       onClick={onClick}
     >
       {title && (
-        <div className="flex items-center justify-between px-2 py-1 border-slate-100 dark:border-slate-700">
-          <h3 className="text-2xl ml-1 mt-1">{title}</h3>
+        <div className="flex items-center justify-between px-6 py-4 border-slate-100 dark:border-slate-700">
+          <h3 className="text-xl font-semibold">{title}</h3>
           
           {actionLabel && (
             actionHref ? (

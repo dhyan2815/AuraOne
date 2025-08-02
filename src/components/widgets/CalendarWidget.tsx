@@ -27,7 +27,7 @@ const CalendarWidget = () => {
 
   return (
     <div>
-      <div className="flex space-x-2 mb-4 overflow-x-auto pb-2">
+      <div className="flex space-x-2 mb-8 overflow-x-auto pb-2">
         {days.map((day) => {
           const isToday = isSameDay(day, new Date());
           const isSelected = isSameDay(day, selectedDate);
@@ -69,7 +69,7 @@ const CalendarWidget = () => {
         })}
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-2 pb-2">
         {eventsForSelectedDate.length === 0 && !showAddForm ? (
           <div className="text-center py-6">
             <p className="text-slate-500 dark:text-slate-400">

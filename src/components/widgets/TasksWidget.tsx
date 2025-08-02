@@ -38,7 +38,7 @@ const TasksWidget = () => {
     tasks.filter((task) => task.completed !== "completed").length - displayTasks.length;
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {displayTasks.length === 0 ? (
         <div className="text-center py-6">
           <p className="text-slate-500 dark:text-slate-400 mb-2">
