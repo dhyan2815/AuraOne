@@ -86,6 +86,13 @@ const Dashboard = () => {
           </Card>
         </motion.div>
 
+        {/* News Widget */}
+        <motion.div variants={item} className="lg:col-span-2 dark:shadow-xl dark:hover:shadow-2xl transition-transform-30">
+          <Card title="Latest News" actionLabel="More news">
+            <NewsWidget />
+          </Card>
+        </motion.div>
+        
         {/* Calendar Widget */}
         <motion.div variants={item} className='dark:shadow-xl dark:hover:shadow-2xl transition-transform-30'>
           <Card title="Events" actionLabel="View all" actionHref="/events">
@@ -93,12 +100,6 @@ const Dashboard = () => {
           </Card>
         </motion.div>
 
-        {/* News Widget */}
-        <motion.div variants={item} className="lg:col-span-2 dark:shadow-xl dark:hover:shadow-2xl transition-transform-30">
-          <Card title="Latest News" actionLabel="More news">
-            <NewsWidget />
-          </Card>
-        </motion.div>
       </motion.div>
     </div>
   );

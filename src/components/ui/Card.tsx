@@ -53,7 +53,7 @@ const Card = ({
         </div>
       )}
       
-      <div className="p-3">
+      <div className="p-4">
         {children}
       </div>
     </div>
