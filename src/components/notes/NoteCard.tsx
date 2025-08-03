@@ -63,7 +63,7 @@ const NoteCard = ({ note, viewMode }: NoteCardProps) => {
         <div className="flex-1">
           <h3 className="text-lg font-medium mb-2">{note.title}</h3>
           <div
-            className="text-slate-600 dark:text-slate-400 line-clamp-3"
+            className="text-slate-600 dark:text-slate-400 line-clamp-3 mb-2"
           >
             {note.content}  
           </div> 

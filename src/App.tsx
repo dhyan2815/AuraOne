@@ -5,6 +5,7 @@ import Dashboard from "./pages/Dashboard";
 import Notes from "./pages/Notes";
 import NotePage from "./pages/NotePage";
 import Tasks from "./pages/Tasks";
+import TaskPage from "./pages/TaskPage";
 import Calendar from "./pages/Calendar";
 import Settings from "./pages/Settings";
 import { useAuth } from "./hooks/useAuth";
@@ -39,6 +40,7 @@ function App() {
             <Route path="notes" element={<Notes />} />
             <Route path="notes/:id" element={<NotePage />} />
             <Route path="tasks" element={<Tasks />} />
+            <Route path="tasks/:id" element={<TaskPage />} />
             <Route path="events" element={<Calendar />} />
             <Route path="chat" element={<Chat />} />
             <Route path="settings" element={<Settings />} />
