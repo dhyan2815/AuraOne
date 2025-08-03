@@ -33,7 +33,19 @@ const TaskItem = ({ task, onToggleComplete, onEdit, onDelete }: TaskItemProps) =
     : '';
 
   // Check if the task is overdue by Time and its Date
-  const isOverdue = task.dueDate && new Date(`${task.dueDate}T${task.dueTime}`) < new Date() && task.completed === "due";
+  const isOverdue = task.dueDate && task.dueTime && (() => {
+    try {
+      const [time, ampm] = task.dueTime.split(' ');
+      const [hours, minutes] = time.split(':');
+      let hour = parseInt(hours);
+      if (ampm === 'PM' && hour !== 12) hour += 12;
+      if (ampm === 'AM' && hour === 12) hour = 0;
+      const dueDateTime = new Date(`${task.dueDate}T${hour.toString().padStart(2, '0')}:${minutes}:00`);
+      return dueDateTime < new Date() && task.completed === "due";
+    } catch {
+      return false;
+    }
+  })();
 
   return (
     <div className={`bg-white dark:bg-slate-800 rounded-lg border ${isOverdue

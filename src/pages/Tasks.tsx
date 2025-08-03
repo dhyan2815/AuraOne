@@ -1,160 +1,60 @@
 // pages/Tasks.tsx
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import {
   PlusIcon,
   Clock,
   FilterIcon,
   CheckCheck,
+  Search,
+  GridIcon,
+  ListIcon,
 } from "lucide-react";
-import TaskItem from "../components/tasks/TaskItem";
+import TaskCard from "../components/tasks/TaskCard";
 import { motion } from "framer-motion";
 import {
-  getTasks,
-  addTask as addTaskToDB,
-  updateTask as updateTaskInDB,
-  deleteTask as deleteTaskFromDB,
+  listenToTasks,
   Task,
 } from "../hooks/useTasks";
 import { useAuth } from "../hooks/useAuth";
-import toast from "react-hot-toast";
 
 const Tasks = () => {
-  // State for managing tasks, new task input, editing state, filter, description, due date, due time, priority, and completion status
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [newTask, setNewTask] = useState("");
-  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [filter, setFilter] = useState<"all" | "completed" | "pending">("all");
-  const [description, setDescription] = useState("");
-  const [dueDate, setDueDate] = useState("");
-  const [dueTime, setDueTime] = useState("");
-  const [priority, setPriority] = useState("No Priority");
 
   const { user } = useAuth();
 
-  // Fetch tasks from the database when the component mounts or when the user changes
   useEffect(() => {
     if (!user) return;
-    const fetchData = async () => {
-      try {
-        const fetchedTasks = await getTasks(user.uid);
-        setTasks(fetchedTasks);
-      } catch (error) {
-        console.error("Error fetching tasks:", error);
-      }
-    };
 
-    fetchData();
+    const unsubscribe = listenToTasks(user.uid, (fetchedTasks) => {
+      setTasks(fetchedTasks as Task[]);
+    });
+
+    return () => unsubscribe();
   }, [user]);
 
-  // Function to handle adding a new task
-  const handleAddTask = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newTask.trim() || !user) return;
-
-    const task: Omit<Task, "id"> = {
-      title: newTask,
-      description: description,
-      dueDate: dueDate,
-      dueTime: dueTime,
-      priority: priority,
-      completed: 'due' // Default
-    };
-
-    const resetState = () => {
-      setNewTask("");
-      setDescription("");
-      setDueDate("");
-      setDueTime("");
-      setPriority("");
-    };
-    try {
-      const newTaskRef = await addTaskToDB(user.uid, task);
-      setTasks(prev => [...prev, {...task, id: newTaskRef.id }])
-      resetState();
-      toast.success("New Task Added Successfully");
-    } catch(error) {
-      console.error("Error adding task: ", error)
-    }
-  };
-
-  // Function to handle editing a task
-  const handleEditTask = (id: string) => {
-    setEditingTaskId(id);
-    const taskToEdit = tasks.find((task) => task.id === id);
-    if (taskToEdit) {
-      setNewTask(taskToEdit.title);
-      setDescription(taskToEdit.description);
-      setDueDate(taskToEdit.dueDate || "");
-      setDueTime(taskToEdit.dueTime || "");
-      setPriority(taskToEdit.priority || "");
-    }
-  };
-
-  // Function to handle updating a task
-  const handleUpdateTask = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newTask.trim() || !user || !editingTaskId) return;
-
-    const task: Omit<Task, "id"> = {
-      title: newTask,
-      description: description,
-      dueDate: dueDate,
-      dueTime: dueTime,
-      priority: priority,
-    };
-
-    try {
-      await updateTaskInDB(user.uid, editingTaskId, task);
-      setTasks(prev => prev.map(t =>
-        t.id === editingTaskId ? { ...t, ...task } : t
-      ));
-      setNewTask("");
-      setDescription("");
-      setDueDate("");
-      setDueTime("");
-      setPriority("");
-      setEditingTaskId(null);
-      toast.success("Task Updated Sucessfully");
-    } catch (error) {
-      console.error("Error updating task:", error);
-    }
-  };
-
-  // Function to handle deleting a task
-  const handleDeleteTask = async (id: string) => {
-    if (!user) return;
-    if (window.confirm("Are you sure you want to delete this task?")) {
-      try {
-        await deleteTaskFromDB(user.uid, id);
-        const updatedTasks = await getTasks(user.uid);
-        toast.success("Task Deleted Successfully");
-        setTasks(updatedTasks);
-      } catch (error) {
-        console.error("Error deleting task:", error);
-      }
-    }
-  };
-
-  // Function to handle toggling the completion status of a task
-  const handleToggleComplete = async (id: string, completed: string) => {
-    if (!user) return;
-    const newStatus = completed === "completed" ? "due" : "completed";
-    try {
-      await updateTaskInDB(user.uid, id, { completed: newStatus });
-      const updatedTasks = await getTasks(user.uid);
-      setTasks(updatedTasks);
-    } catch (error) {
-      console.error("Error toggling task completion:", error);
-    }
-  };
-
-  // Filter tasks based on the selected filter
   const filteredTasks = tasks.filter((task) => {
-    if (filter === "all") return true;
-    if (filter === "completed") return task.completed === "completed";
-    if (filter === "pending") return task.completed === "due";
-    return true;
+    // First apply status filter
+    let statusFiltered = true;
+    if (filter === "completed") statusFiltered = task.completed === "completed";
+    if (filter === "pending") statusFiltered = task.completed === "due";
+    
+    // Then apply search filter
+    let searchFiltered = true;
+    if (searchQuery) {
+      searchFiltered = 
+        task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        task.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        task.priority.toLowerCase().includes(searchQuery.toLowerCase());
+    }
+    
+    return statusFiltered && searchFiltered;
   });
+
+
 
   // Framer Motion variants for animating the task list
   const container = {
@@ -174,83 +74,57 @@ const Tasks = () => {
 
   return (
     <div>
-      <div className="mb-2">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <h1 className="text-3xl font-semibold">Tasks</h1>
-        <p className="text-slate-600 dark:text-slate-400 mt-1">
-          Manage your tasks and stay organized
-        </p>
-      </div>
 
-      {/* Task input form */}
-      <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-2 mb-4">
-        <form onSubmit={editingTaskId ? handleUpdateTask : handleAddTask} className="flex flex-col gap-3">
-          <div className="flex gap-2">
+        <div className="flex items-center gap-5">
+          <div className="relative flex-1 md:w-64">
+            <Search
+              className="absolute flex-1 left-3 top-1/2 -translate-y-1/2 text-slate-400"
+              size={18}
+            />
             <input
               type="text"
-              value={newTask}
-              onChange={(e) => setNewTask(e.target.value)}
-              placeholder="Add a new task..."
-              className="input flex-1"
+              placeholder="  Search tasks..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="input pl-9 w-full"
             />
           </div>
-          <div className="flex gap-2">
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Task description..."
-              className="input  flex-1"
-            />
-          </div>
-          <div className="flex flex-wrap gap-2 justify-between">
-            <div className="flex items-center gap-2">
-              <label htmlFor="dueDate" className="text-sm">Due Date:</label>
-              <input
-                type="date"
-                id="dueDate"
-                value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
-                className="input text-sm"
-              />
-            </div>
 
-            <div className="flex items-center gap-2">
-              <label htmlFor="dueTime" className="text-sm">Due Time:</label>
-              <input
-                type="time"
-                id="dueTime"
-                value={dueTime}
-                onChange={(e) => setDueTime(e.target.value)}
-                className="input text-sm"
-              />
-            </div>
-            <select
-              value={priority}
-              onChange={(e) => setPriority(e.target.value)}
-              className="input text-sm"
+          <div className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-md p-1">
+            <button
+              className={`p-1.5 rounded ${
+                viewMode === "grid"
+                  ? "bg-white dark:bg-slate-700 shadow-sm"
+                  : ""
+              }`}
+              onClick={() => setViewMode("grid")}
             >
-              <option value=" ">Priority</option>
-              <option value="high">High</option>
-              <option value="medium">Medium</option>
-              <option value="low">Low</option>
-            </select>
-            <button type="submit" className="button-primary text-sm">
-              {editingTaskId ? (
-                <>Update Task</>
-              ) : (
-                <>
-                  <PlusIcon size={18} className="mr-1" />
-                  Add
-                </>
-              )}
+              <GridIcon size={18} />
+            </button>
+            <button
+              className={`p-1.5 rounded ${
+                viewMode === "list"
+                  ? "bg-white dark:bg-slate-700 shadow-sm"
+                  : ""
+              }`}
+              onClick={() => setViewMode("list")}
+            >
+              <ListIcon size={18} />
             </button>
           </div>
-        </form>
+
+          <Link to="/tasks/new" className="button-primary">
+            <PlusIcon size={18} className="mr-1" />
+            New Task
+          </Link>
+        </div>
       </div>
 
       {/* Task filter buttons */}
       <div className="flex flex-wrap gap-3 mb-6">
         <button
-          key="due-date-filter"
           className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium ${filter === "all"
               ? "bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-100"
               : "bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300"
@@ -282,10 +156,9 @@ const Tasks = () => {
         </button>
       </div>
 
-      {/* Conditional rendering for empty task list */}
       {filteredTasks.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-48 text-center">
-          <p className="text-slate-500 dark:text-slate-400 mb-2">
+        <div className="flex flex-col items-center justify-center h-64 text-center">
+          <p className="text-slate-500 dark:text-slate-400 mb-4">
             {filter === "all"
               ? "No tasks found"
               : filter === "completed"
@@ -300,25 +173,27 @@ const Tasks = () => {
               View all tasks
             </button>
           )}
+          {filter === "all" && (
+            <Link to="/tasks/new" className="button-primary">
+              <PlusIcon size={18} className="mr-1" />
+              Create your first task
+            </Link>
+          )}
         </div>
       ) : (
-        // Render the task list using Framer Motion for animations
         <motion.div
           variants={container}
           initial="hidden"
           animate="show"
-          className="space-y-3"
+          className={
+            viewMode === "grid"
+              ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+              : "flex flex-col gap-4"
+          }
         >
-          {filteredTasks.map((task) => (
+          {filteredTasks.map((task: Task) => (
             <motion.div key={task.id} variants={item}>
-              <TaskItem
-                task={task}
-                onToggleComplete={() =>
-                  handleToggleComplete(task.id, task.completed || 'due')
-                }
-                onEdit={() => handleEditTask(task.id)}
-                onDelete={() => handleDeleteTask(task.id)}
-              />
+              <TaskCard task={task} viewMode={viewMode} />
             </motion.div>
           ))}
         </motion.div>
