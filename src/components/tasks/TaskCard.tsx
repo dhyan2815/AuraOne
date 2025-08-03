@@ -35,13 +35,17 @@ const TaskCard = ({ task, viewMode }: TaskCardProps) => {
 
   const isOverdue = task.dueDate && task.dueTime && (() => {
     try {
-      const [time, ampm] = task.dueTime.split(' ');
-      const [hours, minutes] = time.split(':');
-      let hour = parseInt(hours);
-      if (ampm === 'PM' && hour !== 12) hour += 12;
-      if (ampm === 'AM' && hour === 12) hour = 0;
-      const dueDateTime = new Date(`${task.dueDate}T${hour.toString().padStart(2, '0')}:${minutes}:00`);
-      return dueDateTime < new Date() && task.completed === "due";
+      // HTML time input provides 24-hour format (HH:MM)
+      const [hours, minutes] = task.dueTime.split(':');
+      const hour = parseInt(hours);
+      const minute = parseInt(minutes);
+      
+      if (hour !== undefined && minute !== undefined) {
+        const dueDateTime = new Date(`${task.dueDate}T${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}:00`);
+        return dueDateTime < new Date() && task.completed === "due";
+      }
+      
+      return false;
     } catch {
       return false;
     }

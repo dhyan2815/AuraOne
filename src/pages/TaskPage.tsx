@@ -43,7 +43,7 @@ const TaskPage = () => {
   const [dueDate, setDueDate] = useState<string>("");
   const [dueTime, setDueTime] = useState<string>("");
   const [priority, setPriority] = useState<"low" | "medium" | "high">("medium");
-  const [completed, setCompleted] = useState<"completed" | "due">("due");
+
   const [starred, setStarred] = useState(false);
   const [pinned, setPinned] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -59,44 +59,42 @@ const TaskPage = () => {
 
       try {
         if (id === "new") {
-          const newTask: Task = {
-            id: "new",
-            title: "Untitled Task",
-            description: "",
-            dueDate: "",
-            dueTime: "",
-            priority: "medium",
-            completed: "due",
-            createdAt: new Date().toISOString(),
-            pinned: false,
-            starred: false,
-          };
-          setTask(newTask);
-          setTitle(newTask.title);
-          setDescription(newTask.description);
-          setDueDate(newTask.dueDate || "");
-          setDueTime(newTask.dueTime || "");
-          setPriority(newTask.priority);
-          setCompleted(newTask.completed);
-          setPinned(false);
-          setStarred(false);
-        } else if (id) {
-          const foundTask = await getTaskById(user.uid, id);
-          if (foundTask) {
-            const typedTask = foundTask as Task;
-            setTask(typedTask);
-            setTitle(typedTask.title);
-            setDescription(typedTask.description);
-            setDueDate(typedTask.dueDate || "");
-            setDueTime(typedTask.dueTime || "");
-            setPriority(typedTask.priority);
-            setCompleted(typedTask.completed);
-            setPinned(typedTask.pinned || false);
-            setStarred(typedTask.starred || false);
-          } else {
-            navigate("/tasks");
-          }
-        }
+                     const newTask: Task = {
+             id: "new",
+             title: "Untitled Task",
+             description: "",
+             dueDate: "",
+             dueTime: "",
+             priority: "medium",
+             completed: "due",
+             createdAt: new Date().toISOString(),
+             pinned: false,
+             starred: false,
+           };
+           setTask(newTask);
+           setTitle(newTask.title);
+           setDescription(newTask.description);
+           setDueDate(newTask.dueDate || "");
+           setDueTime(newTask.dueTime || "");
+           setPriority(newTask.priority);
+           setPinned(false);
+           setStarred(false);
+                   } else if (id) {
+             const foundTask = await getTaskById(user.uid, id);
+             if (foundTask) {
+               const typedTask = foundTask as Task;
+               setTask(typedTask);
+               setTitle(typedTask.title);
+               setDescription(typedTask.description);
+               setDueDate(typedTask.dueDate || "");
+               setDueTime(typedTask.dueTime || "");
+               setPriority(typedTask.priority);
+               setPinned(typedTask.pinned || false);
+               setStarred(typedTask.starred || false);
+             } else {
+               navigate("/tasks");
+             }
+           }
       } finally {
         setLoading(false);
       }
@@ -114,7 +112,7 @@ const TaskPage = () => {
       dueDate: dueDate || undefined,
       dueTime: dueTime || undefined,
       priority,
-      completed,
+      completed: "due" as const,
       pinned,
       starred,
     };
@@ -163,19 +161,19 @@ const TaskPage = () => {
     setPinned(!pinned);
   };
 
-  const toggleCompleted = () => {
-    setCompleted(completed === "completed" ? "due" : "completed");
-  };
-
   const isOverdue = task?.dueDate && task.dueTime && (() => {
     try {
-      const [time, ampm] = task.dueTime.split(' ');
-      const [hours, minutes] = time.split(':');
-      let hour = parseInt(hours);
-      if (ampm === 'PM' && hour !== 12) hour += 12;
-      if (ampm === 'AM' && hour === 12) hour = 0;
-      const dueDateTime = new Date(`${task.dueDate}T${hour.toString().padStart(2, '0')}:${minutes}:00`);
-      return dueDateTime < new Date() && completed === "due";
+      // HTML time input provides 24-hour format (HH:MM)
+      const [hours, minutes] = task.dueTime.split(':');
+      const hour = parseInt(hours);
+      const minute = parseInt(minutes);
+      
+      if (hour !== undefined && minute !== undefined) {
+        const dueDateTime = new Date(`${task.dueDate}T${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}:00`);
+        return dueDateTime < new Date();
+      }
+      
+      return false;
     } catch {
       return false;
     }
@@ -205,25 +203,13 @@ const TaskPage = () => {
             <ArrowLeft size={20} />
           </button>
           <div>
-            <div className="flex items-center gap-2">
-              <input
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="text-3xl font-semibold bg-transparent border-0 outline-none w-full"
-                placeholder="Task title"
-              />
-              <button
-                onClick={toggleCompleted}
-                className={`p-2 rounded-full ${
-                  completed === "completed"
-                    ? "text-success-500"
-                    : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-                }`}
-              >
-                <CheckCircle size={20} fill={completed === "completed" ? "currentColor" : "none"} />
-              </button>
-            </div>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="text-3xl font-semibold bg-transparent border-0 outline-none w-full"
+              placeholder="Task title"
+            />
             {task?.createdAt && (
               <div className="flex items-center text-sm text-slate-500 dark:text-slate-400 mt-1">
                 <Calendar size={14} className="mr-1" />
@@ -286,110 +272,64 @@ const TaskPage = () => {
           />
         </div>
 
-        {/* Due Date, Time, and Priority */}
+        {/* Due Date, Time, and Priority - All on same line */}
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-            Due Date & Time
-          </label>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 flex-1">
-              <Calendar size={16} className="text-slate-500" />
-              <input
-                type="date"
-                value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
-                className="input flex-1"
-              />
+          <div className="flex items-center gap-6">
+            {/* Due Date */}
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                Due Date
+              </label>
+              <div className="flex items-center gap-2">
+                <Calendar size={16} className="text-slate-500" />
+                <input
+                  type="date"
+                  value={dueDate}
+                  onChange={(e) => setDueDate(e.target.value)}
+                  className="input flex-1"
+                />
+              </div>
             </div>
             
-            <div className="flex items-center gap-2 flex-1">
-              <Clock size={16} className="text-slate-500" />
+                         {/* Due Time */}
+             <div className="flex-1">
+               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                 Due Time
+               </label>
+               <div className="flex items-center gap-2">
+                 <Clock size={16} className="text-slate-500" />
+                 <input
+                   type="time"
+                   value={dueTime}
+                   onChange={(e) => setDueTime(e.target.value)}
+                   className="input flex-1"
+                 />
+               </div>
+             </div>
+
+            {/* Priority */}
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                Priority
+              </label>
               <select
-                value={dueTime.split(':')[0] || '12'}
-                onChange={(e) => {
-                  const hour = e.target.value;
-                  const minute = dueTime.split(':')[1] || '00';
-                  const ampm = dueTime.includes('PM') ? 'PM' : 'AM';
-                  setDueTime(`${hour}:${minute} ${ampm}`);
-                }}
-                className="input w-20"
+                value={priority}
+                onChange={(e) => setPriority(e.target.value as "low" | "medium" | "high")}
+                className="input"
               >
-                {Array.from({ length: 12 }, (_, i) => i + 1).map(num => (
-                  <option key={num} value={num.toString().padStart(2, '0')}>
-                    {num}
-                  </option>
-                ))}
-              </select>
-              <span className="text-slate-500">:</span>
-              <select
-                value={dueTime.split(':')[1]?.split(' ')[0] || '00'}
-                onChange={(e) => {
-                  const hour = dueTime.split(':')[0] || '12';
-                  const minute = e.target.value;
-                  const ampm = dueTime.includes('PM') ? 'PM' : 'AM';
-                  setDueTime(`${hour}:${minute} ${ampm}`);
-                }}
-                className="input w-20"
-              >
-                {Array.from({ length: 60 }, (_, i) => i).map(num => (
-                  <option key={num} value={num.toString().padStart(2, '0')}>
-                    {num.toString().padStart(2, '0')}
-                  </option>
-                ))}
-              </select>
-              <select
-                value={dueTime.includes('PM') ? 'PM' : 'AM'}
-                onChange={(e) => {
-                  const timeParts = dueTime.split(' ');
-                  const time = timeParts[0] || '12:00';
-                  setDueTime(`${time} ${e.target.value}`);
-                }}
-                className="input w-16"
-              >
-                <option value="AM">AM</option>
-                <option value="PM">PM</option>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
               </select>
             </div>
           </div>
-        </div>
-
-        {/* Priority */}
-        <div>
-          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-            Priority
-          </label>
-          <select
-            value={priority}
-            onChange={(e) => setPriority(e.target.value as "low" | "medium" | "high")}
-            className="input"
-          >
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-          </select>
-        </div>
-
-        {/* Status */}
-        <div>
-          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-            Status
-          </label>
-          <div className="flex items-center gap-2">
-            <select
-              value={completed}
-              onChange={(e) => setCompleted(e.target.value as "completed" | "due")}
-              className="input"
-            >
-              <option value="due">Due</option>
-              <option value="completed">Completed</option>
-            </select>
-            {isOverdue && (
-              <div className="flex items-center text-error-600 dark:text-error-400">
-                <Flag size={16} className="mr-1" />
-                <span className="text-sm font-medium">Overdue</span>
-              </div>
-            )}
-          </div>
+          
+          {isOverdue && (
+            <div className="flex items-center text-error-600 dark:text-error-400 mt-2">
+              <Flag size={16} className="mr-1" />
+              <span className="text-sm font-medium">Task is overdue</span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -400,18 +340,14 @@ const TaskPage = () => {
           <div className="flex items-center gap-2">
             <CheckCircle 
               size={16} 
-              className={completed === "completed" ? "text-success-500" : "text-slate-400"} 
+              className="text-slate-400" 
             />
-            <span className={`font-medium ${
-              completed === "completed" ? "line-through text-slate-500" : ""
-            }`}>
+            <span className="font-medium">
               {title || "Untitled Task"}
             </span>
           </div>
           {description && (
-            <p className={`text-sm text-slate-600 dark:text-slate-400 ${
-              completed === "completed" ? "line-through" : ""
-            }`}>
+            <p className="text-sm text-slate-600 dark:text-slate-400">
               {description}
             </p>
           )}
