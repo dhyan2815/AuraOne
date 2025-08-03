@@ -1,6 +1,7 @@
 // pages/Tasks.tsx
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import toast from 'react-hot-toast';
 import {
   PlusIcon,
   Clock,
@@ -14,6 +15,7 @@ import TaskCard from "../components/tasks/TaskCard";
 import { motion } from "framer-motion";
 import {
   listenToTasks,
+  updateTask,
   Task,
 } from "../hooks/useTasks";
 import { useAuth } from "../hooks/useAuth";
@@ -35,6 +37,23 @@ const Tasks = () => {
 
     return () => unsubscribe();
   }, [user]);
+
+  const handleToggleComplete = async (taskId: string) => {
+    if (!user) return;
+    
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
+    
+    const newStatus = task.completed === "completed" ? "due" : "completed";
+    
+    try {
+      await updateTask(user.uid, taskId, { completed: newStatus });
+      toast.success(newStatus === "completed" ? "Task marked as completed!" : "Task marked as pending!");
+    } catch (error) {
+      console.error("Failed to toggle task completion:", error);
+      toast.error("Failed to update task status");
+    }
+  };
 
   const filteredTasks = tasks.filter((task) => {
     // First apply status filter
@@ -193,7 +212,7 @@ const Tasks = () => {
         >
           {filteredTasks.map((task: Task) => (
             <motion.div key={task.id} variants={item}>
-              <TaskCard task={task} viewMode={viewMode} />
+              <TaskCard task={task} viewMode={viewMode} onToggleComplete={handleToggleComplete} />
             </motion.div>
           ))}
         </motion.div>

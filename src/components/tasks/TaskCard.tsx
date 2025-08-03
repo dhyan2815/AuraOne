@@ -16,6 +16,7 @@ interface Task {
 interface TaskCardProps {
   task: Task;
   viewMode: "grid" | "list";
+  onToggleComplete?: (taskId: string) => void;
 }
 
 const priorityColors = {
@@ -24,7 +25,7 @@ const priorityColors = {
   high: 'bg-error-100 text-error-800 dark:bg-error-900/30 dark:text-error-300',
 };
 
-const TaskCard = ({ task, viewMode }: TaskCardProps) => {
+const TaskCard = ({ task, viewMode, onToggleComplete }: TaskCardProps) => {
   const formattedDueDate = task.dueDate
     ? format(new Date(task.dueDate), 'MMM d, yyyy')
     : '';
@@ -58,13 +59,22 @@ const TaskCard = ({ task, viewMode }: TaskCardProps) => {
           <div className="flex flex-col md:flex-row md:items-center gap-2">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
-                <CheckCircle 
-                  size={16} 
-                  className={task.completed === "completed" 
-                    ? "text-success-500" 
-                    : "text-slate-400"
-                  } 
-                />
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onToggleComplete?.(task.id);
+                  }}
+                  className="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                >
+                  <CheckCircle 
+                    size={16} 
+                    className={task.completed === "completed" 
+                      ? "text-success-500" 
+                      : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                    } 
+                  />
+                </button>
                 <h3 className={`text-lg font-medium truncate ${
                   task.completed === "completed" 
                     ? "line-through text-slate-500 dark:text-slate-400" 
@@ -125,13 +135,22 @@ const TaskCard = ({ task, viewMode }: TaskCardProps) => {
       <div className="card h-full flex flex-col hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
-            <CheckCircle 
-              size={16} 
-              className={task.completed === "completed" 
-                ? "text-success-500" 
-                : "text-slate-400"
-              } 
-            />
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onToggleComplete?.(task.id);
+              }}
+              className="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+            >
+              <CheckCircle 
+                size={16} 
+                className={task.completed === "completed" 
+                  ? "text-success-500" 
+                  : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                } 
+              />
+            </button>
             <h3 className={`text-lg font-medium ${
               task.completed === "completed" 
                 ? "line-through text-slate-500 dark:text-slate-400" 
