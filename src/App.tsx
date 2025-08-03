@@ -12,6 +12,8 @@ import Login from "./pages/Login";
 import Loader from "./components/ui/Loader";
 import Chat from "./pages/Chat";
 import SignUp from "./pages/SignUp";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 function App() {
 
@@ -26,6 +28,8 @@ function App() {
           <>
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="*" element={<Navigate to="/signup" replace />} />
           </>
         ) : (
