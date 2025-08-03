@@ -34,6 +34,27 @@ const TaskCard = ({ task, viewMode, onToggleComplete }: TaskCardProps) => {
     ? format(new Date(task.createdAt), 'MMM d, yyyy')
     : '';
 
+  // Format time to 12-hour format for better readability
+  const formatTime = (timeString: string) => {
+    try {
+      const [hours, minutes] = timeString.split(':');
+      const hour = parseInt(hours);
+      const minute = parseInt(minutes);
+      
+      if (hour === 0) {
+        return `12:${minutes} AM`;
+      } else if (hour < 12) {
+        return `${hour}:${minutes} AM`;
+      } else if (hour === 12) {
+        return `12:${minutes} PM`;
+      } else {
+        return `${hour - 12}:${minutes} PM`;
+      }
+    } catch {
+      return timeString; // Return original if parsing fails
+    }
+  };
+
   const isOverdue = task.dueDate && task.dueTime && (() => {
     try {
       // HTML time input provides 24-hour format (HH:MM)
@@ -112,7 +133,7 @@ const TaskCard = ({ task, viewMode, onToggleComplete }: TaskCardProps) => {
                   : 'text-slate-500 dark:text-slate-400'
                 }`}>
                   <Clock size={14} className="mr-1" />
-                  {task.dueTime}
+                  {formatTime(task.dueTime)}
                 </div>
               )}
 
@@ -177,6 +198,15 @@ const TaskCard = ({ task, viewMode, onToggleComplete }: TaskCardProps) => {
               }`}>
                 <Calendar size={14} className="mr-1" />
                 {formattedDueDate}
+              </div>
+            )}
+            {task.dueTime && (
+              <div className={`flex items-center ${isOverdue
+                ? 'text-error-600 dark:text-error-400'
+                : 'text-slate-500 dark:text-slate-400'
+              }`}>
+                <Clock size={14} className="mr-1" />
+                {formatTime(task.dueTime)}
               </div>
             )}
           </div>
