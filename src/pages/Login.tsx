@@ -120,6 +120,16 @@ const Login = () => {
               {isLoggingIn ? 'Signing In...' : 'Sign In'}
             </button>
 
+            {/* Forgot Password Link */}
+            <div className="text-center">
+              <Link
+                to="/forgot-password"
+                className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+              >
+                Forgot your password?
+              </Link>
+            </div>
+
             {/* For new user? */}
             <p className="text-sm text-center text-gray-500 mt-4">
               Don&apos;t have an account?{" "}

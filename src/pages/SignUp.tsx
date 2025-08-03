@@ -24,7 +24,7 @@ const SignUp = () => {
             const userCredentails = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredentails.user;
 
-            await setDoc(doc(db, "users", user.uid), { name, email, password, createdAt: new Date() });
+            await setDoc(doc(db, "users", user.uid), { name, email, createdAt: new Date() });
             console.log("User Registered with Name: ", name);
         } catch (err: any) {
             setError(err.message);
@@ -130,6 +130,16 @@ const SignUp = () => {
                         >
                             {isSigningUp ? 'Signing Up...' : 'Sign Up'}
                         </button>
+
+                        {/* Forgot Password Link */}
+                        <div className="text-center">
+                            <Link
+                                to="/forgot-password"
+                                className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+                            >
+                                Forgot your password?
+                            </Link>
+                        </div>
 
                         {/* Existing User? */}
                         <p className="text-sm text-center text-gray-500 mt-4">
