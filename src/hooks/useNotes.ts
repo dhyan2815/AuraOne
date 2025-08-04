@@ -16,7 +16,9 @@ export interface Note {
   title: string;
   content: string;
   createdAt: string;
-  tag: [],
+  tags: string[];
+  starred?: boolean;
+  pinned?: boolean;
 }
 
 const getUserNotesCollection = (userId: string) =>
@@ -74,4 +76,22 @@ export const updateNote = async (
 export const deleteNote = async (userId: string, id: string) => {
   const docRef = doc(db, "users", userId, "notes", id);
   await deleteDoc(docRef);
+};
+
+export const toggleNoteStar = async (
+  userId: string,
+  id: string,
+  starred: boolean
+) => {
+  const docRef = doc(db, "users", userId, "notes", id);
+  await updateDoc(docRef, { starred });
+};
+
+export const toggleNotePin = async (
+  userId: string,
+  id: string,
+  pinned: boolean
+) => {
+  const docRef = doc(db, "users", userId, "notes", id);
+  await updateDoc(docRef, { pinned });
 };
