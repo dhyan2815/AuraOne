@@ -76,22 +76,22 @@ const NoteCard = ({ note, viewMode }: NoteCardProps) => {
               </div>
             </div>
 
-            <div className="flex items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
-              <div className="flex items-center">
-                <Calendar size={14} className="mr-1" />
-                {formattedDate}
+            <div className="flex items-center gap-4 text-sm text-slate-500 dark:text-slate-400 flex-wrap">
+              <div className="flex items-center flex-shrink-0">
+                <Calendar size={14} className="mr-1 flex-shrink-0" />
+                <span className="whitespace-nowrap">{formattedDate}</span>
               </div>
 
               {note.tags?.length > 0 && (
-                <div className="flex items-center">
-                  <Tag size={14} className="mr-1" />
+                <div className="flex items-center flex-shrink-0">
+                  <Tag size={14} className="mr-1 flex-shrink-0" />
                   <span className="max-w-[150px] truncate">
                     {note.tags.join(", ")}
                   </span>
                 </div>
               )}
 
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1 flex-shrink-0">
                 <button
                   onClick={handleToggleStar}
                   className="p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
@@ -152,15 +152,15 @@ const NoteCard = ({ note, viewMode }: NoteCardProps) => {
         </div>
 
         <div className="flex items-center justify-between text-sm text-slate-500 dark:text-slate-400 mt-auto pt-4 border-t border-slate-100 dark:border-slate-700">
-          <div className="flex items-center">
-            <Calendar size={14} className="mr-1" />
-            {formattedDate}
+          <div className="flex items-center flex-shrink-0">
+            <Calendar size={14} className="mr-1 flex-shrink-0" />
+            <span className="whitespace-nowrap">{formattedDate}</span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-shrink-0">
             {note.tags?.length > 0 && (
-              <div className="flex items-center">
-                <Tag size={14} className="mr-1" />
+              <div className="flex items-center flex-shrink-0">
+                <Tag size={14} className="mr-1 flex-shrink-0" />
                 <span className="max-w-[100px] truncate">
                   {note.tags.join(", ")}
                 </span>

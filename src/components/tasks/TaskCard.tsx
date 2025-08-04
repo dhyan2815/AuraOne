@@ -155,35 +155,35 @@ const TaskCard = ({ task, viewMode, onToggleComplete }: TaskCardProps) => {
               </div>
             </div>
 
-            <div className="flex items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
+            <div className="flex items-center gap-4 text-sm text-slate-500 dark:text-slate-400 flex-wrap">
               {task.dueDate && (
-                <div className={`flex items-center ${isOverdue
+                <div className={`flex items-center flex-shrink-0 ${isOverdue
                   ? 'text-error-600 dark:text-error-400'
                   : 'text-slate-500 dark:text-slate-400'
                 }`}>
-                  <Calendar size={14} className="mr-1" />
-                  {formattedDueDate}
+                  <Calendar size={14} className="mr-1 flex-shrink-0" />
+                  <span className="whitespace-nowrap">{formattedDueDate}</span>
                   {isOverdue && (
-                    <span className="ml-1 font-medium">(Overdue)</span>
+                    <span className="ml-1 font-medium whitespace-nowrap">(Overdue)</span>
                   )}
                 </div>
               )}
 
               {task.dueTime && (
-                <div className={`flex items-center ${isOverdue
+                <div className={`flex items-center flex-shrink-0 ${isOverdue
                   ? 'text-error-600 dark:text-error-400'
                   : 'text-slate-500 dark:text-slate-400'
                 }`}>
-                  <Clock size={14} className="mr-1" />
-                  {formatTime(task.dueTime)}
+                  <Clock size={14} className="mr-1 flex-shrink-0" />
+                  <span className="whitespace-nowrap">{formatTime(task.dueTime)}</span>
                 </div>
               )}
 
-              <div className={`px-2 py-0.5 rounded-full text-xs ${priorityColors[task.priority]}`}>
+              <div className={`px-2 py-0.5 rounded-full text-xs flex-shrink-0 ${priorityColors[task.priority]}`}>
                 {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
               </div>
 
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1 flex-shrink-0">
                 <button
                   onClick={handleToggleStar}
                   className="p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
@@ -268,28 +268,28 @@ const TaskCard = ({ task, viewMode, onToggleComplete }: TaskCardProps) => {
         </div>
 
         <div className="flex items-center justify-between text-sm text-slate-500 dark:text-slate-400 mt-auto pt-4 border-t border-slate-100 dark:border-slate-700">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             {task.dueDate && (
-              <div className={`flex items-center ${isOverdue
+              <div className={`flex items-center flex-shrink-0 ${isOverdue
                 ? 'text-error-600 dark:text-error-400'
                 : 'text-slate-500 dark:text-slate-400'
               }`}>
-                <Calendar size={14} className="mr-1" />
-                {formattedDueDate}
+                <Calendar size={14} className="mr-1 flex-shrink-0" />
+                <span className="whitespace-nowrap">{formattedDueDate}</span>
               </div>
             )}
             {task.dueTime && (
-              <div className={`flex items-center ${isOverdue
+              <div className={`flex items-center flex-shrink-0 ${isOverdue
                 ? 'text-error-600 dark:text-error-400'
                 : 'text-slate-500 dark:text-slate-400'
               }`}>
-                <Clock size={14} className="mr-1" />
-                {formatTime(task.dueTime)}
+                <Clock size={14} className="mr-1 flex-shrink-0" />
+                <span className="whitespace-nowrap">{formatTime(task.dueTime)}</span>
               </div>
             )}
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-shrink-0">
             <div className={`px-2 py-0.5 rounded-full text-xs ${priorityColors[task.priority]}`}>
               {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
             </div>
