@@ -28,7 +28,7 @@ const Card = ({
     >
       {title && (
         <div className="flex items-center justify-between px-6 py-4 border-slate-100 dark:border-slate-700">
-          <h3 className="text-xl font-semibold">{title}</h3>
+          <h3 className="text-3xl font-semibold">{title}</h3>
           
           {actionLabel && (
             actionHref ? (
