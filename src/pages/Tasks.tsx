@@ -10,6 +10,8 @@ import {
   Search,
   GridIcon,
   ListIcon,
+  Star,
+  Pin,
 } from "lucide-react";
 import TaskCard from "../components/tasks/TaskCard";
 import { motion } from "framer-motion";
@@ -24,7 +26,7 @@ const Tasks = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [filter, setFilter] = useState<"all" | "completed" | "pending">("all");
+  const [filter, setFilter] = useState<"all" | "completed" | "pending" | "starred" | "pinned">("all");
 
   const { user } = useAuth();
 
@@ -60,6 +62,8 @@ const Tasks = () => {
     let statusFiltered = true;
     if (filter === "completed") statusFiltered = task.completed === "completed";
     if (filter === "pending") statusFiltered = task.completed === "due";
+    if (filter === "starred") statusFiltered = task.starred === true;
+    if (filter === "pinned") statusFiltered = task.pinned === true;
     
     // Then apply search filter
     let searchFiltered = true;
@@ -73,7 +77,19 @@ const Tasks = () => {
     return statusFiltered && searchFiltered;
   });
 
-
+  // Sort tasks: pinned first, then starred, then by creation date
+  const sortedTasks = [...filteredTasks].sort((a, b) => {
+    // Pinned tasks first
+    if (a.pinned && !b.pinned) return -1;
+    if (!a.pinned && b.pinned) return 1;
+    
+    // Then starred tasks
+    if (a.starred && !b.starred) return -1;
+    if (!a.starred && b.starred) return 1;
+    
+    // Finally by creation date (newest first)
+    return new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime();
+  });
 
   // Framer Motion variants for animating the task list
   const container = {
@@ -173,16 +189,40 @@ const Tasks = () => {
           <CheckCheck size={16} />
           Completed
         </button>
+        <button
+          className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium ${filter === "starred"
+              ? "bg-warning-100 dark:bg-warning-900 text-warning-800 dark:text-warning-100"
+              : "bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300"
+            }`}
+          onClick={() => setFilter("starred")}
+        >
+          <Star size={16} />
+          Starred
+        </button>
+        <button
+          className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium ${filter === "pinned"
+              ? "bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-100"
+              : "bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300"
+            }`}
+          onClick={() => setFilter("pinned")}
+        >
+          <Pin size={16} />
+          Pinned
+        </button>
       </div>
 
-      {filteredTasks.length === 0 ? (
+      {sortedTasks.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-64 text-center">
           <p className="text-slate-500 dark:text-slate-400 mb-4">
             {filter === "all"
               ? "No tasks found"
               : filter === "completed"
                 ? "No completed tasks yet"
-                : "No pending tasks"}
+                : filter === "pending"
+                  ? "No pending tasks"
+                  : filter === "starred"
+                    ? "No starred tasks yet"
+                    : "No pinned tasks yet"}
           </p>
           {filter !== "all" && (
             <button
@@ -210,7 +250,7 @@ const Tasks = () => {
               : "flex flex-col gap-4"
           }
         >
-          {filteredTasks.map((task: Task) => (
+          {sortedTasks.map((task: Task) => (
             <motion.div key={task.id} variants={item}>
               <TaskCard task={task} viewMode={viewMode} onToggleComplete={handleToggleComplete} />
             </motion.div>

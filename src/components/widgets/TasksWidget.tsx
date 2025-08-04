@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { getTasks, updateTask, Task } from "../../hooks/useTasks";
 import { useAuth } from "../../hooks/useAuth";
+import { Star, Pin } from "lucide-react";
 
 const TasksWidget = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -30,8 +31,22 @@ const TasksWidget = () => {
     setTasks(updated);
   };
 
-  // Filter only incomplete tasks and limit to 3
-  const displayTasks = tasks.filter((task) => task.completed !== "completed").slice(0, 3);
+  // Filter only incomplete tasks, sort by pinned/starred priority, and limit to 3
+  const displayTasks = tasks
+    .filter((task) => task.completed !== "completed")
+    .sort((a, b) => {
+      // Pinned tasks first
+      if (a.pinned && !b.pinned) return -1;
+      if (!a.pinned && b.pinned) return 1;
+      
+      // Then starred tasks
+      if (a.starred && !b.starred) return -1;
+      if (!a.starred && b.starred) return 1;
+      
+      // Finally by creation date (newest first)
+      return new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime();
+    })
+    .slice(0, 3);
 
   // Count of remaining tasks
   const remainingTasksCount =
@@ -62,8 +77,16 @@ const TasksWidget = () => {
                 onChange={() => handleToggleComplete(task.id, task.completed)}
                 className="mt-1 h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-600"
               />
-              <div>
-                <p className="text-sm font-medium">{task.title}</p>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-medium truncate">{task.title}</p>
+                  {task.starred && (
+                    <Star size={12} className="text-warning-500 flex-shrink-0" fill="currentColor" />
+                  )}
+                  {task.pinned && (
+                    <Pin size={12} className="text-primary-500 flex-shrink-0" fill="currentColor" />
+                  )}
+                </div>
                 <div className="mt-1">
                   <span
                     className={`inline-block px-2 py-0.5 text-xs font-medium rounded-full ${task.priority === "high"

@@ -92,3 +92,21 @@ export const deleteTask = async (userId: string, id: string) => {
   const ref = doc(db, "users", userId, "tasks", id);
   await deleteDoc(ref);
 };
+
+export const toggleTaskStar = async (
+  userId: string,
+  id: string,
+  starred: boolean
+) => {
+  const ref = doc(db, "users", userId, "tasks", id);
+  await updateDoc(ref, { starred });
+};
+
+export const toggleTaskPin = async (
+  userId: string,
+  id: string,
+  pinned: boolean
+) => {
+  const ref = doc(db, "users", userId, "tasks", id);
+  await updateDoc(ref, { pinned });
+};
