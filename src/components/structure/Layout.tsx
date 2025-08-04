@@ -29,7 +29,7 @@ const Layout = () => {
         isCollapsed={isSidebarCollapsed} 
         onToggleCollapse={toggleSidebar} 
       />
-      <main className="flex-1 overflow-auto bg-slate-50 dark:bg-slate-900 transition-all duration-300 ease-in-out">
+      <main className="flex-1 overflow-auto bg-slate-100 dark:bg-slate-900 transition-all duration-300 ease-in-out">
         <motion.div 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
