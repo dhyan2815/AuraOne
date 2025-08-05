@@ -63,7 +63,7 @@ const Login = () => {
 
             {/* Display error */}
             {error && (
-              <p className="text-red-500 text-sm text-center">{error}</p>
+              <p className="text-red-500 text-sm text-center">Incorrect email or password, please try again.</p>
             )}
 
             {/* Email Input */}
