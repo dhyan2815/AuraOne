@@ -4,7 +4,7 @@ import { auth } from "../services/firebase";
 import { useNavigate, Link } from "react-router-dom";
 import { Eye, EyeOff, Shield, Zap, Clock, CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
-import LoginPicture from "../assets/flat-illustration-1.jpg";
+import LoginPicture from "../assets/flat-illustration-3.png";
 
 const Login = () => {
   const navigate = useNavigate();

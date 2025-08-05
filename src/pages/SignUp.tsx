@@ -5,7 +5,7 @@ import { doc, setDoc } from "firebase/firestore";
 import { useNavigate, Link } from "react-router-dom";
 import { Eye, EyeOff, CheckCircle, Calendar, MessageSquare, FileText, Sparkles, Shield, Zap, Users } from "lucide-react";
 import toast from "react-hot-toast";
-import SignUpPicture from "../assets/flat-illustration-1.jpg"
+import SignUpPicture from "../assets/flat-illustration-3.png"
 
 const SignUp = () => {
     const navigate = useNavigate();
