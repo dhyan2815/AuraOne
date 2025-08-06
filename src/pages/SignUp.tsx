@@ -1,14 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../services/firebase";
 import { doc, setDoc } from "firebase/firestore";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { Eye, EyeOff, CheckCircle, Calendar, MessageSquare, FileText, Sparkles, Shield, Zap, Users } from "lucide-react";
 import toast from "react-hot-toast";
 import SignUpPicture from "../assets/flat-illustration-3.png"
 
 const SignUp = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -16,22 +17,52 @@ const SignUp = () => {
     const [error, setError] = useState("");
     const [isSigningUp, setIsSigningUp] = useState(false);
 
-    const handleSignUp = async (e: React.FormEvent) => {
+    // Handle smooth scrolling when coming from other pages or with hash
+    useEffect(() => {
+        if (location.hash === '#signup' || location.search.includes('scroll=form')) {
+            setTimeout(() => {
+                scrollToSignUpForm();
+            }, 500);
+        }
+    }, [location]);
 
+    const handleSignUp = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSigningUp(true);
+        setError(""); // Clear any previous errors
+        
         try {
             const userCredentails = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredentails.user;
 
             await setDoc(doc(db, "users", user.uid), { name, email, createdAt: new Date() });
             console.log("User Registered with Name: ", name);
+            
+            toast.success("Registration Successful! Welcome to AuraOne");
+            toast('Redirecting to your dashboard...', { icon: '🚀' });
+            
+            // Small delay to show the success message before navigation
+            setTimeout(() => {
+                navigate("/dashboard", { replace: true });
+            }, 1500);
+            
         } catch (err: any) {
             setError(err.message);
-            toast.error(`Registration Failed: ${err.message}`)
+            toast.error(`Registration Failed: ${err.message}`);
+        } finally {
+            setIsSigningUp(false);
         }
-        toast.success("Registration Successfull")
-        navigate("/dashboard"); // Redirect to dashboard after successful signup!
+    };
+
+    // Function to scroll to the signup form
+    const scrollToSignUpForm = () => {
+        const formElement = document.querySelector('form');
+        if (formElement) {
+            formElement.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'center' 
+            });
+        }
     };
 
     return (
@@ -157,10 +188,21 @@ const SignUp = () => {
                             {/* Enhanced Sign Up Button */}
                             <button
                                 type="submit"
-                                className="w-full py-3 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold text-base transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                                className={`w-full py-3 rounded-lg font-semibold text-base transition-all duration-200 shadow-lg transform ${
+                                    isSigningUp 
+                                        ? 'bg-gray-400 cursor-not-allowed shadow-md' 
+                                        : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 hover:shadow-xl hover:-translate-y-0.5'
+                                } text-white`}
                                 disabled={isSigningUp}
                             >
-                                {isSigningUp ? 'Creating Your Account...' : '🚀 Start Your Free Journey'}
+                                {isSigningUp ? (
+                                    <div className="flex items-center justify-center gap-2">
+                                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                        Creating Your Account...
+                                    </div>
+                                ) : (
+                                    '🚀 Start Your Free Journey'
+                                )}
                             </button>
 
                             {/* Security Note */}
@@ -172,7 +214,7 @@ const SignUp = () => {
                             <p className="text-sm text-center text-gray-500 mt-4">
                                 Already a part of Aura?{" "}
                                 <Link
-                                    to="/login"
+                                    to="/login?scroll=form"
                                     className="text-indigo-600 font-semibold hover:underline"
                                 >
                                     Login here
@@ -306,15 +348,15 @@ const SignUp = () => {
                         Experience the power of modern web technologies in a beautiful, functional dashboard
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <Link
-                            to="/signup"
-                            className="px-8 py-3 bg-white text-indigo-600 font-semibold rounded-lg hover:bg-gray-100 transition-colors"
+                        <button
+                            onClick={scrollToSignUpForm}
+                            className="px-8 py-3 bg-white text-indigo-600 font-semibold rounded-lg hover:bg-gray-100 transition-all duration-200 transform hover:scale-105 shadow-lg"
                         >
                             Get Started Free
-                        </Link>
+                        </button>
                         <Link
-                            to="/login"
-                            className="px-8 py-3 border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-indigo-600 transition-colors"
+                            to="/login?scroll=form"
+                            className="px-8 py-3 border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-indigo-600 transition-all duration-200 transform hover:scale-105"
                         >
                             Sign In
                         </Link>

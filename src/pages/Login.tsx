@@ -1,31 +1,59 @@
-import { useState} from "react";
+import { useState, useEffect } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../services/firebase";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { Eye, EyeOff, Shield, Zap, Clock, CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
 import LoginPicture from "../assets/flat-illustration-3.png";
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
+  // Function to scroll to the login form
+  const scrollToLoginForm = () => {
+    const formElement = document.querySelector('form');
+    if (formElement) {
+      formElement.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center' 
+      });
+    }
+  };
+
+  // Handle smooth scrolling when coming from other pages or with hash
+  useEffect(() => {
+    if (location.hash === '#login' || location.search.includes('scroll=form')) {
+
+      setTimeout(() => {
+        scrollToLoginForm();
+      }, 500);
+    }
+  }, [location]);
+
   // Login logic
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoggingIn(true);
+    setError(""); // Clear any previous errors
+    
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      toast.success("Logged In Successfully")
-      toast('Welcome to AuraOne', { icon: '👋' });
-      navigate("/dashboard");
+      toast.success("Logged In Successfully!");
+      toast('Welcome back to AuraOne', { icon: '👋' });
+      
+      // Small delay to show the success message before navigation
+      setTimeout(() => {
+        navigate("/dashboard", { replace: true });
+      }, 1500);
+      
     } catch (err: any) {
       setError(err.message);
-      toast.error(`Login Failed: ${err.message}`)
     } finally {
       setIsLoggingIn(false);
     }
@@ -142,10 +170,21 @@ const Login = () => {
               {/* Enhanced Login Button */}
               <button
                 type="submit"
-                className="w-full py-3 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold text-base transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                className={`w-full py-3 rounded-lg font-semibold text-base transition-all duration-200 shadow-lg transform ${
+                  isLoggingIn 
+                    ? 'bg-gray-400 cursor-not-allowed shadow-md' 
+                    : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 hover:shadow-xl hover:-translate-y-0.5'
+                } text-white`}
                 disabled={isLoggingIn}
               >
-                {isLoggingIn ? 'Signing In...' : '🚀 Welcome Back'}
+                {isLoggingIn ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Signing In...
+                  </div>
+                ) : (
+                  '🚀 Welcome Back'
+                )}
               </button>
 
               {/* Forgot Password Link */}
