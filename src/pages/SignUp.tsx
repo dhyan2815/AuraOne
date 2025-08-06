@@ -44,7 +44,7 @@ const SignUp = () => {
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600"> Productivity Hub</span>
                     </h1>
                     <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-                        Manage tasks, notes, calendar, and more in one beautiful workspace. 
+                        Manage tasks, notes, calendar, and more in one beautiful workspace.
                         Join many of users who've transformed their productivity.
                     </p>
                     <div className="flex flex-wrap justify-center gap-6 text-sm text-gray-500 mb-8">
@@ -192,7 +192,7 @@ const SignUp = () => {
                             AuraOne combines all your essential tools in one beautiful, intuitive interface
                         </p>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         <div className="text-center p-6 rounded-xl bg-gradient-to-br from-indigo-50 to-purple-50 hover:shadow-lg transition-all duration-200">
                             <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -245,51 +245,52 @@ const SignUp = () => {
                 </div>
             </div>
 
-            {/* Social Proof Section */}
+            {/* Features Showcase Section */}
             <div className="bg-gray-50 py-16">
                 <div className="container mx-auto px-4">
                     <div className="text-center mb-12">
-                        <h2 className="text-3xl font-bold text-gray-900 mb-4">Trusted by Productivity Enthusiasts</h2>
-                        <p className="text-lg text-gray-600">Join thousands of users who've transformed their workflow</p>
+                        <h2 className="text-3xl font-bold text-gray-900 mb-4">Built for Modern Productivity</h2>
+                        <p className="text-lg text-gray-600">A comprehensive dashboard that brings together all your essential tools</p>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
                         <div className="text-center">
-                            <div className="text-4xl font-bold text-indigo-600 mb-2">10K+</div>
-                            <div className="text-gray-600">Active Users</div>
+                            <div className="text-4xl font-bold text-indigo-600 mb-2">5+</div>
+                            <div className="text-gray-600">Core Features</div>
                         </div>
                         <div className="text-center">
-                            <div className="text-4xl font-bold text-indigo-600 mb-2">50K+</div>
-                            <div className="text-gray-600">Tasks Completed</div>
+                            <div className="text-4xl font-bold text-indigo-600 mb-2">100%</div>
+                            <div className="text-gray-600">Free & Open Source</div>
                         </div>
                         <div className="text-center">
-                            <div className="text-4xl font-bold text-indigo-600 mb-2">99.9%</div>
-                            <div className="text-gray-600">Uptime</div>
+                            <div className="text-4xl font-bold text-indigo-600 mb-2">Instant</div>
+                            <div className="text-gray-600">Smart Productivity Tools</div>
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-2xl p-8 shadow-lg">
+                    {/* Technology Stack Section */}
+                    <div className="bg-white p-8">
                         <div className="flex items-center justify-center gap-4 mb-6">
-                            <Users className="w-6 h-6 text-indigo-600" />
-                            <span className="text-lg font-semibold text-gray-900">What Our Users Say</span>
+                            <Zap className="w-6 h-6 text-indigo-600" />
+                            <span className="text-lg font-semibold text-gray-900">Built with Modern Tech Stack</span>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="p-4 bg-gray-50 rounded-lg">
-                                <p className="text-gray-700 mb-3">"AuraOne has completely transformed how I organize my work. The AI assistant is incredibly helpful!"</p>
-                                <div className="flex items-center gap-2">
-                                    <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
-                                        <span className="text-sm font-semibold text-indigo-600">S</span>
-                                    </div>
-                                    <span className="text-sm font-medium text-gray-900">Sarah M.</span>
+                                <h4 className="font-semibold text-gray-900 mb-2">Frontend Excellence</h4>
+                                <div className="flex flex-wrap gap-2">
+                                    <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">React 18</span>
+                                    <span className="px-3 py-1 bg-cyan-100 text-cyan-700 text-xs rounded-full">TypeScript</span>
+                                    <span className="px-3 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">Tailwind CSS</span>
+                                    <span className="px-3 py-1 bg-orange-100 text-orange-700 text-xs rounded-full">Vite</span>
                                 </div>
                             </div>
                             <div className="p-4 bg-gray-50 rounded-lg">
-                                <p className="text-gray-700 mb-3">"Finally, all my productivity tools in one place. The interface is beautiful and intuitive."</p>
-                                <div className="flex items-center gap-2">
-                                    <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                                        <span className="text-sm font-semibold text-purple-600">M</span>
-                                    </div>
-                                    <span className="text-sm font-medium text-gray-900">Mike R.</span>
+                                <h4 className="font-semibold text-gray-900 mb-2">Backend & Services</h4>
+                                <div className="flex flex-wrap gap-2">
+                                    <span className="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-full">Firebase</span>
+                                    <span className="px-3 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full">AI Integration</span>
+                                    <span className="px-3 py-1 bg-red-100 text-red-700 text-xs rounded-full">Real-time Sync</span>
+                                    <span className="px-3 py-1 bg-indigo-100 text-indigo-700 text-xs rounded-full">PWA Ready</span>
                                 </div>
                             </div>
                         </div>
@@ -300,9 +301,9 @@ const SignUp = () => {
             {/* Final CTA Section */}
             <div className="bg-gradient-to-r from-indigo-600 to-purple-600 py-16">
                 <div className="container mx-auto px-4 text-center">
-                    <h2 className="text-3xl font-bold text-white mb-4">Ready to Transform Your Productivity?</h2>
+                    <h2 className="text-3xl font-bold text-white mb-4">Ready to Boost Your Productivity?</h2>
                     <p className="text-xl text-indigo-100 mb-8 max-w-2xl mx-auto">
-                        Join thousands of users who've already discovered the power of AuraOne
+                        Experience the power of modern web technologies in a beautiful, functional dashboard
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <Link
