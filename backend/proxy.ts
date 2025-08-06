@@ -1,4 +1,4 @@
-// backend/server.ts
+// backend/proxy.ts
 
 import express from 'express';
 import cors from 'cors';
@@ -60,5 +60,5 @@ app.post('/chat', async (req: Request, res: Response) => {
 
 // Start the server
 app.listen(PORT, () => {
-  console.log(`Proxy running on http://localhost:${PORT} (model: ${MODEL})`);
+  console.log(`Proxy running on http://localhost:${PORT} (Model Used: ${MODEL})`);
 });
