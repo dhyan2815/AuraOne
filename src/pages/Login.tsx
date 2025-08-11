@@ -76,13 +76,18 @@ const Login = () => {
       {/* Full-width Image and Credential Section */}
       <div className="w-full px-4 pb-16">
         <div className="md:flex md:max-w-screen-xl lg:max-w-screen-2xl mx-auto">
-          {/* Image section */}
-          <div className="md:w-full flex items-center justify-center rounded-xl mb-8 md:mb-0 z-0">
+          {/* Image section with overlay title */}
+          <div className="md:w-full relative rounded-xl mb-8 md:mb-0 z-0">
             <img
               src={LoginPicture}
               alt="login-art"
               className="w-full rounded-xl h-full object-cover shadow-2xl"
             />
+            {/* AuraOne title overlay on top left of image */}
+            <div className="absolute top-6 left-6 z-20">
+              <span className="drop-shadow-md font-bold text-5xl 
+                text-indigo-700 tracking-wide">AuraOne</span>
+            </div>
           </div>
 
           {/* Login form styled to match the reference image */}
@@ -93,10 +98,6 @@ const Login = () => {
               style={{ minWidth: 340 }}
               autoComplete="off"
             >
-              {/* Logo and Brand */}
-              <div className="flex items-center">
-                <span className="font-bold text-2xl text-indigo-700 tracking-wide">AuraOne</span>
-              </div>
 
               {/* Enhanced Heading */}
               <div>
