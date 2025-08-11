@@ -63,11 +63,11 @@ const Login = () => {
     <div className="login min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
       {/* Welcome Back Header */}
       <div className="container mx-auto px-4 py-8">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+        <div className="text-center mb-6">
+          <h1 className="text-5xl font-bold md:text-6xl text-gray-900 mb-4">
             Welcome Back to <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">AuraOne</span>
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Continue your productivity journey. Your workspace is ready and waiting for you.
           </p>
         </div>

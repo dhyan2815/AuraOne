@@ -68,7 +68,7 @@ const SignUp = () => {
     return (
         <div className="signup min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
             {/* Hero Section */}
-            <div className="container mx-auto px-4 py-6">
+            <div className="container mx-auto px-4 py-8">
                 <div className="text-center mb-6">
                     <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
                         Your All-in-One
@@ -78,20 +78,6 @@ const SignUp = () => {
                         Manage tasks, notes, calendar, and more in one beautiful workspace.
                         Join many of users who've transformed their productivity.
                     </p>
-                    <div className="flex flex-wrap justify-center gap-6 text-sm text-gray-500 mb-8">
-                        <div className="flex items-center gap-2">
-                            <CheckCircle className="w-4 h-4 text-green-500" />
-                            <span>Free forever</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <CheckCircle className="w-4 h-4 text-green-500" />
-                            <span>No credit card required</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <CheckCircle className="w-4 h-4 text-green-500" />
-                            <span>Setup in 2 minutes</span>
-                        </div>
-                    </div>
                 </div>
             </div>
 
