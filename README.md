@@ -41,6 +41,7 @@ AuraOne features a unified AI service that intelligently manages both Gemini and
 - **Schema Validation**: Strict Zod validation ensures consistent AI responses
 - **Auto-Repair**: Invalid responses automatically retried with repair prompts
 - **Environment-Aware**: Different configurations for development vs production
+- **Unified Logic**: Same parsing, validation, and CRUD mapping for both models
 
 ### Project Structure
 ```
@@ -52,10 +53,15 @@ src/
 │   ├── tasks/         # Task-specific components
 │   └── notes/         # Note-specific components
 ├── pages/             # Route components
-├── hooks/             # Custom React hooks
+├── hooks/             # Custom React hooks (useAuth, useTasks, useNotes, useEvents)
 ├── services/          # External service integrations
-├── config/            # Configuration files
+│   ├── aiService.ts   # Unified AI service (Gemini + Qwen)
+│   ├── chatHandler.ts # Chat orchestrator
+│   ├── chatSessionService.ts # Chat session management
+│   └── firebase.ts    # Firebase configuration
+├── config/            # Configuration files (API keys, environment)
 └── utils/             # Utility functions
+    └── aiCommandSchema.ts # Zod validation schemas
 ```
 
 ## 🎯 Features in Detail
@@ -100,6 +106,13 @@ src/
 - **Improved CRUD Accuracy**: Better natural language parsing for tasks, notes, and events
 - **Automatic Repair**: Invalid AI responses automatically retried with repair prompts
 - **Environment-Aware**: Different configurations for development vs production
+
+### v2.0 - Unified AI Service (Current)
+- **Complete Codebase Cleanup**: Removed all legacy AI handlers and parsers
+- **Unified AI Service**: Single `aiService.ts` handles all AI operations
+- **Zod Schema Validation**: Replaced regex parsing with structured validation
+- **Direct API Integration**: Production-ready with direct Gemini/Qwen API calls
+- **Simplified Architecture**: Reduced complexity and improved maintainability
 
 
 ## 👨‍💻 Author
