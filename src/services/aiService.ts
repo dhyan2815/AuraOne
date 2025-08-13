@@ -50,33 +50,47 @@ async function callGeminiAPI(prompt: string): Promise<string> {
     throw new Error('Gemini API not configured or disabled');
   }
 
-  const response = await fetch(
-    `${AI_CONFIG.gemini.apiUrl}/models/${AI_CONFIG.gemini.model}:generateContent?key=${AI_CONFIG.gemini.apiKey}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: SYSTEM_PROMPT + '\n\nUser: ' + prompt + '\n\nAura:' }] }],
-        generationConfig: {
-          temperature: 0.1,
-          maxOutputTokens: 1000,
-        },
-      }),
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), SERVICE_CONFIG.TIMEOUT_MS);
+
+  try {
+    const response = await fetch(
+      `${AI_CONFIG.gemini.apiUrl}/models/${AI_CONFIG.gemini.model}:generateContent?key=${AI_CONFIG.gemini.apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: SYSTEM_PROMPT + '\n\nUser: ' + prompt + '\n\nAura:' }] }],
+          generationConfig: {
+            temperature: 0.1,
+            maxOutputTokens: 1000,
+          },
+        }),
+        signal: controller.signal,
+      }
+    );
+
+        clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`Gemini API error: ${response.status}`);
     }
-  );
 
-  if (!response.ok) {
-    throw new Error(`Gemini API error: ${response.status}`);
+    const data = await response.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    
+    if (!text) {
+      throw new Error('No response from Gemini');
+    }
+
+    return text.trim();
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error('Gemini API request timed out');
+    }
+    throw error;
   }
-
-  const data = await response.json();
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-  
-  if (!text) {
-    throw new Error('No response from Gemini');
-  }
-
-  return text.trim();
 }
 
 // Qwen API call
@@ -85,28 +99,42 @@ async function callQwenAPI(prompt: string): Promise<string> {
     throw new Error('Qwen API not available');
   }
 
-  const response = await fetch(AI_CONFIG.qwen.endpoint, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: AI_CONFIG.qwen.model,
-      stream: false,
-      prompt: SYSTEM_PROMPT + '\n\nUser: ' + prompt + '\n\nAura:',
-    }),
-  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), SERVICE_CONFIG.TIMEOUT_MS);
 
-  if (!response.ok) {
-    throw new Error(`Qwen API error: ${response.status}`);
+  try {
+    const response = await fetch(AI_CONFIG.qwen.endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: AI_CONFIG.qwen.model,
+        stream: false,
+        prompt: SYSTEM_PROMPT + '\n\nUser: ' + prompt + '\n\nAura:',
+      }),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`Qwen API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const text = data.response;
+    
+    if (!text) {
+      throw new Error('No response from Qwen');
+    }
+
+    return text.trim();
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error('Qwen API request timed out');
+    }
+    throw error;
   }
-
-  const data = await response.json();
-  const text = data.response;
-  
-  if (!text) {
-    throw new Error('No response from Qwen');
-  }
-
-  return text.trim();
 }
 
 // Parse AI response and validate
@@ -239,16 +267,20 @@ async function handleRead(type: string, data: Record<string, unknown>, userId: s
 async function handleUpdate(type: string, data: Record<string, unknown>, userId: string): Promise<string> {
   const { id, ...updateData } = data;
   
+  if (!id || typeof id !== 'string') {
+    throw new Error('ID is required for update operations');
+  }
+  
   switch (type) {
     case 'task': {
       const taskUpdates = data.task || {};
-      await updateTask(userId, id as string, taskUpdates as Record<string, unknown>);
+      await updateTask(userId, id, taskUpdates as Record<string, unknown>);
       return `Task updated successfully ✅`;
     }
     
     case 'note': {
       const noteUpdates = data.note || {};
-      await updateNote(userId, id as string, noteUpdates as Record<string, unknown>);
+      await updateNote(userId, id, noteUpdates as Record<string, unknown>);
       return `Note updated successfully ✅`;
     }
     
@@ -266,17 +298,21 @@ async function handleUpdate(type: string, data: Record<string, unknown>, userId:
 async function handleDelete(type: string, data: Record<string, unknown>, userId: string): Promise<string> {
   const { id } = data;
   
+  if (!id || typeof id !== 'string') {
+    throw new Error('ID is required for delete operations');
+  }
+  
   switch (type) {
     case 'task':
-      await deleteTask(userId, id as string);
+      await deleteTask(userId, id);
       return 'Task deleted successfully 🗑️';
     
     case 'note':
-      await deleteNote(userId, id as string);
+      await deleteNote(userId, id);
       return 'Note deleted successfully 🗑️';
     
     case 'event':
-      await deleteEvent(userId, id as string);
+      await deleteEvent(userId, id);
       return 'Event deleted successfully 🗑️';
     
     default:
@@ -319,8 +355,8 @@ export async function processAIRequest(
         
         return result;
         
-              } catch (error) {
-          lastError = error as Error;
+      } catch (error) {
+        lastError = error as Error;
           
           // If it's a validation error, try repair
           if (error instanceof Error && error.message.includes('Failed to parse AI response')) {
