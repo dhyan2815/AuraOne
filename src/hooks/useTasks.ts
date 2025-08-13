@@ -53,14 +53,37 @@ export const getTaskById = async (userId: string, taskId: string): Promise<Task 
 };
 
 export const listenToTasks = (userId: string, callback: (tasks: Task[]) => void) => {
+  // First try to get tasks ordered by createdAt
   const q = query(getUserTasksCollection(userId), orderBy("createdAt", "desc"));
   
   return onSnapshot(q, (snapshot) => {
-    const tasks = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...(doc.data() as Omit<Task, "id">),
-    }));
+    const tasks = snapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+        // Ensure createdAt exists, use current time if missing
+        createdAt: data.createdAt || new Date().toISOString(),
+      } as Task;
+    });
+    console.log('listenToTasks: Received tasks from Firestore:', tasks);
     callback(tasks);
+  }, (error) => {
+    console.error('listenToTasks: Error listening to tasks:', error);
+    // Fallback: get all tasks without ordering
+    const fallbackQuery = query(getUserTasksCollection(userId));
+    onSnapshot(fallbackQuery, (fallbackSnapshot) => {
+      const fallbackTasks = fallbackSnapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          createdAt: data.createdAt || new Date().toISOString(),
+        } as Task;
+      });
+      console.log('listenToTasks: Fallback tasks:', fallbackTasks);
+      callback(fallbackTasks);
+    });
   });
 };
 

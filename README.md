@@ -28,9 +28,19 @@ AuraOne is a modern, intelligent personal assistant designed for comprehensive t
 - **Frontend**: React 18.3.1, TypeScript 5.5.3, Vite 5.4.2
 - **Styling**: Tailwind CSS 3.4.1, Framer Motion 11.0.8
 - **Backend**: Firebase (Authentication, Firestore)
-- **AI**: Google Gemini API, Qwen-Coder (Ollama)
+- **AI**: Google Gemini API (Primary), Qwen-Coder (Ollama Fallback)
 - **APIs**: OpenWeatherMap, NewsData.io
 - **UI Components**: Radix UI, Lucide React Icons
+
+### 🤖 AI Service Architecture
+AuraOne features a unified AI service that intelligently manages both Gemini and Qwen models:
+
+- **Primary Model**: Google Gemini 2.0 Flash for 24/7 reliability
+- **Fallback Model**: Qwen 2.5 Coder (1.5B) via Ollama for local development
+- **Automatic Fallback**: Seamless switching when primary model is unavailable
+- **Schema Validation**: Strict Zod validation ensures consistent AI responses
+- **Auto-Repair**: Invalid responses automatically retried with repair prompts
+- **Environment-Aware**: Different configurations for development vs production
 
 ### Project Structure
 ```
@@ -82,6 +92,14 @@ src/
 ### [v1.1 - Qwen LLM Integration](https://github.com/dhyan2815/AuraOne/releases/tag/v1.1-qwen)
 - Added Qwen-Coder2.5 (1.5B parameters) for advanced prompt-based automation.
 - Improved custom parsing capabilities.
+
+### v2.0 - Unified AI Service (Current)
+- **Unified AI Architecture**: Single service handling both Gemini and Qwen with automatic fallback
+- **Enhanced Schema Validation**: Strict Zod validation for all AI responses
+- **Production-Ready Configuration**: Secure API key management for both development and production
+- **Improved CRUD Accuracy**: Better natural language parsing for tasks, notes, and events
+- **Automatic Repair**: Invalid AI responses automatically retried with repair prompts
+- **Environment-Aware**: Different configurations for development vs production
 
 
 ## 👨‍💻 Author
