@@ -61,12 +61,34 @@ const ChatDataSchema = z.object({
   message: z.string().min(1, "Chat message is required"),
 });
 
-// Main AI command schema
-export const AICommandSchema = z.object({
-  action: z.enum(["create", "read", "update", "delete", "chat"]),
-  type: z.enum(["task", "note", "event", "general"]),
-  data: z.union([CreateDataSchema, UpdateDataSchema, DeleteDataSchema, ReadDataSchema, ChatDataSchema]),
-});
+// Main AI command schema with discriminated union
+export const AICommandSchema = z.discriminatedUnion("action", [
+  z.object({
+    action: z.literal("create"),
+    type: z.enum(["task", "note", "event"]),
+    data: CreateDataSchema,
+  }),
+  z.object({
+    action: z.literal("read"),
+    type: z.enum(["task", "note", "event"]),
+    data: ReadDataSchema,
+  }),
+  z.object({
+    action: z.literal("update"),
+    type: z.enum(["task", "note", "event"]),
+    data: UpdateDataSchema,
+  }),
+  z.object({
+    action: z.literal("delete"),
+    type: z.enum(["task", "note", "event"]),
+    data: DeleteDataSchema,
+  }),
+  z.object({
+    action: z.literal("chat"),
+    type: z.literal("general"),
+    data: ChatDataSchema,
+  }),
+]);
 
 // Type exports for TypeScript
 export type AICommand = z.infer<typeof AICommandSchema>;

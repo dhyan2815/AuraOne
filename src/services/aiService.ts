@@ -35,7 +35,12 @@ Examples:
 - "Show my tasks" → {"action": "read", "type": "task", "data": {}}
 - "Delete the meeting with John" → {"action": "delete", "type": "event", "data": {"id": "event_id"}}
 
-For general conversation, respond with: {"action": "chat", "type": "general", "data": {"message": "your response here"}}
+For general conversation (greetings, questions, casual chat), respond with: {"action": "chat", "type": "general", "data": {"message": "your helpful response here"}}
+
+Examples of general conversation:
+- "Hello" → {"action": "chat", "type": "general", "data": {"message": "Hello! How can I help you today?"}}
+- "How are you?" → {"action": "chat", "type": "general", "data": {"message": "I'm doing well, thank you! I'm here to help you manage your tasks, notes, and events."}}
+- "What can you do?" → {"action": "chat", "type": "general", "data": {"message": "I can help you create and manage tasks, notes, and events. Just ask me to create a task, add a note, or schedule an event!"}}
 
 Always use ISO date format (YYYY-MM-DD) for dates and 24-hour time format (HH:mm) for times.`;
 
@@ -114,7 +119,8 @@ async function parseAndValidateResponse(response: string): Promise<AICommand> {
     const parsed = JSON.parse(cleaned);
     
     // Validate with Zod schema
-    return validateAICommand(parsed);
+    const validated = validateAICommand(parsed);
+    return validated;
   } catch (error) {
     throw new Error(`Failed to parse AI response: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
@@ -134,8 +140,19 @@ async function executeCRUDOperation(command: AICommand, userId: string): Promise
         return await handleUpdate(type, data, userId);
       case 'delete':
         return await handleDelete(type, data, userId);
-      case 'chat':
-        return (data as { message: string }).message || 'How can Aura help you?';
+      case 'chat': {
+        // Handle different possible data structures
+        let message = '';
+        if (typeof data === 'object' && data !== null) {
+          if ('message' in data && typeof data.message === 'string') {
+            message = data.message;
+          } else if (typeof data === 'string') {
+            message = data;
+          }
+        }
+        
+        return message || 'I understand. How can I help you?';
+      }
       default:
         throw new Error(`Unknown action: ${action}`);
     }
@@ -162,7 +179,6 @@ async function handleCreate(type: string, data: Record<string, unknown>, userId:
       };
       
       await createTask(userId, taskDataToSave);
-      console.log('Task created successfully');
       return `Task "${taskData.title as string}" created successfully ✅`;
     }
     
@@ -290,8 +306,6 @@ export async function processAIRequest(
   for (const model of models) {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        console.log(`🤖 Attempting ${model} (attempt ${attempt})`);
-        
         // Call AI model
         const response = model === 'gemini' 
           ? await callGeminiAPI(userPrompt)
@@ -303,30 +317,27 @@ export async function processAIRequest(
         // Execute CRUD operation
         const result = await executeCRUDOperation(command, userId);
         
-        console.log(`✅ ${model} succeeded on attempt ${attempt}`);
         return result;
         
-      } catch (error) {
-        lastError = error as Error;
-        console.error(`❌ ${model} failed on attempt ${attempt}:`, error);
-        
-        // If it's a validation error, try repair
-        if (error instanceof Error && error.message.includes('Failed to parse AI response')) {
-          try {
-            const repairPrompt = createRepairPrompt(userPrompt, error.message);
-            const repairResponse = model === 'gemini' 
-              ? await callGeminiAPI(repairPrompt)
-              : await callQwenAPI(repairPrompt);
-            
-            const command = await parseAndValidateResponse(repairResponse);
-            const result = await executeCRUDOperation(command, userId);
-            
-            console.log(`✅ ${model} repair succeeded`);
-            return result;
-          } catch (repairError) {
-            console.error(`❌ ${model} repair failed:`, repairError);
+              } catch (error) {
+          lastError = error as Error;
+          
+          // If it's a validation error, try repair
+          if (error instanceof Error && error.message.includes('Failed to parse AI response')) {
+            try {
+              const repairPrompt = createRepairPrompt(userPrompt, error.message);
+              const repairResponse = model === 'gemini' 
+                ? await callGeminiAPI(repairPrompt)
+                : await callQwenAPI(repairPrompt);
+              
+              const command = await parseAndValidateResponse(repairResponse);
+              const result = await executeCRUDOperation(command, userId);
+              
+              return result;
+            } catch (repairError) {
+              // Repair failed, continue to next attempt
+            }
           }
-        }
         
         // If this is the last attempt for this model, break to try next model
         if (attempt === maxRetries) break;
