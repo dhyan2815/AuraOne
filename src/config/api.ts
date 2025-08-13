@@ -78,7 +78,7 @@ export const validateApiKeys = () => {
   }
 
   if (result.valid) {
-    console.log("✅ API configuration validated successfully");
+    // API configuration validated successfully
   }
 
   return result;

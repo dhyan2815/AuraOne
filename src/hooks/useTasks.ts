@@ -65,9 +65,8 @@ export const listenToTasks = (userId: string, callback: (tasks: Task[]) => void)
         // Ensure createdAt exists, use current time if missing
         createdAt: data.createdAt || new Date().toISOString(),
       } as Task;
-    });
-    console.log('listenToTasks: Received tasks from Firestore:', tasks);
-    callback(tasks);
+             });
+         callback(tasks);
   }, (error) => {
     console.error('listenToTasks: Error listening to tasks:', error);
     // Fallback: get all tasks without ordering
@@ -80,9 +79,8 @@ export const listenToTasks = (userId: string, callback: (tasks: Task[]) => void)
           ...data,
           createdAt: data.createdAt || new Date().toISOString(),
         } as Task;
-      });
-      console.log('listenToTasks: Fallback tasks:', fallbackTasks);
-      callback(fallbackTasks);
+               });
+         callback(fallbackTasks);
     });
   });
 };

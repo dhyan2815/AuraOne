@@ -36,7 +36,7 @@ const SignUp = () => {
             const user = userCredentails.user;
 
             await setDoc(doc(db, "users", user.uid), { name, email, createdAt: new Date() });
-            console.log("User Registered with Name: ", name);
+            // User registered successfully
             
             toast.success("Registration Successful! Welcome to AuraOne");
             toast('Redirecting to your dashboard...', { icon: '🚀' });
