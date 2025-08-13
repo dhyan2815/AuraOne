@@ -88,7 +88,7 @@ const ResetPassword = () => {
         // Find user document by email and update password
         // Note: This requires a query since we don't have the user ID
         // In production, consider storing user ID in the reset flow or using a different approach
-        console.log("Password updated in Firebase Auth successfully");
+        // Password updated successfully
         
         // If you need to update Firestore, you would do something like:
         // const usersRef = collection(db, "users");

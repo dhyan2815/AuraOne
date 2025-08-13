@@ -28,9 +28,20 @@ AuraOne is a modern, intelligent personal assistant designed for comprehensive t
 - **Frontend**: React 18.3.1, TypeScript 5.5.3, Vite 5.4.2
 - **Styling**: Tailwind CSS 3.4.1, Framer Motion 11.0.8
 - **Backend**: Firebase (Authentication, Firestore)
-- **AI**: Google Gemini API, Qwen-Coder (Ollama)
+- **AI**: Google Gemini API (Primary), Qwen-Coder (Ollama Fallback)
 - **APIs**: OpenWeatherMap, NewsData.io
 - **UI Components**: Radix UI, Lucide React Icons
+
+### 🤖 AI Service Architecture
+AuraOne features a unified AI service that intelligently manages both Gemini and Qwen models:
+
+- **Primary Model**: Google Gemini 2.0 Flash for 24/7 reliability
+- **Fallback Model**: Qwen 2.5 Coder (1.5B) via Ollama for local development
+- **Automatic Fallback**: Seamless switching when primary model is unavailable
+- **Schema Validation**: Strict Zod validation ensures consistent AI responses
+- **Auto-Repair**: Invalid responses automatically retried with repair prompts
+- **Environment-Aware**: Different configurations for development vs production
+- **Unified Logic**: Same parsing, validation, and CRUD mapping for both models
 
 ### Project Structure
 ```
@@ -42,10 +53,15 @@ src/
 │   ├── tasks/         # Task-specific components
 │   └── notes/         # Note-specific components
 ├── pages/             # Route components
-├── hooks/             # Custom React hooks
+├── hooks/             # Custom React hooks (useAuth, useTasks, useNotes, useEvents)
 ├── services/          # External service integrations
-├── config/            # Configuration files
+│   ├── aiService.ts   # Unified AI service (Gemini + Qwen)
+│   ├── chatHandler.ts # Chat orchestrator
+│   ├── chatSessionService.ts # Chat session management
+│   └── firebase.ts    # Firebase configuration
+├── config/            # Configuration files (API keys, environment)
 └── utils/             # Utility functions
+    └── aiCommandSchema.ts # Zod validation schemas
 ```
 
 ## 🎯 Features in Detail
@@ -83,6 +99,21 @@ src/
 - Added Qwen-Coder2.5 (1.5B parameters) for advanced prompt-based automation.
 - Improved custom parsing capabilities.
 
+### [v1.2 - Unified Models Integration](https://github.com/dhyan2815/AuraOne/releases/tag/v1.2-unified)
+- **Unified LLMs Architecture**: Single service handling both Gemini and Qwen with automatic fallback
+- **Enhanced Schema Validation**: Strict Zod validation for all AI responses
+- **Production-Ready Configuration**: Secure API key management for both development and production
+- **Improved CRUD Accuracy**: Better natural language parsing for tasks, notes, and events
+- **Automatic Repair**: Invalid AI responses automatically retried with repair prompts
+- **Environment-Aware**: Different configurations for development vs production
+
+### v2.0 - Unified AI Service (Current)
+- **Complete Codebase Cleanup**: Removed all legacy AI handlers and parsers
+- **Unified AI Service**: Single `aiService.ts` handles all AI operations
+- **Zod Schema Validation**: Replaced regex parsing with structured validation
+- **Direct API Integration**: Production-ready with direct Gemini/Qwen API calls
+- **Simplified Architecture**: Reduced complexity and improved maintainability
+
 
 ## 👨‍💻 Author
 
@@ -100,7 +131,7 @@ src/
 - [Framer Motion](https://www.framer.com/motion/) for animations
 - [OpenWeatherMap](https://openweathermap.org/) for weather data
 - [NewsData.io](https://newsdata.io/) for news aggregation
-
+- [Zod](https://zod.dev/) for robust schema validation
 
 ---
 
