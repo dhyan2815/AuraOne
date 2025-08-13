@@ -93,8 +93,8 @@ src/
 - Added Qwen-Coder2.5 (1.5B parameters) for advanced prompt-based automation.
 - Improved custom parsing capabilities.
 
-### v2.0 - Unified AI Service (Current)
-- **Unified AI Architecture**: Single service handling both Gemini and Qwen with automatic fallback
+### [v1.2 - Unified Models Integration](https://github.com/dhyan2815/AuraOne/releases/tag/v1.2-unified)
+- **Unified LLMs Architecture**: Single service handling both Gemini and Qwen with automatic fallback
 - **Enhanced Schema Validation**: Strict Zod validation for all AI responses
 - **Production-Ready Configuration**: Secure API key management for both development and production
 - **Improved CRUD Accuracy**: Better natural language parsing for tasks, notes, and events
@@ -118,7 +118,7 @@ src/
 - [Framer Motion](https://www.framer.com/motion/) for animations
 - [OpenWeatherMap](https://openweathermap.org/) for weather data
 - [NewsData.io](https://newsdata.io/) for news aggregation
-
+- [Zod](https://zod.dev/) for robust schema validation
 
 ---
 
