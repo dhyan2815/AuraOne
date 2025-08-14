@@ -1,7 +1,8 @@
 
-# ✨ AuraOne - A Digital Management Platform
+# AuraOne - A Digital Management Hub
 
-AuraOne is a modern, intelligent personal assistant designed for comprehensive task management, note-taking, event scheduling, and news aggregation. Built with React, TypeScript, and Firebase, it provides a centralized solution for efficient daily organization with AI-powered features.
+**Sick of app overload?** AuraOne puts your tasks, notes, events, and news in one smart, AI-powered hub.**One app, zero chaos—just pure focus.**
+An **intelligent personal assistant** designed for comprehensive task management, note-taking, event scheduling, and news aggregation.
 
 ## 🚀 Features
 
@@ -73,10 +74,10 @@ src/
 - **News Widget**: Latest news with source attribution
 
 ### Notes Management
-- **Rich Text Editor**: TipTap-powered editor with formatting
-- **Tag System**: Organize notes with custom tags
-- **Search Functionality**: Full-text search across notes
-- **Grid/List Views**: Flexible note display options
+- **Rich Text Editor**: TipTap-based editor with formatting support
+- **Tagging & Organization**: Add, edit, and remove custom tags to organize notes efficiently
+- **Search & Filter**: Instantly search notes by content or tag with full-text search and tag-based filtering
+- **Note CRUD**: Create, update, and delete notes with real-time sync
 
 ### Task Management
 - **Priority Levels**: High, Medium, Low priority classification
@@ -100,19 +101,9 @@ src/
 - Improved custom parsing capabilities.
 
 ### [v1.2 - Unified Models Integration](https://github.com/dhyan2815/AuraOne/releases/tag/v1.2-unified)
-- **Unified LLMs Architecture**: Single service handling both Gemini and Qwen with automatic fallback
-- **Enhanced Schema Validation**: Strict Zod validation for all AI responses
-- **Production-Ready Configuration**: Secure API key management for both development and production
-- **Improved CRUD Accuracy**: Better natural language parsing for tasks, notes, and events
-- **Automatic Repair**: Invalid AI responses automatically retried with repair prompts
-- **Environment-Aware**: Different configurations for development vs production
-
-### v2.0 - Unified AI Service (Current)
-- **Complete Codebase Cleanup**: Removed all legacy AI handlers and parsers
-- **Unified AI Service**: Single `aiService.ts` handles all AI operations
-- **Zod Schema Validation**: Replaced regex parsing with structured validation
-- **Direct API Integration**: Production-ready with direct Gemini/Qwen API calls
-- **Simplified Architecture**: Reduced complexity and improved maintainability
+- Single service handling both Gemini and Qwen with automatic fallback
+- Better natural language parsing for tasks, notes, and events
+- Single `aiService.ts` handles all AI operations
 
 
 ## 👨‍💻 Author
