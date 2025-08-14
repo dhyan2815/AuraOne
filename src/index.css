@@ -113,74 +113,99 @@
   @apply bg-slate-400 dark:bg-slate-500;
 }
 
-/* Rich Text Editor Styles */
-.ProseMirror {
-  @apply min-h-[250px] outline-none;
+/* React Quill Editor Styles */
+.ql-editor {
+  @apply min-h-[300px] p-4 text-slate-900 dark:text-slate-100;
   font-family: inherit;
   line-height: 1.6;
+  font-size: 16px; /* Base font size for the editor */
 }
 
-.ProseMirror:focus {
+.ql-editor.ql-blank::before {
+  @apply text-slate-400 dark:text-slate-500;
+  font-style: normal;
+}
+
+/* Dark mode support for Quill */
+.dark .ql-toolbar {
+  @apply bg-slate-800 border-slate-700;
+}
+
+.dark .ql-container {
+  @apply bg-slate-800 border-slate-700;
+}
+
+.dark .ql-editor {
+  @apply text-slate-100;
+}
+
+.dark .ql-stroke {
+  @apply stroke-slate-300;
+}
+
+.dark .ql-fill {
+  @apply fill-slate-300;
+}
+
+.dark .ql-picker {
+  @apply text-slate-300;
+}
+
+.dark .ql-picker-options {
+  @apply bg-slate-700 border-slate-600;
+}
+
+/* Custom Quill toolbar styling */
+.ql-toolbar {
+  @apply border-slate-200 bg-slate-50 rounded-t-lg;
+}
+
+.ql-container {
+  @apply border-slate-200 rounded-b-lg;
+}
+
+/* Remove default Quill focus styles */
+.ql-editor:focus {
   @apply outline-none;
 }
 
-/* Placeholder styles for TipTap */
-.ProseMirror p.is-editor-empty:first-child::before {
-  @apply text-slate-400 pointer-events-none float-left h-0;
-  content: attr(data-placeholder);
+/* Custom Quill content styling */
+.ql-editor h1 {
+  @apply text-3xl font-bold mb-4 mt-6;
 }
 
-.ProseMirror p.is-editor-empty:first-child {
-  @apply relative;
+.ql-editor h2 {
+  @apply text-2xl font-bold mb-3 mt-5;
 }
 
-/* Dark mode placeholder */
-.dark .ProseMirror p.is-editor-empty:first-child::before {
-  @apply text-slate-500;
+.ql-editor h3 {
+  @apply text-xl font-bold mb-2 mt-4;
 }
 
-/* Enhanced editor content styling */
-.ProseMirror h1 {
-  @apply text-2xl font-bold mb-4 mt-6;
-}
-
-.ProseMirror h2 {
-  @apply text-xl font-bold mb-3 mt-5;
-}
-
-.ProseMirror h3 {
-  @apply text-lg font-bold mb-2 mt-4;
-}
-
-.ProseMirror p {
+.ql-editor p {
   @apply mb-3;
 }
 
-.ProseMirror ul, .ProseMirror ol {
+.ql-editor ul, .ql-editor ol {
   @apply mb-3 pl-6;
 }
 
-.ProseMirror li {
+.ql-editor li {
   @apply mb-1;
 }
 
-.ProseMirror blockquote {
+.ql-editor blockquote {
   @apply border-l-4 border-slate-300 dark:border-slate-600 pl-4 py-2 my-4 italic bg-slate-50 dark:bg-slate-800;
 }
 
-.ProseMirror code {
+.ql-editor code {
   @apply bg-slate-100 dark:bg-slate-700 px-1 py-0.5 rounded text-sm font-mono;
 }
 
-.ProseMirror pre {
+.ql-editor pre {
   @apply bg-slate-100 dark:bg-slate-700 p-4 rounded-lg overflow-x-auto my-4;
 }
 
-.ProseMirror pre code {
+.ql-editor pre code {
   @apply bg-transparent p-0;
-}
-
-/* Toolbar button states */
-.ProseMirror-focused {
-  @apply ring-0;
 }

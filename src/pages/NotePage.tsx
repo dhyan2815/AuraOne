@@ -1,5 +1,5 @@
 // NotesPage.tsx
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import toast from 'react-hot-toast';
 import {
@@ -10,26 +10,10 @@ import {
   Trash2,
   Star,
   Pin,
-  Bold,
-  Italic,
-  List,
-  ListOrdered,
-  Quote,
-  Code,
-  Heading1,
-  Heading2,
-  Heading3,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-  Undo,
-  Redo,
 } from "lucide-react";
 import { format } from "date-fns";
-import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import Link from "@tiptap/extension-link";
-import Placeholder from "@tiptap/extension-placeholder";
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 import {
   createNote,
   updateNote,
@@ -60,40 +44,47 @@ const NotePage = () => {
   const [loading, setLoading] = useState(true);
   const [autoSaving, setAutoSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [content, setContent] = useState("");
 
   const { user } = useAuth();
+  const quillRef = useRef<ReactQuill>(null);
 
-  // Initialize Tiptap editor
-  const editor = useEditor({
-    extensions: [
-      StarterKit,
-      Link.configure({
-        openOnClick: false,
-      }),
-      Placeholder.configure({
-        placeholder: 'Start writing your note here...',
-      }),
+  // Quill editor configuration
+  const modules = {
+    toolbar: [
+      [{ 'header': [1, 2, 3, false] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      [{ 'color': [] }, { 'background': [] }],
+      [{ 'align': [] }],
+      ['blockquote', 'code-block'],
+      ['link'],
+      ['clean']
     ],
-    content: "",
-    editorProps: {
-      attributes: {
-        class: 'prose prose-slate dark:prose-invert max-w-none focus:outline-none',
-      },
+    clipboard: {
+      matchVisual: false,
     },
-    onUpdate: ({ editor }) => {
-      // Update note content state
-      if (editor) {
-        setNote((prev: Note | null) =>
-          prev ? { ...prev, content: editor.getHTML() } : prev
-        );
-      }
-    },
-  });
+    history: {
+      delay: 2000,
+      maxStack: 500,
+      userOnly: true
+    }
+  };
+
+  const formats = [
+    'header',
+    'bold', 'italic', 'underline', 'strike',
+    'list', 'bullet',
+    'color', 'background',
+    'align',
+    'blockquote', 'code-block',
+    'link', 'image'
+  ];
 
   useEffect(() => {
     // Fetch note on mount
     const fetchNote = async () => {
-      if (!editor || !user) {
+      if (!user) {
         setLoading(false);
         return;
       }
@@ -111,11 +102,11 @@ const NotePage = () => {
             starred: false,
           };
           setNote(newNote);
-          setTitle(newNote.title); // This will now work
+          setTitle(newNote.title);
           setTags(newNote.tags);
           setPinned(false);
           setStarred(false);
-          editor.commands.setContent("");
+          setContent("");
         } else if (id) {
           // Fetch existing note
           const foundNote = await getNoteById(user.uid, id);
@@ -126,7 +117,7 @@ const NotePage = () => {
             setTags(typedNote.tags || []);
             setPinned(typedNote.pinned || false);
             setStarred(typedNote.starred || false);
-            editor.commands.setContent(typedNote.content || "");
+            setContent(typedNote.content || "");
           } else {
             navigate("/notes");
           }
@@ -137,23 +128,16 @@ const NotePage = () => {
     };
 
     fetchNote();
-  }, [id, editor, user, navigate]);
-
-  useEffect(() => {
-    // Sync editor with note content
-    if (editor && note?.content !== undefined && editor.getHTML() !== note.content) {
-      editor.commands.setContent(note.content, false);
-    }
-  }, [editor, note?.content]);
+  }, [id, user, navigate]);
 
   // Save or update note
   const handleSave = async (isAutoSave = false) => {
-    if (!user || !editor) return;
+    if (!user) return;
 
     const noteData = {
       title: title.trim() || "Untitled Note",
       tags,
-      content: editor.getHTML(),
+      content: content,
       pinned,
       starred,
     };
@@ -190,40 +174,28 @@ const NotePage = () => {
 
   // Auto-save effect
   useEffect(() => {
-    if (!editor || !user || note?.id === "new") return;
+    if (!user || note?.id === "new") return;
 
     const autoSaveTimeout = setTimeout(() => {
       handleSave(true);
     }, 3000); // Auto-save after 3 seconds of inactivity
 
     return () => clearTimeout(autoSaveTimeout);
-  }, [editor?.getHTML(), title, tags, pinned, starred]);
+  }, [content, title, tags, pinned, starred]);
 
   // Keyboard shortcuts
   useEffect(() => {
-    if (!editor) return;
-
     const handleKeyDown = (event: KeyboardEvent) => {
       // Ctrl/Cmd + S to save
       if ((event.ctrlKey || event.metaKey) && event.key === 's') {
         event.preventDefault();
         handleSave(false);
       }
-      // Ctrl/Cmd + B for bold
-      if ((event.ctrlKey || event.metaKey) && event.key === 'b') {
-        event.preventDefault();
-        editor.chain().focus().toggleBold().run();
-      }
-      // Ctrl/Cmd + I for italic
-      if ((event.ctrlKey || event.metaKey) && event.key === 'i') {
-        event.preventDefault();
-        editor.chain().focus().toggleItalic().run();
-      }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [editor, handleSave]);
+  }, [handleSave]);
 
   // Delete current note
   const handleDelete = async () => {
@@ -237,7 +209,7 @@ const NotePage = () => {
     try {
       await deleteNote(user.uid, note.id);
       toast.success("Note deleted successfully");
-      navigate("/notes"); // Only after actual deletion
+      navigate("/notes");
     } catch (error) {
       toast.error("Deletion of note failed");
     }
@@ -266,146 +238,7 @@ const NotePage = () => {
     setPinned(!pinned);
   };
 
-  // Toolbar component
-  const Toolbar = () => {
-    if (!editor) return null;
-
-    return (
-      <div className="border-b border-slate-200 dark:border-slate-700 p-2 flex flex-wrap items-center gap-1 bg-slate-50 dark:bg-slate-800 rounded-t-lg">
-
-        {/* Text formatting */}
-        <div className="flex items-center gap-1 border-r border-slate-300 dark:border-slate-600 pr-2">
-          <button
-            onClick={() => {
-              editor.chain().focus().toggleBold().run();
-            }}
-            className={`p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700 ${editor.isActive('bold') ? 'bg-slate-200 dark:bg-slate-700' : ''
-              }`}
-            title="Bold"
-          >
-            <Bold size={16} />
-          </button>
-          <button
-            onClick={() => {
-              editor.chain().focus().toggleItalic().run();
-            }}
-            className={`p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700 ${editor.isActive('italic') ? 'bg-slate-200 dark:bg-slate-700' : ''
-              }`}
-            title="Italic"
-          >
-            <Italic size={16} />
-          </button>
-        </div>
-
-        {/* Headings */}
-        <div className="flex items-center gap-1 border-r border-slate-300 dark:border-slate-600 pr-2">
-          <button
-            onClick={() => {
-              editor.chain().focus().toggleHeading({ level: 1 }).run();
-            }}
-            className={`p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700 ${editor.isActive('heading', { level: 1 }) ? 'bg-slate-200 dark:bg-slate-700' : ''
-              }`}
-            title="Heading 1"
-          >
-            <Heading1 size={16} />
-          </button>
-          <button
-            onClick={() => {
-              editor.chain().focus().toggleHeading({ level: 2 }).run();
-            }}
-            className={`p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700 ${editor.isActive('heading', { level: 2 }) ? 'bg-slate-200 dark:bg-slate-700' : ''
-              }`}
-            title="Heading 2"
-          >
-            <Heading2 size={16} />
-          </button>
-          <button
-            onClick={() => {
-              editor.chain().focus().toggleHeading({ level: 3 }).run();
-            }}
-            className={`p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700 ${editor.isActive('heading', { level: 3 }) ? 'bg-slate-200 dark:bg-slate-700' : ''
-              }`}
-            title="Heading 3"
-          >
-            <Heading3 size={16} />
-          </button>
-        </div>
-
-        {/* Lists */}
-        <div className="flex items-center gap-1 border-r border-slate-300 dark:border-slate-600 pr-2">
-          <button
-            onClick={() => {
-              editor.chain().focus().toggleBulletList().run();
-            }}
-            className={`p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700 ${editor.isActive('bulletList') ? 'bg-slate-200 dark:bg-slate-700' : ''
-              }`}
-            title="Bullet List"
-          >
-            <List size={16} />
-          </button>
-          <button
-            onClick={() => {
-              editor.chain().focus().toggleOrderedList().run();
-            }}
-            className={`p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700 ${editor.isActive('orderedList') ? 'bg-slate-200 dark:bg-slate-700' : ''
-              }`}
-            title="Numbered List"
-          >
-            <ListOrdered size={16} />
-          </button>
-        </div>
-
-        {/* Block elements */}
-        <div className="flex items-center gap-1 border-r border-slate-300 dark:border-slate-600 pr-2">
-          <button
-            onClick={() => {
-              editor.chain().focus().toggleBlockquote().run();
-            }}
-            className={`p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700 ${editor.isActive('blockquote') ? 'bg-slate-200 dark:bg-slate-700' : ''
-              }`}
-            title="Quote"
-          >
-            <Quote size={16} />
-          </button>
-          <button
-            onClick={() => {
-              editor.chain().focus().toggleCodeBlock().run();
-            }}
-            className={`p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700 ${editor.isActive('codeBlock') ? 'bg-slate-200 dark:bg-slate-700' : ''
-              }`}
-            title="Code Block"
-          >
-            <Code size={16} />
-          </button>
-        </div>
-
-        {/* History */}
-        <div className="flex items-center gap-1">
-          <button
-            onClick={() => {
-              editor.chain().focus().undo().run();
-            }}
-            className="p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700"
-            title="Undo"
-          >
-            <Undo size={16} />
-          </button>
-          <button
-            onClick={() => {
-              editor.chain().focus().redo().run();
-            }}
-            className="p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700"
-            title="Redo"
-          >
-            <Redo size={16} />
-          </button>
-        </div>
-      </div>
-    );
-  };
-
   if (loading) {
-    // Loading spinner and message
     return (
       <div className="flex flex-col items-center justify-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
@@ -417,7 +250,6 @@ const NotePage = () => {
   }
 
   return (
-    // Page container
     <div>
       {/* Header section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
@@ -463,6 +295,7 @@ const NotePage = () => {
               <span>Last saved: {format(lastSaved, "HH:mm")}</span>
             )}
           </div>
+          
           {/* Star toggle */}
           <button
             onClick={toggleStarred}
@@ -512,7 +345,7 @@ const NotePage = () => {
         {tags.map((tag) => (
           <div
             key={tag}
-            className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-full px-3 py-1 "
+            className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-full px-3 py-1"
           >
             <span className="text-base">{tag}</span>
             {/* Remove tag button */}
@@ -545,21 +378,20 @@ const NotePage = () => {
         </div>
       </div>
 
-
-
       {/* Editor section */}
       <div className="bg-white dark:bg-slate-800 rounded-lg dark:shadow-xl shadow-card overflow-hidden">
-        {editor && (
-          <>
-            <Toolbar />
-            <div
-              className="p-4 min-h-[300px] cursor-text"
-              onClick={() => editor.chain().focus().run()}
-            >
-              <EditorContent editor={editor} />
-            </div>
-          </>
-        )}
+        <div className="h-full">
+          <ReactQuill
+            ref={quillRef}
+            theme="snow"
+            value={content}
+            onChange={setContent}
+            modules={modules}
+            formats={formats}
+            placeholder="Start writing your note here..."
+            className="h-full text-md"
+          />
+        </div>
       </div>
     </div>
   );

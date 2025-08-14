@@ -27,8 +27,10 @@ const NoteCard = ({ note, viewMode }: NoteCardProps) => {
   // Function to strip HTML tags and get clean text
   const stripHtml = (html: string) => {
     if (!html) return '';
-    // Simple regex to remove HTML tags
-    return html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
+    // Create a temporary div to parse HTML and extract text
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || '';
   };
 
   // Get clean content for display
