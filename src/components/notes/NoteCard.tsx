@@ -24,6 +24,16 @@ const NoteCard = ({ note, viewMode }: NoteCardProps) => {
   const { user } = useAuth();
   const formattedDate = format(new Date(note.createdAt), "MMM d, yyyy");
 
+  // Function to strip HTML tags and get clean text
+  const stripHtml = (html: string) => {
+    if (!html) return '';
+    // Simple regex to remove HTML tags
+    return html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
+  };
+
+  // Get clean content for display
+  const cleanContent = stripHtml(note.content);
+
   const handleToggleStar = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -72,7 +82,7 @@ const NoteCard = ({ note, viewMode }: NoteCardProps) => {
               <div
                 className="text-slate-600 dark:text-slate-400 line-clamp-3 mb-4"
               >
-                {note.content}
+                {cleanContent}
               </div>
             </div>
 
@@ -147,7 +157,7 @@ const NoteCard = ({ note, viewMode }: NoteCardProps) => {
           <div
             className="text-slate-600 dark:text-slate-400 line-clamp-3 mb-2"
           >
-            {note.content}  
+            {cleanContent}
           </div> 
         </div>
 

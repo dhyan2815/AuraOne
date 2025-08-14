@@ -115,10 +115,72 @@
 
 /* Rich Text Editor Styles */
 .ProseMirror {
-  @apply min-h-[150px] p-3 outline-none;
+  @apply min-h-[250px] outline-none;
+  font-family: inherit;
+  line-height: 1.6;
 }
 
-.ProseMirror p.is-empty::before {
-  @apply text-slate-400 float-left h-0 pointer-events-none;
+.ProseMirror:focus {
+  @apply outline-none;
+}
+
+/* Placeholder styles for TipTap */
+.ProseMirror p.is-editor-empty:first-child::before {
+  @apply text-slate-400 pointer-events-none float-left h-0;
   content: attr(data-placeholder);
+}
+
+.ProseMirror p.is-editor-empty:first-child {
+  @apply relative;
+}
+
+/* Dark mode placeholder */
+.dark .ProseMirror p.is-editor-empty:first-child::before {
+  @apply text-slate-500;
+}
+
+/* Enhanced editor content styling */
+.ProseMirror h1 {
+  @apply text-2xl font-bold mb-4 mt-6;
+}
+
+.ProseMirror h2 {
+  @apply text-xl font-bold mb-3 mt-5;
+}
+
+.ProseMirror h3 {
+  @apply text-lg font-bold mb-2 mt-4;
+}
+
+.ProseMirror p {
+  @apply mb-3;
+}
+
+.ProseMirror ul, .ProseMirror ol {
+  @apply mb-3 pl-6;
+}
+
+.ProseMirror li {
+  @apply mb-1;
+}
+
+.ProseMirror blockquote {
+  @apply border-l-4 border-slate-300 dark:border-slate-600 pl-4 py-2 my-4 italic bg-slate-50 dark:bg-slate-800;
+}
+
+.ProseMirror code {
+  @apply bg-slate-100 dark:bg-slate-700 px-1 py-0.5 rounded text-sm font-mono;
+}
+
+.ProseMirror pre {
+  @apply bg-slate-100 dark:bg-slate-700 p-4 rounded-lg overflow-x-auto my-4;
+}
+
+.ProseMirror pre code {
+  @apply bg-transparent p-0;
+}
+
+/* Toolbar button states */
+.ProseMirror-focused {
+  @apply ring-0;
 }

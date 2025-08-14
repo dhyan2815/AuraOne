@@ -10,11 +10,26 @@ import {
   Trash2,
   Star,
   Pin,
+  Bold,
+  Italic,
+  List,
+  ListOrdered,
+  Quote,
+  Code,
+  Heading1,
+  Heading2,
+  Heading3,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  Undo,
+  Redo,
 } from "lucide-react";
 import { format } from "date-fns";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
+import Placeholder from "@tiptap/extension-placeholder";
 import {
   createNote,
   updateNote,
@@ -43,6 +58,8 @@ const NotePage = () => {
   const [starred, setStarred] = useState(false);
   const [pinned, setPinned] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [autoSaving, setAutoSaving] = useState(false);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
 
   const { user } = useAuth();
 
@@ -53,8 +70,16 @@ const NotePage = () => {
       Link.configure({
         openOnClick: false,
       }),
+      Placeholder.configure({
+        placeholder: 'Start writing your note here...',
+      }),
     ],
     content: "",
+    editorProps: {
+      attributes: {
+        class: 'prose prose-slate dark:prose-invert max-w-none focus:outline-none',
+      },
+    },
     onUpdate: ({ editor }) => {
       // Update note content state
       if (editor) {
@@ -122,35 +147,83 @@ const NotePage = () => {
   }, [editor, note?.content]);
 
   // Save or update note
-  const handleSave = async () => {
+  const handleSave = async (isAutoSave = false) => {
     if (!user || !editor) return;
 
     const noteData = {
       title: title.trim() || "Untitled Note",
       tags,
-      content: editor.getText(),
+      content: editor.getHTML(),
       pinned,
       starred,
     };
 
     try {
+      setAutoSaving(true);
       if (note?.id === "new" || !note?.id) {
         const newNoteData = {
           ...noteData,
           createdAt: new Date().toISOString(),
         };
-        const newId = await createNote(user.uid, newNoteData)
-        toast.success("New Note created Successfully");
-        navigate(`/notes/${newId}`, { replace: true });
+        const newId = await createNote(user.uid, newNoteData);
+        if (!isAutoSave) {
+          toast.success("New Note created Successfully");
+          navigate(`/notes/${newId}`, { replace: true });
+        }
+        setLastSaved(new Date());
       } else {
         await updateNote(user.uid, note.id, noteData);
-        navigate("/notes");
-        toast.success("Note Updated sucessfully");
+        if (!isAutoSave) {
+          navigate("/notes");
+          toast.success("Note Updated successfully");
+        }
+        setLastSaved(new Date());
       }
     } catch (err) {
-      toast.error("failed to save note");
+      if (!isAutoSave) {
+        toast.error("Failed to save note");
+      }
+    } finally {
+      setAutoSaving(false);
     }
   };
+
+  // Auto-save effect
+  useEffect(() => {
+    if (!editor || !user || note?.id === "new") return;
+
+    const autoSaveTimeout = setTimeout(() => {
+      handleSave(true);
+    }, 3000); // Auto-save after 3 seconds of inactivity
+
+    return () => clearTimeout(autoSaveTimeout);
+  }, [editor?.getHTML(), title, tags, pinned, starred]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    if (!editor) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Ctrl/Cmd + S to save
+      if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+        event.preventDefault();
+        handleSave(false);
+      }
+      // Ctrl/Cmd + B for bold
+      if ((event.ctrlKey || event.metaKey) && event.key === 'b') {
+        event.preventDefault();
+        editor.chain().focus().toggleBold().run();
+      }
+      // Ctrl/Cmd + I for italic
+      if ((event.ctrlKey || event.metaKey) && event.key === 'i') {
+        event.preventDefault();
+        editor.chain().focus().toggleItalic().run();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [editor, handleSave]);
 
   // Delete current note
   const handleDelete = async () => {
@@ -191,6 +264,144 @@ const NotePage = () => {
   // Toggle pinned state
   const togglePinned = () => {
     setPinned(!pinned);
+  };
+
+  // Toolbar component
+  const Toolbar = () => {
+    if (!editor) return null;
+
+    return (
+      <div className="border-b border-slate-200 dark:border-slate-700 p-2 flex flex-wrap items-center gap-1 bg-slate-50 dark:bg-slate-800 rounded-t-lg">
+
+        {/* Text formatting */}
+        <div className="flex items-center gap-1 border-r border-slate-300 dark:border-slate-600 pr-2">
+          <button
+            onClick={() => {
+              editor.chain().focus().toggleBold().run();
+            }}
+            className={`p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700 ${editor.isActive('bold') ? 'bg-slate-200 dark:bg-slate-700' : ''
+              }`}
+            title="Bold"
+          >
+            <Bold size={16} />
+          </button>
+          <button
+            onClick={() => {
+              editor.chain().focus().toggleItalic().run();
+            }}
+            className={`p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700 ${editor.isActive('italic') ? 'bg-slate-200 dark:bg-slate-700' : ''
+              }`}
+            title="Italic"
+          >
+            <Italic size={16} />
+          </button>
+        </div>
+
+        {/* Headings */}
+        <div className="flex items-center gap-1 border-r border-slate-300 dark:border-slate-600 pr-2">
+          <button
+            onClick={() => {
+              editor.chain().focus().toggleHeading({ level: 1 }).run();
+            }}
+            className={`p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700 ${editor.isActive('heading', { level: 1 }) ? 'bg-slate-200 dark:bg-slate-700' : ''
+              }`}
+            title="Heading 1"
+          >
+            <Heading1 size={16} />
+          </button>
+          <button
+            onClick={() => {
+              editor.chain().focus().toggleHeading({ level: 2 }).run();
+            }}
+            className={`p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700 ${editor.isActive('heading', { level: 2 }) ? 'bg-slate-200 dark:bg-slate-700' : ''
+              }`}
+            title="Heading 2"
+          >
+            <Heading2 size={16} />
+          </button>
+          <button
+            onClick={() => {
+              editor.chain().focus().toggleHeading({ level: 3 }).run();
+            }}
+            className={`p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700 ${editor.isActive('heading', { level: 3 }) ? 'bg-slate-200 dark:bg-slate-700' : ''
+              }`}
+            title="Heading 3"
+          >
+            <Heading3 size={16} />
+          </button>
+        </div>
+
+        {/* Lists */}
+        <div className="flex items-center gap-1 border-r border-slate-300 dark:border-slate-600 pr-2">
+          <button
+            onClick={() => {
+              editor.chain().focus().toggleBulletList().run();
+            }}
+            className={`p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700 ${editor.isActive('bulletList') ? 'bg-slate-200 dark:bg-slate-700' : ''
+              }`}
+            title="Bullet List"
+          >
+            <List size={16} />
+          </button>
+          <button
+            onClick={() => {
+              editor.chain().focus().toggleOrderedList().run();
+            }}
+            className={`p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700 ${editor.isActive('orderedList') ? 'bg-slate-200 dark:bg-slate-700' : ''
+              }`}
+            title="Numbered List"
+          >
+            <ListOrdered size={16} />
+          </button>
+        </div>
+
+        {/* Block elements */}
+        <div className="flex items-center gap-1 border-r border-slate-300 dark:border-slate-600 pr-2">
+          <button
+            onClick={() => {
+              editor.chain().focus().toggleBlockquote().run();
+            }}
+            className={`p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700 ${editor.isActive('blockquote') ? 'bg-slate-200 dark:bg-slate-700' : ''
+              }`}
+            title="Quote"
+          >
+            <Quote size={16} />
+          </button>
+          <button
+            onClick={() => {
+              editor.chain().focus().toggleCodeBlock().run();
+            }}
+            className={`p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700 ${editor.isActive('codeBlock') ? 'bg-slate-200 dark:bg-slate-700' : ''
+              }`}
+            title="Code Block"
+          >
+            <Code size={16} />
+          </button>
+        </div>
+
+        {/* History */}
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => {
+              editor.chain().focus().undo().run();
+            }}
+            className="p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700"
+            title="Undo"
+          >
+            <Undo size={16} />
+          </button>
+          <button
+            onClick={() => {
+              editor.chain().focus().redo().run();
+            }}
+            className="p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700"
+            title="Redo"
+          >
+            <Redo size={16} />
+          </button>
+        </div>
+      </div>
+    );
   };
 
   if (loading) {
@@ -240,6 +451,18 @@ const NotePage = () => {
 
         {/* Action buttons */}
         <div className="flex items-center space-x-2">
+          {/* Status indicator */}
+          <div className="flex items-center text-sm text-slate-500 dark:text-slate-400">
+            {autoSaving && (
+              <div className="flex items-center">
+                <div className="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-primary-500 mr-2"></div>
+                <span>Saving...</span>
+              </div>
+            )}
+            {lastSaved && !autoSaving && (
+              <span>Last saved: {format(lastSaved, "HH:mm")}</span>
+            )}
+          </div>
           {/* Star toggle */}
           <button
             onClick={toggleStarred}
@@ -265,7 +488,7 @@ const NotePage = () => {
           </button>
 
           {/* Save button */}
-          <button onClick={handleSave} className="button-primary">
+          <button onClick={() => handleSave(false)} className="button-primary">
             <Save size={18} className="mr-1" />
             Save
           </button>
@@ -320,21 +543,22 @@ const NotePage = () => {
             Add
           </button>
         </div>
-        {/* Write your notes here */}
-        <div className="pl-5 text-gray-500 border-0 outline-none text-lg">
-          <label htmlFor="Notes">Tap anywhere below to start writing ⬇️</label>
-        </div>
       </div>
 
 
 
       {/* Editor section */}
-      <div className="bg-white dark:bg-slate-800 rounded-lg dark:shadow-xl shadow-card p-2  min-h-[300px]">
+      <div className="bg-white dark:bg-slate-800 rounded-lg dark:shadow-xl shadow-card overflow-hidden">
         {editor && (
-          // Tiptap content area
-          <div className="prose prose-slate dark:prose-invert max-w-none">
-            <EditorContent editor={editor} />
-          </div>
+          <>
+            <Toolbar />
+            <div
+              className="p-4 min-h-[300px] cursor-text"
+              onClick={() => editor.chain().focus().run()}
+            >
+              <EditorContent editor={editor} />
+            </div>
+          </>
         )}
       </div>
     </div>
