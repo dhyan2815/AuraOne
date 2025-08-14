@@ -1,6 +1,6 @@
 // components/widgets/TasksWidget.tsx
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getTasks, updateTask, deleteTask, Task } from "../../hooks/useTasks";
 import { useAuth } from "../../hooks/useAuth";
 import { Star, Pin, CheckCircle, Clock, Trash2 } from "lucide-react";
@@ -8,6 +8,7 @@ import toast from 'react-hot-toast';
 
 const TasksWidget = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
+  const navigate = useNavigate();
 
   const { user } = useAuth();
 
@@ -27,11 +28,11 @@ const TasksWidget = () => {
     if (!user) return;
 
     const newStatus = completed === "completed" ? "due" : "completed";
-    
+
     try {
       await updateTask(user.uid, id, { completed: newStatus });
       toast.success(newStatus === "completed" ? "Task marked as completed!" : "Task marked as pending!");
-      
+
       // Update local state
       const updated = await getTasks(user.uid);
       setTasks(updated);
@@ -53,7 +54,7 @@ const TasksWidget = () => {
     try {
       await deleteTask(user.uid, id);
       toast.success("Task deleted successfully!");
-      
+
       // Update local state
       const updated = await getTasks(user.uid);
       setTasks(updated);
@@ -63,13 +64,18 @@ const TasksWidget = () => {
     }
   };
 
+  // Event handler to navigate to task detail page
+  const handleTaskClick = (taskId: string) => {
+    navigate(`/tasks/${taskId}`);
+  };
+
   // Format time to 12-hour format for better readability
   const formatTime = (timeString: string) => {
     try {
       const [hours, minutes] = timeString.split(':');
       const hour = parseInt(hours);
       const minute = parseInt(minutes);
-      
+
       if (hour === 0) {
         return `12:${minutes} AM`;
       } else if (hour < 12) {
@@ -91,11 +97,11 @@ const TasksWidget = () => {
       // Pinned tasks first
       if (a.pinned && !b.pinned) return -1;
       if (!a.pinned && b.pinned) return 1;
-      
+
       // Then starred tasks
       if (a.starred && !b.starred) return -1;
       if (!a.starred && b.starred) return 1;
-      
+
       // Finally by creation date (newest first)
       return new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime();
     })
@@ -122,18 +128,25 @@ const TasksWidget = () => {
       ) : (
         <>
           {displayTasks.map((task) => (
-            <div key={task.id} className="flex items-start gap-3">
+            <div
+              key={task.id}
+              className="flex items-start gap-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
+              onClick={() => handleTaskClick(task.id)}
+            >
               {/* Task completion toggle */}
               <button
-                onClick={() => handleToggleComplete(task.id, task.completed)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleToggleComplete(task.id, task.completed);
+                }}
                 className="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors flex-shrink-0 mt-0.5"
               >
-                <CheckCircle 
+                <CheckCircle
                   size={20}
-                  className={task.completed === "completed" 
-                    ? "text-success-500" 
+                  className={task.completed === "completed"
+                    ? "text-success-500"
                     : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-                  } 
+                  }
                 />
               </button>
               <div className="flex-1 min-w-0">
@@ -149,10 +162,10 @@ const TasksWidget = () => {
                 <div className="flex items-center gap-3 mt-1">
                   <span
                     className={`inline-block px-2 py-0.5 text-xs font-medium rounded-full ${task.priority === "high"
-                        ? "bg-error-100 text-error-800 dark:bg-error-900/30 dark:text-error-300"
-                        : task.priority === "medium"
-                          ? "bg-warning-100 text-warning-800 dark:bg-warning-900/30 dark:text-warning-300"
-                          : "bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-300"
+                      ? "bg-error-100 text-error-800 dark:bg-error-900/30 dark:text-error-300"
+                      : task.priority === "medium"
+                        ? "bg-warning-100 text-warning-800 dark:bg-warning-900/30 dark:text-warning-300"
+                        : "bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-300"
                       }`}
                   >
                     {task.priority.charAt(0).toUpperCase() +
@@ -168,7 +181,10 @@ const TasksWidget = () => {
               </div>
               {/* Delete task button */}
               <button
-                onClick={() => handleDeleteTask(task.id, task.title)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDeleteTask(task.id, task.title);
+                }}
                 className="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors flex-shrink-0 mt-0.5 text-slate-400 hover:text-error-600 dark:hover:text-error-400"
                 title="Delete task"
               >

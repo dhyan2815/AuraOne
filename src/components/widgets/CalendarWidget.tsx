@@ -2,8 +2,10 @@ import { useState, useMemo } from "react";
 import { format, addDays, isSameDay } from "date-fns";
 import { useEvents, addEvent } from "../../hooks/useEvents";
 import { useAuth } from "../../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 const CalendarWidget = () => {
+  const navigate = useNavigate();
 
   // State variables for add event form visibility and data
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -24,6 +26,12 @@ const CalendarWidget = () => {
   );
 
   const days = Array.from({ length: 5 }, (_, i) => addDays(new Date(), i));
+
+  // Event handler to navigate to calendar page
+  const handleEventClick = (eventId: string) => {
+    // Navigate to calendar page with the selected date
+    navigate(`/events?date=${selectedDate.toISOString().split('T')[0]}`);
+  };
 
   return (
     <div>
@@ -128,7 +136,8 @@ const CalendarWidget = () => {
           eventsForSelectedDate.map((event) => (
             <div
               key={event.id}
-              className="flex items-start rounded-md bg-slate-50 dark:bg-slate-800/50"
+              className="flex items-start rounded-md bg-slate-50 dark:bg-slate-800/50 p-2 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors cursor-pointer"
+              onClick={() => handleEventClick(event.id)}
             >
               <div className="flex-1 min-w-0">
                 <h4 className="font-medium">{event.title}</h4>

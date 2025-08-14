@@ -51,8 +51,8 @@ const Calendar = () => {
   const prevDays = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1;
   const emptyDaysBefore = Array.from({ length: prevDays });
 
-  // Create an array to display the next 7 days
-  const next7Days = Array.from({ length: 7 }, (_, i) => addDays(new Date(), i));
+  // Create an array to display the next 6 days
+  const next6Days = Array.from({ length: 6 }, (_, i) => addDays(new Date(), i));
 
   // Handler to delete an event
   const handleDeleteEvent = async (eventId: string) => {
@@ -189,9 +189,9 @@ const Calendar = () => {
             <h3 className="font-semibold mb-5 text-center">Today's Schedule</h3>
           </div>
 
-          {/* Render the next 7 days */}
+          {/* Render the next 6 days */}
           <div className="space-y-4">
-            {next7Days.map((day) => {
+            {next6Days.map((day) => {
               const isSelectedMiniDay = isSameDay(day, selectedDate);
               const dayEvents = events.filter((event) =>
                 isSameDay(event.date, day)
