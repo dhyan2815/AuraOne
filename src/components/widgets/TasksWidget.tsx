@@ -1,9 +1,9 @@
 // components/widgets/TasksWidget.tsx
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { getTasks, updateTask, Task } from "../../hooks/useTasks";
+import { getTasks, updateTask, deleteTask, Task } from "../../hooks/useTasks";
 import { useAuth } from "../../hooks/useAuth";
-import { Star, Pin, CheckCircle, Clock } from "lucide-react";
+import { Star, Pin, CheckCircle, Clock, Trash2 } from "lucide-react";
 import toast from 'react-hot-toast';
 
 const TasksWidget = () => {
@@ -38,6 +38,28 @@ const TasksWidget = () => {
     } catch (error) {
       console.error("Failed to toggle task completion:", error);
       toast.error("Failed to update task status");
+    }
+  };
+
+  // Event handler to delete a task
+  const handleDeleteTask = async (id: string, title: string) => {
+    if (!user) return;
+
+    // Show confirmation dialog
+    if (!window.confirm(`Are you sure you want to delete "${title}"?`)) {
+      return;
+    }
+
+    try {
+      await deleteTask(user.uid, id);
+      toast.success("Task deleted successfully!");
+      
+      // Update local state
+      const updated = await getTasks(user.uid);
+      setTasks(updated);
+    } catch (error) {
+      console.error("Failed to delete task:", error);
+      toast.error("Failed to delete task");
     }
   };
 
@@ -144,6 +166,14 @@ const TasksWidget = () => {
                   )}
                 </div>
               </div>
+              {/* Delete task button */}
+              <button
+                onClick={() => handleDeleteTask(task.id, task.title)}
+                className="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors flex-shrink-0 mt-0.5 text-slate-400 hover:text-error-600 dark:hover:text-error-400"
+                title="Delete task"
+              >
+                <Trash2 size={16} />
+              </button>
             </div>
           ))}
 
