@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { db } from "../services/firebase";
 import { handleSendMessage } from '../services/chatHandler';
-import { createNewSession, deleteCurrentSession } from "../services/chatSessionService";
+import { createNewSession, deleteCurrentSession, updateSessionNameWithFallback } from "../services/chatSessionService";
 
 type Message = {
   id?: string;
@@ -37,19 +37,23 @@ const Chat = () => {
     if (!user) return;
 
     const sessionsRef = collection(db, "users", user.uid, "sessions");
-    getDocs(sessionsRef).then((snapshot) => {
+    
+    // Use onSnapshot for real-time updates
+    const unsubscribe = onSnapshot(sessionsRef, (snapshot) => {
       const sessionList = snapshot.docs.map((doc) => ({
         id: doc.id,
         name: doc.data().name || `Chat ${doc.id}`,
       }));
       setSessions(sessionList);
 
-      // Select the first session automatically
+      // Select the first session automatically if no session is selected
       if (sessionList.length > 0 && !selectedSession) {
         setSelectedSession(sessionList[0].id);
       }
     });
-  }, [user]);
+
+    return unsubscribe;
+  }, [user, selectedSession]);
 
   // Function to handle sending messages
   const handleSend = () => {
@@ -139,8 +143,8 @@ const handleDeleteCurrentSession = async () => {
 
   return (
     <div className="flex flex-col h-[calc(100vh-2rem)]">
-      {/* Header */}
-      <div className="flex justify-center dark:border-slate-700 pt-1 pb-2">
+      {/* Header with Session Controls */}
+      <div className="flex justify-between items-center px-2 py-2 border-b border-slate-200 dark:border-slate-700">
         <div className="flex items-center gap-3">
           <div className="flex justify-center gap-2">
             <div className="w-5 h-5 bg-gradient-to-br from-primary-500 to-primary-600 rounded-md flex justify-center items-center">
@@ -156,6 +160,43 @@ const handleDeleteCurrentSession = async () => {
             </div>
           </div>
         </div>
+        
+        {/* Session Controls */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleCreateNewSession}
+            className="px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-slate-700 dark:text-slate-300 text-sm font-medium"
+            title="New Chat"
+          >
+            <SquarePen size={16} className="inline mr-1" />
+            New Chat
+          </button>
+          
+          <div className="relative">
+            <select
+              className="px-3 py-1.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+              value={selectedSession ?? ""}
+              onChange={(e) => setSelectedSession(e.target.value)}
+            >
+              <option value="" disabled>Select Chat</option>
+              {sessions.map((session) => (
+                <option key={session.id} value={session.id}>
+                  {session.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          
+          {selectedSession && (
+            <button
+              onClick={handleDeleteCurrentSession}
+              className="p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 transition-colors"
+              title="Delete Current Chat"
+            >
+              <Trash2 size={16} />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Chat Messages */}
@@ -164,11 +205,11 @@ const handleDeleteCurrentSession = async () => {
           {messages.length === 0 ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
-                <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-2">
-                  With Great Powers Comes Great Responsibilities
+                <h3 className="text-4xl font-semibold text-slate-900 dark:text-slate-100 mb-2">
+                  Aura Assistant – Your go-to smart work buddy.
                 </h3>
-                <p className="text-slate-600 dark:text-slate-400 text-base whitespace-nowrap overflow-hidden text-ellipsis leading-relaxed">
-                  Tap <SquarePen size={17} className="inline" /> to Unleash yourself with the Power of Aura . .
+                <p className="text-xl text-slate-600 dark:text-slate-400 whitespace-nowrap overflow-hidden text-ellipsis leading-relaxed">
+                  Assign tasks, events, or notes with a single prompt. Just type and let Aura do the rest.
                 </p>
               </div>
             </div>
@@ -177,8 +218,7 @@ const handleDeleteCurrentSession = async () => {
               {messages.map((msg, idx) => (
                 <div
                   key={msg.id || idx}
-                  className={`flex gap-2 ${msg.role === "user" ? "justify-end" : "justify-start"
-                    }`}
+                  className={`flex gap-2 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                 >
                   {msg.role === "ai" && (
                     <div className="w-4 h-4 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center mt-1">
@@ -187,10 +227,11 @@ const handleDeleteCurrentSession = async () => {
                   )}
 
                   <div
-                    className={`max-w-[75%] p-2 rounded-xl text-[16px] leading-snug ${msg.role === "user"
-                      ? "bg-primary-600 text-white rounded-br-md"
-                      : "bg-gray-100 text-slate-900 dark:text-slate-100 dark:bg-gray-700 border-slate-200 rounded-bl-md"
-                      }`}
+                    className={`max-w-[75%] p-2 rounded-xl text-[16px] leading-snug ${
+                      msg.role === "user"
+                        ? "bg-primary-600 text-white rounded-br-md"
+                        : "bg-gray-100 text-slate-900 dark:text-slate-100 dark:bg-gray-700 border-slate-200 rounded-bl-md"
+                    }`}
                   >
                     <div className="whitespace-pre-wrap break-words">
                       {cleanTextOnly(msg.content)}
@@ -236,48 +277,11 @@ const handleDeleteCurrentSession = async () => {
         </div>
       </div>
 
+      {/* Input Area */}
       <div className="px-1 py-1">
         <div className="max-w-5xl mx-auto">
           <div className="flex items-end gap-3">
-
-            {/* New Chat Session */}
-            <div className="mb-1 w-2/9">
-              <button
-                onClick={handleCreateNewSession}
-                className="w-full px-1 py-1 dark:border-slate-600 rounded-lg text-base text-slate-900 dark:text-slate-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <SquarePen size={22} />
-              </button>
-            </div>
-
-            {/* Delete current Chat Session */}
-            <div className="mb-1 w-2/9">
-              <button
-                onClick={handleDeleteCurrentSession}
-                className="w-full px-1 py-1 dark:border-slate-600 rounded-lg text-base text-slate-900 dark:text-slate-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <Trash2 size={21} />
-              </button>
-            </div>
-
-            {/* Chat Sessions */}
-            <div className="mb-1 w-2/9">
-              <select
-                className="w-full px-1 py-1 dark:bg-slate-800 rounded-lg text-base text-slate-900 dark:text-white"
-                value={selectedSession ?? ""}
-                onChange={(e) => setSelectedSession(e.target.value)}
-              >
-                <option value="" disabled>Chat History</option>
-                {sessions.map((session) => (
-                  <option key={session.id} value={session.id}>
-                    {session.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Input */}
-            <div className="flex-1 w-4/9">
+            <div className="flex-1">
               <textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}

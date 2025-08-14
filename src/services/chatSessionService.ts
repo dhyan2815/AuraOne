@@ -7,10 +7,102 @@ import {
   setDoc,
   deleteDoc,
   getDocs,
+  updateDoc,
 } from "firebase/firestore";
 import { toast } from "react-hot-toast";
 
 type Session = { id: string; name: string };
+
+// Generate a meaningful session name from the first message
+const generateSessionName = (firstMessage: string): string => {
+  // Clean and truncate the message
+  const cleanMessage = firstMessage.trim().replace(/\s+/g, ' ');
+  
+  // If it's a short message, use it directly
+  if (cleanMessage.length <= 30) {
+    return cleanMessage;
+  }
+  
+  // For longer messages, take the first meaningful part
+  const words = cleanMessage.split(' ');
+  let name = '';
+  
+  for (const word of words) {
+    if ((name + ' ' + word).length <= 30) {
+      name += (name ? ' ' : '') + word;
+    } else {
+      break;
+    }
+  }
+  
+  return name + (name.length < cleanMessage.length ? '...' : '');
+};
+
+// Generate a fallback name for sessions without meaningful content
+const generateFallbackName = (sessionId: string): string => {
+  const timestamp = new Date().toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+  });
+  return `Chat ${timestamp}`;
+};
+
+// Update session name based on conversation content
+export const updateSessionName = async (
+  db: any,
+  user: any,
+  sessionId: string,
+  firstMessage: string
+) => {
+  if (!user || !sessionId) return;
+
+  try {
+    const sessionName = generateSessionName(firstMessage);
+    const sessionRef = doc(db, "users", user.uid, "sessions", sessionId);
+    
+    await updateDoc(sessionRef, {
+      name: sessionName,
+    });
+    
+    return sessionName;
+  } catch (error) {
+    console.error("Failed to update session name:", error);
+    return null;
+  }
+};
+
+// Update session name with fallback for existing sessions
+export const updateSessionNameWithFallback = async (
+  db: any,
+  user: any,
+  sessionId: string,
+  firstMessage?: string
+) => {
+  if (!user || !sessionId) return;
+
+  try {
+    let sessionName: string;
+    
+    // Only use fallback if no firstMessage is provided
+    if (firstMessage && firstMessage.trim().length > 0) {
+      sessionName = generateSessionName(firstMessage);
+    } else {
+      // Only use fallback for truly old sessions, not new ones
+      sessionName = generateFallbackName(sessionId);
+    }
+    
+    const sessionRef = doc(db, "users", user.uid, "sessions", sessionId);
+    
+    await updateDoc(sessionRef, {
+      name: sessionName,
+    });
+    
+    return sessionName;
+  } catch (error) {
+    console.error("Failed to update session name:", error);
+    return null;
+  }
+};
 
 // Create a new session
 export const createNewSession = async (
@@ -26,7 +118,7 @@ export const createNewSession = async (
 
   const newSessionRef = doc(collection(db, "users", user.uid, "sessions"));
   const sessionId = newSessionRef.id;
-  const sessionName = `Chat Session ${sessions.length + 1}`;
+  const sessionName = "New Chat"; // Start with a simple name
 
   await setDoc(newSessionRef, {
     name: sessionName,

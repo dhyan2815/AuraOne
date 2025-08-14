@@ -1,6 +1,7 @@
 // /services/chatHandler.ts
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { addDoc, collection, serverTimestamp, getDocs } from "firebase/firestore";
 import { processAIRequest } from "./aiService";
+import { updateSessionName } from "./chatSessionService";
 
 /**
  * Main orchestrator for handling a user message using the unified AI service.
@@ -45,6 +46,13 @@ export const handleSendMessage = async ({
   });
 
   setInput("");
+
+  // Check if this is the first message in the session and update session name
+  const messagesSnapshot = await getDocs(messagesRef);
+  if (messagesSnapshot.size === 1) {
+    // This is the first message, update the session name
+    await updateSessionName(db, user, selectedSession, content);
+  }
 
   const timer = setTimeout(() => setLoading(true), 300);
   setLoadingTimer(timer);
