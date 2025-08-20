@@ -81,7 +81,7 @@ const Dashboard = () => {
 
         {/* Tasks Widget */}
         <motion.div variants={item} className='dark:shadow-xl dark:hover:shadow-2xl transition-transform-30'>
-          <Card title="Tasks" actionIcon={<PlusIcon size={16} />} actionLabel="New task" actionHref="/tasks">
+          <Card title="Tasks" actionLabel="View all" actionHref="/tasks">
             <TasksWidget />
           </Card>
         </motion.div>

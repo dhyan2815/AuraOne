@@ -107,30 +107,26 @@ const TasksWidget = () => {
     })
     .slice(0, 3);
 
-  // Count of remaining tasks
-  const remainingTasksCount =
-    tasks.filter((task) => task.completed !== "completed").length - displayTasks.length;
-
   return (
     <div className="space-y-4">
       {displayTasks.length === 0 ? (
-        <div className="text-center py-6">
-          <p className="text-slate-500 dark:text-slate-400 mb-2">
+        <div className="text-center py-8">
+          <div className="w-16 h-16 mx-auto mb-4 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center">
+            <CheckCircle size={24} className="text-success-500" />
+          </div>
+          <p className="text-slate-500 dark:text-slate-400 mb-2 font-medium">
             All tasks completed!
           </p>
-          <Link
-            to="/tasks"
-            className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 text-sm font-medium"
-          >
-            Add new tasks
-          </Link>
+          <p className="text-slate-400 dark:text-slate-500 text-sm">
+            Great job! Keep up the productivity.
+          </p>
         </div>
       ) : (
-        <>
+        <div className="space-y-2">
           {displayTasks.map((task) => (
             <div
               key={task.id}
-              className="flex items-start gap-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
+              className="flex items-start gap-3 p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer border border-slate-100 dark:border-slate-700"
               onClick={() => handleTaskClick(task.id)}
             >
               {/* Task completion toggle */}
@@ -150,8 +146,8 @@ const TasksWidget = () => {
                 />
               </button>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-medium truncate">{task.title}</p>
+                <div className="flex items-center gap-2 mb-1">
+                  <p className="text-sm font-medium truncate text-slate-900 dark:text-slate-100">{task.title}</p>
                   {task.starred && (
                     <Star size={12} className="text-warning-500 flex-shrink-0" fill="currentColor" />
                   )}
@@ -159,7 +155,7 @@ const TasksWidget = () => {
                     <Pin size={12} className="text-primary-500 flex-shrink-0" fill="currentColor" />
                   )}
                 </div>
-                <div className="flex items-center gap-3 mt-1">
+                <div className="flex items-center gap-3">
                   <span
                     className={`inline-block px-2 py-0.5 text-xs font-medium rounded-full ${task.priority === "high"
                       ? "bg-error-100 text-error-800 dark:bg-error-900/30 dark:text-error-300"
@@ -192,17 +188,7 @@ const TasksWidget = () => {
               </button>
             </div>
           ))}
-
-          {remainingTasksCount > 0 && (
-            <Link
-              to="/tasks"
-              className="block text-center text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 pt-2 border-t border-slate-100 dark:border-slate-700"
-            >
-              View {remainingTasksCount} more{" "}
-              {remainingTasksCount === 1 ? "task" : "tasks"}
-            </Link>
-          )}
-        </>
+        </div>
       )}
     </div>
   );
