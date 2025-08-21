@@ -43,7 +43,16 @@ const Login = () => {
     setError(""); // Clear any previous errors
     
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      
+      if (!user.emailVerified) {
+        toast.error("Please verify your email address before logging in.");
+        toast('Check your email for verification link', { icon: '📧' });
+        navigate("/verify-email", { replace: true });
+        return;
+      }
+      
       toast.success("Logged In Successfully!");
       toast('Welcome back to AuraOne', { icon: '👋' });
       

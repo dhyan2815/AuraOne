@@ -15,6 +15,8 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
+  Mail,
+  AlertCircle,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../../hooks/useAuth";
@@ -176,6 +178,39 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
                 </button>
               )}
             </div>
+
+            {/* Email Verification Banner */}
+            {user && !user.emailVerified && (
+              <div className="px-3 py-2">
+                <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-3">
+                  <div className="flex items-start gap-2">
+                    <AlertCircle className="w-4 h-4 text-orange-600 dark:text-orange-400 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium text-orange-800 dark:text-orange-200">
+                        Email not verified
+                      </p>
+                      <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">
+                        Please verify your email to access all features
+                      </p>
+                      <button
+                        onClick={async () => {
+                          try {
+                            await user.sendEmailVerification();
+                            toast.success("Verification email sent!");
+                          } catch (error: any) {
+                            toast.error(`Failed to send email: ${error.message}`);
+                          }
+                        }}
+                        className="text-xs text-orange-700 dark:text-orange-300 hover:text-orange-800 dark:hover:text-orange-200 font-medium mt-2 flex items-center gap-1"
+                      >
+                        <Mail className="w-3 h-3" />
+                        Resend
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Navigation */}
             <nav className="flex-1 px-2 py-2 space-y-1">

@@ -7,7 +7,8 @@ An **intelligent personal assistant** designed for comprehensive task management
 ## 🚀 Features
 
 ### ✨ Core Features
-- **🔐 User Authentication** - Secure Firebase Authentication with email/password
+- **🔐 User Authentication** - Secure Firebase Authentication with email/password and email verification
+- **📧 Email Verification** - Firebase email verification with resend functionality and verification status tracking
 - **💬 Aura Assistant** - AI Powered Functional Chat Based Assistant
 - **📝 Note Management** - Rich text editor with tags and organization
 - **✅ Task Management** - Priority-based task tracking with due dates
@@ -72,6 +73,10 @@ src/
 - **Tasks Widget**: Quick task overview with priority indicators
 - **Calendar Widget**: Upcoming events and quick event creation
 - **News Widget**: Latest news with source attribution
+
+### Email Verification System
+- **Automatic Verification**: Email verification sent upon user registration, with real-time status and resend options in the sidebar and settings.
+- **Protected Access**: Unverified users are redirected to a dedicated verification page, with support for handling verification links and cooldowns for resending emails.
 
 ### Notes Management
 - **Rich Text Editor**: TipTap-based editor with formatting support

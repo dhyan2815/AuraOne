@@ -36,14 +36,17 @@ const SignUp = () => {
             const user = userCredentails.user;
 
             await setDoc(doc(db, "users", user.uid), { name, email, createdAt: new Date() });
-            // User registered successfully
             
-            toast.success("Registration Successful! Welcome to AuraOne");
-            toast('Redirecting to your dashboard...', { icon: '🚀' });
+            // Send verification email
+            await user.sendEmailVerification();
+            
+            // User registered successfully
+            toast.success("Registration Successful! Please check your email to verify your account.");
+            toast('Redirecting to verification page...', { icon: '📧' });
             
             // Small delay to show the success message before navigation
             setTimeout(() => {
-                navigate("/dashboard", { replace: true });
+                navigate("/verify-email", { replace: true });
             }, 1500);
             
         } catch (err: any) {
