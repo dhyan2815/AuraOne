@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { User, Info, Eye, EyeOff, Mail, CheckCircle, AlertCircle } from "lucide-react";
+import { User, Info, Eye, EyeOff, Camera } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { auth, db } from "../services/firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
@@ -259,45 +259,6 @@ const Settings = () => {
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                   Email cannot be changed for security reasons
                 </p>
-              </div>
-
-              {/* Email Verification Status */}
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Email Verification
-                </label>
-                <div className="flex items-center gap-3">
-                  {user?.emailVerified ? (
-                    <>
-                      <CheckCircle className="w-5 h-5 text-green-600" />
-                      <span className="text-green-600 font-medium">Verified</span>
-                    </>
-                  ) : (
-                    <>
-                      <AlertCircle className="w-5 h-5 text-orange-600" />
-                      <span className="text-orange-600 font-medium">Not Verified</span>
-                      <button
-                        onClick={async () => {
-                          try {
-                            await user?.sendEmailVerification();
-                            toast.success("Verification email sent!");
-                          } catch (error: any) {
-                            toast.error(`Failed to send email: ${error.message}`);
-                          }
-                        }}
-                        className="ml-auto text-primary-600 hover:text-primary-700 text-sm font-medium flex items-center gap-1"
-                      >
-                        <Mail className="w-4 h-4" />
-                        Resend Verification
-                      </button>
-                    </>
-                  )}
-                </div>
-                {!user?.emailVerified && (
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                    Please verify your email to access all features
-                  </p>
-                )}
               </div>
 
               {/* Account Creation Date */}

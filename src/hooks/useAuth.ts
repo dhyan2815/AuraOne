@@ -2,7 +2,6 @@
 import { useEffect, useState } from "react";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
 import { auth } from "../services/firebase";
-import { sendVerificationEmail } from "../services/firebase";
 
 export const useAuth = () => {
   // initially user is set to null
@@ -24,21 +23,5 @@ export const useAuth = () => {
     setUser(null);
   };
 
-  // send verification email function
-  const sendEmailVerification = async () => {
-    try {
-      await sendVerificationEmail();
-      return { success: true };
-    } catch (error: any) {
-      return { success: false, error: error.message };
-    }
-  };
-
-  return { 
-    user, 
-    loading, 
-    logout, 
-    sendEmailVerification,
-    isEmailVerified: user?.emailVerified || false 
-  };
+  return { user, loading, logout };
 };

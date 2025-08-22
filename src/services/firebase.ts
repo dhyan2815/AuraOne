@@ -1,6 +1,6 @@
 // src/services/firebase.ts
 import { initializeApp } from "firebase/app";
-import { getAuth, sendEmailVerification, applyActionCode, ActionCodeInfo } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -18,14 +18,3 @@ const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
-
-// Email verification functions
-export const sendVerificationEmail = async () => {
-  if (auth.currentUser && !auth.currentUser.emailVerified) {
-    await sendEmailVerification(auth.currentUser);
-  }
-};
-
-export const verifyEmail = async (actionCode: string): Promise<ActionCodeInfo> => {
-  return await applyActionCode(auth, actionCode);
-};

@@ -15,13 +15,11 @@ import Chat from "./pages/Chat";
 import SignUp from "./pages/SignUp";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
-import VerifyEmail from "./pages/VerifyEmail";
-import EmailVerificationHandler from "./pages/EmailVerificationHandler";
 
 function App() {
 
   // Loader is displayed when logging..
-  const { user, loading, isEmailVerified } = useAuth();
+  const { user, loading } = useAuth();
   if (loading) return <Loader />;
 
   return (
@@ -33,14 +31,7 @@ function App() {
             <Route path="/signup" element={<SignUp />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/verify-email" element={<EmailVerificationHandler />} />
             <Route path="*" element={<Navigate to="/signup" replace />} />
-          </>
-        ) : !isEmailVerified ? (
-          <>
-            <Route path="/verify-email" element={<VerifyEmail />} />
-            <Route path="/verify-email/confirm" element={<EmailVerificationHandler />} />
-            <Route path="*" element={<Navigate to="/verify-email" replace />} />
           </>
         ) : (
           <Route path="/" element={<Layout />}>
