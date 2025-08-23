@@ -23,6 +23,46 @@ An **intelligent personal assistant** designed for comprehensive task management
 - **🎭 Smooth Animations** - Framer Motion powered transitions
 - **♿ Accessibility** - WCAG compliant with keyboard navigation
 
+## 🔄 User Workflow
+
+```mermaid
+flowchart TD
+    A[👤 User Arrives] --> B[🔐 Authentication]
+    B --> C["🏠 Dashboard Hub<br/>(Weather, News)"]
+    C --> D["🎯 Explore Features"]
+    
+    D --> E[📝 Notes]
+    D --> F[✅ Tasks]
+    D --> G[📅 Events]
+    D --> H[💬 Aura Assistant]
+    
+    H --> I[🤖 Natural Language Input]
+    I --> J[🧠 Model Processing]
+    J --> K[✨ Automate Content]
+    
+    E --> L[💾 Save & Sync]
+    F --> L
+    G --> L
+    K --> L
+    
+    L --> M[📱 Access Anywhere]
+    M --> N[🔄 Real-time Updates]
+    
+    style A fill:#e1f5fe
+    style C fill:#c8e6c9
+    style H fill:#fff3e0
+    style M fill:#f3e5f5
+    style N fill:#e8f5e8
+```
+
+**Professional Workflow:**
+1. **🔐 Secure Access** → Firebase authentication with email/password
+2. **🏠 Centralized Hub** → Dashboard with weather, tasks, news, and calendar widgets
+3. **🎯 Multi-Modal Input** → Traditional UI or AI-powered natural language
+4. **🤖 Intelligent Processing** → AI parses requests and calls appropriate functions
+5. **💾 Seamless Sync** → Real-time updates across all devices
+6. **📱 Universal Access** → Responsive design for desktop, tablet, and mobile
+
 ## 🏗️ Architecture
 
 ### Tech Stack
