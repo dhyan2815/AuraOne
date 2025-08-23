@@ -26,6 +26,7 @@ An **intelligent personal assistant** designed for comprehensive task management
 ## 🔄 User Workflow
 
 ```mermaid
+%%{init: {'theme': 'dark'}}%%
 flowchart TD
     A[👤 User Arrives] --> B[🔐 Authentication]
     B --> C["🏠 Dashboard Hub<br/>(Weather, News)"]
@@ -48,11 +49,11 @@ flowchart TD
     L --> M[📱 Access Anywhere]
     M --> N[🔄 Real-time Updates]
     
-    style A fill:#e1f5fe
-    style C fill:#c8e6c9
-    style H fill:#fff3e0
-    style M fill:#f3e5f5
-    style N fill:#e8f5e8
+    style A fill:#1e3a8a,stroke:#3b82f6,color:#ffffff
+    style C fill:#059669,stroke:#10b981,color:#ffffff
+    style H fill:#d97706,stroke:#f59e0b,color:#ffffff
+    style M fill:#7c3aed,stroke:#8b5cf6,color:#ffffff
+    style N fill:#059669,stroke:#10b981,color:#ffffff
 ```
 
 **Professional Workflow:**
