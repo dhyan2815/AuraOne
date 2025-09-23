@@ -1,8 +1,19 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Calendar, CheckCircle, FileText, MessageSquare, Sparkles, Shield, Zap, ArrowRight, Clock, BarChart3, Smartphone, Globe, Lock, Heart, ChevronDown } from "lucide-react";
 import LandingPicture from "../assets/flat-illustration-1.jpg";
 
 const LandingPage = () => {
+    const [isScrolled, setIsScrolled] = useState(false);
+
+    // Handle scroll effect for navbar
+    useEffect(() => {
+        const handleScroll = () => {
+            setIsScrolled(window.scrollY > 50);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     // Smooth scroll to features section
     const scrollToFeatures = () => {
@@ -12,18 +23,34 @@ const LandingPage = () => {
         }
     };
 
+    // Smooth scroll to tech section
+    const scrollToTech = () => {
+        const techElement = document.getElementById('tech');
+        if (techElement) {
+            techElement.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
+
+    // Smooth scroll to top
+    const scrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     return (
-        <div className="landing-page min-h-screen bg-white">
+        <div className="landing-page min-h-screen bg-white" style={{ scrollBehavior: 'smooth' }}>
             {/* Navigation */}
-            <nav className="fixed top-0 w-full z-50 transition-all duration-300 bg-white/20 backdrop-blur-xl border-b border-white/30 shadow-lg shadow-black/5">
+            <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-white/30 backdrop-blur-xl border-b border-white/40 shadow-lg shadow-black/10' : 'bg-white/20 backdrop-blur-xl border-b border-white/30 shadow-lg shadow-black/5'}`}>
                 <div className="container mx-auto px-4 py-2">
                     <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
+                        <button 
+                            onClick={scrollToTop}
+                            className="flex items-center space-x-2 hover:opacity-80 transition-opacity cursor-pointer"
+                        >
                             <div className="w-6 h-6 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
                                 <Sparkles className="w-3 h-3 text-white" />
                             </div>
                             <span className="text-2xl font-bold text-gray-900">AuraOne</span>
-                        </div>
+                        </button>
 
                         <div className="flex items-center space-x-4">
                             <Link
@@ -332,7 +359,7 @@ const LandingPage = () => {
             {/* Footer */}
             <footer className="bg-gray-900 text-white py-12">
                 <div className="container mx-auto px-4">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         <div className="space-y-4">
                             <div className="flex items-center space-x-2">
                                 <div className="w-8 h-8 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
@@ -343,52 +370,59 @@ const LandingPage = () => {
                             <p className="text-gray-400">
                                 Your all-in-one productivity hub for the modern digital workspace.
                             </p>
+                            <div className="flex items-center space-x-4 text-sm text-gray-400">
+                                <span className="flex items-center space-x-1">
+                                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                    <span>Beta Version</span>
+                                </span>
+                                <span>•</span>
+                                <span>Free to use</span>
+                            </div>
                         </div>
 
                         <div>
-                            <h4 className="font-semibold mb-4">Product</h4>
+                            <h4 className="font-semibold mb-4">Quick Links</h4>
                             <ul className="space-y-2 text-gray-400">
-                                <li><a href="#features" className="hover:text-white transition-colors">Features</a></li>
-                                <li><a href="#tech" className="hover:text-white transition-colors">Technology</a></li>
-                                <li><a href="#" className="hover:text-white transition-colors">Pricing</a></li>
-                                <li><a href="#" className="hover:text-white transition-colors">Updates</a></li>
+                                <li><button onClick={scrollToFeatures} className="hover:text-white transition-colors text-left">Features</button></li>
+                                <li><button onClick={scrollToTech} className="hover:text-white transition-colors text-left">Technology</button></li>
+                                <li><Link to="/login" className="hover:text-white transition-colors">Sign In</Link></li>
+                                <li><Link to="/signup" className="hover:text-white transition-colors">Get Started</Link></li>
                             </ul>
                         </div>
 
                         <div>
-                            <h4 className="font-semibold mb-4">Company</h4>
+                            <h4 className="font-semibold mb-4">Get in Touch</h4>
                             <ul className="space-y-2 text-gray-400">
-                                <li><a href="#" className="hover:text-white transition-colors">About</a></li>
-                                <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
-                                <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
-                                <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
-                            </ul>
-                        </div>
-
-                        <div>
-                            <h4 className="font-semibold mb-4">Support</h4>
-                            <ul className="space-y-2 text-gray-400">
-                                <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
-                                <li><a href="#" className="hover:text-white transition-colors">Documentation</a></li>
-                                <li><a href="#" className="hover:text-white transition-colors">Community</a></li>
-                                <li><a href="#" className="hover:text-white transition-colors">Status</a></li>
+                                <li>
+                                    <a 
+                                        href="mailto:dhyan.work.2815@gmail.com" 
+                                        className="hover:text-white transition-colors"
+                                    >
+                                        dhyan.work.2815@gmail.com
+                                    </a>
+                                </li>
+                                <li>
+                                    <a 
+                                        href="https://dhyan-patel.onrender.com" 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className="hover:text-white transition-colors"
+                                    >
+                                        Developer Portfolio
+                                    </a>
+                                </li>
+                                <li className="text-sm text-gray-500">
+                                    We're just getting started! 
+                                    <br />
+                                    Your feedback shapes our future.
+                                </li>
                             </ul>
                         </div>
                     </div>
 
                     <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
                         <p>&copy; 2025 AuraOne. All rights reserved.</p>
-                        <p>
-                            Developed by{" "}
-                            <a
-                                href="https://dhyan-patel.onrender.com"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="hover:text-white transition-colors"
-                            >
-                                Dhyan Patel
-                            </a>.
-                        </p>
+                        <p> Developed by Dhyan Patel </p>
                     </div>
                 </div>
             </footer>
