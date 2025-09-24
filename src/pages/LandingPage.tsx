@@ -107,18 +107,18 @@ const LandingPage = () => {
                                 </div>
 
                                 {/* Stats */}
-                                <div className="grid grid-cols-3 gap-8 pt-0">
+                                <div className="grid grid-cols-3 gap-5 pt-0">
                                     <div className="text-center bg-white/20 backdrop-blur-sm rounded-xl p-4 border border-white/30">
                                         <div className="text-3xl font-bold text-indigo-600">10+</div>
-                                        <div className="text-gray-600 text-sm">Active Users</div>
+                                        <div className="text-black font-medium text-sm">Active Users</div>
                                     </div>
                                     <div className="text-center bg-white/20 backdrop-blur-sm rounded-xl p-4 border border-white/30">
                                         <div className="text-3xl font-bold text-indigo-600">89.99%</div>
-                                        <div className="text-gray-600 text-sm">Uptime</div>
+                                        <div className="text-black font-medium text-sm">Uptime</div>
                                     </div>
                                     <div className="text-center bg-white/20 backdrop-blur-sm rounded-xl p-4 border border-white/30">
                                         <div className="text-3xl font-bold text-indigo-600">★★★★</div>
-                                        <div className="text-gray-600 text-sm">User Rating</div>
+                                        <div className="text-black font-medium text-sm">User Rating</div>
                                     </div>
                                 </div>
                             </div>
@@ -157,8 +157,8 @@ const LandingPage = () => {
             {/* Features Section */}
             <section id="features" className="py-20 bg-white">
                 <div className="container mx-auto px-4">
-                    <div className="text-center mb-16">
-                        <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+                    <div className="text-center mb-12">
+                        <h2 className="text-4xl lg:text-6xl font-bold text-gray-900 mb-6">
                             Everything You Need to Stay
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600"> Productive</span>
                         </h2>
@@ -167,46 +167,46 @@ const LandingPage = () => {
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {/* Feature Cards */}
                         {[
                             {
-                                icon: <Calendar className="w-8 h-8 text-indigo-600" />,
+                                icon: <Calendar className="w-6 h-6 text-indigo-600" />,
                                 title: "Smart Calendar",
                                 description: "Organize your schedule with intelligent event management and smart reminders.",
                                 gradient: "from-indigo-50 to-purple-50",
                                 iconBg: "bg-indigo-100"
                             },
                             {
-                                icon: <CheckCircle className="w-8 h-8 text-green-600" />,
+                                icon: <CheckCircle className="w-6 h-6 text-green-600" />,
                                 title: "Task Management",
                                 description: "Track and complete tasks with priority levels, deadlines, and progress tracking.",
                                 gradient: "from-green-50 to-emerald-50",
                                 iconBg: "bg-green-100"
                             },
                             {
-                                icon: <FileText className="w-8 h-8 text-blue-600" />,
+                                icon: <FileText className="w-6 h-6 text-blue-600" />,
                                 title: "Rich Notes",
                                 description: "Create, organize, and search through your notes with powerful rich text editing.",
                                 gradient: "from-blue-50 to-cyan-50",
                                 iconBg: "bg-blue-100"
                             },
                             {
-                                icon: <MessageSquare className="w-8 h-8 text-purple-600" />,
+                                icon: <MessageSquare className="w-6 h-6 text-purple-600" />,
                                 title: "AI Assistant",
                                 description: "Get intelligent help and insights from our advanced AI-powered chat assistant.",
                                 gradient: "from-purple-50 to-pink-50",
                                 iconBg: "bg-purple-100"
                             },
                             {
-                                icon: <BarChart3 className="w-8 h-8 text-yellow-600" />,
+                                icon: <BarChart3 className="w-6 h-6 text-yellow-600" />,
                                 title: "Analytics Dashboard",
                                 description: "Track your productivity patterns and get insights to optimize your workflow.",
                                 gradient: "from-yellow-50 to-orange-50",
                                 iconBg: "bg-yellow-100"
                             },
                             {
-                                icon: <Shield className="w-8 h-8 text-red-600" />,
+                                icon: <Shield className="w-6 h-6 text-red-600" />,
                                 title: "Secure & Private",
                                 description: "Your data is encrypted and protected with enterprise-grade security measures.",
                                 gradient: "from-red-50 to-rose-50",
@@ -215,13 +215,13 @@ const LandingPage = () => {
                         ].map((feature, index) => (
                             <div
                                 key={index}
-                                className={`p-8 rounded-2xl bg-gradient-to-br ${feature.gradient} hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 group backdrop-blur-sm border border-white/20`}
+                                className={`p-6 rounded-xl bg-gradient-to-br ${feature.gradient} shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group backdrop-blur-sm border border-white/20`}
                             >
-                                <div className={`w-16 h-16 ${feature.iconBg} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                                <div className={`w-12 h-12 ${feature.iconBg} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
                                     {feature.icon}
                                 </div>
-                                <h3 className="text-xl font-bold text-gray-900 mb-4">{feature.title}</h3>
-                                <p className="text-gray-600 leading-relaxed">{feature.description}</p>
+                                <h3 className="text-lg font-bold text-gray-900 mb-3">{feature.title}</h3>
+                                <p className="text-gray-600 leading-relaxed text-md">{feature.description}</p>
                             </div>
                         ))}
                     </div>
@@ -232,7 +232,7 @@ const LandingPage = () => {
             <section id="tech" className="py-20 bg-gray-50">
                 <div className="container mx-auto px-4">
                     <div className="text-center mb-16">
-                        <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+                        <h2 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
                             Built with
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600"> Modern Technology</span>
                         </h2>
@@ -328,8 +328,8 @@ const LandingPage = () => {
             {/* CTA Section */}
             <section className="py-20 bg-gradient-to-r from-indigo-600 to-purple-600">
                 <div className="container mx-auto px-4 text-center">
-                    <div className="max-w-4xl mx-auto">
-                        <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">
+                    <div className="max-w-6xl mx-auto">
+                        <h2 className="text-4xl lg:text-6xl font-bold text-white mb-6">
                             Ready to Transform Your Productivity?
                         </h2>
                         <p className="text-xl text-indigo-100 mb-12 leading-relaxed">
@@ -340,14 +340,14 @@ const LandingPage = () => {
                         <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
                             <Link
                                 to="/signup"
-                                className="bg-white text-indigo-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-all duration-200 transform hover:scale-105 shadow-xl flex items-center group"
+                                className="bg-white text-indigo-600 px-8 py-3 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-all duration-200 transform hover:scale-105 shadow-2xl flex items-center group"
                             >
                                 Get Started Free
                                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                             </Link>
                             <Link
                                 to="/login"
-                                className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-indigo-600 transition-all duration-200 transform hover:scale-105"
+                                className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold text-lg hover:bg-white hover:text-indigo-600 transition-all duration-200 transform hover:scale-105 shadow-2xl"
                             >
                                 Sign In
                             </Link>
@@ -370,13 +370,13 @@ const LandingPage = () => {
                             <p className="text-gray-400">
                                 Your all-in-one productivity hub for the modern digital workspace.
                             </p>
-                            <div className="flex items-center space-x-4 text-sm text-gray-400">
+                            <div className="flex items-center space-x-1 text-sm text-gray-400">
                                 <span className="flex items-center space-x-1">
                                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                                     <span>Beta Version</span>
                                 </span>
-                                <span>•</span>
-                                <span>Free to use</span>
+                                <span>-</span>
+                                <span>Free</span>
                             </div>
                         </div>
 
