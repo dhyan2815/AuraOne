@@ -12,10 +12,7 @@ import {
     FileText,
     Sparkles,
     Shield,
-    Zap,
-    Users,
     ArrowRight,
-    ChevronDown,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -433,7 +430,7 @@ const SignUp = () => {
             <div className="bg-gray-50 py-16">
                 <div className="container mx-auto px-4">
                     <div className="text-center mb-12">
-                        <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                        <h2 className="text-5xl font-bold text-gray-900 mb-4">
                             Built for Modern Productivity
                         </h2>
                         <p className="text-lg text-gray-600">
@@ -444,71 +441,22 @@ const SignUp = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
                         <div className="text-center">
-                            <div className="text-4xl font-bold text-indigo-600 mb-2">5+</div>
+                            <div className="text-5xl font-bold text-indigo-600 mb-2">5+</div>
                             <div className="text-gray-600">Core Features</div>
                         </div>
                         <div className="text-center">
-                            <div className="text-4xl font-bold text-indigo-600 mb-2">
+                            <div className="text-5xl font-bold text-indigo-600 mb-2">
                                 100%
                             </div>
                             <div className="text-gray-600">Free & Open Source</div>
                         </div>
                         <div className="text-center">
-                            <div className="text-4xl font-bold text-indigo-600 mb-2">
+                            <div className="text-5xl font-bold text-indigo-600 mb-2">
                                 Instant
                             </div>
                             <div className="text-gray-600">Smart Productivity Tools</div>
                         </div>
-                    </div>
 
-                    {/* Technology Stack Section */}
-                    <div className="bg-white p-8">
-                        <div className="flex items-center justify-center gap-4 mb-6">
-                            <Zap className="w-6 h-6 text-indigo-600" />
-                            <span className="text-lg font-semibold text-gray-900">
-                                Built with Modern Tech Stack
-                            </span>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="p-4 bg-gray-50 rounded-lg">
-                                <h4 className="font-semibold text-gray-900 mb-2">
-                                    Frontend Excellence
-                                </h4>
-                                <div className="flex flex-wrap gap-2">
-                                    <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
-                                        React 18
-                                    </span>
-                                    <span className="px-3 py-1 bg-cyan-100 text-cyan-700 text-xs rounded-full">
-                                        TypeScript
-                                    </span>
-                                    <span className="px-3 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">
-                                        Tailwind CSS
-                                    </span>
-                                    <span className="px-3 py-1 bg-orange-100 text-orange-700 text-xs rounded-full">
-                                        Vite
-                                    </span>
-                                </div>
-                            </div>
-                            <div className="p-4 bg-gray-50 rounded-lg">
-                                <h4 className="font-semibold text-gray-900 mb-2">
-                                    Backend & Services
-                                </h4>
-                                <div className="flex flex-wrap gap-2">
-                                    <span className="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-full">
-                                        Firebase
-                                    </span>
-                                    <span className="px-3 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full">
-                                        AI Integration
-                                    </span>
-                                    <span className="px-3 py-1 bg-red-100 text-red-700 text-xs rounded-full">
-                                        Real-time Sync
-                                    </span>
-                                    <span className="px-3 py-1 bg-indigo-100 text-indigo-700 text-xs rounded-full">
-                                        PWA Ready
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -544,6 +492,77 @@ const SignUp = () => {
                     </div>
                 </div>
             </section>
+
+            {/* Footer */}
+            <footer className="bg-gray-900 text-white py-12">
+                <div className="container mx-auto px-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div className="space-y-4">
+                            <div className="flex items-center space-x-2">
+                                <div className="w-8 h-8 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
+                                    <Sparkles className="w-5 h-5 text-white" />
+                                </div>
+                                <span className="text-xl font-bold">AuraOne</span>
+                            </div>
+                            <p className="text-gray-400">
+                                Your all-in-one productivity hub for the modern digital workspace.
+                            </p>
+                            <div className="flex items-center space-x-1 text-sm text-gray-400">
+                                <span className="flex items-center space-x-1">
+                                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                    <span>Beta Version</span>
+                                </span>
+                                <span>-</span>
+                                <span>Free</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 className="font-semibold mb-4">Quick Links</h4>
+                            <ul className="space-y-2 text-gray-400">
+                                <li><Link to="/" className="hover:text-white transition-colors">Home</Link></li>
+                                <li><Link to="/login" className="hover:text-white transition-colors">Sign In</Link></li>
+                                <li><Link to="/signup" className="hover:text-white transition-colors">Get Started</Link></li>
+                                <li><a href="#features" className="hover:text-white transition-colors">Features</a></li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h4 className="font-semibold mb-4">Get in Touch</h4>
+                            <ul className="space-y-2 text-gray-400">
+                                <li>
+                                    <a 
+                                        href="mailto:dhyan.work.2815@gmail.com" 
+                                        className="hover:text-white transition-colors"
+                                    >
+                                        dhyan.work.2815@gmail.com
+                                    </a>
+                                </li>
+                                <li>
+                                    <a 
+                                        href="https://dhyan-patel.onrender.com" 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className="hover:text-white transition-colors"
+                                    >
+                                        Developer Portfolio
+                                    </a>
+                                </li>
+                                <li className="text-sm text-gray-500">
+                                    We're just getting started! 
+                                    <br />
+                                    Your feedback shapes our future.
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                        <p>&copy; 2025 AuraOne. All rights reserved.</p>
+                        <p> Developed by Dhyan Patel </p>
+                    </div>
+                </div>
+            </footer>
         </div>
     );
 };
