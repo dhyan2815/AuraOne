@@ -94,11 +94,6 @@ const SignUp = () => {
         }
     };
 
-    // Smooth scroll to top
-    const scrollToTop = () => {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-    };
-
     return (
         <div
             className="signup min-h-screen bg-white"
@@ -113,15 +108,15 @@ const SignUp = () => {
             >
                 <div className="container mx-auto px-4 py-1">
                     <div className="flex items-center justify-between">
-                        <button
-                            onClick={scrollToTop}
+                        <Link
+                            to="/"
                             className="flex items-center space-x-2 hover:opacity-80 transition-opacity cursor-pointer"
                         >
                             <div className="w-4 h-4 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
                                 <Sparkles className="w-2 h-2 text-white" />
                             </div>
                             <span className="text-xl font-bold text-gray-900">AuraOne</span>
-                        </button>
+                        </Link>
 
                         <div className="flex items-center space-x-4">
                             <Link
