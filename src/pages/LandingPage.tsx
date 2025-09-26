@@ -1,10 +1,39 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Calendar, CheckCircle, FileText, MessageSquare, Sparkles, Shield, Zap, ArrowRight, Clock, BarChart3, Smartphone, Globe, Lock, Heart, ChevronDown } from "lucide-react";
+import { Calendar, CheckCircle, FileText, MessageSquare, Sparkles, Shield, Zap, ArrowRight, Clock, BarChart3, Smartphone, Globe, Lock, Heart, ChevronDown, Star, Users } from "lucide-react";
 import LandingPicture from "../assets/LandingImage.png";
 
 const LandingPage = () => {
     const [isScrolled, setIsScrolled] = useState(false);
+    const [currentTestimonial, setCurrentTestimonial] = useState(0);
+
+    // Testimonials data
+    const testimonials = [
+        {
+            name: "Sarah Johnson",
+            role: "Product Manager",
+            content: "AuraOne has completely transformed how I manage my daily tasks and notes. The AI assistant is incredibly intuitive and saves me hours every week.",
+            rating: 4
+        },
+        {
+            name: "Michael Chen",
+            role: "Software Developer",
+            content: "The real-time sync across all my devices is flawless. I can start a task on my phone and finish it on my laptop without any hassle.",
+            rating: 4
+        },
+        {
+            name: "Emily Rodriguez",
+            role: "Marketing Director",
+            content: "The calendar integration and smart reminders have made me so much more organized. AuraOne is exactly what I needed for my busy schedule.",
+            rating: 5
+        },
+        {
+            name: "David Thompson",
+            role: "Freelance Writer",
+            content: "The rich text editor for notes is fantastic, and the AI chat feature helps me brainstorm ideas quickly. This is productivity software done right.",
+            rating: 4
+        }
+    ];
 
     // Handle scroll effect for navbar
     useEffect(() => {
@@ -14,6 +43,17 @@ const LandingPage = () => {
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
+
+    // Auto-rotate testimonials every 4 seconds
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentTestimonial((prevIndex) => 
+                (prevIndex + 1) % testimonials.length
+            );
+        }, 4000);
+
+        return () => clearInterval(interval);
+    }, [testimonials.length]);
 
     // Smooth scroll to features section
     const scrollToFeatures = () => {
@@ -238,6 +278,69 @@ const LandingPage = () => {
                                 <h3 className="text-lg font-bold text-gray-900 mb-3">{feature.title}</h3>
                                 <p className="text-gray-600 leading-relaxed text-md">{feature.description}</p>
                             </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* Testimonials Section */}
+            <section className="py-8 bg-gradient-to-br from-indigo-50 to-purple-50">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center mb-5">
+                        <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
+                            What Our Users Say
+                        </h2>
+                        <p className="text-xl text-gray-600">
+                            Hear from real users who are transforming their productivity with AuraOne
+                        </p>
+                    </div>
+
+                    {/* Testimonial Card */}
+                    <div className="max-w-6xl mx-auto">
+                        <div className="bg-white rounded-2xl shadow-xl p-4 lg:p-8 text-center relative overflow-hidden">
+                            <div 
+                                key={currentTestimonial}
+                                className="transition-all duration-500 ease-in-out transform"
+                                style={{
+                                    opacity: 1,
+                                    transform: 'translateY(0)'
+                                }}
+                            >
+                                <div className="flex justify-center mb-6">
+                                    {[...Array(testimonials[currentTestimonial].rating)].map((_, i) => (
+                                        <Star key={i} className="w-6 h-6 text-yellow-400 fill-current transition-all duration-300" />
+                                    ))}
+                                </div>
+                                <blockquote className="text-xl lg:text-2xl text-gray-700 mb-8 leading-relaxed transition-all duration-500">
+                                    "{testimonials[currentTestimonial].content}"
+                                </blockquote>
+                                <div className="flex items-center justify-center">
+                                    <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mr-4 transition-all duration-300">
+                                        <Users className="w-6 h-6 text-indigo-600" />
+                                    </div>
+                                    <div className="text-left">
+                                        <div className="font-semibold text-gray-900 transition-all duration-500">
+                                            {testimonials[currentTestimonial].name}
+                                        </div>
+                                        <div className="text-gray-600 transition-all duration-500">
+                                            {testimonials[currentTestimonial].role}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Testimonial indicators */}
+                    <div className="flex justify-center mt-8 space-x-2">
+                        {testimonials.map((_, index) => (
+                            <button
+                                key={index}
+                                onClick={() => setCurrentTestimonial(index)}
+                                className={`w-3 h-3 rounded-full transition-all duration-300 ease-in-out transform hover:scale-110 ${
+                                    index === currentTestimonial ? 'bg-indigo-600 scale-110' : 'bg-gray-300 hover:bg-indigo-400'
+                                }`}
+                            />
                         ))}
                     </div>
                 </div>
