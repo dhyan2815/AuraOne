@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Calendar, CheckCircle, FileText, MessageSquare, Sparkles, Shield, Zap, ArrowRight, Clock, BarChart3, Smartphone, Globe, Lock, Heart, ChevronDown } from "lucide-react";
-import LandingPicture from "../assets/flat-illustration-1.jpg";
+import LandingPicture from "../assets/LandingImage.png";
 
 const LandingPage = () => {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -135,19 +135,34 @@ const LandingPage = () => {
                                 </div>
 
                                 {/* Floating Cards */}
-                                <div className="absolute -top-4 -left-4 bg-white/20 backdrop-blur-md rounded-xl shadow-lg p-4 transform rotate-3 border border-white/30">
+                                <div className="absolute -top-4 -left-4 bg-white/20 backdrop-blur-md rounded-xl shadow-lg p-4 transform rotate-3 border border-white/30 animate-float-slow">
                                     <div className="flex items-center space-x-2">
-                                        <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                                        <span className="text-sm font-medium text-gray-800">AI Assistant Active</span>
+                                        <div className="w-3 h-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full animate-pulse"></div>
+                                        <span className="text-md font-semibold text-gray-800">AI Assistant</span>
                                     </div>
                                 </div>
 
-                                <div className="absolute -bottom-4 -right-4 bg-white/20 backdrop-blur-md rounded-xl shadow-lg p-4 transform -rotate-3 border border-white/30">
+                                <div className="absolute -top-4 -right-4 bg-white/20 backdrop-blur-md rounded-xl shadow-lg p-4 transform rotate-3 border border-white/30 animate-float-slow">
                                     <div className="flex items-center space-x-2">
-                                        <Calendar className="w-4 h-4 text-indigo-600" />
-                                        <span className="text-sm font-medium text-gray-800">3 Events Today</span>
+                                        <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full animate-spin"></div>
+                                        <span className="text-md font-semibold text-gray-800">Smart Sync</span>
                                     </div>
                                 </div>
+
+                                <div className="absolute -bottom-4 -left-4 bg-white/20 backdrop-blur-md rounded-xl shadow-lg p-4 transform rotate-3 border border-white/30 animate-float-slow">
+                                    <div className="flex items-center space-x-2">
+                                        <div className="w-3 h-3 bg-gradient-to-r from-orange-500 to-red-500 rounded-full animate-ping"></div>
+                                        <span className="text-md font-semibold text-gray-800">Live Data</span>
+                                    </div>
+                                </div>
+
+                                <div className="absolute -bottom-4 -right-4 bg-white/20 backdrop-blur-md rounded-xl shadow-lg p-4 transform -rotate-3 border border-white/30 animate-float-fast">
+                                    <div className="flex items-center space-x-2">
+                                        <div className="w-3 h-3 bg-gradient-to-r from-emerald-500 to-green-500 rounded-full animate-pulse"></div>
+                                        <span className="text-md font-semibold text-gray-800">Secure Auth</span>
+                                    </div>
+                                </div>
+                                
                             </div>
                         </div>
                     </div>

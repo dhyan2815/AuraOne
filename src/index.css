@@ -209,3 +209,61 @@
 .ql-editor pre code {
   @apply bg-transparent p-0;
 }
+
+/* Floating Card Animations */
+@keyframes float-slow {
+  0%, 100% {
+    transform: translateY(0px) rotate(3deg) translateX(0px);
+  }
+  25% {
+    transform: translateY(-8px) rotate(2deg) translateX(2px);
+  }
+  50% {
+    transform: translateY(-12px) rotate(4deg) translateX(-1px);
+  }
+  75% {
+    transform: translateY(-6px) rotate(1deg) translateX(3px);
+  }
+}
+
+@keyframes float-fast {
+  0%, 100% {
+    transform: translateY(0px) rotate(-3deg) translateX(0px);
+  }
+  20% {
+    transform: translateY(-10px) rotate(-1deg) translateX(-2px);
+  }
+  40% {
+    transform: translateY(-15px) rotate(-5deg) translateX(1px);
+  }
+  60% {
+    transform: translateY(-8px) rotate(-2deg) translateX(-3px);
+  }
+  80% {
+    transform: translateY(-12px) rotate(-4deg) translateX(2px);
+  }
+}
+
+@keyframes gentle-sway {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(1deg);
+  }
+  75% {
+    transform: rotate(-1deg);
+  }
+}
+
+.animate-float-slow {
+  animation: float-slow 6s ease-in-out infinite;
+}
+
+.animate-float-fast {
+  animation: float-fast 4s ease-in-out infinite;
+}
+
+.animate-gentle-sway {
+  animation: gentle-sway 3s ease-in-out infinite;
+}
