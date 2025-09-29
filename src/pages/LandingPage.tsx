@@ -11,25 +11,25 @@ const LandingPage = () => {
     // Testimonials data
     const testimonials = [
         {
-            name: "Sarah Johnson",
+            name: "Rajesh Verma",
             role: "Product Manager",
             content: "AuraOne has completely transformed how I manage my daily tasks and notes. The AI assistant is incredibly intuitive and saves me hours every week.",
             rating: 4
         },
         {
-            name: "Michael Chen",
+            name: "Anjali Sharma",
             role: "Software Developer",
             content: "The real-time sync across all my devices is flawless. I can start a task on my phone and finish it on my laptop without any hassle.",
             rating: 4
         },
-        {
-            name: "Emily Rodriguez",
+        {  
+            name: "Amit Patel",
             role: "Marketing Director",
             content: "The calendar integration and smart reminders have made me so much more organized. AuraOne is exactly what I needed for my busy schedule.",
             rating: 5
         },
         {
-            name: "David Thompson",
+            name: "Dhairya Kumar",
             role: "Freelance Writer",
             content: "The rich text editor for notes is fantastic, and the AI chat feature helps me brainstorm ideas quickly. This is productivity software done right.",
             rating: 4
