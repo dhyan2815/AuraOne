@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Calendar, CheckCircle, FileText, MessageSquare, Sparkles, Shield, Zap, ArrowRight, Clock, BarChart3, Smartphone, Globe, Lock, Heart, ChevronDown, Star, Users } from "lucide-react";
+import { Calendar, CheckCircle, FileText, MessageSquare, Sparkles, Shield, ArrowRight, Clock, BarChart3, Smartphone, Lock, Heart, ChevronDown, Star, Users } from "lucide-react";
 import LandingPicture from "../assets/LandingImage.png";
+import LandingVideo from "../assets/LandingVideo2.mp4";
 
 const LandingPage = () => {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -346,94 +347,71 @@ const LandingPage = () => {
                 </div>
             </section>
 
-            {/* Technology Stack Section */}
-            <section id="tech" className="py-20 bg-gray-50">
+            {/* Video Showcase Section */}
+            <section id="tech" className="py-20 bg-gradient-to-br from-gray-50 via-white to-indigo-50">
                 <div className="container mx-auto px-4">
                     <div className="text-center mb-16">
                         <h2 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
-                            Built with
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600"> Modern Technology</span>
+                            Experience
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600"> AuraOne in Action</span>
                         </h2>
                         <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                            AuraOne leverages cutting-edge web technologies to deliver a fast, secure, and scalable productivity experience.
+                            See how AuraOne transforms your productivity with its intuitive interface and powerful features.
                         </p>
                     </div>
 
-                    <div className="max-w-6xl mx-auto">
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                            {/* Tech Stack Cards */}
-                            <div className="space-y-6">
-                                <div className="bg-white/20 backdrop-blur-md rounded-2xl p-8 shadow-lg border border-white/30">
-                                    <div className="flex items-center mb-6">
-                                        <Zap className="w-6 h-6 text-indigo-600 mr-3" />
-                                        <h3 className="text-xl font-bold text-gray-900">Frontend Excellence</h3>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        {[
-                                            { name: "React 18", color: "bg-blue-100 text-blue-700" },
-                                            { name: "TypeScript", color: "bg-cyan-100 text-cyan-700" },
-                                            { name: "Tailwind CSS", color: "bg-purple-100 text-purple-700" },
-                                            { name: "Vite", color: "bg-orange-100 text-orange-700" }
-                                        ].map((tech, index) => (
-                                            <span key={index} className={`px-4 py-2 rounded-lg text-sm font-medium ${tech.color}`}>
-                                                {tech.name}
-                                            </span>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <div className="bg-white/20 backdrop-blur-md rounded-2xl p-8 shadow-lg border border-white/30">
-                                    <div className="flex items-center mb-6">
-                                        <Globe className="w-6 h-6 text-indigo-600 mr-3" />
-                                        <h3 className="text-xl font-bold text-gray-900">Backend & Services</h3>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        {[
-                                            { name: "Firebase", color: "bg-green-100 text-green-700" },
-                                            { name: "AI Integration", color: "bg-yellow-100 text-yellow-700" },
-                                            { name: "Real-time Sync", color: "bg-red-100 text-red-700" },
-                                            { name: "PWA Ready", color: "bg-indigo-100 text-indigo-700" }
-                                        ].map((tech, index) => (
-                                            <span key={index} className={`px-4 py-2 rounded-lg text-sm font-medium ${tech.color}`}>
-                                                {tech.name}
-                                            </span>
-                                        ))}
-                                    </div>
+                    <div className="max-w-7xl mx-auto">
+                        <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 items-center">
+                            {/* Video Section - Left Content */}
+                            <div className="relative lg:col-span-3">
+                                <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+                                    <video
+                                        className="w-full h-auto max-h-[800px] object-cover rounded-2xl"
+                                        autoPlay
+                                        muted
+                                        loop
+                                        playsInline
+                                        poster={LandingPicture}
+                                        style={{ aspectRatio: '16/13' }}
+                                    >
+                                        <source src={LandingVideo} type="video/mp4" />
+                                        Your browser does not support the video tag.
+                                    </video>
                                 </div>
                             </div>
 
-                            {/* Benefits List */}
-                            <div className="space-y-8">
-                                <h3 className="text-2xl font-bold text-gray-900 mb-6">Why Choose AuraOne?</h3>
+                            {/* Benefits List - Right Content */}
+                            <div className="space-y-5 lg:col-span-2">
+                                <h3 className="text-3xl font-bold text-gray-900 mb-8">Why Choose AuraOne?</h3>
                                 {[
                                     {
-                                        icon: <Clock className="w-6 h-6 text-indigo-600" />,
+                                        icon: <Clock className="w-7 h-7 text-indigo-600" />,
                                         title: "Lightning Fast",
                                         description: "Built with Vite and optimized for performance, AuraOne loads instantly and responds quickly to every interaction."
                                     },
                                     {
-                                        icon: <Lock className="w-6 h-6 text-green-600" />,
+                                        icon: <Lock className="w-7 h-7 text-green-600" />,
                                         title: "Enterprise Security",
                                         description: "Your data is protected with Firebase's enterprise-grade security and end-to-end encryption."
                                     },
                                     {
-                                        icon: <Smartphone className="w-6 h-6 text-purple-600" />,
+                                        icon: <Smartphone className="w-7 h-7 text-purple-600" />,
                                         title: "Cross-Platform",
                                         description: "Access AuraOne from any device - desktop, tablet, or mobile - with our responsive design."
                                     },
                                     {
-                                        icon: <Heart className="w-6 h-6 text-red-600" />,
+                                        icon: <Heart className="w-7 h-7 text-red-600" />,
                                         title: "User-Centric Design",
                                         description: "Every feature is designed with user experience in mind, making productivity enjoyable and intuitive."
                                     }
                                 ].map((benefit, index) => (
-                                    <div key={index} className="flex items-start space-x-4">
-                                        <div className="flex-shrink-0 w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30">
+                                    <div key={index} className="flex items-start space-x-6 group">
+                                        <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-white/30 to-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-white/40 group-hover:scale-110 transition-transform duration-300 shadow-lg">
                                             {benefit.icon}
                                         </div>
-                                        <div>
-                                            <h4 className="text-lg font-semibold text-gray-900 mb-2">{benefit.title}</h4>
-                                            <p className="text-gray-600">{benefit.description}</p>
+                                        <div className="flex-1">
+                                            <h4 className="text-xl font-bold text-gray-900 mb-1 group-hover:text-indigo-600 transition-colors duration-300">{benefit.title}</h4>
+                                            <p className="text-gray-600 leading-relaxed text-lg">{benefit.description}</p>
                                         </div>
                                     </div>
                                 ))}
