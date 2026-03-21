@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../services/firebase";
+import { useAuth } from "../hooks/useAuth";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import {
     Eye,
@@ -18,6 +17,7 @@ import toast from "react-hot-toast";
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -38,9 +38,9 @@ const Login = () => {
   const scrollToLoginForm = () => {
     const formElement = document.querySelector('form');
     if (formElement) {
-      formElement.scrollIntoView({ 
-        behavior: 'smooth', 
-        block: 'center' 
+      formElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
       });
     }
   };
@@ -59,17 +59,17 @@ const Login = () => {
     e.preventDefault();
     setIsLoggingIn(true);
     setError(""); // Clear any previous errors
-    
+
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      await login(email, password);
       toast.success("Logged In Successfully!");
       toast('Welcome back to AuraOne', { icon: '👋' });
-      
+
       // Small delay to show the success message before navigation
       setTimeout(() => {
         navigate("/dashboard", { replace: true });
       }, 1500);
-      
+
     } catch (err: any) {
       setError(err.message);
     } finally {

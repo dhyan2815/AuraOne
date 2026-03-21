@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "../services/firebase";
-import { doc, setDoc } from "firebase/firestore";
+import { useAuth } from "../hooks/useAuth";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import {
     Eye,
@@ -19,6 +17,7 @@ import toast from "react-hot-toast";
 const SignUp = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const { signup } = useAuth();
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -54,19 +53,7 @@ const SignUp = () => {
         setError(""); // Clear any previous errors
 
         try {
-            const userCredentails = await createUserWithEmailAndPassword(
-                auth,
-                email,
-                password
-            );
-            const user = userCredentails.user;
-
-            await setDoc(doc(db, "users", user.uid), {
-                name,
-                email,
-                createdAt: new Date(),
-            });
-            // User registered successfully
+            await signup(email, password, { data: { name } });
 
             toast.success("Registration Successful! Welcome to AuraOne");
             toast("Redirecting to your dashboard...", { icon: "🚀" });
