@@ -1,22 +1,8 @@
-import { Calendar, Clock, Flag, MoreVertical, CheckCircle, Star, Pin } from "lucide-react";
+import { Calendar, Clock, Flag, MoreVertical, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
-import { toggleTaskStar, toggleTaskPin } from "../../hooks/useTasks";
+import { Task } from "../../hooks/useTasks"; // Import the centralized Task interface
 import { useAuth } from "../../hooks/useAuth";
-import toast from 'react-hot-toast';
-
-interface Task {
-  id: string;
-  title: string;
-  description: string;
-  dueDate?: string;
-  dueTime?: string;
-  completed: "completed" | "due";
-  priority: "low" | "medium" | "high";
-  createdAt?: string;
-  pinned?: boolean;
-  starred?: boolean;
-}
 
 interface TaskCardProps {
   task: Task;
@@ -32,90 +18,22 @@ const priorityColors = {
 
 const TaskCard = ({ task, viewMode, onToggleComplete }: TaskCardProps) => {
   const { user } = useAuth();
-  const formattedDueDate = task.dueDate
-    ? format(new Date(task.dueDate), 'MMM d, yyyy')
-    : '';
-  
-  const formattedCreatedDate = task.createdAt
-    ? format(new Date(task.createdAt), 'MMM d, yyyy')
+  const formattedDueDate = task.due_date
+    ? format(new Date(task.due_date), 'MMM d, yyyy')
     : '';
 
-  const handleToggleStar = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (!user) return;
+  const formattedCreatedDate = task.created_at
+    ? format(new Date(task.created_at), 'MMM d, yyyy')
+    : '';
 
-    try {
-      await toggleTaskStar(user.uid, task.id, !task.starred);
-      toast.success(task.starred ? "Task unstarred!" : "Task starred!");
-    } catch (error) {
-      console.error("Failed to toggle star:", error);
-      toast.error("Failed to update task");
-    }
-  };
+  const dueTime = task.due_date ? format(new Date(task.due_date), 'p') : '';
 
-  const handleTogglePin = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (!user) return;
-
-    try {
-      await toggleTaskPin(user.uid, task.id, !task.pinned);
-      toast.success(task.pinned ? "Task unpinned!" : "Task pinned!");
-    } catch (error) {
-      console.error("Failed to toggle pin:", error);
-      toast.error("Failed to update task");
-    }
-  };
-
-  // Format time to 12-hour format for better readability
-  const formatTime = (timeString: string) => {
-    try {
-      const [hours, minutes] = timeString.split(':');
-      const hour = parseInt(hours);
-      const minute = parseInt(minutes);
-      
-      if (hour === 0) {
-        return `12:${minutes} AM`;
-      } else if (hour < 12) {
-        return `${hour}:${minutes} AM`;
-      } else if (hour === 12) {
-        return `12:${minutes} PM`;
-      } else {
-        return `${hour - 12}:${minutes} PM`;
-      }
-    } catch {
-      return timeString; // Return original if parsing fails
-    }
-  };
-
-  const isOverdue = task.dueDate && task.dueTime && (() => {
-    try {
-      // HTML time input provides 24-hour format (HH:MM)
-      const [hours, minutes] = task.dueTime.split(':');
-      const hour = parseInt(hours);
-      const minute = parseInt(minutes);
-      
-      if (hour !== undefined && minute !== undefined) {
-        const dueDateTime = new Date(`${task.dueDate}T${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}:00`);
-        return dueDateTime < new Date() && task.completed === "due";
-      }
-      
-      return false;
-    } catch {
-      return false;
-    }
-  })();
+  const isOverdue = task.due_date && new Date(task.due_date) < new Date() && !task.completed;
 
   if (viewMode === "list") {
     return (
       <Link to={`/tasks/${task.id}`} className="block">
         <div className="card hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors relative">
-          {task.pinned && (
-            <div className="absolute top-2 right-2">
-              <Pin size={14} className="text-primary-500" fill="currentColor" />
-            </div>
-          )}
           <div className="flex flex-col md:flex-row md:items-center gap-2">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
@@ -127,28 +45,25 @@ const TaskCard = ({ task, viewMode, onToggleComplete }: TaskCardProps) => {
                   }}
                   className="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
                 >
-                  <CheckCircle 
-                    size={16} 
-                    className={task.completed === "completed" 
-                      ? "text-success-500" 
+                  <CheckCircle
+                    size={16}
+                    className={task.completed
+                      ? "text-success-500"
                       : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-                    } 
+                    }
                   />
                 </button>
                 <h3 className={`text-lg font-medium truncate ${
-                  task.completed === "completed" 
-                    ? "line-through text-slate-500 dark:text-slate-400" 
+                  task.completed
+                    ? "line-through text-slate-500 dark:text-slate-400"
                     : ""
                 }`}>
                   {task.title}
                 </h3>
-                {task.starred && (
-                  <Star size={16} className="text-warning-500" fill="currentColor" />
-                )}
               </div>
               <div className={`text-slate-600 dark:text-slate-400 line-clamp-2 mb-4 ${
-                task.completed === "completed" 
-                  ? "line-through text-slate-400 dark:text-slate-500" 
+                task.completed
+                  ? "line-through text-slate-400 dark:text-slate-500"
                   : ""
               }`}>
                 {task.description || "No description"}
@@ -156,7 +71,7 @@ const TaskCard = ({ task, viewMode, onToggleComplete }: TaskCardProps) => {
             </div>
 
             <div className="flex items-center gap-4 text-sm text-slate-500 dark:text-slate-400 flex-wrap">
-              {task.dueDate && (
+              {task.due_date && (
                 <div className={`flex items-center flex-shrink-0 ${isOverdue
                   ? 'text-error-600 dark:text-error-400'
                   : 'text-slate-500 dark:text-slate-400'
@@ -169,47 +84,23 @@ const TaskCard = ({ task, viewMode, onToggleComplete }: TaskCardProps) => {
                 </div>
               )}
 
-              {task.dueTime && (
+              {dueTime && (
                 <div className={`flex items-center flex-shrink-0 ${isOverdue
                   ? 'text-error-600 dark:text-error-400'
                   : 'text-slate-500 dark:text-slate-400'
                 }`}>
                   <Clock size={14} className="mr-1 flex-shrink-0" />
-                  <span className="whitespace-nowrap">{formatTime(task.dueTime)}</span>
+                  <span className="whitespace-nowrap">{dueTime}</span>
                 </div>
               )}
 
-              <div className={`px-2 py-0.5 rounded-full text-xs flex-shrink-0 ${priorityColors[task.priority]}`}>
-                {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
-              </div>
+              {task.priority && (
+                <div className={`px-2 py-0.5 rounded-full text-xs flex-shrink-0 ${priorityColors[task.priority]}`}>
+                  {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+                </div>
+              )}
 
               <div className="flex items-center gap-1 flex-shrink-0">
-                <button
-                  onClick={handleToggleStar}
-                  className="p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
-                >
-                  <Star 
-                    size={16} 
-                    className={task.starred 
-                      ? "text-warning-500" 
-                      : "text-slate-400 hover:text-warning-500"
-                    } 
-                    fill={task.starred ? "currentColor" : "none"}
-                  />
-                </button>
-                <button
-                  onClick={handleTogglePin}
-                  className="p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
-                >
-                  <Pin 
-                    size={16} 
-                    className={task.pinned 
-                      ? "text-primary-500" 
-                      : "text-slate-400 hover:text-primary-500"
-                    } 
-                    fill={task.pinned ? "currentColor" : "none"}
-                  />
-                </button>
                 <button className="p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700">
                   <MoreVertical size={16} />
                 </button>
@@ -224,11 +115,6 @@ const TaskCard = ({ task, viewMode, onToggleComplete }: TaskCardProps) => {
   return (
     <Link to={`/tasks/${task.id}`} className="block h-full">
       <div className="card h-full flex flex-col hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors relative">
-        {task.pinned && (
-          <div className="absolute top-2 right-2">
-            <Pin size={14} className="text-primary-500" fill="currentColor" />
-          </div>
-        )}
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
             <button
@@ -239,28 +125,25 @@ const TaskCard = ({ task, viewMode, onToggleComplete }: TaskCardProps) => {
               }}
               className="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
             >
-              <CheckCircle 
-                size={16} 
-                className={task.completed === "completed" 
-                  ? "text-success-500" 
+              <CheckCircle
+                size={16}
+                className={task.completed
+                  ? "text-success-500"
                   : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-                } 
+                }
               />
             </button>
             <h3 className={`text-lg font-medium ${
-              task.completed === "completed" 
-                ? "line-through text-slate-500 dark:text-slate-400" 
+              task.completed
+                ? "line-through text-slate-500 dark:text-slate-400"
                 : ""
             }`}>
               {task.title}
             </h3>
-            {task.starred && (
-              <Star size={16} className="text-warning-500" fill="currentColor" />
-            )}
           </div>
           <div className={`text-slate-600 dark:text-slate-400 line-clamp-3 mb-3 ${
-            task.completed === "completed" 
-              ? "line-through text-slate-400 dark:text-slate-500" 
+            task.completed
+              ? "line-through text-slate-400 dark:text-slate-500"
               : ""
           }`}>
             {task.description || "No description"}
@@ -269,7 +152,7 @@ const TaskCard = ({ task, viewMode, onToggleComplete }: TaskCardProps) => {
 
         <div className="flex items-center justify-between text-sm text-slate-500 dark:text-slate-400 mt-auto pt-4 border-t border-slate-100 dark:border-slate-700">
           <div className="flex items-center gap-2 flex-wrap">
-            {task.dueDate && (
+            {task.due_date && (
               <div className={`flex items-center flex-shrink-0 ${isOverdue
                 ? 'text-error-600 dark:text-error-400'
                 : 'text-slate-500 dark:text-slate-400'
@@ -278,52 +161,26 @@ const TaskCard = ({ task, viewMode, onToggleComplete }: TaskCardProps) => {
                 <span className="whitespace-nowrap">{formattedDueDate}</span>
               </div>
             )}
-            {task.dueTime && (
+            {dueTime && (
               <div className={`flex items-center flex-shrink-0 ${isOverdue
                 ? 'text-error-600 dark:text-error-400'
                 : 'text-slate-500 dark:text-slate-400'
               }`}>
                 <Clock size={14} className="mr-1 flex-shrink-0" />
-                <span className="whitespace-nowrap">{formatTime(task.dueTime)}</span>
+                <span className="whitespace-nowrap">{dueTime}</span>
               </div>
             )}
           </div>
 
           <div className="flex items-center gap-2 flex-shrink-0">
-            <div className={`px-2 py-0.5 rounded-full text-xs ${priorityColors[task.priority]}`}>
-              {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
-            </div>
+            {task.priority && (
+              <div className={`px-2 py-0.5 rounded-full text-xs ${priorityColors[task.priority]}`}>
+                {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+              </div>
+            )}
             {isOverdue && (
               <Flag size={14} className="text-error-500" />
             )}
-            <div className="flex items-center gap-1">
-              <button
-                onClick={handleToggleStar}
-                className="p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
-              >
-                <Star 
-                  size={14} 
-                  className={task.starred 
-                    ? "text-warning-500" 
-                    : "text-slate-400 hover:text-warning-500"
-                  } 
-                  fill={task.starred ? "currentColor" : "none"}
-                />
-              </button>
-              <button
-                onClick={handleTogglePin}
-                className="p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
-              >
-                <Pin 
-                  size={14} 
-                  className={task.pinned 
-                    ? "text-primary-500" 
-                    : "text-slate-400 hover:text-primary-500"
-                  } 
-                  fill={task.pinned ? "currentColor" : "none"}
-                />
-              </button>
-            </div>
           </div>
         </div>
       </div>
@@ -331,4 +188,5 @@ const TaskCard = ({ task, viewMode, onToggleComplete }: TaskCardProps) => {
   );
 };
 
-export default TaskCard; 
+export default TaskCard;
+ 

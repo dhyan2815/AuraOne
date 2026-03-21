@@ -1,133 +1,116 @@
-// hooks/useTasks.ts
-import { db } from "../services/firebase";
-import {
-  collection,
-  getDocs,
-  getDoc,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  doc,
-  onSnapshot,
-  query,
-  orderBy,
-} from "firebase/firestore";
+// src/hooks/useTasks.ts
+import { supabase } from "../services/supabase";
+import { RealtimeChannel } from "@supabase/supabase-js";
 
-export type TaskStatus = "due" | "completed";
-
+// The Task interface now matches the Supabase table schema
 export interface Task {
-  id: string;
+  id: string; // uuid
+  user_id: string; // uuid
   title: string;
-  description: string;
-  dueDate?: string;
-  dueTime?: string;
-  completed: TaskStatus;
-  priority: "low" | "medium" | "high";
-  createdAt?: string;
-  pinned?: boolean;
-  starred?: boolean;
+  description?: string;
+  due_date?: string; // TIMESTAMPTZ
+  priority?: "low" | "medium" | "high";
+  completed?: boolean;
+  created_at?: string; // TIMESTAMPTZ
 }
 
-const getUserTasksCollection = (userId: string) =>
-  collection(db, "users", userId, "tasks");
+// Type for creating a new task, `id`, `user_id` and `created_at` are optional
+export type NewTask = Omit<Task, "id" | "user_id" | "created_at">;
 
+// Fetch all tasks for the current user
 export const getTasks = async (userId: string): Promise<Task[]> => {
-  const snapshot = await getDocs(getUserTasksCollection(userId));
-  return snapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...(doc.data() as Omit<Task, "id">),
-  }));
-};
+  const { data, error } = await supabase
+    .from("tasks")
+    .select("*")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
 
-export const getTaskById = async (userId: string, taskId: string): Promise<Task | null> => {
-  const taskRef = doc(db, "users", userId, "tasks", taskId);
-  const taskSnap = await getDoc(taskRef);
-  
-  if (taskSnap.exists()) {
-    return {
-      id: taskSnap.id,
-      ...(taskSnap.data() as Omit<Task, "id">),
-    };
+  if (error) {
+    console.error("Error fetching tasks:", error);
+    throw error;
   }
-  return null;
+  return data || [];
 };
 
-export const listenToTasks = (userId: string, callback: (tasks: Task[]) => void) => {
-  // First try to get tasks ordered by createdAt
-  const q = query(getUserTasksCollection(userId), orderBy("createdAt", "desc"));
-  
-  return onSnapshot(q, (snapshot) => {
-    const tasks = snapshot.docs.map((doc) => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        ...data,
-        // Ensure createdAt exists, use current time if missing
-        createdAt: data.createdAt || new Date().toISOString(),
-      } as Task;
-             });
-         callback(tasks);
-  }, (error) => {
-    console.error('listenToTasks: Error listening to tasks:', error);
-    // Fallback: get all tasks without ordering
-    const fallbackQuery = query(getUserTasksCollection(userId));
-    onSnapshot(fallbackQuery, (fallbackSnapshot) => {
-      const fallbackTasks = fallbackSnapshot.docs.map((doc) => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          ...data,
-          createdAt: data.createdAt || new Date().toISOString(),
-        } as Task;
-               });
-         callback(fallbackTasks);
+// Fetch a single task by its ID
+export const getTaskById = async (taskId: string): Promise<Task | null> => {
+  const { data, error } = await supabase
+    .from("tasks")
+    .select("*")
+    .eq("id", taskId)
+    .single();
+
+  if (error) {
+    console.error("Error fetching task by id:", error);
+    throw error;
+  }
+  return data;
+};
+
+// Listen for real-time changes to tasks
+export const listenToTasks = (
+  userId: string,
+  callback: (payload: any) => void
+): RealtimeChannel => {
+  const channel = supabase
+    .channel(`public:tasks:user_id=eq.${userId}`)
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "tasks", filter: `user_id=eq.${userId}` },
+      callback
+    )
+    .subscribe((status, err) => {
+      if (status === 'SUBSCRIBED') {
+        console.log('Connected to tasks channel!');
+      }
+      if (err) {
+        console.error('Error subscribing to tasks channel:', err);
+      }
     });
-  });
+
+  return channel;
 };
 
-export const addTask = async (
-  userId: string,
-  task: Omit<Task, "id">
-) => {
-  return await addDoc(getUserTasksCollection(userId), task);
+// Create a new task
+export const createTask = async (userId: string, task: NewTask): Promise<Task> => {
+  const { data, error } = await supabase
+    .from("tasks")
+    .insert([{ ...task, user_id: userId }])
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error creating task:", error);
+    throw error;
+  }
+  return data;
 };
 
-export const createTask = async (
-  userId: string,
-  task: Omit<Task, "id">
-) => {
-  const docRef = await addDoc(getUserTasksCollection(userId), task);
-  return docRef.id;
-};
-
+// Update an existing task
 export const updateTask = async (
-  userId: string,
-  id: string,
-  updates: Partial<Task>
-) => {
-  const ref = doc(db, "users", userId, "tasks", id);
-  await updateDoc(ref, updates);
+  taskId: string,
+  updates: Partial<NewTask>
+): Promise<Task> => {
+  const { data, error } = await supabase
+    .from("tasks")
+    .update(updates)
+    .eq("id", taskId)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error updating task:", error);
+    throw error;
+  }
+  return data;
 };
 
-export const deleteTask = async (userId: string, id: string) => {
-  const ref = doc(db, "users", userId, "tasks", id);
-  await deleteDoc(ref);
-};
+// Delete a task
+export const deleteTask = async (taskId: string) => {
+  const { error } = await supabase.from("tasks").delete().eq("id", taskId);
 
-export const toggleTaskStar = async (
-  userId: string,
-  id: string,
-  starred: boolean
-) => {
-  const ref = doc(db, "users", userId, "tasks", id);
-  await updateDoc(ref, { starred });
-};
-
-export const toggleTaskPin = async (
-  userId: string,
-  id: string,
-  pinned: boolean
-) => {
-  const ref = doc(db, "users", userId, "tasks", id);
-  await updateDoc(ref, { pinned });
+  if (error) {
+    console.error("Error deleting task:", error);
+    throw error;
+  }
 };

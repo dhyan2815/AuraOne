@@ -1,5 +1,5 @@
 // pages/Tasks.tsx
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import toast from 'react-hot-toast';
 import {
@@ -10,47 +10,64 @@ import {
   Search,
   GridIcon,
   ListIcon,
-  Star,
-  Pin,
 } from "lucide-react";
 import TaskCard from "../components/tasks/TaskCard";
 import { motion } from "framer-motion";
 import {
   listenToTasks,
   updateTask,
+  getTasks,
   Task,
 } from "../hooks/useTasks";
 import { useAuth } from "../hooks/useAuth";
+import { RealtimeChannel } from "@supabase/supabase-js";
 
 const Tasks = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [filter, setFilter] = useState<"all" | "completed" | "pending" | "starred" | "pinned">("all");
+  const [filter, setFilter] = useState<"all" | "completed" | "pending">("all");
 
   const { user } = useAuth();
+
+  const fetchTasks = useCallback(async () => {
+    if (!user) return;
+    try {
+      const fetchedTasks = await getTasks(user.id);
+      setTasks(fetchedTasks);
+    } catch (error) {
+      toast.error("Failed to fetch tasks.");
+      console.error("Error fetching tasks:", error);
+    }
+  }, [user]);
 
   useEffect(() => {
     if (!user) return;
 
-    const unsubscribe = listenToTasks(user.uid, (fetchedTasks) => {
-      setTasks(fetchedTasks as Task[]);
+    fetchTasks(); // Initial fetch
+
+    const channel: RealtimeChannel = listenToTasks(user.id, (payload) => {
+      console.log('Realtime update received:', payload);
+      // Refetch all tasks to get the most up-to-date list
+      fetchTasks();
     });
 
-    return () => unsubscribe();
-  }, [user]);
+    return () => {
+      channel.unsubscribe();
+    };
+  }, [user, fetchTasks]);
 
   const handleToggleComplete = async (taskId: string) => {
-    if (!user) return;
-    
     const task = tasks.find(t => t.id === taskId);
     if (!task) return;
-    
-    const newStatus = task.completed === "completed" ? "due" : "completed";
-    
+
+    const newStatus = !task.completed;
+
     try {
-      await updateTask(user.uid, taskId, { completed: newStatus });
-      toast.success(newStatus === "completed" ? "Task marked as completed!" : "Task marked as pending!");
+      await updateTask(taskId, { completed: newStatus });
+      toast.success(newStatus ? "Task marked as completed!" : "Task marked as pending!");
+      // The real-time listener will handle updating the state, but for instant feedback, we can update it locally
+      setTasks(prevTasks => prevTasks.map(t => t.id === taskId ? { ...t, completed: newStatus } : t));
     } catch (error) {
       console.error("Failed to toggle task completion:", error);
       toast.error("Failed to update task status");
@@ -58,40 +75,25 @@ const Tasks = () => {
   };
 
   const filteredTasks = tasks.filter((task) => {
-    // First apply status filter
     let statusFiltered = true;
-    if (filter === "completed") statusFiltered = task.completed === "completed";
-    if (filter === "pending") statusFiltered = task.completed === "due";
-    if (filter === "starred") statusFiltered = task.starred === true;
-    if (filter === "pinned") statusFiltered = task.pinned === true;
-    
-    // Then apply search filter
+    if (filter === "completed") statusFiltered = task.completed === true;
+    if (filter === "pending") statusFiltered = task.completed === false;
+
     let searchFiltered = true;
     if (searchQuery) {
-      searchFiltered = 
+      searchFiltered =
         task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        task.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        task.priority.toLowerCase().includes(searchQuery.toLowerCase());
+        (task.description && task.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (task.priority && task.priority.toLowerCase().includes(searchQuery.toLowerCase()));
     }
-    
+
     return statusFiltered && searchFiltered;
   });
 
-  // Sort tasks: pinned first, then starred, then by creation date
   const sortedTasks = [...filteredTasks].sort((a, b) => {
-    // Pinned tasks first
-    if (a.pinned && !b.pinned) return -1;
-    if (!a.pinned && b.pinned) return 1;
-    
-    // Then starred tasks
-    if (a.starred && !b.starred) return -1;
-    if (!a.starred && b.starred) return 1;
-    
-    // Finally by creation date (newest first)
-    return new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime();
+    return new Date(b.created_at || '').getTime() - new Date(a.created_at || '').getTime();
   });
 
-  // Framer Motion variants for animating the task list
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -188,26 +190,6 @@ const Tasks = () => {
         >
           <CheckCheck size={16} />
           Completed
-        </button>
-        <button
-          className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium ${filter === "starred"
-              ? "bg-warning-100 dark:bg-warning-900 text-warning-800 dark:text-warning-100"
-              : "bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300"
-            }`}
-          onClick={() => setFilter("starred")}
-        >
-          <Star size={16} />
-          Starred
-        </button>
-        <button
-          className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium ${filter === "pinned"
-              ? "bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-100"
-              : "bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300"
-            }`}
-          onClick={() => setFilter("pinned")}
-        >
-          <Pin size={16} />
-          Pinned
         </button>
       </div>
 
