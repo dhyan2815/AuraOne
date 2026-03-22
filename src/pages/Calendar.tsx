@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { ArrowLeft, ArrowRight, PlusIcon, Trash2 } from "lucide-react";
 import {
   format,
@@ -10,63 +10,96 @@ import {
   eachDayOfInterval,
   isSameDay,
   isToday,
+  parse,
 } from "date-fns";
-import { useEvents, addEvent, deleteEvent } from "../hooks/useEvents";
+import { getEvents, createEvent, deleteEvent, listenToEvents, Event } from "../hooks/useEvents";
 import { useAuth } from "../hooks/useAuth";
 import toast from "react-hot-toast";
+import { RealtimeChannel } from "@supabase/supabase-js";
 
 const Calendar = () => {
-  // State variables for managing calendar and event data
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
-
-  // State variables for add event form visibility and data
   const [showAddForm, setShowAddForm] = useState(false);
   const [newEventTitle, setNewEventTitle] = useState("");
   const [newEventTime, setNewEventTime] = useState("");
+  const [events, setEvents] = useState<Event[]>([]);
 
-  // user authentication
   const { user } = useAuth();
 
-  // Custom hook to fetch events
-  const events = useEvents(user?.uid || "");
+  const fetchEvents = useCallback(async () => {
+    if (!user) return;
+    try {
+      const fetchedEvents = await getEvents(user.id);
+      setEvents(fetchedEvents);
+    } catch (error) {
+      toast.error("Failed to fetch events.");
+      console.error("Error fetching events:", error);
+    }
+  }, [user]);
 
-  // Memoized events for the selected date
+  useEffect(() => {
+    if (!user) return;
+
+    fetchEvents();
+
+    const channel: RealtimeChannel = listenToEvents(user.id, () => {
+      fetchEvents();
+    });
+
+    return () => {
+      channel.unsubscribe();
+    };
+  }, [user, fetchEvents]);
+
   const eventsForSelectedDate = useMemo(
-    () => events.filter((event) => isSameDay(event.date, selectedDate)),
+    () => events.filter((event) => isSameDay(new Date(event.start_time), selectedDate)),
     [events, selectedDate]
   );
 
-  // Functions to navigate between months
   const nextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
   const prevMonth = () => setCurrentMonth(subMonths(currentMonth, 1));
 
-  // Calculate dates for the calendar grid
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
   const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
 
-  // Calculate empty days before the start of the month
   const firstDayOfMonth = monthStart.getDay();
   const prevDays = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1;
   const emptyDaysBefore = Array.from({ length: prevDays });
 
-  // Create an array to display the next 6 days
   const next6Days = Array.from({ length: 6 }, (_, i) => addDays(new Date(), i));
 
-  // Handler to delete an event
-  const handleDeleteEvent = async (eventId: string) => {
-    if (!user?.uid) {
-      console.error("User id is missing")
-      return;
+  const handleAddEvent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user || !newEventTitle || !newEventTime) return;
+
+    try {
+      const startTime = parse(newEventTime, "HH:mm", selectedDate);
+      await createEvent(user.id, {
+        title: newEventTitle,
+        start_time: startTime.toISOString(),
+        end_time: null,
+        description: null,
+      });
+      toast.success("Event created successfully!");
+      setNewEventTitle("");
+      setNewEventTime("");
+      setShowAddForm(false);
+    } catch (error) {
+      toast.error("Failed to create event.");
+      console.error("Error creating event:", error);
     }
+  };
+
+  const handleDeleteEvent = async (eventId: string) => {
     const confirmDelete = window.confirm('Are you sure you want to delete this event?');
     if (!confirmDelete) return;
     try {
-      await deleteEvent(user.uid, eventId);
+      await deleteEvent(eventId);
       toast.success("Event deleted");
     } catch (err) {
-      toast.error("Error deleting event")
+      toast.error("Error deleting event");
     }
   };
 
@@ -128,7 +161,7 @@ const Calendar = () => {
             {/* Render each day of the month */}
             {days.map((day) => {
               const dayEvents = events.filter((event) =>
-                isSameDay(event.date, day)
+                isSameDay(new Date(event.start_time), day)
               );
               const isSelected = isSameDay(day, selectedDate);
 
@@ -150,7 +183,7 @@ const Calendar = () => {
 
                   {/* Renders Events on the specific day */}
                   <div className="space-y-0.5 overflow-hidden">
-                    {dayEvents.slice(0, 2).map((event) => (
+                    {events.filter(event => isSameDay(new Date(event.start_time), day)).slice(0, 2).map((event) => (
                       <div
                         key={event.id}
                         className="truncate px-1 py-0.5 rounded bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-200"
@@ -159,11 +192,10 @@ const Calendar = () => {
                         • {event.title}
                       </div>
                     ))}
-                    {dayEvents.length > 2 && (
+                    {events.filter(event => isSameDay(new Date(event.start_time), day)).length > 2 && (
                       <div
-                        className="text-slate-500 dark:text-slate-400 
+                        className="text-slate-500 dark:text-slate-400
                         cursor-pointer text-xs"
-                        // Scroll to the events
                         onClick={() => {
                           const eventsList = document.getElementById('events-list');
                           if (eventsList) {
@@ -171,7 +203,7 @@ const Calendar = () => {
                           }
                         }}
                       >
-                        +{dayEvents.length - 3} more
+                        +{events.filter(event => isSameDay(new Date(event.start_time), day)).length - 2} more
                       </div>
                     )}
                   </div>
@@ -194,7 +226,7 @@ const Calendar = () => {
             {next6Days.map((day) => {
               const isSelectedMiniDay = isSameDay(day, selectedDate);
               const dayEvents = events.filter((event) =>
-                isSameDay(event.date, day)
+                isSameDay(new Date(event.start_time), day)
               );
 
               return (
@@ -262,7 +294,7 @@ const Calendar = () => {
                 No events scheduled.
               </p>
             ) : (
-              eventsForSelectedDate.sort((a, b) => a.time.localeCompare(b.time)).map((event) => (
+              eventsForSelectedDate.sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime()).map((event) => (
                 <div
                   key={event.id}
                   className="flex justify-between items-center px-3 py-2 rounded-md bg-slate-100 dark:bg-slate-700"
@@ -270,7 +302,7 @@ const Calendar = () => {
                   <div className="event-title-and-time">
                     <h4 className="font-medium">{event.title}</h4>
                     <p className="text-sm text-slate-600 dark:text-slate-400">
-                      {event.time}
+                      {format(new Date(event.start_time), "p")}
                     </p>
                   </div>
 
@@ -289,15 +321,7 @@ const Calendar = () => {
           {/* Add Event Form */}
           {showAddForm && (
             <form
-              onSubmit={async (e) => {
-                e.preventDefault();
-                if (!newEventTitle || !newEventTime || !user?.uid) return;
-
-                await addEvent(user.uid, newEventTitle, newEventTime, selectedDate);
-                setShowAddForm(false);
-                setNewEventTitle("");
-                setNewEventTime("");
-              }}
+              onSubmit={handleAddEvent}
               className="mt-4 space-y-2"
             >
               <input

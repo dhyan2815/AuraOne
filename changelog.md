@@ -23,6 +23,30 @@ This file tracks the major changes, migrations, and new features implemented dur
 - **UI Components**:
     - Refactored `src/pages/Tasks.tsx` to align with the new data structure and functions from the Supabase-powered `useTasks` hook.
     - Refactored `src/components/tasks/TaskCard.tsx` to correctly display task data from the new schema and remove defunct features like "star" and "pin".
+- **Verification**: User deferred verification until all migrations are complete.
+
+### Phase 3: Database & Feature Migration (Notes)
+- **Database**: Created the `notes` table in Supabase with appropriate columns and RLS policies.
+- **`useNotes` Hook**: Refactored `src/hooks/useNotes.ts` from Firestore to Supabase, including CRUD operations and real-time listeners.
+- **UI Components**:
+    - Refactored `src/pages/Notes.tsx` to use the new hook and remove defunct filter options.
+    - Refactored `src/components/notes/NoteCard.tsx` to match the new `Note` data schema.
+    - Refactored `src/pages/NotePage.tsx` for creating and editing notes, including updating the auto-save logic.
+- **Verification**: User deferred verification until all migrations are complete.
 
 ---
-*Next up: Verification of the Tasks feature, followed by migration of the Notes feature.*
+### Phase 4: Database & Feature Migration (Events)
+- **Database**: Created the `events` table in Supabase with appropriate columns (`title`, `start_time`, `end_time`, etc.) and RLS policies.
+- **`useEvents` Hook**: Refactored `src/hooks/useEvents.ts` to be a collection of exported functions using the Supabase client for all CRUD operations and real-time listeners.
+- **UI Components**:
+    - Refactored `src/pages/Calendar.tsx` to align with the new data structure from the Supabase-powered `useEvents` functions, including fetching, creating, and deleting events.
+- **Verification**: User deferred verification until all migrations are complete.
+
+---
+## `2026-03-22` - Phase 5: Project Cleanup
+- **Dependencies**: Uninstalled the `firebase` package as it is no longer required.
+- **Code Cleanup**: Removed the unused `src/services/firebase.ts` file.
+- **Completion**: The migration from Firebase to Supabase is now complete. All core features (Auth, Tasks, Notes, Events) are running on the new backend.
+
+---
+*Next up: V2 Feature Planning & Implementation.*

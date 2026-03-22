@@ -1,92 +1,81 @@
-// hooks/useEvents.tsx
-// hooks/useEvents.ts
-import { useEffect, useState } from "react";
-import {
-  collection,
-  onSnapshot,
-  deleteDoc,
-  getDocs,
-  doc,
-  addDoc,
-} from "firebase/firestore";
-import { db } from "../services/firebase";
+// src/hooks/useEvents.ts
+import { supabase } from "../services/supabase";
+import { RealtimeChannel } from "@supabase/supabase-js";
 
-// Event type definition
-export interface EventType {
-  id: string;
+// The Event interface matches the Supabase 'events' table
+export interface Event {
+  id: string; // uuid
+  user_id: string; // uuid
   title: string;
-  time: string;
-  date: string; // Store as ISO string
+  start_time: string; // TIMESTAMPTZ
+  end_time: string | null; // TIMESTAMPTZ
+  description: string | null;
+  created_at: string; // TIMESTAMPTZ
 }
 
-// Hook to fetch events
-export const useEvents = (userId: string): EventType[] => {
+// Type for creating a new event
+export type NewEvent = Omit<Event, "id" | "user_id" | "created_at">;
 
-  const [events, setEvents] = useState<EventType[]>([]);
+// Fetch all events for the current user
+export const getEvents = async (userId: string): Promise<Event[]> => {
+  const { data, error } = await supabase
+    .from("events")
+    .select("*")
+    .eq("user_id", userId)
+    .order("start_time", { ascending: true });
 
-  useEffect(() => {
-    if (!userId) return;
+  if (error) {
+    console.error("Error fetching events:", error);
+    throw error;
+  }
+  return data || [];
+};
 
-    const unsub = onSnapshot(collection(db, "users", userId, "events"), (snapshot) => {
-      const fetched = snapshot.docs.map((doc) => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          title: data.title,
-          time: data.time,
-          date: data.date,
-        };
-      });
-      setEvents(fetched);
+// Listen for real-time changes to events
+export const listenToEvents = (
+  userId: string,
+  callback: (payload: any) => void
+): RealtimeChannel => {
+  const channel = supabase
+    .channel(`public:events:user_id=eq.${userId}`)
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "events", filter: `user_id=eq.${userId}` },
+      callback
+    )
+    .subscribe((status, err) => {
+      if (status === 'SUBSCRIBED') {
+        console.log('Connected to events channel!');
+      }
+      if (err) {
+        console.error('Error subscribing to events channel:', err);
+      }
     });
 
-    return () => unsub();
-  }, [userId]);
-
-  return events;
+  return channel;
 };
 
-// Function to fetch events
-export const getEvents = async (userId: string): Promise<EventType[]> => {
-  if (!userId) throw new Error("User not authenticated");
+// Create a new event
+export const createEvent = async (userId: string, event: NewEvent): Promise<Event> => {
+  const { data, error } = await supabase
+    .from("events")
+    .insert([{ ...event, user_id: userId }])
+    .select()
+    .single();
 
-  const eventsCollection = collection(db, "users", userId, "events");
-  const snapshot = await getDocs(eventsCollection);
-
-  return snapshot.docs.map((doc) => {
-    const data = doc.data();
-    return {
-      id: doc.id,
-      title: data.title,
-      time: data.time,
-      date: data.date,
-    };
-  }) as EventType[];
+  if (error) {
+    console.error("Error creating event:", error);
+    throw error;
+  }
+  return data;
 };
 
-// Function to add an event
-export const addEvent = async (
-  userId: string,
-  title: string,
-  time: string,
-  date: Date
-): Promise<void> => {
-  if (!userId) throw new Error("User not authenticated");
+// Delete an event
+export const deleteEvent = async (eventId: string): Promise<void> => {
+  const { error } = await supabase.from("events").delete().eq("id", eventId);
 
-  await addDoc(collection(db, "users", userId, "events"), {
-    title,
-    time,
-    date: date.toISOString(),
-  });
-};
-
-// Function to delete an event
-export const deleteEvent = async (
-  userId: string,
-  eventId: string
-): Promise<void> => {
-  if (!userId) throw new Error("User not authenticated");
-
-  const eventRef = doc(db, "users", userId, "events", eventId);
-  await deleteDoc(eventRef);
+  if (error) {
+    console.error("Error deleting event:", error);
+    throw error;
+  }
 };
