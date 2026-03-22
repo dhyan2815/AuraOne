@@ -18,8 +18,6 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../../hooks/useAuth";
-import { doc, getDoc } from 'firebase/firestore';
-import { auth, db } from "../../services/firebase";
 import toast from "react-hot-toast";
 
 interface SidebarProps {
@@ -59,24 +57,18 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
   const toggleSidebar = () => setExpanded(!expanded);
   const closeSidebar = () => setExpanded(true);
 
-  // To fetch the user's name
+  const { user, logout } = useAuth();
   const [userName, setUserName] = useState('');
+
   useEffect(() => {
-    const fetchUserData = async () => {
-      const user = auth.currentUser;
-      if (user) {
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
-        if (userDoc.exists()) {
-          setUserName(userDoc.data().name);
-        }
-      }
-    };
-    fetchUserData();
-  }, []);
+    if (user) {
+      const name = user.user_metadata?.name || user.email;
+      setUserName(name);
+    }
+  }, [user]);
 
   // Logout Logic
   const navigate = useNavigate();
-  const { logout } = useAuth();
   const handleLogout = async () => {
     await logout();
     toast.success("Log out successfully")
