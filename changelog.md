@@ -50,3 +50,10 @@ This file tracks the major changes, migrations, and new features implemented dur
 
 ---
 *Next up: V2 Feature Planning & Implementation.*
+
+---
+### Phase 6: Post-Migration Bug Squashing
+- **Console Errors**: Addressed multiple critical errors that appeared in the browser console after the Supabase migration.
+- **Event Creation Fix**: Refactored `CalendarWidget` and `aiService` to use the correct `createEvent` function instead of the non-existent `addEvent`, resolving multiple import errors and crashes. (Closes #57)
+- **Dashboard 404 Fix**: Removed legacy Firebase authentication logic from the `Dashboard` component, which was causing a 404 error, and replaced it with the Supabase `useAuth` hook. (Closes #58)
+
