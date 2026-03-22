@@ -1,142 +1,155 @@
-import { collection, getDocs, onSnapshot, orderBy, query} from "firebase/firestore";
+// src/pages/Chat.tsx
 import { Bot, Send, Sparkles, SquarePen, Trash2, User } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useAuth } from "../hooks/useAuth";
-import { db } from "../services/firebase";
-import { handleSendMessage } from '../services/chatHandler';
-import { createNewSession, deleteCurrentSession, updateSessionNameWithFallback } from "../services/chatSessionService";
-
-type Message = {
-  id?: string;
-  role: "user" | "ai";
-  content: string;
-  createdAt?: any;
-};
+import {
+  getSessions,
+  createNewSession,
+  deleteSession,
+  Session,
+} from "../services/chatSessionService";
+import {
+  getMessages,
+  handleSendMessage,
+  Message,
+} from "../services/chatHandler";
+import { supabase } from "../services/supabase";
+import toast from "react-hot-toast";
 
 const Chat = () => {
   const { user, loading: authLoading } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [loadingTimer, setLoadingTimer] = useState<NodeJS.Timeout | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [sessions, setSessions] = useState<{ id: string; name: string }[]>([]);
+  const [sessions, setSessions] = useState<Session[]>([]);
   const [selectedSession, setSelectedSession] = useState<string | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  // Scroll to bottom whenever messages change
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+  // --- Data Fetching and Real-time ---
 
-  // Fetch messages from Firestore when user is authenticated
-  useEffect(() => {
+  const fetchSessions = useCallback(async () => {
     if (!user) return;
-
-    const sessionsRef = collection(db, "users", user.uid, "sessions");
-    
-    // Use onSnapshot for real-time updates
-    const unsubscribe = onSnapshot(sessionsRef, (snapshot) => {
-      const sessionList = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        name: doc.data().name || `Chat ${doc.id}`,
-      }));
+    try {
+      const sessionList = await getSessions(user.id);
       setSessions(sessionList);
-
-      // Select the first session automatically if no session is selected
       if (sessionList.length > 0 && !selectedSession) {
         setSelectedSession(sessionList[0].id);
       }
-    });
-
-    return unsubscribe;
+    } catch (error) {
+      toast.error("Failed to fetch chat sessions.");
+    }
   }, [user, selectedSession]);
 
-  // Function to handle sending messages
-  const handleSend = () => {
-    handleSendMessage({
-      input,
-      user,
-      selectedSession,
-      db,
-      setInput,
-      setLoading,
-      setLoadingTimer,
-      loadingTimer,
-    });
+  useEffect(() => {
+    fetchSessions();
+  }, [user, fetchSessions]);
+
+  const fetchMessages = useCallback(async () => {
+    if (!selectedSession) {
+      setMessages([]);
+      return;
+    };
+    try {
+      const messageList = await getMessages(selectedSession);
+      setMessages(messageList);
+    } catch (error) {
+      toast.error("Failed to fetch messages.");
+    }
+  }, [selectedSession]);
+
+  useEffect(() => {
+    fetchMessages();
+
+    // Subscribe to real-time message updates
+    const channel = supabase
+      .channel(`chat-messages-${selectedSession}`)
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `session_id=eq.${selectedSession}` },
+        (payload) => {
+          setMessages((currentMessages) => [...currentMessages, payload.new as Message]);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [selectedSession, fetchMessages]);
+
+  useEffect(scrollToBottom, [messages]);
+
+
+  // --- Event Handlers ---
+
+  const handleSend = async () => {
+    if (!user || !selectedSession || !input.trim()) return;
+
+    const currentInput = input;
+    setInput("");
+    setLoading(true);
+
+    try {
+      await handleSendMessage(currentInput, user, selectedSession);
+      // After sending, we need to refresh the session name in case it was the first message
+      const updatedSessions = sessions.map(s => s.id === selectedSession ? {...s, name: currentInput.substring(0,40)} : s)
+      const session = await getSessions(user.id);
+      setSessions(session);
+
+    } catch (error) {
+      toast.error("Failed to send message.");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // listens for messages in the current session
-  useEffect(() => {
-    if (!user || !selectedSession) return;
+  const handleCreateNewSession = async () => {
+    if (!user) return;
+    try {
+      const newSession = await createNewSession(user);
+      setSessions([newSession, ...sessions]);
+      setSelectedSession(newSession.id);
+      setMessages([]);
+      setInput("");
+      toast.success("New chat created!");
+    } catch (error) {
+      toast.error("Failed to create new chat.");
+    }
+  };
 
-    const messagesRef = collection(
-      db,
-      "users",
-      user.uid,
-      "sessions",
-      selectedSession,
-      "messages"
-    );
+  const handleDeleteCurrentSession = async () => {
+    if (!selectedSession) return;
+    const confirmed = window.confirm("Are you sure you want to delete this chat?");
+    if (!confirmed) return;
 
-    const q = query(messagesRef, orderBy("createdAt"));
+    try {
+      await deleteSession(selectedSession);
+      toast.success("Chat deleted successfully!");
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      setMessages(
-        snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Message))
-      );
-    });
-    return unsubscribe;
-  }, [user, selectedSession]);
+      const updatedSessions = sessions.filter(s => s.id !== selectedSession);
+      setSessions(updatedSessions);
 
-  //call create session
-const handleCreateNewSession = async () => {
-  await createNewSession(
-    db,
-    user,
-    sessions,
-    setSessions,
-    setSelectedSession,
-    setMessages,
-    setInput
-  );
-};
+      if (updatedSessions.length > 0) {
+        setSelectedSession(updatedSessions[0].id);
+      } else {
+        setSelectedSession(null);
+        setMessages([]);
+      }
+    } catch (error) {
+      toast.error("Failed to delete chat.");
+    }
+  };
 
-//call delete session
-const handleDeleteCurrentSession = async () => {
-  await deleteCurrentSession(
-    db,
-    user,
-    selectedSession,
-    sessions,
-    setSessions,
-    setSelectedSession,
-    setMessages,
-    setInput
-  );
-};
+  // --- UI Rendering ---
 
-
-  // function to render clean plain text 
-  function cleanTextOnly(text: string): string {
-    return text
-      .replace(/\*\*(.*?)\*\*/g, "$1")   // remove bold
-      .replace(/^\s*\*\s+/gm, "- ")       // replace * bullets with dashes
-      .replace(/\n{2,}/g, "\n\n")         // normalize new lines
-      .trim();
-  }
-
-  // If auth is loading, show a loading spinner
   if (authLoading) {
     return (
       <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-3 border-primary-200 border-t-primary-600 rounded-full animate-spin"></div>
-          <p className="text-sm text-slate-500">Loading your chat...</p>
-        </div>
+        <div className="w-8 h-8 border-4 border-slate-200 border-t-primary-600 rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -160,7 +173,7 @@ const handleDeleteCurrentSession = async () => {
             </div>
           </div>
         </div>
-        
+
         {/* Session Controls */}
         <div className="flex items-center gap-2">
           <button
@@ -171,7 +184,7 @@ const handleDeleteCurrentSession = async () => {
             <SquarePen size={16} className="inline mr-1" />
             New Chat
           </button>
-          
+
           <div className="relative">
             <select
               className="px-3 py-1.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
@@ -186,7 +199,7 @@ const handleDeleteCurrentSession = async () => {
               ))}
             </select>
           </div>
-          
+
           {selectedSession && (
             <button
               onClick={handleDeleteCurrentSession}
@@ -202,14 +215,14 @@ const handleDeleteCurrentSession = async () => {
       {/* Chat Messages */}
       <div className="flex-1 overflow-hidden">
         <div className="h-full overflow-y-auto px-2 py-2">
-          {messages.length === 0 ? (
+          {messages.length === 0 && !loading ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
                 <h3 className="text-4xl font-semibold text-slate-900 dark:text-slate-100 mb-2">
-                  Aura Assistant – Your go-to smart work buddy.
+                  Aura Assistant
                 </h3>
-                <p className="text-xl text-slate-600 dark:text-slate-400 whitespace-nowrap overflow-hidden text-ellipsis leading-relaxed">
-                  Assign tasks, events, or notes with a single prompt. Just type and let Aura do the rest.
+                <p className="text-xl text-slate-600 dark:text-slate-400">
+                  How can I help you today?
                 </p>
               </div>
             </div>
@@ -221,26 +234,26 @@ const handleDeleteCurrentSession = async () => {
                   className={`flex gap-2 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                 >
                   {msg.role === "ai" && (
-                    <div className="w-4 h-4 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center mt-1">
-                      <Sparkles className="w-[15px] h-[15px] text-white" />
+                    <div className="w-7 h-7 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center flex-shrink-0">
+                      <Bot className="w-4 h-4 text-white" />
                     </div>
                   )}
 
                   <div
-                    className={`max-w-[75%] p-2 rounded-xl text-[16px] leading-snug ${
+                    className={`max-w-[75%] p-3 rounded-xl text-base leading-snug ${
                       msg.role === "user"
                         ? "bg-primary-600 text-white rounded-br-md"
-                        : "bg-gray-100 text-slate-900 dark:text-slate-100 dark:bg-gray-700 border-slate-200 rounded-bl-md"
+                        : "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-bl-md"
                     }`}
                   >
                     <div className="whitespace-pre-wrap break-words">
-                      {cleanTextOnly(msg.content)}
+                      {msg.content}
                     </div>
                   </div>
 
                   {msg.role === "user" && (
-                    <div className="w-4 h-4 bg-slate-600 dark:bg-slate-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                      <User className="w-[14px] h-[14px] text-white" />
+                    <div className="w-7 h-7 bg-slate-600 dark:bg-slate-500 rounded-full flex items-center justify-center flex-shrink-0">
+                      <User className="w-4 h-4 text-white" />
                     </div>
                   )}
                 </div>
@@ -248,25 +261,16 @@ const handleDeleteCurrentSession = async () => {
 
               {loading && (
                 <div className="flex gap-3 justify-start">
-                  <div className="w-7 h-7 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Bot className="w-[14px] h-[14px] text-white" />
-                  </div>
-                  <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl rounded-bl-md px-1 py-1 text-[15px] leading-snug">
-                    <div className="flex items-center gap-1">
-                      <div className="flex space-x-1">
-                        <div className="w-1 h-1 bg-slate-400 rounded-full animate-bounce"></div>
-                        <div
-                          className="w-1 h-1 bg-slate-400 rounded-full animate-bounce"
-                          style={{ animationDelay: "0.1s" }}
-                        ></div>
-                        <div
-                          className="w-1 h-1 bg-slate-400 rounded-full animate-bounce"
-                          style={{ animationDelay: "0.2s" }}
-                        ></div>
+                   <div className="w-7 h-7 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center flex-shrink-0">
+                      <Bot className="w-4 h-4 text-white" />
+                    </div>
+                  <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl rounded-bl-md px-4 py-3 text-base leading-snug">
+                    <div className="flex items-center gap-2">
+                       <div className="flex space-x-1">
+                        <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"></div>
+                        <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+                        <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "0.4s" }}></div>
                       </div>
-                      <span className="text-sm text-slate-500 ml-2">
-                        Aura is thinking...
-                      </span>
                     </div>
                   </div>
                 </div>
@@ -279,30 +283,28 @@ const handleDeleteCurrentSession = async () => {
 
       {/* Input Area */}
       <div className="px-1 py-1">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex items-end gap-3">
-            <div className="flex-1">
-              <textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSend();
-                  }
-                }}
-                placeholder="Type your message..."
-                disabled={loading}
-                className="w-full px-1 py-1 mt-1 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-base placeholder:text-slate-500 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed resize-none"
-                rows={1}
-              />
-            </div>
+        <div className="max-w-4xl mx-auto">
+          <div className="relative">
+            <textarea
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSend();
+                }
+              }}
+              placeholder="Ask Aura anything..."
+              disabled={loading}
+              className="w-full pl-4 pr-20 py-3 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full text-base placeholder:text-slate-500 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-50 resize-none"
+              rows={1}
+            />
             <button
               onClick={handleSend}
               disabled={loading || !input.trim()}
-              className="px-1 py-1 mb-1 bg-primary-600 hover:bg-primary-700 disabled:bg-slate-300 dark:disabled:bg-slate-600 text-white rounded-lg transition-colors disabled:cursor-not-allowed flex items-center justify-center min-w-[50px]"
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-primary-600 hover:bg-primary-700 disabled:bg-slate-400 dark:disabled:bg-slate-600 text-white rounded-full transition-colors"
             >
-              <Send size={21} />
+              <Send size={20} />
             </button>
           </div>
         </div>
