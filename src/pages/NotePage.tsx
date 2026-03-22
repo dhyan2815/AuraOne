@@ -9,8 +9,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { format } from "date-fns";
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+import TiptapEditor from "../components/editor/TiptapEditor";
 import {
   createNote,
   updateNote,
@@ -33,39 +32,6 @@ const NotePage = () => {
   const [content, setContent] = useState("");
 
   const { user } = useAuth();
-  const quillRef = useRef<ReactQuill>(null);
-
-  // Quill editor configuration
-  const modules = {
-    toolbar: [
-      [{ 'header': [1, 2, 3, false] }],
-      ['bold', 'italic', 'underline', 'strike'],
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-      [{ 'color': [] }, { 'background': [] }],
-      [{ 'align': [] }],
-      ['blockquote', 'code-block'],
-      ['link'],
-      ['clean']
-    ],
-    clipboard: {
-      matchVisual: false,
-    },
-    history: {
-      delay: 2000,
-      maxStack: 500,
-      userOnly: true
-    }
-  };
-
-  const formats = [
-    'header',
-    'bold', 'italic', 'underline', 'strike',
-    'list', 'bullet',
-    'color', 'background',
-    'align',
-    'blockquote', 'code-block',
-    'link', 'image'
-  ];
 
   useEffect(() => {
     const fetchNote = async () => {
@@ -312,18 +278,9 @@ const NotePage = () => {
       </div>
 
       {/* Editor section */}
-      <div className="bg-white dark:bg-slate-800 rounded-lg dark:shadow-xl shadow-card overflow-hidden">
-        <div className="h-full">
-          <ReactQuill
-            ref={quillRef}
-            theme="snow"
-            value={content}
-            onChange={setContent}
-            modules={modules}
-            formats={formats}
-            placeholder="Start writing your note here..."
-            className="h-full text-md"
-          />
+      <div className="bg-white dark:bg-slate-800 rounded-lg dark:shadow-xl shadow-card overflow-hidden p-4">
+        <div className="prose dark:prose-invert max-w-none">
+          <TiptapEditor content={content} onChange={setContent} />
         </div>
       </div>
     </div>
