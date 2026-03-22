@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
-import { confirmPasswordReset, verifyPasswordResetCode } from "firebase/auth";
-import { auth, db } from "../services/firebase";
-import { doc, updateDoc } from "firebase/firestore";
+import { supabase } from "../services/supabase";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Eye, EyeOff, CheckCircle, AlertCircle } from "lucide-react";
 import toast from "react-hot-toast";
@@ -15,54 +13,25 @@ const ResetPassword = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
-  const [isValidCode, setIsValidCode] = useState(false);
-  const [isCheckingCode, setIsCheckingCode] = useState(true);
   const [resetSuccess, setResetSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Get the oobCode from URL parameters
-  const oobCode = searchParams.get("oobCode");
-
-  // Verify the reset code when component mounts
   useEffect(() => {
-    const verifyCode = async () => {
-      if (!oobCode) {
-        setIsCheckingCode(false);
-        return;
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        // The user is in the password recovery state
+        // You can now allow them to reset their password
       }
+    });
 
-      try {
-        await verifyPasswordResetCode(auth, oobCode);
-        setIsValidCode(true);
-      } catch (error: any) {
-        console.error("Invalid reset code:", error);
-        setIsValidCode(false);
-        
-        // Handle specific errors
-        switch (error.code) {
-          case 'auth/invalid-action-code':
-            toast.error("Invalid or expired reset link");
-            break;
-          case 'auth/expired-action-code':
-            toast.error("Reset link has expired. Please request a new one.");
-            break;
-          default:
-            toast.error("Invalid reset link");
-        }
-      } finally {
-        setIsCheckingCode(false);
-      }
+    return () => {
+      subscription?.unsubscribe();
     };
-
-    verifyCode();
-  }, [oobCode]);
+  }, []);
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!oobCode) {
-      toast.error("Invalid reset link");
-      return;
-    }
+    setError(null);
 
     if (newPassword !== confirmPassword) {
       toast.error("Passwords don't match");
@@ -75,117 +44,22 @@ const ResetPassword = () => {
     }
 
     setIsResetting(true);
-    
-    try {
-      // First, get the email from the reset code
-      const email = await verifyPasswordResetCode(auth, oobCode);
-      
-      // Reset password in Firebase Auth
-      await confirmPasswordReset(auth, oobCode, newPassword);
-      
-      // Update password in Firestore (if you need to keep it there)
-      try {
-        // Find user document by email and update password
-        // Note: This requires a query since we don't have the user ID
-        // In production, consider storing user ID in the reset flow or using a different approach
-        // Password updated successfully
-        
-        // If you need to update Firestore, you would do something like:
-        // const usersRef = collection(db, "users");
-        // const q = query(usersRef, where("email", "==", email));
-        // const querySnapshot = await getDocs(q);
-        // if (!querySnapshot.empty) {
-        //   const userDoc = querySnapshot.docs[0];
-        //   await updateDoc(userDoc.ref, { password: newPassword });
-        // }
-        
-      } catch (firestoreError) {
-        console.error("Failed to update Firestore:", firestoreError);
-        // Don't fail the reset if Firestore update fails
-        toast.error("Password reset successful, but failed to update additional data");
-      }
-      
+
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+
+    if (error) {
+      console.error("Password reset error:", error);
+      toast.error(error.message || "Failed to reset password. Please try again.");
+      setError(error.message);
+    } else {
       setResetSuccess(true);
       toast.success("Password reset successfully!");
-    } catch (error: any) {
-      console.error("Password reset error:", error);
-      
-      switch (error.code) {
-        case 'auth/weak-password':
-          toast.error("Password is too weak. Please choose a stronger password.");
-          break;
-        case 'auth/invalid-action-code':
-          toast.error("Invalid or expired reset link");
-          break;
-        case 'auth/expired-action-code':
-          toast.error("Reset link has expired. Please request a new one.");
-          break;
-        default:
-          toast.error("Failed to reset password. Please try again.");
-      }
-    } finally {
-      setIsResetting(false);
     }
+
+    setIsResetting(false);
   };
 
-  // Loading state while checking the reset code
-  if (isCheckingCode) {
-    return (
-      <div className="login min-h-screen flex items-center justify-center px-4">
-        <div className="md:flex md:w-full md:max-w-screen-xl lg:max-w-screen-2xl">
-          <div className="md:w-1/2 flex items-center justify-center">
-            <img
-              src={LoginPicture}
-              alt="reset-password-art"
-              className="w-full h-auto object-cover"
-            />
-          </div>
-          <div className="md:w-1/2 flex items-center justify-center bg-white">
-            <div className="w-full px-8 py-9 rounded-2xl space-y-7 text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-              <p className="text-gray-600">Verifying reset link...</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
-  // Invalid or expired reset code
-  if (!isValidCode || !oobCode) {
-    return (
-      <div className="login min-h-screen flex items-center justify-center px-4">
-        <div className="md:flex md:w-full md:max-w-screen-xl lg:max-w-screen-2xl">
-          <div className="md:w-1/2 flex items-center justify-center">
-            <img
-              src={LoginPicture}
-              alt="reset-password-art"
-              className="w-full h-auto object-cover"
-            />
-          </div>
-          <div className="md:w-1/2 flex items-center justify-center bg-white">
-            <div className="w-full px-8 py-9 rounded-2xl space-y-7 text-center">
-              <div className="flex justify-center">
-                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
-                  <AlertCircle size={32} className="text-red-600" />
-                </div>
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900">Invalid Reset Link</h2>
-              <p className="text-gray-600">
-                This password reset link is invalid or has expired. Please request a new one.
-              </p>
-              <button
-                onClick={() => navigate("/forgot-password")}
-                className="w-full py-2 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-base transition-colors shadow-sm"
-              >
-                Request New Reset Link
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   // Success state
   if (resetSuccess) {
