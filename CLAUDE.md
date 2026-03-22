@@ -20,7 +20,7 @@ The frontend is a single-page application built with React, Vite, and TypeScript
   - `src/pages/`: Top-level components for each page/route (e.g., `Dashboard.tsx`, `Login.tsx`).
   - `src/components/`: Reusable components, organized by feature (e.g., `notes`, `tasks`) and type (`ui`, `structure`, `widgets`).
   - `src/hooks/`: Custom React hooks for managing state and business logic (e.g., `useAuth`, `useTasks`).
-  - `src/services/`: Modules for interacting with external services like Firebase and AI APIs.
+  - `src/services/`: Modules for interacting with external services like Supabase and AI APIs.
   - `src/config/`: Configuration files, such as API endpoints.
 - **Core Components & Libraries**:
   - **Routing**: Handled by `react-router-dom`.
@@ -32,7 +32,7 @@ The frontend is a single-page application built with React, Vite, and TypeScript
   - `vite`, `typescript`
   - `tailwindcss`, `@radix-ui/react-*`
   - `zustand`
-  - `firebase`
+  - `@supabase/supabase-js`
   - `@google/generative-ai`
 
 ### Backend
