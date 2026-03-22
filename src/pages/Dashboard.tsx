@@ -5,9 +5,8 @@ import WeatherWidget from '../components/widgets/WeatherWidget';
 import NewsWidget from '../components/widgets/NewsWidget';
 import TasksWidget from '../components/widgets/TasksWidget';
 import CalendarWidget from '../components/widgets/CalendarWidget';
+import { useAuth } from '../hooks/useAuth';
 import { motion } from 'framer-motion';
-import { doc, getDoc } from 'firebase/firestore';
-import { auth, db } from "../services/firebase";
 
 const Dashboard = () => {
 
@@ -24,19 +23,16 @@ const Dashboard = () => {
   // Initialize state for the user's name
   const [userName, setUserName] = useState('');
 
-  // to fetch the user's name from Firebase
+  const { user } = useAuth();
+
+  // to fetch the user's name
   useEffect(() => {
-    const fetchUserData = async () => {
-      const user = auth.currentUser; // Check if a user is logged in
-      if (user) {
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
-        if (userDoc.exists()) {
-          setUserName(userDoc.data().name);
-        }
-      }
-    };
-    fetchUserData();
-  }, []);
+    if (user) {
+      // Supabase stores custom user data in user_metadata
+      const name = user.user_metadata?.name || user.email;
+      setUserName(name);
+    }
+  }, [user]);
 
 
   // Define animation variants for the container
