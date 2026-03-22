@@ -1,5 +1,4 @@
-// NotesPage.tsx
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import toast from 'react-hot-toast';
 import {
@@ -8,8 +7,6 @@ import {
   Calendar,
   Save,
   Trash2,
-  Star,
-  Pin,
 } from "lucide-react";
 import { format } from "date-fns";
 import ReactQuill from 'react-quill';
@@ -19,18 +16,9 @@ import {
   updateNote,
   deleteNote,
   getNoteById,
+  Note, // Import the centralized Note interface
 } from "../hooks/useNotes";
 import { useAuth } from "../hooks/useAuth";
-
-interface Note {
-  id: string;
-  title: string;
-  content: string;
-  createdAt: string;
-  tags: string[];
-  pinned: boolean;
-  starred: boolean;
-}
 
 const NotePage = () => {
   const [note, setNote] = useState<Note | null>(null);
@@ -39,8 +27,6 @@ const NotePage = () => {
   const [title, setTitle] = useState<string>("");
   const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState<string>("");
-  const [starred, setStarred] = useState(false);
-  const [pinned, setPinned] = useState(false);
   const [loading, setLoading] = useState(true);
   const [autoSaving, setAutoSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
@@ -82,7 +68,6 @@ const NotePage = () => {
   ];
 
   useEffect(() => {
-    // Fetch note on mount
     const fetchNote = async () => {
       if (!user) {
         setLoading(false);
@@ -91,37 +76,25 @@ const NotePage = () => {
 
       try {
         if (id === "new") {
-          // Create new note defaults
-          const newNote: Note = {
-            id: "new",
-            title: "Untitled Note",
-            content: "",
-            createdAt: new Date().toISOString(),
-            tags: [],
-            pinned: false,
-            starred: false,
-          };
-          setNote(newNote);
-          setTitle(newNote.title);
-          setTags(newNote.tags);
-          setPinned(false);
-          setStarred(false);
+          setTitle("Untitled Note");
           setContent("");
+          setTags([]);
+          setNote(null); // No existing note
         } else if (id) {
-          // Fetch existing note
-          const foundNote = await getNoteById(user.uid, id);
+          const foundNote = await getNoteById(id);
           if (foundNote) {
-            const typedNote = foundNote as Note;
-            setNote(typedNote);
-            setTitle(typedNote.title);
-            setTags(typedNote.tags || []);
-            setPinned(typedNote.pinned || false);
-            setStarred(typedNote.starred || false);
-            setContent(typedNote.content || "");
+            setNote(foundNote);
+            setTitle(foundNote.title || "Untitled Note");
+            setTags(foundNote.tags || []);
+            setContent(foundNote.content || "");
           } else {
+            toast.error("Note not found.");
             navigate("/notes");
           }
         }
+      } catch (error) {
+        toast.error("Failed to fetch note.");
+        navigate("/notes");
       } finally {
         setLoading(false);
       }
@@ -130,35 +103,30 @@ const NotePage = () => {
     fetchNote();
   }, [id, user, navigate]);
 
-  // Save or update note
-  const handleSave = async (isAutoSave = false) => {
+  // Save or update note, wrapped in useCallback for performance
+  const handleSave = useCallback(async (isAutoSave = false) => {
     if (!user) return;
 
     const noteData = {
       title: title.trim() || "Untitled Note",
       tags,
-      content: content,
-      pinned,
-      starred,
+      content,
+      is_archived: note?.is_archived || false, // Preserve existing archive status
     };
 
     try {
       setAutoSaving(true);
-      if (note?.id === "new" || !note?.id) {
-        const newNoteData = {
-          ...noteData,
-          createdAt: new Date().toISOString(),
-        };
-        const newId = await createNote(user.uid, newNoteData);
+      if (!note?.id || id === 'new') { // If it's a new note
+        const newNote = await createNote(user.id, noteData);
         if (!isAutoSave) {
           toast.success("New Note created Successfully");
-          navigate(`/notes/${newId}`, { replace: true });
         }
         setLastSaved(new Date());
-      } else {
-        await updateNote(user.uid, note.id, noteData);
+        // Navigate to the new note's URL to enable editing/auto-saving
+        navigate(`/notes/${newNote.id}`, { replace: true });
+      } else { // If it's an existing note
+        await updateNote(note.id, noteData);
         if (!isAutoSave) {
-          navigate("/notes");
           toast.success("Note Updated successfully");
         }
         setLastSaved(new Date());
@@ -170,23 +138,22 @@ const NotePage = () => {
     } finally {
       setAutoSaving(false);
     }
-  };
+  }, [user, title, tags, content, note, id, navigate]);
 
   // Auto-save effect
   useEffect(() => {
-    if (!user || note?.id === "new") return;
+    if (loading || id === 'new') return; // Don't auto-save on initial load or for new notes
 
     const autoSaveTimeout = setTimeout(() => {
       handleSave(true);
     }, 3000); // Auto-save after 3 seconds of inactivity
 
     return () => clearTimeout(autoSaveTimeout);
-  }, [content, title, tags, pinned, starred]);
+  }, [content, title, tags, id, loading, handleSave]);
 
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      // Ctrl/Cmd + S to save
       if ((event.ctrlKey || event.metaKey) && event.key === 's') {
         event.preventDefault();
         handleSave(false);
@@ -199,7 +166,7 @@ const NotePage = () => {
 
   // Delete current note
   const handleDelete = async () => {
-    if (!user || !note?.id || note.id === "new") {
+    if (!user || !note?.id) { // Cannot delete a note that hasn't been saved
       navigate("/notes");
       return;
     }
@@ -207,7 +174,7 @@ const NotePage = () => {
     if (!window.confirm("Are you sure you want to delete this Note?")) return;
 
     try {
-      await deleteNote(user.uid, note.id);
+      await deleteNote(note.id);
       toast.success("Note deleted successfully");
       navigate("/notes");
     } catch (error) {
@@ -226,16 +193,6 @@ const NotePage = () => {
   // Remove a tag
   const removeTag = (tagToRemove: string) => {
     setTags(tags.filter((tag) => tag !== tagToRemove));
-  };
-
-  // Toggle starred state
-  const toggleStarred = () => {
-    setStarred(!starred);
-  };
-
-  // Toggle pinned state
-  const togglePinned = () => {
-    setPinned(!pinned);
   };
 
   if (loading) {
@@ -295,30 +252,6 @@ const NotePage = () => {
               <span>Last saved: {format(lastSaved, "HH:mm")}</span>
             )}
           </div>
-          
-          {/* Star toggle */}
-          <button
-            onClick={toggleStarred}
-            className={`p-2 rounded-full ${starred
-              ? "text-warning-500"
-              : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-              }`}
-            aria-label={starred ? "Unstar note" : "Star note"}
-          >
-            <Star size={20} fill={starred ? "currentColor" : "none"} />
-          </button>
-
-          {/* Pin toggle */}
-          <button
-            onClick={togglePinned}
-            className={`p-2 rounded-full ${pinned
-              ? "text-primary-500"
-              : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-              }`}
-            aria-label={pinned ? "Unpin note" : "Pin note"}
-          >
-            <Pin size={20} />
-          </button>
 
           {/* Save button */}
           <button onClick={() => handleSave(false)} className="button-primary">

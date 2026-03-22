@@ -1,97 +1,115 @@
-// hooks/useNotes.ts
-import { db } from "../services/firebase";
-import {
-  collection,
-  getDoc,
-  getDocs,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  doc,
-  onSnapshot,
-} from "firebase/firestore";
+// src/hooks/useNotes.ts
+import { supabase } from "../services/supabase";
+import { RealtimeChannel } from "@supabase/supabase-js";
 
+// The Note interface now matches the Supabase table schema
 export interface Note {
-  id: string;
-  title: string;
-  content: string;
-  createdAt: string;
-  tags: string[];
-  starred?: boolean;
-  pinned?: boolean;
+  id: string; // uuid
+  user_id: string; // uuid
+  title: string | null;
+  content: string | null;
+  tags: string[] | null;
+  created_at: string; // TIMESTAMPTZ
+  is_archived: boolean;
 }
 
-const getUserNotesCollection = (userId: string) =>
-  collection(db, "users", userId, "notes");
+// Type for creating a new note
+export type NewNote = Omit<Note, "id" | "user_id" | "created_at">;
 
-// Real-time listener
+// Fetch all notes for the current user
+export const getNotes = async (userId: string): Promise<Note[]> => {
+  const { data, error } = await supabase
+    .from("notes")
+    .select("*")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching notes:", error);
+    throw error;
+  }
+  return data || [];
+};
+
+// Fetch a single note by its ID
+export const getNoteById = async (noteId: string): Promise<Note | null> => {
+  const { data, error } = await supabase
+    .from("notes")
+    .select("*")
+    .eq("id", noteId)
+    .single();
+
+  if (error) {
+    console.error("Error fetching note by id:", error);
+    throw error;
+  }
+  return data;
+};
+
+// Listen for real-time changes to notes
 export const listenToNotes = (
   userId: string,
-  onNotesChange: (notes: Note[]) => void
-) => {
-  const unsubscribe = onSnapshot(getUserNotesCollection(userId), (snapshot) => {
-    const notes = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...(doc.data() as Omit<Note, "id">),
-    }));
-    onNotesChange(notes);
-  });
+  callback: (payload: any) => void
+): RealtimeChannel => {
+  const channel = supabase
+    .channel(`public:notes:user_id=eq.${userId}`)
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "notes", filter: `user_id=eq.${userId}` },
+      callback
+    )
+    .subscribe((status, err) => {
+      if (status === 'SUBSCRIBED') {
+        console.log('Connected to notes channel!');
+      }
+      if (err) {
+        console.error('Error subscribing to notes channel:', err);
+      }
+    });
 
-  return unsubscribe;
+  return channel;
 };
 
-export const getNoteById = async (userId: string, id: string) => {
-  const docRef = doc(db, "users", userId, "notes", id);
-  const snapshot = await getDoc(docRef);
-  return snapshot.exists()
-    ? ({ id: snapshot.id, ...(snapshot.data() as any) } as Note)
-    : null;
+// Create a new note
+export const createNote = async (userId: string, note: NewNote): Promise<Note> => {
+  const { data, error } = await supabase
+    .from("notes")
+    .insert([{ ...note, user_id: userId }])
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error creating note:", error);
+    throw error;
+  }
+  return data;
 };
 
-export const getNotes = async (userId: string): Promise<Note[]> => {
-  const snapshot = await getDocs(getUserNotesCollection(userId));
-  return snapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...(doc.data() as Omit<Note, "id">),
-  }));
-};
-
-export const createNote = async (
-  userId: string,
-  note: Omit<Note, "id">
-) => {
-  const docRef = await addDoc(getUserNotesCollection(userId), note);
-  return { id: docRef.id, ...note };
-};
-
+// Update an existing note
 export const updateNote = async (
-  userId: string,
-  id: string,
-  note: Partial<Note>
-) => {
-  const docRef = doc(db, "users", userId, "notes", id);
-  await updateDoc(docRef, note);
+  noteId: string,
+  updates: Partial<NewNote>
+): Promise<Note> => {
+  const { data, error } = await supabase
+    .from("notes")
+    .update(updates)
+    .eq("id", noteId)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error updating note:", error);
+    throw error;
+  }
+  return data;
 };
 
-export const deleteNote = async (userId: string, id: string) => {
-  const docRef = doc(db, "users", userId, "notes", id);
-  await deleteDoc(docRef);
-};
+// Delete a note
+export const deleteNote = async (noteId: string) => {
+  const { error } = await supabase.from("notes").delete().eq("id", noteId);
 
-export const toggleNoteStar = async (
-  userId: string,
-  id: string,
-  starred: boolean
-) => {
-  const docRef = doc(db, "users", userId, "notes", id);
-  await updateDoc(docRef, { starred });
-};
-
-export const toggleNotePin = async (
-  userId: string,
-  id: string,
-  pinned: boolean
-) => {
-  const docRef = doc(db, "users", userId, "notes", id);
-  await updateDoc(docRef, { pinned });
+  if (error) {
+    console.error("Error deleting note:", error);
+    throw error;
+  }
 };

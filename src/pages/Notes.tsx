@@ -1,71 +1,59 @@
-import { useState, useEffect } from "react";
-import { PlusIcon, Search, GridIcon, ListIcon, Star, Pin } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { PlusIcon, Search, GridIcon, ListIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import NoteCard from "../components/notes/NoteCard";
 import { motion } from "framer-motion";
-import { listenToNotes } from "../hooks/useNotes";
+import { listenToNotes, getNotes, Note } from "../hooks/useNotes";
 import { useAuth } from "../hooks/useAuth";
-
-interface Note {
-  id: string;
-  title: string;
-  content: string;
-  createdAt: string;
-  tags: string[];
-  starred?: boolean;
-  pinned?: boolean;
-}
+import { RealtimeChannel } from "@supabase/supabase-js";
 
 const Notes = () => {
   const [notes, setNotes] = useState<Note[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [filter, setFilter] = useState<"all" | "starred" | "pinned">("all");
 
   const { user } = useAuth();
+
+  const fetchNotes = useCallback(async () => {
+    if (!user) return;
+    try {
+      const fetchedNotes = await getNotes(user.id);
+      setNotes(fetchedNotes);
+    } catch (error) {
+      console.error("Error fetching notes:", error);
+    }
+  }, [user]);
 
   useEffect(() => {
     if (!user) return;
 
-    const unsubscribe = listenToNotes(user.uid, (fetchedNotes) => {
-      setNotes(fetchedNotes as Note[]);
+    fetchNotes(); // Initial fetch
+
+    const channel: RealtimeChannel = listenToNotes(user.id, (payload) => {
+      console.log('Realtime update received for notes:', payload);
+      fetchNotes(); // Refetch all notes on any change
     });
 
-    return () => unsubscribe();
-  }, [user]);
+    return () => {
+      channel.unsubscribe();
+    };
+  }, [user, fetchNotes]);
 
   const filteredNotes = notes.filter((note) => {
-    // First apply status filter
-    let statusFiltered = true;
-    if (filter === "starred") statusFiltered = note.starred === true;
-    if (filter === "pinned") statusFiltered = note.pinned === true;
-    
-    // Then apply search filter
-    let searchFiltered = true;
-    if (searchQuery) {
-      searchFiltered = 
-        note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        note.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        note.tags.some((tag) =>
-          tag.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-    }
-    
-    return statusFiltered && searchFiltered;
+    if (!searchQuery) return true;
+    const searchLower = searchQuery.toLowerCase();
+
+    const titleMatch = note.title && note.title.toLowerCase().includes(searchLower);
+    const contentMatch = note.content && note.content.toLowerCase().includes(searchLower);
+    const tagMatch = note.tags && note.tags.some((tag) =>
+      tag.toLowerCase().includes(searchLower)
+    );
+
+    return titleMatch || contentMatch || tagMatch;
   });
 
-  // Sort notes: pinned first, then starred, then by creation date
   const sortedNotes = [...filteredNotes].sort((a, b) => {
-    // Pinned notes first
-    if (a.pinned && !b.pinned) return -1;
-    if (!a.pinned && b.pinned) return 1;
-    
-    // Then starred notes
-    if (a.starred && !b.starred) return -1;
-    if (!a.starred && b.starred) return 1;
-    
-    // Finally by creation date (newest first)
-    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
   });
 
   const container = {
@@ -135,60 +123,18 @@ const Notes = () => {
 
       {/* Note filter buttons */}
       <div className="flex flex-wrap gap-3 mb-6">
-        <button
-          className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium ${filter === "all"
-              ? "bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-100"
-              : "bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300"
-            }`}
-          onClick={() => setFilter("all")}
-        >
-          All
-        </button>
-        <button
-          className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium ${filter === "starred"
-              ? "bg-warning-100 dark:bg-warning-900 text-warning-800 dark:text-warning-100"
-              : "bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300"
-            }`}
-          onClick={() => setFilter("starred")}
-        >
-          <Star size={16} />
-          Starred
-        </button>
-        <button
-          className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium ${filter === "pinned"
-              ? "bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-100"
-              : "bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300"
-            }`}
-          onClick={() => setFilter("pinned")}
-        >
-          <Pin size={16} />
-          Pinned
-        </button>
+        {/* The filter buttons have been removed as the feature is not implemented in Supabase yet */}
       </div>
 
       {sortedNotes.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-64 text-center">
           <p className="text-slate-500 dark:text-slate-400 mb-4">
-            {filter === "all"
-              ? "No notes found"
-              : filter === "starred"
-                ? "No starred notes yet"
-                : "No pinned notes yet"}
+            No notes found.
           </p>
-          {filter !== "all" && (
-            <button
-              className="text-primary-600 hover:text-primary-700"
-              onClick={() => setFilter("all")}
-            >
-              View all notes
-            </button>
-          )}
-          {filter === "all" && (
-            <Link to="/notes/new" className="button-primary">
-              <PlusIcon size={18} className="mr-1" />
-              Create your first note
-            </Link>
-          )}
+          <Link to="/notes/new" className="button-primary">
+            <PlusIcon size={18} className="mr-1" />
+            Create your first note
+          </Link>
         </div>
       ) : (
         <motion.div
