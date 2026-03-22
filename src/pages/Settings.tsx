@@ -1,13 +1,7 @@
 import { useState, useEffect } from "react";
 import { User, Info, Eye, EyeOff, Camera } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
-import { auth, db } from "../services/firebase";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
-import {
-  updatePassword,
-  EmailAuthProvider,
-  reauthenticateWithCredential,
-} from "firebase/auth";
+import { supabase } from "../services/supabase";
 import toast from "react-hot-toast";
 
 /**
@@ -60,37 +54,15 @@ const Settings = () => {
    * Fetches user information from Firestore and Firebase Auth metadata
    */
   useEffect(() => {
-    const fetchUserProfile = async () => {
-      if (user) {
-        try {
-          // Fetch user document from Firestore
-          const userDoc = await getDoc(doc(db, "users", user.uid));
-          if (userDoc.exists()) {
-            const userData = userDoc.data();
-
-            // Safely handle date creation with fallbacks
-            const creationTime = user.metadata.creationTime;
-            const lastSignInTime = user.metadata.lastSignInTime;
-
-            setProfile({
-              name: userData.name || user.displayName || "",
-              email: user.email || "",
-              createdAt:
-                userData.createdAt?.toDate() ||
-                (creationTime ? new Date(creationTime) : new Date()),
-              lastLogin:
-                userData.lastLogin?.toDate() ||
-                (lastSignInTime ? new Date(lastSignInTime) : new Date()),
-            });
-            setNewName(userData.name || user.displayName || "");
-          }
-        } catch (error) {
-          console.error("Error fetching user profile:", error);
-        }
-      }
-    };
-
-    fetchUserProfile();
+    if (user) {
+      setProfile({
+        name: user.user_metadata?.name || user.email || "",
+        email: user.email || "",
+        createdAt: user.created_at ? new Date(user.created_at) : new Date(),
+        lastLogin: user.last_sign_in_at ? new Date(user.last_sign_in_at) : new Date(),
+      });
+      setNewName(user.user_metadata?.name || user.email || "");
+    }
   }, [user]);
 
   /**
@@ -100,19 +72,19 @@ const Settings = () => {
   const handleUpdateName = async () => {
     if (!user || !newName.trim()) return;
 
-    try {
-      // Update user document in Firestore
-      await updateDoc(doc(db, "users", user.uid), {
-        name: newName.trim(),
-      });
+    const { data, error } = await supabase.auth.updateUser({
+      data: { name: newName.trim() },
+    });
 
-      // Update local state
+    if (error) {
+      toast.error("Failed to update name");
+      console.error("Error updating name:", error);
+    } else {
+      // The user object from useAuth will update automatically.
+      // We just need to update our local state to reflect the change immediately.
       setProfile((prev) => ({ ...prev, name: newName.trim() }));
       setIsEditingName(false);
       toast.success("Name updated successfully");
-    } catch (error) {
-      toast.error("Failed to update name");
-      console.error("Error updating name:", error);
     }
   };
 
@@ -122,7 +94,7 @@ const Settings = () => {
    */
   const handleChangePassword = async () => {
     // Validate all fields are filled
-    if (!user || !currentPassword || !newPassword || !confirmPassword) {
+    if (!user || !newPassword || !confirmPassword) {
       toast.error("Please fill in all password fields");
       return;
     }
@@ -140,34 +112,20 @@ const Settings = () => {
     }
 
     setIsChangingPassword(true);
-    try {
-      // Reauthenticate user before password change
-      const credential = EmailAuthProvider.credential(
-        user.email!,
-        currentPassword
-      );
-      await reauthenticateWithCredential(user, credential);
 
-      // Update password in Firebase Auth
-      await updatePassword(user, newPassword);
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
 
+    if (error) {
+      toast.error(error.message || "Failed to change password");
+      console.error("Error changing password:", error);
+    } else {
       // Clear form fields after successful change
-      setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-
       toast.success("Password changed successfully");
-    } catch (error: any) {
-      // Handle specific authentication errors
-      if (error.code === "auth/wrong-password") {
-        toast.error("Current password is incorrect");
-      } else {
-        toast.error("Failed to change password");
-      }
-      console.error("Error changing password:", error);
-    } finally {
-      setIsChangingPassword(false);
     }
+
+    setIsChangingPassword(false);
   };
 
   /**
@@ -287,37 +245,6 @@ const Settings = () => {
           <div className="bg-white dark:bg-slate-800 rounded-lg shadow-card p-6">
             <h2 className="text-xl font-medium mb-4">Change Password</h2>
             <div className="space-y-4">
-              {/* Current Password Field */}
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Current Password
-                </label>
-                <div className="relative">
-                  <input
-                    type={showPasswords.current ? "text" : "password"}
-                    value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
-                    className="input w-full pr-10"
-                    placeholder="Enter current password"
-                  />
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setShowPasswords((prev) => ({
-                        ...prev,
-                        current: !prev.current,
-                      }))
-                    }
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  >
-                    {showPasswords.current ? (
-                      <EyeOff size={16} />
-                    ) : (
-                      <Eye size={16} />
-                    )}
-                  </button>
-                </div>
-              </div>
 
               {/* New Password Field */}
               <div>
