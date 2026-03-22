@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { sendPasswordResetEmail } from "firebase/auth";
-import { auth } from "../services/firebase";
+import { supabase } from "../services/supabase";
 import { useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Mail, CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
@@ -15,34 +14,20 @@ const ForgotPassword = () => {
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSending(true);
-    
-    try {
-      await sendPasswordResetEmail(auth, email);
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+
+    if (error) {
+      console.error("Password reset error:", error);
+      toast.error(error.message || "Failed to send reset email. Please try again.");
+    } else {
       setEmailSent(true);
       toast.success("Password reset email sent successfully!");
-    } catch (error: any) {
-      console.error("Password reset error:", error);
-      
-      // Handle specific Firebase errors
-      switch (error.code) {
-        case 'auth/user-not-found':
-          toast.error("No account found with this email address");
-          break;
-        case 'auth/invalid-email':
-          toast.error("Please enter a valid email address");
-          break;
-        case 'auth/too-many-requests':
-          toast.error("Too many attempts. Please try again later");
-          break;
-        case 'auth/network-request-failed':
-          toast.error("Network error. Please check your connection");
-          break;
-        default:
-          toast.error("Failed to send reset email. Please try again");
-      }
-    } finally {
-      setIsSending(false);
     }
+
+    setIsSending(false);
   };
 
   return (
