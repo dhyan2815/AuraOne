@@ -6,7 +6,7 @@ import * as chrono from 'chrono-node';
 // CRUD function imports
 import { createNote, deleteNote, updateNote, getNotes } from '../hooks/useNotes';
 import { createTask, deleteTask, updateTask, getTasks } from '../hooks/useTasks';
-import { addEvent, deleteEvent, getEvents } from '../hooks/useEvents';
+import { createEvent, deleteEvent, getEvents } from '../hooks/useEvents';
 
 // Get AI configuration
 const AI_CONFIG = getAIConfig();
@@ -228,7 +228,12 @@ async function handleCreate(type: string, data: Record<string, unknown>, userId:
       const parsedDate = chrono.parseDate(eventData.date as string);
       if (!parsedDate) throw new Error('Invalid event date');
       
-      await addEvent(userId, eventData.title as string, format(parsedDate, 'HH:mm'), parsedDate);
+      await createEvent(userId, {
+        title: eventData.title as string,
+        start_time: parsedDate.toISOString(),
+        end_time: null,
+        description: null,
+      });
       return `Event "${eventData.title as string}" created successfully ✅`;
     }
     
@@ -255,7 +260,7 @@ async function handleRead(type: string, data: Record<string, unknown>, userId: s
     case 'event': {
       const events = await getEvents(userId);
       if (events.length === 0) return 'No events found 🗓️';
-      return 'Your Events:\n' + events.map(e => `- ${e.title} (${e.date})`).join('\n');
+      return 'Your Events:\n' + events.map(e => `- ${e.title} (${format(new Date(e.start_time), 'yyyy-MM-dd HH:mm')})`).join('\n');
     }
     
     default:

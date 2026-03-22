@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
-import { format, addDays, isSameDay } from "date-fns";
-import { useEvents, addEvent } from "../../hooks/useEvents";
+import { format, addDays, isSameDay, parse } from "date-fns";
+import { getEvents, createEvent, Event } from "../../hooks/useEvents";
 import { useAuth } from "../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 
@@ -16,12 +16,17 @@ const CalendarWidget = () => {
   // user authentication
   const { user } = useAuth();
 
-  // Custom hook to fetch events
-  const events = useEvents(user?.uid || "");
+  const [events, setEvents] = useState<Event[]>([]);
+
+  useEffect(() => {
+    if (user?.uid) {
+      getEvents(user.uid).then(setEvents);
+    }
+  }, [user]);
 
   // Memoized events for the selected date
   const eventsForSelectedDate = useMemo(
-    () => events.filter((event) => isSameDay(event.date, selectedDate)),
+    () => events.filter((event) => isSameDay(new Date(event.start_time), selectedDate)),
     [events, selectedDate]
   );
 
@@ -39,7 +44,7 @@ const CalendarWidget = () => {
         {days.map((day) => {
           const isToday = isSameDay(day, new Date());
           const isSelected = isSameDay(day, selectedDate);
-          const hasEvents = events.some((event) => isSameDay(event.date, day));
+          const hasEvents = events.some((event) => isSameDay(new Date(event.start_time), day));
 
           return (
             <button
@@ -96,7 +101,13 @@ const CalendarWidget = () => {
               e.preventDefault();
               if (!newEventTitle || !newEventTime || !user?.uid) return;
 
-              await addEvent(user.uid, newEventTitle, newEventTime, selectedDate);
+              const startTime = parse(newEventTime, "HH:mm", selectedDate);
+              await createEvent(user.uid, {
+                title: newEventTitle,
+                start_time: startTime.toISOString(),
+                end_time: null,
+                description: null,
+              });
               setNewEventTitle("");
               setNewEventTime("");
               setShowAddForm(false);
@@ -142,7 +153,7 @@ const CalendarWidget = () => {
               <div className="flex-1 min-w-0">
                 <h4 className="font-medium">{event.title}</h4>
                 <p className="text-sm text-slate-600 dark:text-slate-400">
-                  {event.time}
+                  {format(new Date(event.start_time), "p")}
                 </p>
               </div>
             </div>
