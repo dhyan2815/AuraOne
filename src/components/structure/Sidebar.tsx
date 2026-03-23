@@ -94,215 +94,154 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
 
   return (
     <>
-      {expanded && (
-        <div
-          className="fixed inset-0 bg-black/50 z-20 md:hidden"
-          onClick={closeSidebar}
-        />
-      )}
+      <AnimatePresence>
+        {expanded && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-primary/10 backdrop-blur-sm z-20 md:hidden"
+            onClick={closeSidebar}
+          />
+        )}
+      </AnimatePresence>
 
       <button
-        className="fixed top-4 left-4 z-30 md:hidden bg-white dark:bg-slate-800 rounded-md p-2 shadow-md"
+        className="fixed top-4 left-4 z-30 md:hidden glass p-2 rounded-lg text-primary shadow-lg"
         onClick={toggleSidebar}
       >
-        {expanded ? <X size={24} /> : <Menu size={24} />}
+        {expanded ? <X size={20} /> : <Menu size={20} />}
       </button>
 
-      <AnimatePresence>
-        <motion.aside
-          initial={{ x: -280 }}
-          animate={{ x: expanded ? 0 : -280 }}
-          transition={{ duration: 0.3, ease: "easeInOut" }}
-          className={`fixed inset-y-0 left-0 z-20 bg-white dark:bg-slate-800 shadow-lg md:shadow-none md:static md:translate-x-0 transition-all duration-300 ease-in-out ${
-            isCollapsed ? 'w-[100px]' : 'w-64'
-          }`}
-        >
-          <div className="flex flex-col h-full dark:shadow-xl">
-            {/* Header */}
-            <div className="flex items-center justify-between h-12 px-4 border-b border-slate-200 dark:border-slate-700">
-              <AnimatePresence mode="wait">
-                {!isCollapsed ? (
-                  <motion.div
-                    key="expanded-header"
-                    initial={{ opacity: 1, width: 0 }}
-                    animate={{ opacity: 1, width: "auto" }}
-                    exit={{ opacity: 0, width: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="flex items-center gap-2 flex-1"
-                  >
-                    <Sparkles className="w-5 h-5 text-primary-600 flex-shrink-0" />
-                    <div className="min-w-0">
-                      <h1 className="text-lg font-bold truncate">AuraOne</h1>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 truncate">{userName}</p>
-                    </div>
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="collapsed-header"
-                    initial={{ opacity: 1 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="flex justify-between items-center w-full"  
-                  >
-                    <Sparkles className="w-5 h-5 text-primary-600 flex-shrink-0" />
-                    <button
-                      onClick={onToggleCollapse}
-                      className="md:flex p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-                      aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-                    >
-                      {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
-                    </button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-              
-              {/* Collapse/Expand Button - Only show when expanded */}
+      <motion.aside
+        initial={false}
+        animate={{ 
+          width: isCollapsed ? 88 : 256,
+          x: expanded ? 0 : -256 
+        }}
+        transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+        className="fixed inset-y-0 left-0 z-20 glass-panel md:static md:translate-x-0 m-4 rounded-3xl overflow-hidden flex flex-col"
+      >
+        {/* Header Section */}
+        <div className="p-6 flex items-center justify-between border-b border-primary/5">
+          <AnimatePresence mode="wait">
+            {!isCollapsed && (
+              <motion.div
+                key="header"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                className="flex items-center gap-3 overflow-hidden"
+              >
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg shadow-primary/20">
+                  <Sparkles className="text-white w-5 h-5" />
+                </div>
+                <div className="min-w-0">
+                  <h1 className="text-base font-bold text-aurora-on-surface truncate">AuraOne</h1>
+                  <span className="text-[0.65rem] font-medium uppercase tracking-widest text-primary/60 truncate block">
+                    Productivity Hub
+                  </span>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <button
+            onClick={onToggleCollapse}
+            className="p-2 rounded-xl text-primary/40 hover:text-primary hover:bg-primary/10 transition-all hidden md:block"
+          >
+            {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+          </button>
+        </div>
+
+        {/* Navigation Section */}
+        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+          {menuItems.slice(0, 4).map((item) => (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              className={({ isActive }) =>
+                `flex items-center px-4 py-3 rounded-2xl transition-all duration-300 group min-h-[48px] ${
+                  isActive
+                    ? "nav-item-active"
+                    : "text-aurora-on-surface-variant hover:bg-white/60 hover:text-primary"
+                } ${isCollapsed ? 'justify-center px-0' : ''}`
+              }
+              title={isCollapsed ? item.label : undefined}
+            >
+              <div className="flex-shrink-0">{item.icon}</div>
               {!isCollapsed && (
-                <button
-                  onClick={onToggleCollapse}
-                  className="hidden md:flex p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-                  aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+                <motion.span
+                  initial={{ opacity: 0, x: -5 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="ml-4 font-medium text-sm truncate"
                 >
-                  {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
-                </button>
+                  {item.label}
+                </motion.span>
               )}
-            </div>
+            </NavLink>
+          ))}
+          
+          <div className="pt-4 pb-2">
+            {!isCollapsed && <p className="section-header px-4">AI Interaction</p>}
+            <NavLink
+              to="/chat"
+              className={({ isActive }) =>
+                `flex items-center px-4 py-3 rounded-2xl transition-all duration-300 min-h-[48px] ${
+                  isActive ? "nav-item-active" : "text-aurora-on-surface-variant hover:bg-white/60 hover:text-primary"
+                } ${isCollapsed ? 'justify-center px-0' : ''}`
+              }
+            >
+              <MessagesSquare size={22} />
+              {!isCollapsed && <span className="ml-4 font-medium text-sm">Aura Assistant</span>}
+            </NavLink>
+          </div>
+        </nav>
 
-            {/* Navigation */}
-            <nav className="flex-1 px-2 py-2 space-y-1">
-              {menuItems.map((item) => (
-                <NavLink
-                  key={item.path}
-                  to={item.path}
-                  className={({ isActive }) =>
-                    `flex items-center px-3 py-2 rounded-md transition-colors group ${
-                      isActive
-                        ? "bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-100"
-                        : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
-                    } ${isCollapsed ? 'justify-center' : ''}`
-                  }
-                  onClick={
-                    item.onclick ? item.onclick : () => navigate(item.path)
-                  }
-                  title={isCollapsed ? item.label : undefined}
-                >
-                  <span className="flex-shrink-0">{item.icon}</span>
-                  <AnimatePresence mode="wait">
-                    {!isCollapsed && (
-                      <motion.span
-                        initial={{ opacity: 0, width: 0 }}
-                        animate={{ opacity: 1, width: "auto" }}
-                        exit={{ opacity: 0, width: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="ml-3 truncate"
-                      >
-                        {item.label}
-                      </motion.span>
-                    )}
-                  </AnimatePresence>
-                </NavLink>
-              ))}
-            </nav>
-
-            {/* Footer Actions */}
-            <div className="p-3 border-t border-slate-200 dark:border-slate-700">
-              <div className={`flex ${isCollapsed ? 'flex-col space-y-2' : 'justify-around'} gap-x-1`}>
-                {/* Theme */}
-                <div className={`${isCollapsed ? 'flex justify-center' : 'flex-1'}`}>
-                  <button
-                    onClick={toggleTheme}
-                    className="flex p-3 rounded-full bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
-                    aria-label="Toggle theme"
-                    title={isCollapsed ? "Theme" : undefined}
-                  >
-                    {theme === "light" ? (
-                      <MoonIcon size={18} />
-                    ) : (
-                      <SunIcon size={18} />
-                    )}
-                  </button>
-                  <AnimatePresence mode="wait">
-                    {!isCollapsed && (
-                      <motion.span
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.3, ease: "easeInOut" }}
-                        className="text-xs flex justify-center text-slate-600 dark:text-slate-300 mt-1"
-                      >
-                        Theme
-                      </motion.span>
-                    )}
-                  </AnimatePresence>
-                </div>
-
-                {/* Aura Assistant */}
-                <div className={`${isCollapsed ? 'flex justify-center' : 'flex-1'}`}>
-                  <NavLink
-                    to="/chat"
-                    className={({ isActive }) =>
-                      `flex p-3 rounded-full transition-colors ${
-                        isActive
-                          ? "bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300"
-                          : "bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600"
-                      }`
-                    }
-                    title={isCollapsed ? "Chat with AI" : undefined}
-                  >
-                    <MessagesSquare size={18} />
-                  </NavLink>
-                  <AnimatePresence mode="wait">
-                    {!isCollapsed && (
-                      <motion.span
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.3, ease: "easeInOut" }}
-                        className="text-xs flex justify-center text-slate-600 dark:text-slate-300 mt-1"
-                      >
-                        Aura
-                      </motion.span>
-                    )}
-                  </AnimatePresence>
-                </div>
-
-                {/* Settings */}
-                <div className={`${isCollapsed ? 'flex justify-center' : 'flex-1'}`}>
-                  <NavLink
-                    to="/settings"
-                    className={({ isActive }) =>
-                      `flex p-3 rounded-full transition-colors ${
-                        isActive
-                          ? "bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300"
-                          : "bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600"
-                      }`
-                    }
-                    title={isCollapsed ? "Settings" : undefined}
-                  >
-                    <SettingsIcon size={18} />
-                  </NavLink>
-                  <AnimatePresence mode="wait">
-                    {!isCollapsed && (
-                      <motion.span
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.3, ease: "easeInOut" }}
-                        className="text-xs flex justify-center text-slate-600 dark:text-slate-300 mt-1"
-                      >
-                        Settings
-                      </motion.span>
-                    )}
-                  </AnimatePresence>
-                </div>
+        {/* User & Settings Section */}
+        <div className="p-4 mt-auto border-t border-primary/5 space-y-2">
+          {!isCollapsed && (
+            <div className="px-4 py-3 flex items-center gap-3 glass bg-white/40 rounded-2xl mb-4">
+              <div className="w-8 h-8 rounded-full bg-secondary/10 flex items-center justify-center text-secondary font-bold text-xs ring-2 ring-white shadow-sm">
+                {userName.charAt(0).toUpperCase()}
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-bold text-aurora-on-surface truncate">{userName}</p>
+                <p className="text-[0.6rem] text-primary/50 truncate">Premium Plan</p>
               </div>
             </div>
+          )}
+
+          <div className={`flex ${isCollapsed ? 'flex-col items-center' : 'items-center justify-between gap-2'} px-2`}>
+            <button
+              onClick={toggleTheme}
+              className="p-3 rounded-2xl text-primary/40 hover:text-primary hover:bg-white/80 transition-all"
+              title="Toggle Theme"
+            >
+              {theme === "light" ? <MoonIcon size={18} /> : <SunIcon size={18} />}
+            </button>
+            
+            <NavLink
+              to="/settings"
+              className="p-3 rounded-2xl text-primary/40 hover:text-primary hover:bg-white/80 transition-all"
+              title="Settings"
+            >
+              <SettingsIcon size={18} />
+            </NavLink>
+
+            <button
+              onClick={handleLogout}
+              className="p-3 rounded-2xl text-error/40 hover:text-error hover:bg-error/10 transition-all"
+              title="Logout"
+            >
+              <LogOut size={18} />
+            </button>
           </div>
-        </motion.aside>
-      </AnimatePresence>
+        </div>
+      </motion.aside>
     </>
   );
 };
+
 
 export default Sidebar;

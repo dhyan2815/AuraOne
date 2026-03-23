@@ -1,8 +1,8 @@
 import { Calendar, Clock, Flag, MoreVertical, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
-import { Task } from "../../hooks/useTasks"; // Import the centralized Task interface
-import { useAuth } from "../../hooks/useAuth";
+import { Task } from "../../hooks/useTasks";
+import { motion } from "framer-motion";
 
 interface TaskCardProps {
   task: Task;
@@ -10,101 +10,55 @@ interface TaskCardProps {
   onToggleComplete?: (taskId: string) => void;
 }
 
-const priorityColors = {
-  low: 'bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-300',
-  medium: 'bg-warning-100 text-warning-800 dark:bg-warning-900/30 dark:text-warning-300',
-  high: 'bg-error-100 text-error-800 dark:bg-error-900/30 dark:text-error-300',
+const priorityConfig = {
+  low: { color: 'text-success', bg: 'bg-success/10', border: 'border-success/20' },
+  medium: { color: 'text-secondary', bg: 'bg-secondary/10', border: 'border-secondary/20' },
+  high: { color: 'text-error', bg: 'bg-error/10', border: 'border-error/20' },
 };
 
 const TaskCard = ({ task, viewMode, onToggleComplete }: TaskCardProps) => {
-  const { user } = useAuth();
-  const formattedDueDate = task.due_date
-    ? format(new Date(task.due_date), 'MMM d, yyyy')
-    : '';
-
-  const formattedCreatedDate = task.created_at
-    ? format(new Date(task.created_at), 'MMM d, yyyy')
-    : '';
-
+  const formattedDueDate = task.due_date ? format(new Date(task.due_date), 'MMM d, yyyy') : '';
   const dueTime = task.due_date ? format(new Date(task.due_date), 'p') : '';
-
   const isOverdue = task.due_date && new Date(task.due_date) < new Date() && !task.completed;
+  const config = task.priority ? priorityConfig[task.priority] : priorityConfig.low;
 
   if (viewMode === "list") {
     return (
-      <Link to={`/tasks/${task.id}`} className="block">
-        <div className="card hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors relative">
-          <div className="flex flex-col md:flex-row md:items-center gap-2">
+      <Link to={`/tasks/${task.id}`} className="block group">
+        <div className={`glass p-4 rounded-2xl transition-all border border-transparent hover:border-primary/20 hover:bg-white/60 relative ${task.completed ? "opacity-60" : ""}`}>
+          <div className="flex items-center gap-6">
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onToggleComplete?.(task.id);
+              }}
+              className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+                task.completed ? "bg-primary border-primary text-white" : "border-primary/20 group-hover:border-primary text-transparent"
+              }`}
+            >
+              <CheckCircle size={14} className={task.completed ? "opacity-100" : "opacity-0"} />
+            </button>
+
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    onToggleComplete?.(task.id);
-                  }}
-                  className="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-                >
-                  <CheckCircle
-                    size={16}
-                    className={task.completed
-                      ? "text-success-500"
-                      : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-                    }
-                  />
-                </button>
-                <h3 className={`text-lg font-medium truncate ${
-                  task.completed
-                    ? "line-through text-slate-500 dark:text-slate-400"
-                    : ""
-                }`}>
-                  {task.title}
-                </h3>
-              </div>
-              <div className={`text-slate-600 dark:text-slate-400 line-clamp-2 mb-4 ${
-                task.completed
-                  ? "line-through text-slate-400 dark:text-slate-500"
-                  : ""
-              }`}>
-                {task.description || "No description"}
-              </div>
+              <h3 className={`text-sm font-black text-aurora-on-surface truncate ${task.completed ? "line-through opacity-50" : ""}`}>
+                {task.title}
+              </h3>
             </div>
 
-            <div className="flex items-center gap-4 text-sm text-slate-500 dark:text-slate-400 flex-wrap">
+            <div className="flex items-center gap-4">
               {task.due_date && (
-                <div className={`flex items-center flex-shrink-0 ${isOverdue
-                  ? 'text-error-600 dark:text-error-400'
-                  : 'text-slate-500 dark:text-slate-400'
-                }`}>
-                  <Calendar size={14} className="mr-1 flex-shrink-0" />
-                  <span className="whitespace-nowrap">{formattedDueDate}</span>
-                  {isOverdue && (
-                    <span className="ml-1 font-medium whitespace-nowrap">(Overdue)</span>
-                  )}
+                <div className={`flex items-center text-[10px] font-bold ${isOverdue ? 'text-error' : 'text-aurora-on-surface-variant'}`}>
+                  <Calendar size={12} className="mr-1" />
+                  {formattedDueDate}
                 </div>
               )}
-
-              {dueTime && (
-                <div className={`flex items-center flex-shrink-0 ${isOverdue
-                  ? 'text-error-600 dark:text-error-400'
-                  : 'text-slate-500 dark:text-slate-400'
-                }`}>
-                  <Clock size={14} className="mr-1 flex-shrink-0" />
-                  <span className="whitespace-nowrap">{dueTime}</span>
-                </div>
-              )}
-
               {task.priority && (
-                <div className={`px-2 py-0.5 rounded-full text-xs flex-shrink-0 ${priorityColors[task.priority]}`}>
-                  {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
-                </div>
+                <span className={`px-2 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider ${config.bg} ${config.color} border ${config.border}`}>
+                  {task.priority}
+                </span>
               )}
-
-              <div className="flex items-center gap-1 flex-shrink-0">
-                <button className="p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700">
-                  <MoreVertical size={16} />
-                </button>
-              </div>
+              <MoreVertical size={14} className="text-aurora-on-surface-variant opacity-0 group-hover:opacity-100 transition-all" />
             </div>
           </div>
         </div>
@@ -113,80 +67,65 @@ const TaskCard = ({ task, viewMode, onToggleComplete }: TaskCardProps) => {
   }
 
   return (
-    <Link to={`/tasks/${task.id}`} className="block h-full">
-      <div className="card h-full flex flex-col hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors relative">
-        <div className="flex-1">
-          <div className="flex items-center gap-2 mb-2">
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                onToggleComplete?.(task.id);
-              }}
-              className="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-            >
-              <CheckCircle
-                size={16}
-                className={task.completed
-                  ? "text-success-500"
-                  : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-                }
-              />
-            </button>
-            <h3 className={`text-lg font-medium ${
-              task.completed
-                ? "line-through text-slate-500 dark:text-slate-400"
-                : ""
-            }`}>
-              {task.title}
-            </h3>
-          </div>
-          <div className={`text-slate-600 dark:text-slate-400 line-clamp-3 mb-3 ${
-            task.completed
-              ? "line-through text-slate-400 dark:text-slate-500"
-              : ""
-          }`}>
-            {task.description || "No description"}
+    <Link to={`/tasks/${task.id}`} className="block h-full group">
+      <motion.div 
+        whileHover={{ y: -4 }}
+        className={`glass h-full flex flex-col p-6 rounded-[2.5rem] transition-all border border-transparent hover:border-primary/20 hover:bg-white/60 relative ${task.completed ? "opacity-60" : ""} shadow-sm hover:shadow-xl hover:shadow-primary/5`}
+      >
+        <div className="flex justify-between items-start mb-4">
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onToggleComplete?.(task.id);
+            }}
+            className={`w-8 h-8 rounded-2xl flex items-center justify-center transition-all ${
+              task.completed ? "bg-primary text-white shadow-lg shadow-primary/20" : "glass border border-primary/20 text-primary/20 hover:text-primary hover:border-primary"
+            }`}
+          >
+            <CheckCircle size={18} />
+          </button>
+          
+          <div className="flex items-center gap-2">
+            {isOverdue && <Flag size={14} className="text-error animate-pulse" />}
+            <MoreVertical size={16} className="text-aurora-on-surface-variant opacity-0 group-hover:opacity-100 transition-all cursor-pointer" />
           </div>
         </div>
 
-        <div className="flex items-center justify-between text-sm text-slate-500 dark:text-slate-400 mt-auto pt-4 border-t border-slate-100 dark:border-slate-700">
-          <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex-1 mb-6">
+          <h3 className={`text-lg font-black leading-tight text-aurora-on-surface mb-2 ${task.completed ? "line-through opacity-50" : ""}`}>
+            {task.title}
+          </h3>
+          <p className={`text-xs font-medium text-aurora-on-surface-variant line-clamp-2 ${task.completed ? "opacity-40" : ""}`}>
+            {task.description || "Initialize registry details"}
+          </p>
+        </div>
+
+        <div className="flex items-center justify-between pt-4 border-t border-primary/5">
+          <div className="flex flex-col gap-1">
             {task.due_date && (
-              <div className={`flex items-center flex-shrink-0 ${isOverdue
-                ? 'text-error-600 dark:text-error-400'
-                : 'text-slate-500 dark:text-slate-400'
-              }`}>
-                <Calendar size={14} className="mr-1 flex-shrink-0" />
-                <span className="whitespace-nowrap">{formattedDueDate}</span>
+              <div className={`flex items-center text-[10px] font-black uppercase tracking-widest ${isOverdue ? "text-error" : "text-aurora-on-surface-variant"}`}>
+                <Clock size={12} className="mr-1.5" />
+                {dueTime}
               </div>
             )}
-            {dueTime && (
-              <div className={`flex items-center flex-shrink-0 ${isOverdue
-                ? 'text-error-600 dark:text-error-400'
-                : 'text-slate-500 dark:text-slate-400'
-              }`}>
-                <Clock size={14} className="mr-1 flex-shrink-0" />
-                <span className="whitespace-nowrap">{dueTime}</span>
-              </div>
-            )}
+            <div className="text-[9px] font-bold text-aurora-on-surface-variant/40 flex items-center">
+              <Calendar size={10} className="mr-1" />
+              {formattedDueDate || "No Deadline"}
+            </div>
           </div>
 
-          <div className="flex items-center gap-2 flex-shrink-0">
-            {task.priority && (
-              <div className={`px-2 py-0.5 rounded-full text-xs ${priorityColors[task.priority]}`}>
-                {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
-              </div>
-            )}
-            {isOverdue && (
-              <Flag size={14} className="text-error-500" />
-            )}
-          </div>
+          {task.priority && (
+            <span className={`px-2.5 py-1 rounded-xl text-[10px] font-black uppercase tracking-[0.1em] border ${config.bg} ${config.color} ${config.border}`}>
+              {task.priority}
+            </span>
+          )}
         </div>
-      </div>
+      </motion.div>
     </Link>
   );
 };
 
 export default TaskCard;
+
  

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { MapPin, Droplets, Wind, Thermometer, MapPinOff } from "lucide-react"; // Importing icons
+import { MapPin, Droplets, Wind, MapPinOff } from "lucide-react"; // Importing icons
 import { API_CONFIG } from "../../config/api"; // Importing API configuration
+import { motion } from "framer-motion";
 
 // Defining the structure of the weather data
 interface WeatherData {
@@ -259,11 +260,10 @@ const WeatherWidget = () => {
   // Render loading state
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-32">
-        <div className="animate-pulse flex flex-col items-center">
-          <div className="h-12 w-12 bg-slate-200 dark:bg-slate-700 rounded-full mb-2"></div>
-          <div className="h-4 w-24 bg-slate-200 dark:bg-slate-700 rounded mb-2"></div>
-          <div className="h-3 w-32 bg-slate-200 dark:bg-slate-700 rounded"></div>
+      <div className="flex justify-center items-center h-48">
+        <div className="flex flex-col items-center">
+          <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin mb-4" />
+          <p className="text-aurora-on-surface-variant font-bold tracking-widest text-xs uppercase animate-pulse">Syncing Atmosphere...</p>
         </div>
       </div>
     );
@@ -272,48 +272,19 @@ const WeatherWidget = () => {
   // Render location permission denied state
   if (locationPermission === 'denied') {
     return (
-      <div className="text-center py-6">
+      <div className="text-center py-6 h-full flex flex-col justify-center">
         <div className="flex flex-col items-center">
-          <MapPinOff size={48} className="text-slate-400 dark:text-slate-500 mb-3" />
-          <h3 className="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-2">
-            Location Access Required
-          </h3>
-          <p className="text-slate-600 dark:text-slate-400 mb-4 max-w-xs">
-            Allow location access to see weather information for your area
-          </p>
-          <div className="flex flex-col gap-2 w-full max-w-xs">
-            <button
-              onClick={requestLocationPermission}
-              className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors duration-200 text-sm font-medium"
-            >
-              Try Again
-            </button>
-            <details className="mt-2">
-              <summary className="text-xs text-slate-500 dark:text-slate-400 cursor-pointer hover:text-slate-600 dark:hover:text-slate-300">
-                How to enable location access?
-              </summary>
-              <div className="mt-2 text-xs text-slate-600 dark:text-slate-400 text-left bg-slate-50 dark:bg-slate-800 p-3 rounded-lg">
-                <p className="mb-2"><strong>Chrome/Edge:</strong></p>
-                <ul className="list-disc list-inside space-y-1 mb-2">
-                  <li>Click the lock icon in the address bar</li>
-                  <li>Change "Location" to "Allow"</li>
-                  <li>Refresh the page</li>
-                </ul>
-                <p className="mb-2"><strong>Firefox:</strong></p>
-                <ul className="list-disc list-inside space-y-1 mb-2">
-                  <li>Click the shield icon in the address bar</li>
-                  <li>Click "Allow" for location access</li>
-                  <li>Refresh the page</li>
-                </ul>
-                <p className="mb-2"><strong>Safari:</strong></p>
-                <ul className="list-disc list-inside space-y-1">
-                  <li>Go to Safari → Preferences → Websites → Location</li>
-                  <li>Allow location access for this site</li>
-                  <li>Refresh the page</li>
-                </ul>
-              </div>
-            </details>
+          <div className="w-16 h-16 glass rounded-2xl flex items-center justify-center mb-4 shadow-sm">
+            <MapPinOff size={32} className="text-aurora-on-surface-variant" />
           </div>
+          <h3 className="text-lg font-black tracking-tighter mb-2">Location Access Needed</h3>
+          <p className="text-sm text-aurora-on-surface-variant font-medium mb-6 max-w-[200px]">Allow location to illuminate your local weather data.</p>
+          <button
+            onClick={requestLocationPermission}
+            className="btn-aurora-primary px-6 py-2 text-sm"
+          >
+            Enable Access
+          </button>
         </div>
       </div>
     );
@@ -322,8 +293,10 @@ const WeatherWidget = () => {
   // Render error state (only for technical/API issues)
   if (error) {
     return (
-      <div className="text-center py-6">
-        <p className="text-error-600 dark:text-error-400">{error}</p>
+      <div className="text-center py-8 h-full flex flex-col justify-center">
+        <div className="glass-panel p-4 rounded-2xl border-error/10 bg-error/5">
+          <p className="text-sm font-bold text-error">{error}</p>
+        </div>
       </div>
     );
   }
@@ -333,86 +306,53 @@ const WeatherWidget = () => {
 
   // Render weather data
   return (
-    <div>
-      <div className="flex flex-col md:flex-row items-center justify-evenly mb-2">
-
-        {/* Weather location, temperature and condition */}
-        <div className="text-center md:text-left mb-2 md:mb-0 ">
-          <div className="flex items-center justify-center md:justify-start text-lg text-slate-600 dark:text-slate-400 mb-2">
-            <MapPin size={22} className="mr-1 mb-1" />
+    <div className="h-full flex flex-col justify-between">
+      <div className="flex items-start justify-between">
+        <div>
+          <div className="flex items-center text-xs font-black uppercase tracking-widest text-aurora-on-surface-variant mb-1">
+            <MapPin size={12} className="mr-1 text-primary" />
             {weather.location}
           </div>
-          <div className="flex items-center">
-            <span className="text-2xl font-semibold">
+          <div className="flex items-baseline gap-2">
+            <span className="text-5xl font-black tracking-tighter text-aurora-on-surface">
               {weather.temperature}°
             </span>
-            <span className="ml-2 text-slate-600 dark:text-slate-400 text-xl">
+            <span className="text-base font-bold text-primary italic">
               {weather.condition}
             </span>
           </div>
         </div>
-
-        {/* Weather humidity */}
-        <div className="flex gap-8">
-          <div className="flex flex-col items-center">
-            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 mb-1">
-              <Droplets size={30} />
-            </div>
-            <div className="text-base font-bold text-slate-600 dark:text-slate-400">
-              {weather.humidity}%
-            </div>
-            <div className="text-sm text-slate-500 dark:text-slate-500">
-              Humidity
-            </div>
+        
+        <div className="flex gap-4">
+          <div className="flex flex-col items-center p-2 glass rounded-xl min-w-[60px]">
+            <Droplets size={16} className="text-secondary mb-1" />
+            <span className="text-xs font-black">{weather.humidity}%</span>
           </div>
-
-          {/* Weather windspeed */}
-          <div className="flex flex-col items-center">
-            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 mb-1">
-              <Wind size={30} />
-            </div>
-            <div className="text-base font-bold text-slate-600 dark:text-slate-400">
-              {weather.windSpeed} mph
-            </div>
-            <div className="text-sm text-slate-500 dark:text-slate-500">
-              Wind
-            </div>
-          </div>
-
-          {/* Weather temperature */}
-          <div className="flex flex-col items-center">
-            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 mb-1">
-              <Thermometer size={30} />
-            </div>
-            <div className="text-base font-bold text-slate-600 dark:text-slate-400">
-              24°/35°
-            </div>
-            <div className="text-sm text-slate-500 dark:text-slate-500">
-              Min/Max
-            </div>
+          <div className="flex flex-col items-center p-2 glass rounded-xl min-w-[60px]">
+            <Wind size={16} className="text-tertiary mb-1" />
+            <span className="text-xs font-black">{weather.windSpeed}m</span>
           </div>
         </div>
       </div>
 
-      {/* Days weather temperature */}
-      <div className="grid grid-cols-5 gap-x-0 text-center pt-1 border-slate-100 dark:border-slate-700">
+      <div className="grid grid-cols-5 gap-2 mt-6">
         {weather.forecast.map((day, index) => (
-          <div key={index} className="flex flex-col items-center">
-            <div className="font-large">{day.day}</div>
-            <div className="text-4xl">
-              {day.condition === "Clear"
-                ? "☀️"
-                : day.condition === "Clouds"
-                  ? "☁️"
-                  : day.condition === "Rain"
-                    ? "🌧️"
-                    : day.condition === "Snow"
-                      ? "❄️"
-                      : "🌤️"
-              }
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
+            key={index} 
+            className="flex flex-col items-center py-3 glass rounded-2xl hover:bg-white/40 transition-colors"
+          >
+            <span className="text-[10px] font-black uppercase tracking-tighter text-aurora-on-surface-variant mb-2">{day.day}</span>
+            <div className="text-2xl mb-2 filter drop-shadow-sm">
+              {day.condition === "Clear" ? "☀️" : 
+               day.condition === "Clouds" ? "☁️" : 
+               day.condition === "Rain" ? "🌧️" : 
+               day.condition === "Snow" ? "❄️" : "🌤️"}
             </div>
-            <div className="text-base font-bold text-slate-600 dark:text-slate-400">{day.temp}°</div>
-          </div>
+            <span className="text-sm font-black">{day.temp}°</span>
+          </motion.div>
         ))}
       </div>
     </div>
@@ -420,3 +360,4 @@ const WeatherWidget = () => {
 };
 
 export default WeatherWidget;
+

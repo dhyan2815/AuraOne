@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import toast from 'react-hot-toast';
 import {
@@ -7,6 +7,9 @@ import {
   Calendar,
   Save,
   Trash2,
+  Sparkles,
+  Cloud,
+  RotateCw
 } from "lucide-react";
 import { format } from "date-fns";
 import TiptapEditor from "../components/editor/TiptapEditor";
@@ -15,9 +18,10 @@ import {
   updateNote,
   deleteNote,
   getNoteById,
-  Note, // Import the centralized Note interface
+  Note,
 } from "../hooks/useNotes";
 import { useAuth } from "../hooks/useAuth";
+import { motion } from "framer-motion";
 
 const NotePage = () => {
   const [note, setNote] = useState<Note | null>(null);
@@ -42,24 +46,24 @@ const NotePage = () => {
 
       try {
         if (id === "new") {
-          setTitle("Untitled Note");
+          setTitle("Draft Protocol");
           setContent("");
           setTags([]);
-          setNote(null); // No existing note
+          setNote(null);
         } else if (id) {
           const foundNote = await getNoteById(id);
           if (foundNote) {
             setNote(foundNote);
-            setTitle(foundNote.title || "Untitled Note");
+            setTitle(foundNote.title || "Draft Protocol");
             setTags(foundNote.tags || []);
             setContent(foundNote.content || "");
           } else {
-            toast.error("Note not found.");
+            toast.error("Protocol not found");
             navigate("/notes");
           }
         }
       } catch (error) {
-        toast.error("Failed to fetch note.");
+        toast.error("Neural link sync failed");
         navigate("/notes");
       } finally {
         setLoading(false);
@@ -69,55 +73,49 @@ const NotePage = () => {
     fetchNote();
   }, [id, user, navigate]);
 
-  // Save or update note, wrapped in useCallback for performance
   const handleSave = useCallback(async (isAutoSave = false) => {
     if (!user) return;
 
     const noteData = {
-      title: title.trim() || "Untitled Note",
+      title: title.trim() || "Draft Protocol",
       tags,
       content,
-      is_archived: note?.is_archived || false, // Preserve existing archive status
+      is_archived: note?.is_archived || false,
     };
 
     try {
       setAutoSaving(true);
-      if (!note?.id || id === 'new') { // If it's a new note
+      if (!note?.id || id === 'new') {
         const newNote = await createNote(user.id, noteData);
         if (!isAutoSave) {
-          toast.success("New Note created Successfully");
+          toast.success("Memory archive established");
         }
         setLastSaved(new Date());
-        // Navigate to the new note's URL to enable editing/auto-saving
         navigate(`/notes/${newNote.id}`, { replace: true });
-      } else { // If it's an existing note
+      } else {
         await updateNote(note.id, noteData);
         if (!isAutoSave) {
-          toast.success("Note Updated successfully");
+          toast.success("Archive updated");
         }
         setLastSaved(new Date());
       }
     } catch (err) {
       if (!isAutoSave) {
-        toast.error("Failed to save note");
+        toast.error("Memory sync failed");
       }
     } finally {
       setAutoSaving(false);
     }
   }, [user, title, tags, content, note, id, navigate]);
 
-  // Auto-save effect
   useEffect(() => {
-    if (loading || id === 'new') return; // Don't auto-save on initial load or for new notes
-
+    if (loading || id === 'new') return;
     const autoSaveTimeout = setTimeout(() => {
       handleSave(true);
-    }, 3000); // Auto-save after 3 seconds of inactivity
-
+    }, 5000);
     return () => clearTimeout(autoSaveTimeout);
   }, [content, title, tags, id, loading, handleSave]);
 
-  // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if ((event.ctrlKey || event.metaKey) && event.key === 's') {
@@ -125,30 +123,25 @@ const NotePage = () => {
         handleSave(false);
       }
     };
-
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [handleSave]);
 
-  // Delete current note
   const handleDelete = async () => {
-    if (!user || !note?.id) { // Cannot delete a note that hasn't been saved
+    if (!user || !note?.id) {
       navigate("/notes");
       return;
     }
-
-    if (!window.confirm("Are you sure you want to delete this Note?")) return;
-
+    if (!window.confirm("Purge this memory from archive?")) return;
     try {
       await deleteNote(note.id);
-      toast.success("Note deleted successfully");
+      toast.success("Protocol neutralized");
       navigate("/notes");
     } catch (error) {
-      toast.error("Deletion of note failed");
+      toast.error("Archive integrity maintained");
     }
   };
 
-  // Add new tag
   const addTag = () => {
     if (newTag.trim() && !tags.includes(newTag.trim())) {
       setTags([...tags, newTag.trim()]);
@@ -156,135 +149,135 @@ const NotePage = () => {
     }
   };
 
-  // Remove a tag
   const removeTag = (tagToRemove: string) => {
     setTags(tags.filter((tag) => tag !== tagToRemove));
   };
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
-        <p className="mt-4 text-slate-600 dark:text-slate-400">
-          Loading note...
-        </p>
+      <div className="flex flex-col items-center justify-center min-h-[60vh]">
+        <div className="w-16 h-16 glass rounded-2xl flex items-center justify-center mb-4">
+          <RotateCw className="text-primary animate-spin" size={24} />
+        </div>
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/50">Recalibrating Archive...</p>
       </div>
     );
   }
 
   return (
-    <div>
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Header section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
-        {/* Title and date */}
-        <div className="flex items-center">
-          {/* Back button */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+        <div className="flex items-start gap-6 group">
           <button
             onClick={() => navigate("/notes")}
-            className="mr-3 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
+            className="mt-1 p-3 rounded-2xl glass border border-primary/5 text-aurora-on-surface-variant hover:text-primary hover:border-primary/20 transition-all active:scale-95"
           >
             <ArrowLeft size={20} />
           </button>
-          <div>
-            {/* Note title input */}
+          <div className="space-y-3 flex-1">
+            <div className="flex items-center gap-2 text-primary">
+              <Sparkles size={14} className="aurora-glow" />
+              <span className="text-[10px] font-black uppercase tracking-[0.2em]">Editing Protocol</span>
+            </div>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="text-3xl font-semibold bg-transparent border-0 outline-none w-full"
-              placeholder="Note title"
+              className="text-4xl md:text-5xl font-black bg-transparent border-0 outline-none w-full text-aurora-on-surface placeholder:text-aurora-on-surface-variant/20 tracking-tight leading-none"
+              placeholder="Draft Protocol"
             />
-            {/* Creation date display */}
-            {note?.createdAt && (
-              <div className="flex items-center text-sm text-slate-500 dark:text-slate-400 mt-1">
-                <Calendar size={14} className="mr-1" />
-                {format(new Date(note.createdAt), "MMMM d, yyyy")}
+            {note?.created_at && (
+              <div className="flex items-center text-[10px] font-bold text-aurora-on-surface-variant uppercase tracking-widest opacity-60">
+                <Calendar size={12} className="mr-2" />
+                Captured on {format(new Date(note.created_at), "MMMM d, yyyy")}
               </div>
             )}
           </div>
         </div>
 
-        {/* Action buttons */}
-        <div className="flex items-center space-x-2">
-          {/* Status indicator */}
-          <div className="flex items-center text-sm text-slate-500 dark:text-slate-400">
-            {autoSaving && (
-              <div className="flex items-center">
-                <div className="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-primary-500 mr-2"></div>
-                <span>Saving...</span>
+        <div className="flex flex-wrap items-center gap-4 lg:self-end">
+          <div className="flex items-center gap-3 px-4 py-2 rounded-2xl glass border border-primary/5 text-[10px] font-black uppercase tracking-wider">
+            {autoSaving ? (
+              <div className="flex items-center text-primary group">
+                <RotateCw size={12} className="animate-spin mr-2" />
+                <span>Synchronizing...</span>
               </div>
-            )}
-            {lastSaved && !autoSaving && (
-              <span>Last saved: {format(lastSaved, "HH:mm")}</span>
+            ) : lastSaved ? (
+              <div className="flex items-center text-success/60">
+                <Cloud size={14} className="mr-2" />
+                <span>Last Sync: {format(lastSaved, "HH:mm")}</span>
+              </div>
+            ) : (
+              <span className="text-aurora-on-surface-variant/40 italic">System Ready</span>
             )}
           </div>
 
-          {/* Save button */}
-          <button onClick={() => handleSave(false)} className="button-primary">
-            <Save size={18} className="mr-1" />
-            Save
+          <button onClick={() => handleSave(false)} className="btn-aurora-primary px-8 py-3 text-xs font-black uppercase tracking-widest shadow-lg shadow-primary/20 flex items-center gap-2">
+            <Save size={16} />
+            Commit Changes
           </button>
 
-          {/* Delete button */}
           <button
             onClick={handleDelete}
-            className="p-2 rounded-full text-slate-400 hover:text-error-600 dark:hover:text-error-400"
-            aria-label="Delete note"
+            className="p-3 rounded-2xl glass border border-primary/5 text-aurora-on-surface-variant hover:text-error hover:border-error/20 transition-all active:scale-95"
+            aria-label="Delete protocol"
           >
             <Trash2 size={20} />
           </button>
         </div>
       </div>
 
-      {/* Tag input section */}
-      <div className="mb-3 flex flex-wrap items-center gap-2">
-        <Tag size={16} className="text-slate-500 dark:text-slate-400" />
+      {/* Tag section */}
+      <div className="flex flex-wrap items-center gap-3 p-1">
+        <div className="w-10 h-10 rounded-xl glass flex items-center justify-center text-primary/40">
+          <Tag size={18} />
+        </div>
 
-        {/* Existing tags */}
-        {tags.map((tag) => (
-          <div
-            key={tag}
-            className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-full px-3 py-1"
-          >
-            <span className="text-base">{tag}</span>
-            {/* Remove tag button */}
-            <button
-              onClick={() => removeTag(tag)}
-              className="ml-1 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+        <div className="flex flex-wrap items-center gap-2">
+          {tags.map((tag) => (
+            <motion.div
+              layout
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              key={tag}
+              className="flex items-center gap-2 glass border border-primary/10 pl-3 pr-2 py-1.5 rounded-xl group/tag"
             >
-              &times;
-            </button>
-          </div>
-        ))}
+              <span className="text-[10px] font-black uppercase tracking-wider text-primary">{tag}</span>
+              <button
+                onClick={() => removeTag(tag)}
+                className="w-4 h-4 rounded-md flex items-center justify-center hover:bg-error/10 hover:text-error transition-colors opacity-40 group-hover/tag:opacity-100"
+              >
+                &times;
+              </button>
+            </motion.div>
+          ))}
 
-        {/* New tag input */}
-        <div className="flex">
-          <input
-            type="text"
-            value={newTag}
-            onChange={(e) => setNewTag(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && addTag()}
-            placeholder="Add tag..."
-            className="bg-transparent border-0 outline-none text-base"
-          />
-          {/* Add tag button */}
-          <button
-            onClick={addTag}
-            className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 text-base font-medium"
-          >
-            Add
-          </button>
+          <div className="relative group/input ml-2">
+            <input
+              type="text"
+              value={newTag}
+              onChange={(e) => setNewTag(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && addTag()}
+              placeholder="Add Tag..."
+              className="bg-transparent border-0 border-b border-primary/10 outline-none text-[10px] font-black uppercase tracking-wider py-1.5 w-24 focus:w-40 focus:border-primary transition-all placeholder:text-aurora-on-surface-variant/20"
+            />
+          </div>
         </div>
       </div>
 
       {/* Editor section */}
-      <div className="bg-white dark:bg-slate-800 rounded-lg dark:shadow-xl shadow-card overflow-hidden p-4">
-        <div className="prose dark:prose-invert max-w-none">
+      <motion.div 
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        className="glass-panel rounded-[3rem] p-8 min-h-[500px] border border-primary/5 shadow-2xl shadow-primary/5"
+      >
+        <div className="prose prose-aurora max-w-none">
           <TiptapEditor content={content} onChange={setContent} />
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };
 
-export default NotePage;
+export default NotePage;

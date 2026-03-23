@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { supabase } from "../services/supabase";
-import { useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Mail, CheckCircle } from "lucide-react";
+import { Link } from "react-router-dom";
+import { ArrowLeft, Mail, CheckCircle, Sparkles, RotateCw, ShieldAlert } from "lucide-react";
 import toast from "react-hot-toast";
-import LoginPicture from "../assets/flat-illustration-1.jpg";
+import { motion, AnimatePresence } from "framer-motion";
 
 const ForgotPassword = () => {
-  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
@@ -20,140 +19,148 @@ const ForgotPassword = () => {
     });
 
     if (error) {
-      console.error("Password reset error:", error);
-      toast.error(error.message || "Failed to send reset email. Please try again.");
+      toast.error(error.message || "Failed to send reset link");
     } else {
       setEmailSent(true);
-      toast.success("Password reset email sent successfully!");
+      toast.success("Reset link dispatched");
     }
 
     setIsSending(false);
   };
 
   return (
-    <div className="login min-h-screen flex items-center justify-center px-4">
-      <div className="md:flex md:w-full md:max-w-screen-xl lg:max-w-screen-2xl">
-        {/* Image section */}
-        <div className="md:w-1/2 flex items-center justify-center">
-          <img
-            src={LoginPicture}
-            alt="forgot-password-art"
-            className="w-full h-auto object-cover"
-          />
-        </div>
+    <div className="login min-h-screen flex items-center justify-center px-4 py-12 relative overflow-hidden bg-white">
+      {/* Decorative Orbs */}
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-secondary/10 rounded-full blur-[120px] pointer-events-none" />
 
-        {/* Form section */}
-        <div className="md:w-1/2 flex items-center justify-center bg-white">
-          <div
-            className="w-full px-8 py-9 rounded-2xl space-y-7"
-            style={{ minWidth: 340 }}
-          >
-            {/* Logo and Brand */}
-            <div className="flex items-center">
-              <span className="font-bold text-2xl text-indigo-700 tracking-wide">AuraOne</span>
+      <motion.div 
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        className="w-full max-w-lg relative z-10"
+      >
+        <div className="glass-panel p-12 rounded-[3.5rem] border border-primary/5 shadow-2xl shadow-primary/5 space-y-10">
+          {/* Logo */}
+          <div className="flex flex-col items-center text-center space-y-4">
+            <div className="w-16 h-16 rounded-[1.5rem] glass border border-primary/10 flex items-center justify-center text-primary relative group">
+              <Sparkles size={32} className="aurora-glow group-hover:scale-110 transition-transform" />
             </div>
+            <div className="space-y-1">
+              <h1 className="text-3xl font-black text-aurora-on-surface tracking-tighter">Neural Recovery</h1>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/40">Access Restoration Protocol</p>
+            </div>
+          </div>
 
+          <AnimatePresence mode="wait">
             {!emailSent ? (
-              <>
-                {/* Heading */}
-                <div>
-                  <h2 className="text-3xl font-bold text-gray-900 mb-1">Forgot Password?</h2>
-                  <p className="text-gray-500 text-base mb-4">
-                    No worries! Enter your email address and we'll send you a link to reset your password.
+              <motion.div
+                key="form"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                className="space-y-8"
+              >
+                <div className="text-center space-y-2">
+                  <p className="text-sm font-medium text-aurora-on-surface-variant leading-relaxed px-4">
+                    Enter your registered neural link (email) to receive a cryptographic reset sequence.
                   </p>
                 </div>
 
-                {/* Reset Form */}
-                <form onSubmit={handleResetPassword} className="space-y-6">
-                  {/* Email Input */}
-                  <div>
-                    <label htmlFor="email" className="block text-gray-700 text-sm font-medium mb-1">
-                      Email Address
+                <form onSubmit={handleResetPassword} className="space-y-8">
+                  <div className="space-y-3">
+                    <label htmlFor="email" className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/40 ml-4">
+                      Neural Link (Email)
                     </label>
-                    <input
-                      id="email"
-                      type="email"
-                      placeholder="name@gmail.com"
-                      className="w-full px-4 py-2 rounded-md border border-gray-300 bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      autoComplete="email"
-                    />
+                    <div className="relative group">
+                      <Mail className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/30 group-focus-within:text-primary transition-colors" size={18} />
+                      <input
+                        id="email"
+                        type="email"
+                        placeholder="identity@matrix.io"
+                        className="input-aurora w-full pl-14 pr-6 py-4 text-sm font-bold"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        autoComplete="email"
+                      />
+                    </div>
                   </div>
 
-                  {/* Reset Button */}
                   <button
                     type="submit"
-                    className="w-full py-2 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-base transition-colors shadow-sm flex items-center justify-center gap-2"
+                    className="btn-aurora-primary w-full py-5 text-xs font-black uppercase tracking-[0.3em] shadow-xl shadow-primary/20 flex items-center justify-center gap-3 disabled:opacity-50 group"
                     disabled={isSending}
                   >
-                    <Mail size={18} />
-                    {isSending ? 'Sending Reset Email...' : 'Send Reset Email'}
+                    {isSending ? <RotateCw className="animate-spin" size={18} /> : <ShieldAlert size={18} className="group-hover:rotate-12 transition-transform" />}
+                    {isSending ? "Dispatching..." : "Dispatch Reset Sequence"}
                   </button>
                 </form>
 
-                {/* Back to Login */}
                 <div className="text-center">
                   <Link
                     to="/login"
-                    className="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-700 font-medium"
+                    className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary/60 hover:text-primary transition-colors group"
                   >
-                    <ArrowLeft size={16} />
-                    Back to Login
+                    <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+                    Return to Login
                   </Link>
                 </div>
-              </>
+              </motion.div>
             ) : (
-              <>
-                {/* Success State */}
-                <div className="text-center space-y-6">
-                  <div className="flex justify-center">
-                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-                      <CheckCircle size={32} className="text-green-600" />
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Check Your Email</h2>
-                    <p className="text-gray-500 text-base">
-                      We've sent a password reset link to <strong>{email}</strong>
-                    </p>
-                  </div>
-
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <p className="text-sm text-blue-800">
-                      <strong>Didn't receive the email?</strong> Check your spam folder or try again with a different email address.
-                    </p>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="space-y-3">
-                    <button
-                      onClick={() => {
-                        setEmailSent(false);
-                        setEmail("");
-                      }}
-                      className="w-full py-2 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-base transition-colors shadow-sm"
-                    >
-                      Send Another Email
-                    </button>
-                    
-                    <Link
-                      to="/login"
-                      className="block w-full py-2 rounded-md border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 font-semibold text-base transition-colors shadow-sm text-center"
-                    >
-                      Back to Login
-                    </Link>
+              <motion.div
+                key="success"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-center space-y-8"
+              >
+                <div className="flex justify-center">
+                  <div className="w-20 h-20 rounded-[2rem] glass border border-success/20 flex items-center justify-center text-success relative">
+                    <CheckCircle size={40} className="aurora-glow" />
                   </div>
                 </div>
-              </>
+                
+                <div className="space-y-3">
+                  <h2 className="text-2xl font-black text-aurora-on-surface tracking-tight">Sequence Dispatched</h2>
+                  <p className="text-sm font-medium text-aurora-on-surface-variant leading-relaxed">
+                    Check your neural inbox. We've sent a cryptographic link to <strong className="text-primary">{email}</strong>
+                  </p>
+                </div>
+
+                <div className="glass p-6 rounded-[2rem] border border-primary/5 bg-primary/5 text-center space-y-2">
+                   <p className="text-[10px] font-black uppercase tracking-widest text-primary/60">No transmission detected?</p>
+                   <p className="text-[9px] font-bold text-aurora-on-surface-variant/40 leading-relaxed uppercase">Check junk sectors or re-establish sync below.</p>
+                </div>
+
+                <div className="space-y-4">
+                  <button
+                    onClick={() => {
+                      setEmailSent(false);
+                      setEmail("");
+                    }}
+                    className="btn-aurora-primary w-full py-4 text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-primary/10"
+                  >
+                    Resync Transmission
+                  </button>
+                  
+                  <Link
+                    to="/login"
+                    className="block w-full py-4 rounded-[1.5rem] glass border border-primary/10 text-[10px] font-black uppercase tracking-[0.2em] text-aurora-on-surface hover:bg-white/40 transition-all text-center"
+                  >
+                    Back to Matrix
+                  </Link>
+                </div>
+              </motion.div>
             )}
-          </div>
+          </AnimatePresence>
         </div>
-      </div>
+
+        {/* Footer Credit */}
+        <div className="mt-8 text-center">
+           <p className="text-[9px] font-black uppercase tracking-[0.5em] text-primary/30">AuraOne Recovery Interface</p>
+        </div>
+      </motion.div>
     </div>
   );
 };
 
-export default ForgotPassword; 
+export default ForgotPassword;
