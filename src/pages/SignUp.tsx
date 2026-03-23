@@ -4,15 +4,11 @@ import { useNavigate, Link, useLocation } from "react-router-dom";
 import {
     Eye,
     EyeOff,
-    CheckCircle,
-    Calendar,
-    MessageSquare,
-    FileText,
     Sparkles,
-    Shield,
     ArrowRight,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { motion } from "framer-motion";
 
 const SignUp = () => {
     const navigate = useNavigate();
@@ -81,472 +77,202 @@ const SignUp = () => {
         }
     };
 
-    return (
-        <div
-            className="signup min-h-screen bg-white"
-            style={{ scrollBehavior: "smooth" }}
-        >
-            {/* Navigation */}
-            <nav
-                className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled
-                        ? "bg-white/30 backdrop-blur-xl border-white/40 shadow-lg shadow-black/10"
-                        : "bg-white/20 backdrop-blur-xl border-white/30 shadow-lg shadow-black/5"
-                    }`}
-            >
-                <div className="container mx-auto px-4 py-1">
-                    <div className="flex items-center justify-between">
-                        <Link
-                            to="/"
-                            className="flex items-center space-x-2 hover:opacity-80 transition-opacity cursor-pointer"
-                        >
-                            <div className="w-4 h-4 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
-                                <Sparkles className="w-2 h-2 text-white" />
-                            </div>
-                            <span className="text-xl font-bold text-gray-900">AuraOne</span>
-                        </Link>
+  return (
+    <div className="signup min-h-screen text-aurora-on-surface" style={{ scrollBehavior: "smooth" }}>
+      {/* Background Animated Gradient Mesh */}
+      <div className="aurora-mesh fixed inset-0 z-[-1]" aria-hidden="true" />
 
-                        <div className="flex items-center space-x-4">
-                            <Link
-                                to="/login"
-                                className="text-black hover:text-indigo-600 transition-colors font-medium text-lg"
-                            >
-                                Sign In
-                            </Link>
-                            <Link
-                                to="/"
-                                className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-2 py-1 rounded-md font-medium hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-md text-lg"
-                            >
-                                Back to Home
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-            </nav>
-
-            {/* Hero Section with Form */}
-            <section className="pt-20 pb-16 bg-gradient-to-br from-indigo-50 via-white to-purple-50 mt-0">
-                <div className="container mx-auto px-4">
-                    <div className="max-w-8xl mx-auto">
-                        <div className="grid lg:grid-cols-5 gap-8 items-center">
-                            {/* Left Content */}
-                            <div className="space-y-4 lg:col-span-2">
-                                <div className="space-y-4 mt-2">
-                                    <h1 className="text-3xl lg:text-6xl font-bold text-gray-900 leading-tight">
-                                        Join AuraOne
-                                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 block">
-                                            Start Your Journey
-                                        </span>
-                                    </h1>
-                                    <p className="text-xl text-gray-600 leading-relaxed max-w-2xl">
-                                        Transform your workflow with AuraOne - the intelligent
-                                        productivity platform that combines tasks, notes, calendar,
-                                        and AI assistance in one beautiful interface.
-                                    </p>
-                                </div>
-
-                                {/* Stats */}
-                                <div className="grid grid-cols-3 gap-5 pt-0">
-                                    <div className="text-center bg-white/20 backdrop-blur-sm rounded-xl p-4 border border-white/30">
-                                        <div className="text-3xl font-bold text-indigo-600">
-                                            10+
-                                        </div>
-                                        <div className="text-black font-medium text-sm">
-                                            Active Users
-                                        </div>
-                                    </div>
-                                    <div className="text-center bg-white/20 backdrop-blur-sm rounded-xl p-4 border border-white/30">
-                                        <div className="text-3xl font-bold text-indigo-600">
-                                            100%
-                                        </div>
-                                        <div className="text-black font-medium text-sm">Free</div>
-                                    </div>
-                                    <div className="text-center bg-white/20 backdrop-blur-sm rounded-xl p-4 border border-white/30">
-                                        <div className="text-3xl font-bold text-indigo-600">
-                                            ★★★★
-                                        </div>
-                                        <div className="text-black font-medium text-sm">
-                                            User Rating
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Right Content - Form */}
-                            <div className="lg:col-span-3">
-                                <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-5 shadow-xl border border-white/30">
-                                    <form
-                                        onSubmit={handleSignUp}
-                                        className="max-w-2xl mx-auto space-y-4"
-                                        autoComplete="off"
-                                    >
-                                        {/* Enhanced Heading */}
-                                        <div className="text-center mb-8">
-                                            <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                                                Make yourself comfortable with AuraOne
-                                            </h2>
-                                            <p className="text-gray-600 text-base">
-                                                Join the productivity revolution and get organized
-                                                instantly.
-                                            </p>
-                                        </div>
-
-                                        {/* Display error */}
-                                        {error && (
-                                            <p className="text-red-500 text-sm text-center bg-red-50 p-3 rounded-lg">
-                                                {error}
-                                            </p>
-                                        )}
-
-                                        {/* Name Input */}
-                                        <div>
-                                            <label
-                                                htmlFor="name"
-                                                className="block text-gray-700 text-md font-medium mb-1"
-                                            >
-                                                Name
-                                            </label>
-                                            <input
-                                                id="name"
-                                                type="text"
-                                                placeholder="Your name"
-                                                className="w-full px-2 py-2 rounded-lg border border-gray-300 bg-white/50 backdrop-blur-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
-                                                value={name}
-                                                onChange={(e) => setName(e.target.value)}
-                                                required
-                                            />
-                                        </div>
-
-                                        {/* Email Input */}
-                                        <div>
-                                            <label
-                                                htmlFor="email"
-                                                className="block text-gray-700 text-md font-medium mb-1"
-                                            >
-                                                Email
-                                            </label>
-                                            <input
-                                                id="email"
-                                                type="email"
-                                                placeholder="name@gmail.com"
-                                                className="w-full px-2 py-2 rounded-lg border border-gray-300 bg-white/50 backdrop-blur-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
-                                                value={email}
-                                                onChange={(e) => setEmail(e.target.value)}
-                                                required
-                                                autoComplete="username"
-                                            />
-                                        </div>
-
-                                        {/* Password Input */}
-                                        <div>
-                                            <label
-                                                htmlFor="password"
-                                                className="block text-gray-700 text-md font-medium mb-1"
-                                            >
-                                                Password
-                                            </label>
-                                            <div className="relative">
-                                                <input
-                                                    id="password"
-                                                    type={showPassword ? "text" : "password"}
-                                                    placeholder="********"
-                                                    className="w-full px-2 py-2 rounded-lg border border-gray-300 bg-white/50 backdrop-blur-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
-                                                    value={password}
-                                                    onChange={(e) => setPassword(e.target.value)}
-                                                    required
-                                                    autoComplete="new-password"
-                                                />
-                                                <button
-                                                    type="button"
-                                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-                                                    onClick={() => setShowPassword((prev) => !prev)}
-                                                    tabIndex={-1}
-                                                    aria-label={
-                                                        showPassword ? "Hide password" : "Show password"
-                                                    }
-                                                >
-                                                    {showPassword ? (
-                                                        <EyeOff size={18} />
-                                                    ) : (
-                                                        <Eye size={18} />
-                                                    )}
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        {/* Enhanced Sign Up Button */}
-                                        <button
-                                            type="submit"
-                                            className={`w-full py-2 px-2 rounded-lg font-semibold text-base transition-all duration-200 shadow-lg transform flex items-center justify-center group ${isSigningUp
-                                                    ? "bg-gray-400 cursor-not-allowed shadow-md"
-                                                    : "bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 hover:shadow-xl hover:-translate-y-0.5"
-                                                } text-white`}
-                                            disabled={isSigningUp}
-                                        >
-                                            {isSigningUp ? (
-                                                <div className="flex items-center justify-center gap-2">
-                                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                                    Creating Your Account...
-                                                </div>
-                                            ) : (
-                                                <>
-                                                    Start Your Free Journey
-                                                    <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                                                </>
-                                            )}
-                                        </button>
-
-                                        {/* Security Note */}
-                                        <p className="text-xs text-center text-gray-500">
-                                            🔒 Your data is encrypted and secure. We never share your
-                                            information.
-                                        </p>
-
-                                        {/* Existing User? */}
-                                        <p className="text-lg text-center text-gray-500 mt-4">
-                                            Already a part of Aura?{" "}
-                                            <Link
-                                                to="/login?scroll=form"
-                                                className="text-indigo-600 font-semibold hover:underline"
-                                            >
-                                                Login here
-                                            </Link>
-                                        </p>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Feature Highlights Section */}
-            <section className="py-20 bg-white">
-                <div className="container mx-auto px-4">
-                    <div className="text-center mb-12">
-                        <h2 className="text-4xl lg:text-6xl font-bold text-gray-900 mb-6">
-                            Everything You Need to Stay
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
-                                {" "}
-                                Productive
-                            </span>
-                        </h2>
-                        <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                            AuraOne combines all your essential productivity tools in one
-                            intelligent, beautiful interface designed for modern workflows.
-                        </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {[
-                            {
-                                icon: <Calendar className="w-6 h-6 text-indigo-600" />,
-                                title: "Smart Calendar",
-                                description:
-                                    "Organize your schedule with intelligent event management and smart reminders.",
-                                gradient: "from-indigo-50 to-purple-50",
-                                iconBg: "bg-indigo-100",
-                            },
-                            {
-                                icon: <CheckCircle className="w-6 h-6 text-green-600" />,
-                                title: "Task Management",
-                                description:
-                                    "Track and complete tasks with priority levels, deadlines, and progress tracking.",
-                                gradient: "from-green-50 to-emerald-50",
-                                iconBg: "bg-green-100",
-                            },
-                            {
-                                icon: <FileText className="w-6 h-6 text-blue-600" />,
-                                title: "Rich Notes",
-                                description:
-                                    "Create, organize, and search through your notes with powerful rich text editing.",
-                                gradient: "from-blue-50 to-cyan-50",
-                                iconBg: "bg-blue-100",
-                            },
-                            {
-                                icon: <MessageSquare className="w-6 h-6 text-purple-600" />,
-                                title: "AI Assistant",
-                                description:
-                                    "Get intelligent help and insights from our advanced AI-powered chat assistant.",
-                                gradient: "from-purple-50 to-pink-50",
-                                iconBg: "bg-purple-100",
-                            },
-                            {
-                                icon: <Sparkles className="w-6 h-6 text-yellow-600" />,
-                                title: "Smart Widgets",
-                                description:
-                                    "Weather, news, and productivity widgets at your fingertips.",
-                                gradient: "from-yellow-50 to-orange-50",
-                                iconBg: "bg-yellow-100",
-                            },
-                            {
-                                icon: <Shield className="w-6 h-6 text-red-600" />,
-                                title: "Secure & Private",
-                                description:
-                                    "Your data is encrypted and protected with enterprise-grade security measures.",
-                                gradient: "from-red-50 to-rose-50",
-                                iconBg: "bg-red-100",
-                            },
-                        ].map((feature, index) => (
-                            <div
-                                key={index}
-                                className={`p-6 rounded-xl bg-gradient-to-br ${feature.gradient} shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group backdrop-blur-sm border border-white/20`}
-                            >
-                                <div
-                                    className={`w-12 h-12 ${feature.iconBg} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}
-                                >
-                                    {feature.icon}
-                                </div>
-                                <h3 className="text-lg font-bold text-gray-900 mb-3">
-                                    {feature.title}
-                                </h3>
-                                <p className="text-gray-600 leading-relaxed text-md">
-                                    {feature.description}
-                                </p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* Features Showcase Section */}
-            <div className="bg-gray-50 py-16">
-                <div className="container mx-auto px-4">
-                    <div className="text-center mb-12">
-                        <h2 className="text-5xl font-bold text-gray-900 mb-4">
-                            Built for Modern Productivity
-                        </h2>
-                        <p className="text-lg text-gray-600">
-                            A comprehensive dashboard that brings together all your essential
-                            tools
-                        </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-                        <div className="text-center">
-                            <div className="text-5xl font-bold text-indigo-600 mb-2">5+</div>
-                            <div className="text-gray-600">Core Features</div>
-                        </div>
-                        <div className="text-center">
-                            <div className="text-5xl font-bold text-indigo-600 mb-2">
-                                100%
-                            </div>
-                            <div className="text-gray-600">Free & Open Source</div>
-                        </div>
-                        <div className="text-center">
-                            <div className="text-5xl font-bold text-indigo-600 mb-2">
-                                Instant
-                            </div>
-                            <div className="text-gray-600">Smart Productivity Tools</div>
-                        </div>
-
-                    </div>
-                </div>
+      {/* Navigation */}
+      <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${isScrolled ? 'glass py-3 border-b border-primary/5' : 'bg-transparent py-6'}`}>
+        <div className="max-w-[1440px] mx-auto px-6 flex items-center justify-between">
+          <Link
+            to="/"
+            className="flex items-center space-x-3 hover:opacity-80 transition-opacity cursor-pointer group"
+          >
+            <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform">
+              <Sparkles className="w-5 h-5 text-white" />
             </div>
+            <span className="text-2xl font-black tracking-tighter text-aurora-on-surface">AuraOne</span>
+          </Link>
 
-            {/* Final CTA Section */}
-            <section className="py-20 bg-gradient-to-r from-indigo-600 to-purple-600">
-                <div className="container mx-auto px-4 text-center">
-                    <div className="max-w-6xl mx-auto">
-                        <h2 className="text-4xl lg:text-6xl font-bold text-white mb-6">
-                            Ready to Transform Your Productivity?
-                        </h2>
-                        <p className="text-xl text-indigo-100 mb-12 leading-relaxed">
-                            Join thousands of users who have already revolutionized their
-                            workflow with AuraOne. Start your free journey today and
-                            experience the future of productivity.
-                        </p>
-
-                        <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-                            <button
-                                onClick={scrollToSignUpForm}
-                                className="bg-white text-indigo-600 px-8 py-3 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-all duration-200 transform hover:scale-105 shadow-2xl flex items-center group"
-                            >
-                                Get Started Free
-                                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                            </button>
-                            <Link
-                                to="/login?scroll=form"
-                                className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold text-lg hover:bg-white hover:text-indigo-600 transition-all duration-200 transform hover:scale-105 shadow-2xl"
-                            >
-                                Sign In
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Footer */}
-            <footer className="bg-gray-900 text-white py-12">
-                <div className="container mx-auto px-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <div className="space-y-4">
-                            <div className="flex items-center space-x-2">
-                                <div className="w-8 h-8 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
-                                    <Sparkles className="w-5 h-5 text-white" />
-                                </div>
-                                <span className="text-xl font-bold">AuraOne</span>
-                            </div>
-                            <p className="text-gray-400">
-                                Your all-in-one productivity hub for the modern digital workspace.
-                            </p>
-                            <div className="flex items-center space-x-1 text-sm text-gray-400">
-                                <span className="flex items-center space-x-1">
-                                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                                    <span>Beta Version</span>
-                                </span>
-                                <span>-</span>
-                                <span>Free</span>
-                            </div>
-                        </div>
-
-                        <div>
-                            <h4 className="font-semibold mb-4">Quick Links</h4>
-                            <ul className="space-y-2 text-gray-400">
-                                <li><Link to="/" className="hover:text-white transition-colors">Home</Link></li>
-                                <li><Link to="/login" className="hover:text-white transition-colors">Sign In</Link></li>
-                                <li><Link to="/signup" className="hover:text-white transition-colors">Get Started</Link></li>
-                                <li><a href="#features" className="hover:text-white transition-colors">Features</a></li>
-                            </ul>
-                        </div>
-
-                        <div>
-                            <h4 className="font-semibold mb-4">Get in Touch</h4>
-                            <ul className="space-y-2 text-gray-400">
-                                <li>
-                                    <a 
-                                        href="mailto:dhyan.work.2815@gmail.com" 
-                                        className="hover:text-white transition-colors"
-                                    >
-                                        dhyan.work.2815@gmail.com
-                                    </a>
-                                </li>
-                                <li>
-                                    <a 
-                                        href="https://dhyan-patel.onrender.com" 
-                                        target="_blank" 
-                                        rel="noopener noreferrer"
-                                        className="hover:text-white transition-colors"
-                                    >
-                                        Developer Portfolio
-                                    </a>
-                                </li>
-                                <li className="text-sm text-gray-500">
-                                    We're just getting started! 
-                                    <br />
-                                    Your feedback shapes our future.
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-                        <p>&copy; 2025 AuraOne. All rights reserved.</p>
-                        <p> Developed by Dhyan Patel </p>
-                    </div>
-                </div>
-            </footer>
+          <div className="flex items-center space-x-8">
+            <Link
+              to="/login"
+              className="text-sm font-bold text-aurora-on-surface-variant hover:text-primary transition-colors uppercase tracking-widest"
+            >
+              Sign In
+            </Link>
+            <Link
+              to="/"
+              className="btn-aurora-secondary px-8 py-3"
+            >
+              Back to Home
+            </Link>
+          </div>
         </div>
-    );
+      </nav>
+
+      {/* Main Content */}
+      <section className="pt-40 pb-32">
+        <div className="max-w-[1440px] mx-auto px-6">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* Left Content */}
+            <motion.div 
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              className="space-y-8"
+            >
+              <div className="space-y-4">
+                <p className="section-header">Initiate Expansion</p>
+                <h1 className="display-lg leading-tight bg-gradient-to-br from-primary via-secondary to-tertiary bg-clip-text text-transparent italic">
+                  Craft Your<br />
+                  <span className="not-italic text-aurora-on-surface font-extrabold">Next Paradigm.</span>
+                </h1>
+                <p className="text-xl text-aurora-on-surface-variant font-medium leading-relaxed max-w-xl">
+                  Step into the future of productivity. A workspace designed to adapt, illuminate, and empower your every thought.
+                </p>
+              </div>
+
+              {/* Benefits */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4">
+                {[
+                  { title: "Intelligent Design", desc: "Aesthetic meets function in harmony." },
+                  { title: "Universal Sync", desc: "Your data, everywhere, instantly." },
+                  { title: "AI Integration", desc: "Augmented cognition by default." },
+                  { title: "Privacy First", desc: "End-to-end encryption for your mind." },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-start space-x-3">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2" />
+                    <div>
+                      <p className="font-bold text-aurora-on-surface">{item.title}</p>
+                      <p className="text-sm text-aurora-on-surface-variant">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Right Content - Form */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              <div className="glass-panel p-10 rounded-[2.5rem] shadow-2xl relative">
+                <form onSubmit={handleSignUp} className="space-y-6" autoComplete="off">
+                  <div className="text-center mb-10 space-y-2">
+                    <h2 className="headline-sm text-3xl tracking-tighter">Create Sanctuary</h2>
+                    <p className="text-aurora-on-surface-variant font-medium">Join the frontier of productivity.</p>
+                  </div>
+
+                  {error && (
+                    <motion.p 
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="text-error text-sm font-bold text-center bg-error/10 p-4 rounded-2xl border border-error/10"
+                    >
+                      {error}
+                    </motion.p>
+                  )}
+
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <label htmlFor="name" className="section-header mb-0 ml-1">Guardian Name</label>
+                      <input
+                        id="name"
+                        type="text"
+                        placeholder="How shall we address you?"
+                        className="input-aurora"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label htmlFor="email" className="section-header mb-0 ml-1">Digital Identifier</label>
+                      <input
+                        id="email"
+                        type="email"
+                        placeholder="your@future.com"
+                        className="input-aurora"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label htmlFor="password" className="section-header mb-0 ml-1">Cryptographic Key</label>
+                      <div className="relative group">
+                        <input
+                          id="password"
+                          type={showPassword ? "text" : "password"}
+                          placeholder="••••••••"
+                          className="input-aurora pr-12"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          required
+                        />
+                        <button
+                          type="button"
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-primary/40 hover:text-primary transition-colors"
+                          onClick={() => setShowPassword((prev) => !prev)}
+                        >
+                          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isSigningUp}
+                    className="btn-aurora-primary w-full py-4 text-lg shadow-xl shadow-primary/20 mt-4 group"
+                  >
+                    {isSigningUp ? (
+                      <div className="flex items-center justify-center gap-3">
+                        <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin" />
+                        Establishing Core...
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center">
+                        Commence Journey
+                        <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    )}
+                  </button>
+
+                  <p className="text-center text-aurora-on-surface-variant font-medium mt-8">
+                    Already a visionary?{" "}
+                    <Link to="/login" className="text-primary font-bold hover:underline">Restore Session</Link>
+                  </p>
+                </form>
+
+                {/* Decorative Blur */}
+                <div className="absolute -top-10 -left-10 w-40 h-40 bg-primary/10 blur-[60px] -z-10 rounded-full" />
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Enhanced Footer */}
+      <footer className="py-20 border-t border-primary/5">
+        <div className="max-w-[1440px] mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center">
+              <Sparkles className="w-4 h-4 text-white" />
+            </div>
+            <span className="text-2xl font-black tracking-tighter">AuraOne</span>
+          </div>
+          <p className="text-xs font-black uppercase tracking-widest text-primary/40">&copy; 2026 AuraOne Registry. Developed by Dhyan Patel</p>
+        </div>
+      </footer>
+    </div>
+  );
 };
 
 export default SignUp;
+

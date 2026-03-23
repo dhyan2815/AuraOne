@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Calendar, CheckCircle, FileText, MessageSquare, Sparkles, Shield, ArrowRight, Clock, BarChart3, Smartphone, Lock, Heart, ChevronDown, Star, Users } from "lucide-react";
+import { Calendar, CheckCircle, FileText, MessageSquare, Sparkles, Shield, ArrowRight, ChevronDown, Star, BarChart3 } from "lucide-react";
+
+import { motion, AnimatePresence } from "framer-motion";
 import LandingPicture from "../assets/LandingImage.png";
-import LandingVideo from "../assets/LandingVideo2.mp4";
+
 
 const LandingPage = () => {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -78,452 +80,298 @@ const LandingPage = () => {
     };
 
     return (
-        <div className="landing-page min-h-screen bg-white" style={{ scrollBehavior: 'smooth' }}>
-            {/* Navigation */}
-            <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-white/30 backdrop-blur-xl border-white/40 shadow-lg shadow-black/10' : 'bg-white/20 backdrop-blur-xl border-white/30 shadow-lg shadow-black/5'}`}>
-                <div className="container mx-auto px-4 py-1">
-                    <div className="flex items-center justify-between">
-                        <button 
-                            onClick={scrollToTop}
-                            className="flex items-center space-x-2 hover:opacity-80 transition-opacity cursor-pointer"
-                        >
-                            <div className="w-4 h-4 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
-                                <Sparkles className="w-2 h-2 text-white" />
-                            </div>
-                            <span className="text-xl font-bold text-gray-900">AuraOne</span>
-                        </button>
+        <div className="landing-page min-h-screen text-aurora-on-surface" style={{ scrollBehavior: 'smooth' }}>
+            {/* Background Animated Gradient Mesh */}
+            <div className="aurora-mesh fixed inset-0 z-[-1]" aria-hidden="true" />
 
-                        <div className="flex items-center space-x-4">
-                            <Link
-                                to="/login"
-                                className="text-black hover:text-indigo-600 transition-colors font-medium text-lg"
-                            >
-                                Sign In
-                            </Link>
-                            <Link
-                                to="/signup"
-                                className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-2 py-1 rounded-md font-medium hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-md text-lg"
-                            >
-                                Get Started
-                            </Link>
+            {/* Navigation */}
+            <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${isScrolled ? 'glass py-3 border-b border-primary/5' : 'bg-transparent py-6'}`}>
+                <div className="max-w-[1440px] mx-auto px-6 flex items-center justify-between">
+                    <button 
+                        onClick={scrollToTop}
+                        className="flex items-center space-x-3 hover:opacity-80 transition-opacity cursor-pointer group"
+                    >
+                        <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform">
+                            <Sparkles className="w-5 h-5 text-white" />
                         </div>
+                        <span className="text-2xl font-black tracking-tighter text-aurora-on-surface">AuraOne</span>
+                    </button>
+
+                    <div className="flex items-center space-x-8">
+                        <Link
+                            to="/login"
+                            className="text-sm font-bold text-aurora-on-surface-variant hover:text-primary transition-colors uppercase tracking-widest"
+                        >
+                            Sign In
+                        </Link>
+                        <Link
+                            to="/signup"
+                            className="btn-aurora-primary px-8 py-3"
+                        >
+                            Get Started
+                        </Link>
                     </div>
                 </div>
             </nav>
 
             {/* Hero Section */}
-            <section className="pt-20 pb-16 bg-gradient-to-br from-indigo-50 via-white to-purple-50 mt-0">
-                <div className="container mx-auto px-4">
-                    <div className="max-w-7xl mx-auto">
-                        <div className="grid lg:grid-cols-5 gap-8 items-center">
-                            {/* Left Content */}
-                            <div className="space-y-4 lg:col-span-2">
-                                <div className="space-y-4 mt-2">
-                                    <h1 className="text-3xl lg:text-6xl font-bold text-gray-900 leading-tight">
-                                        Your All-in-One
-                                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 block">
-                                            Productivity Hub
-                                        </span>
-                                    </h1>
-                                    <p className="text-xl text-gray-600 leading-relaxed max-w-2xl">
-                                        Transform your workflow with AuraOne - the intelligent productivity platform that combines tasks, notes, calendar, and AI assistance in one beautiful interface.
-                                    </p>
-                                </div>
+            <section className="relative pt-48 pb-32 overflow-hidden">
+                <div className="max-w-[1440px] mx-auto px-6">
+                    <div className="grid lg:grid-cols-2 gap-16 items-center">
+                        <motion.div 
+                            initial={{ opacity: 0, x: -30 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.8 }}
+                            className="space-y-8"
+                        >
+                            <h1 className="display-lg leading-[1.1] bg-gradient-to-br from-primary via-secondary to-tertiary bg-clip-text text-transparent italic">
+                                Your Workspace,<br />
+                                <span className="not-italic text-aurora-on-surface font-extrabold">Redefined in Light.</span>
+                            </h1>
+                            <p className="text-xl text-aurora-on-surface-variant font-medium leading-relaxed max-w-xl">
+                                Experience productivity as a sanctuary. AuraOne harmonizes tasks, notes, and AI intelligence within a breathtaking luminous environment.
+                            </p>
 
-                                <div className="flex flex-col sm:flex-row gap-3">
-                                    <Link
-                                        to="/signup"
-                                        className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-2 rounded-lg font-semibold text-base hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-xl flex items-center justify-center group"
-                                    >
-                                        Start Free Journey
-                                        <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                                    </Link>
-                                    <button
-                                        onClick={scrollToFeatures}
-                                        className="border-2 border-indigo-600 text-indigo-600 px-6 py-2 rounded-lg font-semibold text-base hover:bg-indigo-600 hover:text-white transition-all duration-200 transform hover:scale-105 flex items-center justify-center group"
-                                    >
-                                        Explore Features
-                                        <ChevronDown className="ml-2 w-4 h-4 group-hover:translate-y-1 transition-transform" />
-                                    </button>
-                                </div>
-
-                                {/* Stats */}
-                                <div className="grid grid-cols-3 gap-5 pt-0">
-                                    <div className="text-center bg-white/20 backdrop-blur-sm rounded-xl p-4 border border-white/30">
-                                        <div className="text-3xl font-bold text-indigo-600">10+</div>
-                                        <div className="text-black font-medium text-sm">Active Users</div>
-                                    </div>
-                                    <div className="text-center bg-white/20 backdrop-blur-sm rounded-xl p-4 border border-white/30">
-                                        <div className="text-3xl font-bold text-indigo-600">89.99%</div>
-                                        <div className="text-black font-medium text-sm">Uptime</div>
-                                    </div>
-                                    <div className="text-center bg-white/20 backdrop-blur-sm rounded-xl p-4 border border-white/30">
-                                        <div className="text-3xl font-bold text-indigo-600">★★★★</div>
-                                        <div className="text-black font-medium text-sm">User Rating</div>
-                                    </div>
-                                </div>
+                            <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                                <Link
+                                    to="/signup"
+                                    className="btn-aurora-primary group text-lg"
+                                >
+                                    Start Your Flow
+                                    <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                </Link>
+                                <button
+                                    onClick={scrollToFeatures}
+                                    className="btn-aurora-secondary text-lg"
+                                >
+                                    Explore Sanctuaries
+                                    <ChevronDown className="ml-2 w-5 h-5 group-hover:translate-y-1 transition-transform" />
+                                </button>
                             </div>
 
-                            {/* Right Content - Hero Image */}
-                            <div className="relative lg:col-span-3">
-                                <div className="relative rounded-lg overflow-hidden shadow-2xl">
-                                    <img
-                                        src={LandingPicture}
-                                        alt="AuraOne Dashboard Preview"
-                                        className="w-full h-[500px] object-cover"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                            {/* Trust Stats */}
+                            <div className="flex items-center gap-12 pt-8">
+                                <div className="space-y-1">
+                                    <p className="text-3xl font-black text-primary">10k+</p>
+                                    <p className="section-header mb-0 text-[0.6rem]">Visionaries</p>
                                 </div>
-
-                                {/* Floating Cards */}
-                                <div className="absolute -top-4 -left-4 bg-white/20 backdrop-blur-md rounded-xl shadow-lg p-4 transform rotate-3 border border-white/30 animate-float-slow">
-                                    <div className="flex items-center space-x-2">
-                                        <div className="w-3 h-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full animate-pulse"></div>
-                                        <span className="text-md font-semibold text-gray-800">AI Assistant</span>
-                                    </div>
+                                <div className="w-px h-12 bg-primary/10" />
+                                <div className="space-y-1">
+                                    <p className="text-3xl font-black text-secondary">99.9%</p>
+                                    <p className="section-header mb-0 text-[0.6rem]">Uptime</p>
                                 </div>
-
-                                <div className="absolute -top-4 -right-4 bg-white/20 backdrop-blur-md rounded-xl shadow-lg p-4 transform rotate-3 border border-white/30 animate-float-slow">
-                                    <div className="flex items-center space-x-2">
-                                        <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full animate-spin"></div>
-                                        <span className="text-md font-semibold text-gray-800">Smart Sync</span>
-                                    </div>
+                                <div className="w-px h-12 bg-primary/10" />
+                                <div className="space-y-1">
+                                    <p className="text-3xl font-black text-tertiary">4.9/5</p>
+                                    <p className="section-header mb-0 text-[0.6rem]">Rating</p>
                                 </div>
-
-                                <div className="absolute -bottom-4 -left-4 bg-white/20 backdrop-blur-md rounded-xl shadow-lg p-4 transform rotate-3 border border-white/30 animate-float-slow">
-                                    <div className="flex items-center space-x-2">
-                                        <div className="w-3 h-3 bg-gradient-to-r from-orange-500 to-red-500 rounded-full animate-ping"></div>
-                                        <span className="text-md font-semibold text-gray-800">Live Data</span>
-                                    </div>
-                                </div>
-
-                                <div className="absolute -bottom-4 -right-4 bg-white/20 backdrop-blur-md rounded-xl shadow-lg p-4 transform -rotate-3 border border-white/30 animate-float-fast">
-                                    <div className="flex items-center space-x-2">
-                                        <div className="w-3 h-3 bg-gradient-to-r from-emerald-500 to-green-500 rounded-full animate-pulse"></div>
-                                        <span className="text-md font-semibold text-gray-800">Secure Auth</span>
-                                    </div>
-                                </div>
-                                
                             </div>
-                        </div>
+                        </motion.div>
+
+                        {/* Hero Visual */}
+                        <motion.div 
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 1, ease: "easeOut" }}
+                            className="relative"
+                        >
+                            <div className="glass-panel p-4 rounded-[2.5rem] shadow-2xl relative z-10">
+                                <img
+                                    src={LandingPicture}
+                                    alt="Luminous Interface"
+                                    className="w-full h-auto rounded-[2rem] shadow-inner"
+                                />
+                            </div>
+                            
+                            {/* Decorative Aurora Elements */}
+                            <div className="absolute -top-20 -right-20 w-80 h-80 bg-primary/10 blur-[100px] -z-10 rounded-full animate-aurora-float" />
+                            <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-secondary/10 blur-[100px] -z-10 rounded-full animate-aurora-float [animation-delay:2s]" />
+                        </motion.div>
                     </div>
                 </div>
             </section>
 
             {/* Features Section */}
-            <section id="features" className="py-20 bg-white">
-                <div className="container mx-auto px-4">
-                    <div className="text-center mb-12">
-                        <h2 className="text-4xl lg:text-6xl font-bold text-gray-900 mb-6">
-                            Everything You Need to Stay
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600"> Productive</span>
+            <section id="features" className="py-32 relative">
+                <div className="max-w-[1440px] mx-auto px-6">
+                    <div className="text-center mb-24 space-y-4">
+                        <p className="section-header">Sophisticated Capabilities</p>
+                        <h2 className="headline-sm text-4xl lg:text-6xl tracking-tighter bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                            Crafted for the Modern Mind.
                         </h2>
-                        <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                            AuraOne combines all your essential productivity tools in one intelligent, beautiful interface designed for modern workflows.
-                        </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {/* Feature Cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {[
                             {
-                                icon: <Calendar className="w-6 h-6 text-indigo-600" />,
-                                title: "Smart Calendar",
-                                description: "Organize your schedule with intelligent event management and smart reminders.",
-                                gradient: "from-indigo-50 to-purple-50",
-                                iconBg: "bg-indigo-100"
+                                icon: <Calendar className="w-6 h-6 text-primary" />,
+                                title: "Ethereal Calendar",
+                                description: "A weightless scheduling experience that brings clarity to your temporal flow.",
+                                gradient: "from-primary/5 to-transparent"
                             },
                             {
-                                icon: <CheckCircle className="w-6 h-6 text-green-600" />,
-                                title: "Task Management",
-                                description: "Track and complete tasks with priority levels, deadlines, and progress tracking.",
-                                gradient: "from-green-50 to-emerald-50",
-                                iconBg: "bg-green-100"
+                                icon: <CheckCircle className="w-6 h-6 text-secondary" />,
+                                title: "Fluid Tasks",
+                                description: "Prioritize with grace. Manage your output with intuitive focus systems.",
+                                gradient: "from-secondary/5 to-transparent"
                             },
                             {
-                                icon: <FileText className="w-6 h-6 text-blue-600" />,
-                                title: "Rich Notes",
-                                description: "Create, organize, and search through your notes with powerful rich text editing.",
-                                gradient: "from-blue-50 to-cyan-50",
-                                iconBg: "bg-blue-100"
+                                icon: <MessageSquare className="w-6 h-6 text-tertiary" />,
+                                title: "Aura Intelligence",
+                                description: "Advanced AI assistance that converses with you, not just for you.",
+                                gradient: "from-tertiary/5 to-transparent"
                             },
                             {
-                                icon: <MessageSquare className="w-6 h-6 text-purple-600" />,
-                                title: "AI Assistant",
-                                description: "Get intelligent help and insights from our advanced AI-powered chat assistant.",
-                                gradient: "from-purple-50 to-pink-50",
-                                iconBg: "bg-purple-100"
+                                icon: <FileText className="w-6 h-6 text-primary" />,
+                                title: "Rich Typography",
+                                description: "Note-taking that feels like editorial design. Every word deserves beauty.",
+                                gradient: "from-primary/5 to-transparent"
                             },
                             {
-                                icon: <BarChart3 className="w-6 h-6 text-yellow-600" />,
-                                title: "Analytics Dashboard",
-                                description: "Track your productivity patterns and get insights to optimize your workflow.",
-                                gradient: "from-yellow-50 to-orange-50",
-                                iconBg: "bg-yellow-100"
+                                icon: <BarChart3 className="w-6 h-6 text-secondary" />,
+                                title: "Deep Insights",
+                                description: "Visualize your cognitive patterns and optimize your peak productivity hours.",
+                                gradient: "from-secondary/5 to-transparent"
                             },
                             {
-                                icon: <Shield className="w-6 h-6 text-red-600" />,
-                                title: "Secure & Private",
-                                description: "Your data is encrypted and protected with enterprise-grade security measures.",
-                                gradient: "from-red-50 to-rose-50",
-                                iconBg: "bg-red-100"
+                                icon: <Shield className="w-6 h-6 text-tertiary" />,
+                                title: "Fortified Privacy",
+                                description: "Your sanctuary is protected by enterprise-grade encryption and ethical AI.",
+                                gradient: "from-tertiary/5 to-transparent"
                             }
                         ].map((feature, index) => (
-                            <div
+                            <motion.div
                                 key={index}
-                                className={`p-6 rounded-xl bg-gradient-to-br ${feature.gradient} shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group backdrop-blur-sm border border-white/20`}
+                                whileHover={{ y: -10 }}
+                                className={`glass-card bg-gradient-to-br ${feature.gradient} group cursor-default`}
                             >
-                                <div className={`w-12 h-12 ${feature.iconBg} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                                <div className="w-14 h-14 glass bg-white/60 rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-white/20 group-hover:scale-110 group-hover:bg-white transition-all">
                                     {feature.icon}
                                 </div>
-                                <h3 className="text-lg font-bold text-gray-900 mb-3">{feature.title}</h3>
-                                <p className="text-gray-600 leading-relaxed text-md">{feature.description}</p>
-                            </div>
+                                <h3 className="text-xl font-bold mb-4">{feature.title}</h3>
+                                <p className="text-aurora-on-surface-variant font-medium leading-relaxed">{feature.description}</p>
+                            </motion.div>
                         ))}
                     </div>
                 </div>
             </section>
 
-            {/* Testimonials Section */}
-            <section className="py-8 bg-gradient-to-br from-indigo-50 to-purple-50">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-5">
-                        <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
-                            What Our Users Say
-                        </h2>
-                        <p className="text-xl text-gray-600">
-                            Hear from real users who are transforming their productivity with AuraOne
-                        </p>
-                    </div>
-
-                    {/* Testimonial Card */}
-                    <div className="max-w-6xl mx-auto">
-                        <div className="bg-white rounded-2xl shadow-xl p-4 lg:p-8 text-center relative overflow-hidden">
-                            <div 
+            {/* Testimonials */}
+            <section className="py-32 glass bg-white/20 backdrop-blur-3xl overflow-hidden">
+                <div className="max-w-[1440px] mx-auto px-6 relative">
+                    <div className="max-w-4xl mx-auto text-center space-y-12">
+                        <AnimatePresence mode="wait">
+                            <motion.div
                                 key={currentTestimonial}
-                                className="transition-all duration-500 ease-in-out transform"
-                                style={{
-                                    opacity: 1,
-                                    transform: 'translateY(0)'
-                                }}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.95 }}
+                                transition={{ duration: 0.6 }}
+                                className="space-y-10"
                             >
-                                <div className="flex justify-center mb-6">
-                                    {[...Array(testimonials[currentTestimonial].rating)].map((_, i) => (
-                                        <Star key={i} className="w-6 h-6 text-yellow-400 fill-current transition-all duration-300" />
+                                <div className="flex justify-center gap-1">
+                                    {[...Array(5)].map((_, i) => (
+                                        <Star key={i} className={`w-5 h-5 ${i < testimonials[currentTestimonial].rating ? 'text-secondary fill-secondary' : 'text-primary/10'}`} />
                                     ))}
                                 </div>
-                                <blockquote className="text-xl lg:text-2xl text-gray-700 mb-8 leading-relaxed transition-all duration-500">
+                                <blockquote className="text-4xl lg:text-5xl font-black italic tracking-tighter leading-tight text-primary/80">
                                     "{testimonials[currentTestimonial].content}"
                                 </blockquote>
-                                <div className="flex items-center justify-center">
-                                    <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mr-4 transition-all duration-300">
-                                        <Users className="w-6 h-6 text-indigo-600" />
+                                <div className="flex items-center justify-center gap-4">
+                                    <div className="w-12 h-12 rounded-full glass flex items-center justify-center font-black text-secondary ring-4 ring-white shadow-xl">
+                                        {testimonials[currentTestimonial].name.charAt(0)}
                                     </div>
                                     <div className="text-left">
-                                        <div className="font-semibold text-gray-900 transition-all duration-500">
-                                            {testimonials[currentTestimonial].name}
-                                        </div>
-                                        <div className="text-gray-600 transition-all duration-500">
-                                            {testimonials[currentTestimonial].role}
-                                        </div>
+                                        <p className="font-bold text-lg">{testimonials[currentTestimonial].name}</p>
+                                        <p className="text-sm font-medium text-primary/50 uppercase tracking-[0.2em]">{testimonials[currentTestimonial].role}</p>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
+                            </motion.div>
+                        </AnimatePresence>
 
-                    {/* Testimonial indicators */}
-                    <div className="flex justify-center mt-8 space-x-2">
-                        {testimonials.map((_, index) => (
-                            <button
-                                key={index}
-                                onClick={() => setCurrentTestimonial(index)}
-                                className={`w-3 h-3 rounded-full transition-all duration-300 ease-in-out transform hover:scale-110 ${
-                                    index === currentTestimonial ? 'bg-indigo-600 scale-110' : 'bg-gray-300 hover:bg-indigo-400'
-                                }`}
-                            />
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* Video Showcase Section */}
-            <section id="tech" className="py-20 bg-gradient-to-br from-gray-50 via-white to-indigo-50">
-                <div className="container mx-auto px-4">
-                    <div className="text-center mb-16">
-                        <h2 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
-                            Experience
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600"> AuraOne in Action</span>
-                        </h2>
-                        <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                            See how AuraOne transforms your productivity with its intuitive interface and powerful features.
-                        </p>
-                    </div>
-
-                    <div className="max-w-7xl mx-auto">
-                        <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 items-center">
-                            {/* Video Section - Left Content */}
-                            <div className="relative lg:col-span-3">
-                                <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                                    <video
-                                        className="w-full h-auto max-h-[800px] object-cover rounded-2xl"
-                                        autoPlay
-                                        muted
-                                        loop
-                                        playsInline
-                                        poster={LandingPicture}
-                                        style={{ aspectRatio: '16/13' }}
-                                    >
-                                        <source src={LandingVideo} type="video/mp4" />
-                                        Your browser does not support the video tag.
-                                    </video>
-                                </div>
-                            </div>
-
-                            {/* Benefits List - Right Content */}
-                            <div className="space-y-5 lg:col-span-2">
-                                <h3 className="text-3xl font-bold text-gray-900 mb-8">Why Choose AuraOne?</h3>
-                                {[
-                                    {
-                                        icon: <Clock className="w-7 h-7 text-indigo-600" />,
-                                        title: "Lightning Fast",
-                                        description: "Built with Vite and optimized for performance, AuraOne loads instantly and responds quickly to every interaction."
-                                    },
-                                    {
-                                        icon: <Lock className="w-7 h-7 text-green-600" />,
-                                        title: "Enterprise Security",
-                                        description: "Your data is protected with Firebase's enterprise-grade security and end-to-end encryption."
-                                    },
-                                    {
-                                        icon: <Smartphone className="w-7 h-7 text-purple-600" />,
-                                        title: "Cross-Platform",
-                                        description: "Access AuraOne from any device - desktop, tablet, or mobile - with our responsive design."
-                                    },
-                                    {
-                                        icon: <Heart className="w-7 h-7 text-red-600" />,
-                                        title: "User-Centric Design",
-                                        description: "Every feature is designed with user experience in mind, making productivity enjoyable and intuitive."
-                                    }
-                                ].map((benefit, index) => (
-                                    <div key={index} className="flex items-start space-x-6 group">
-                                        <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-white/30 to-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-white/40 group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                                            {benefit.icon}
-                                        </div>
-                                        <div className="flex-1">
-                                            <h4 className="text-xl font-bold text-gray-900 mb-1 group-hover:text-indigo-600 transition-colors duration-300">{benefit.title}</h4>
-                                            <p className="text-gray-600 leading-relaxed text-lg">{benefit.description}</p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
+                        <div className="flex justify-center gap-2">
+                            {testimonials.map((_, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => setCurrentTestimonial(i)}
+                                    className={`h-1.5 transition-all duration-500 rounded-full ${i === currentTestimonial ? 'w-10 bg-secondary shadow-lg shadow-secondary/30' : 'w-4 bg-primary/10 hover:bg-primary/30'}`}
+                                />
+                            ))}
                         </div>
                     </div>
                 </div>
             </section>
 
             {/* CTA Section */}
-            <section className="py-20 bg-gradient-to-r from-indigo-600 to-purple-600">
-                <div className="container mx-auto px-4 text-center">
-                    <div className="max-w-6xl mx-auto">
-                        <h2 className="text-4xl lg:text-6xl font-bold text-white mb-6">
-                            Ready to Transform Your Productivity?
-                        </h2>
-                        <p className="text-xl text-indigo-100 mb-12 leading-relaxed">
-                            Join thousands of users who have already revolutionized their workflow with AuraOne.
-                            Start your free journey today and experience the future of productivity.
-                        </p>
-
-                        <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-                            <Link
-                                to="/signup"
-                                className="bg-white text-indigo-600 px-8 py-3 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-all duration-200 transform hover:scale-105 shadow-2xl flex items-center group"
-                            >
-                                Get Started Free
-                                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                            </Link>
-                            <Link
-                                to="/login"
-                                className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold text-lg hover:bg-white hover:text-indigo-600 transition-all duration-200 transform hover:scale-105 shadow-2xl"
-                            >
-                                Sign In
-                            </Link>
-                        </div>
+            <section className="py-40 relative">
+                <div className="max-w-4xl mx-auto px-6 text-center glass-panel p-20 rounded-[3rem] shadow-[0_50px_100px_-20px_rgba(73,83,188,0.2)]">
+                    <h2 className="display-lg mb-8 tracking-tighter">
+                        Join the <span className="text-secondary italic">Aura</span>.
+                    </h2>
+                    <p className="text-xl text-aurora-on-surface-variant font-medium mb-12 max-w-2xl mx-auto">
+                        Elevate your digital presence. Start your journey into the Luminous Workspace today.
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-6 justify-center">
+                        <Link
+                            to="/signup"
+                            className="btn-aurora-primary px-12 py-4 text-xl shadow-2xl shadow-primary/40"
+                        >
+                            Get Started Free
+                        </Link>
+                        <Link
+                            to="/login"
+                            className="btn-aurora-secondary px-12 py-4 text-xl"
+                        >
+                            Visionary Login
+                        </Link>
                     </div>
                 </div>
             </section>
 
             {/* Footer */}
-            <footer className="bg-gray-900 text-white py-12">
-                <div className="container mx-auto px-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <div className="space-y-4">
-                            <div className="flex items-center space-x-2">
-                                <div className="w-8 h-8 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
-                                    <Sparkles className="w-5 h-5 text-white" />
+            <footer className="py-20 border-t border-primary/5">
+                <div className="max-w-[1440px] mx-auto px-6">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+                        <div className="col-span-2 space-y-6">
+                            <div className="flex items-center space-x-3">
+                                <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center">
+                                    <Sparkles className="w-4 h-4 text-white" />
                                 </div>
-                                <span className="text-xl font-bold">AuraOne</span>
+                                <span className="text-2xl font-black tracking-tighter">AuraOne</span>
                             </div>
-                            <p className="text-gray-400">
-                                Your all-in-one productivity hub for the modern digital workspace.
+                            <p className="text-aurora-on-surface-variant max-w-sm font-medium leading-relaxed">
+                                Curating focus in a world of distraction. Built with love for the dreamers and the doers.
                             </p>
-                            <div className="flex items-center space-x-1 text-sm text-gray-400">
-                                <span className="flex items-center space-x-1">
-                                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                                    <span>Beta Version</span>
-                                </span>
-                                <span>-</span>
-                                <span>Free</span>
-                            </div>
                         </div>
 
-                        <div>
-                            <h4 className="font-semibold mb-4">Quick Links</h4>
-                            <ul className="space-y-2 text-gray-400">
-                                <li><button onClick={scrollToFeatures} className="hover:text-white transition-colors text-left">Features</button></li>
-                                <li><button onClick={scrollToTech} className="hover:text-white transition-colors text-left">Technology</button></li>
-                                <li><Link to="/login" className="hover:text-white transition-colors">Sign In</Link></li>
-                                <li><Link to="/signup" className="hover:text-white transition-colors">Get Started</Link></li>
+                        <div className="space-y-6">
+                            <p className="section-header">Sanctuary</p>
+                            <ul className="space-y-4 font-bold text-sm">
+                                <li><button onClick={scrollToFeatures} className="hover:text-primary transition-colors">Experience</button></li>
+                                <li><Link to="/login" className="hover:text-primary transition-colors">Join Us</Link></li>
+                                <li><a href="https://dhyan-patel.onrender.com" target="_blank" className="hover:text-primary transition-colors">Developer</a></li>
                             </ul>
                         </div>
 
-                        <div>
-                            <h4 className="font-semibold mb-4">Get in Touch</h4>
-                            <ul className="space-y-2 text-gray-400">
-                                <li>
-                                    <a 
-                                        href="mailto:dhyan.work.2815@gmail.com" 
-                                        className="hover:text-white transition-colors"
-                                    >
-                                        dhyan.work.2815@gmail.com
-                                    </a>
-                                </li>
-                                <li>
-                                    <a 
-                                        href="https://dhyan-patel.onrender.com" 
-                                        target="_blank" 
-                                        rel="noopener noreferrer"
-                                        className="hover:text-white transition-colors"
-                                    >
-                                        Developer Portfolio
-                                    </a>
-                                </li>
-                                <li className="text-sm text-gray-500">
-                                    We're just getting started! 
-                                    <br />
-                                    Your feedback shapes our future.
-                                </li>
+                        <div className="space-y-6">
+                            <p className="section-header">Philosophy</p>
+                            <ul className="space-y-4 font-bold text-sm">
+                                <li><span className="text-primary/40">Beta Phase</span></li>
+                                <li><span className="text-secondary/40">Design First</span></li>
+                                <li><span className="text-tertiary/40">Privacy Centric</span></li>
                             </ul>
                         </div>
                     </div>
 
-                    <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-                        <p>&copy; 2025 AuraOne. All rights reserved.</p>
-                        <p> Developed by Dhyan Patel </p>
+                    <div className="pt-8 border-t border-primary/5 flex flex-col md:flex-row justify-between items-center gap-4">
+                        <p className="text-xs font-black uppercase tracking-widest text-primary/40">&copy; 2026 AuraOne Registry. All rights reserved.</p>
+                        <p className="text-xs font-black uppercase tracking-widest text-secondary/40">Designed by Dhyan Patel</p>
                     </div>
                 </div>
             </footer>
         </div>
     );
+
 };
 
 export default LandingPage;

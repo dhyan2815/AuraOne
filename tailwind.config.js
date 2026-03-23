@@ -7,86 +7,53 @@ export default {
   theme: {
     extend: {
       colors: {
-        darkblue: '#00008B',
+        // Aurora Glass Color Palette
         primary: {
-          50: '#eef2ff',
-          100: '#e0e7ff',
-          200: '#c7d2fe',
-          300: '#a5b4fc',
-          400: '#818cf8',
-          500: '#6366f1',
-          600: '#4f46e5',
-          700: '#4338ca',
-          800: '#3730a3',
-          900: '#312e81',
-          950: '#1e1b4b',
+          DEFAULT: '#4953bc',
+          container: '#818cf8',
+          fixed: '#e0e0ff',
+          dim: '#bdc2ff',
         },
-        accent: {
-          50: '#f0fdfa',
-          100: '#ccfbf1',
-          200: '#99f6e4',
-          300: '#5eead4',
-          400: '#2dd4bf',
-          500: '#14b8a6',
-          600: '#0d9488',
-          700: '#0f766e',
-          800: '#115e59',
-          900: '#134e4a',
-          950: '#042f2e',
+        secondary: {
+          DEFAULT: '#674bb5',
+          container: '#ab8ffe',
+          fixed: '#e8ddff',
+          dim: '#cebdff',
         },
-        success: {
-          50: '#ecfdf5',
-          100: '#d1fae5',
-          200: '#a7f3d0',
-          300: '#6ee7b7',
-          400: '#34d399',
-          500: '#10b981',
-          600: '#059669',
-          700: '#047857',
-          800: '#065f46',
-          900: '#064e3b',
-          950: '#022c22',
+        tertiary: {
+          DEFAULT: '#a43073',
+          container: '#e869ac',
+          fixed: '#ffd8e7',
+          dim: '#ffafd3',
         },
-        warning: {
-          50: '#fffbeb',
-          100: '#fef3c7',
-          200: '#fde68a',
-          300: '#fcd34d',
-          400: '#fbbf24',
-          500: '#f59e0b',
-          600: '#d97706',
-          700: '#b45309',
-          800: '#92400e',
-          900: '#78350f',
-          950: '#451a03',
+        aurora: {
+          bg: '#faf8fd',
+          surface: '#faf8fd',
+          'surface-low': '#f5f3f8',
+          'surface-high': '#e9e7ec',
+          'surface-highest': '#e3e2e7',
+          'surface-lowest': '#ffffff',
+          'on-surface': '#1b1b1f',
+          'on-surface-variant': '#454653',
         },
         error: {
-          50: '#fef2f2',
-          100: '#fee2e2',
-          200: '#fecaca',
-          300: '#fca5a5',
-          400: '#f87171',
-          500: '#ef4444',
-          600: '#dc2626',
-          700: '#b91c1c',
-          800: '#991b1b',
-          900: '#7f1d1d',
-          950: '#450a0a',
+          DEFAULT: '#ba1a1a',
+          container: '#ffdad6',
         },
-        background: {
-          light: '#ffffff',
-          dark: '#0f172a',
+        success: {
+          DEFAULT: '#10b981',
+          container: '#d1fae5',
         },
-        surface: {
-          light: '#f8fafc',
-          dark: '#1e293b',
+        warning: {
+          DEFAULT: '#f59e0b',
+          container: '#fef3c7',
         },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
       },
       spacing: {
-        '0.5': '4px', // 0.5 * 8px
+        '0.5': '4px',
         '1': '8px',
         '1.5': '12px',
         '2': '16px',
@@ -100,14 +67,25 @@ export default {
         '12': '96px',
         '16': '128px',
       },
+      borderRadius: {
+        none: '0',
+        sm: '0.125rem',
+        DEFAULT: '0.25rem',
+        md: '0.375rem',
+        lg: '1rem', // Aurora Glass 'lg'
+        xl: '1.5rem', // Aurora Glass 'xl'
+        '2xl': '2rem',
+        '3xl': '3rem',
+        full: '9999px',
+      },
+      boxShadow: {
+        'aurora-glow': '0 0 30px rgba(73, 83, 188, 0.08)',
+        'aurora-glow-lg': '0 0 50px rgba(73, 83, 188, 0.12)',
+      },
       animation: {
-        'fade-in': 'fadeIn 0.3s ease-in-out',
-        'slide-up': 'slideUp 0.3s ease-out',
-        'slide-down': 'slideDown 0.3s ease-out',
-        'slide-left': 'slideLeft 0.3s ease-out',
-        'slide-right': 'slideRight 0.3s ease-out',
-        'scale-in': 'scaleIn 0.3s ease-out',
-        'scale-out': 'scaleOut 0.3s ease-out',
+        'fade-in': 'fadeIn 0.5s ease-in-out',
+        'slide-up': 'slideUp 0.4s ease-out',
+        'aurora-float': 'auroraFloat 10s ease-in-out infinite',
       },
       keyframes: {
         fadeIn: {
@@ -115,42 +93,16 @@ export default {
           '100%': { opacity: '1' },
         },
         slideUp: {
-          '0%': { transform: 'translateY(10px)', opacity: '0' },
+          '0%': { transform: 'translateY(20px)', opacity: '0' },
           '100%': { transform: 'translateY(0)', opacity: '1' },
         },
-        slideDown: {
-          '0%': { transform: 'translateY(-10px)', opacity: '0' },
-          '100%': { transform: 'translateY(0)', opacity: '1' },
-        },
-        slideLeft: {
-          '0%': { transform: 'translateX(10px)', opacity: '0' },
-          '100%': { transform: 'translateX(0)', opacity: '1' },
-        },
-        slideRight: {
-          '0%': { transform: 'translateX(-10px)', opacity: '0' },
-          '100%': { transform: 'translateX(0)', opacity: '1' },
-        },
-        scaleIn: {
-          '0%': { transform: 'scale(0.95)', opacity: '0' },
-          '100%': { transform: 'scale(1)', opacity: '1' },
-        },
-        scaleOut: {
-          '0%': { transform: 'scale(1.05)', opacity: '0' },
-          '100%': { transform: 'scale(1)', opacity: '1' },
-        },
+        auroraFloat: {
+          '0%, 100%': { transform: 'translate(0, 0) scale(1)' },
+          '33%': { transform: 'translate(2%, 4%) scale(1.05)' },
+          '66%': { transform: 'translate(-1%, -2%) scale(0.98)' },
+        }
       },
-      boxShadow: {
-        'card': '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
-        'card-hover': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-        'dropdown': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-        'modal': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-      },
-      borderRadius: {
-        'card': '0.75rem', // 12px
-        'button': '0.5rem', // 8px
-        'input': '0.375rem', // 6px
-      }
     },
   },
   plugins: [animate]
-};
+};

@@ -7,10 +7,11 @@ import {
   Clock,
   Save,
   Trash2,
-  Star,
-  Pin,
   CheckCircle,
   Flag,
+  Sparkles,
+  RotateCw,
+  AlertCircle
 } from "lucide-react";
 import { format } from "date-fns";
 import {
@@ -18,37 +19,25 @@ import {
   updateTask,
   deleteTask,
   getTaskById,
+  NewTask
 } from "../hooks/useTasks";
 import { useAuth } from "../hooks/useAuth";
-
-interface Task {
-  id: string;
-  title: string;
-  description: string;
-  dueDate?: string;
-  dueTime?: string;
-  completed: "completed" | "due";
-  priority: "low" | "medium" | "high";
-  createdAt?: string;
-  pinned?: boolean;
-  starred?: boolean;
-}
+import { motion, AnimatePresence } from "framer-motion";
 
 const TaskPage = () => {
-  const [task, setTask] = useState<Task | null>(null);
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
+
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [dueDate, setDueDate] = useState<string>("");
   const [dueTime, setDueTime] = useState<string>("");
   const [priority, setPriority] = useState<"low" | "medium" | "high">("medium");
-
-  const [starred, setStarred] = useState(false);
-  const [pinned, setPinned] = useState(false);
+  const [completed, setCompleted] = useState(false);
   const [loading, setLoading] = useState(true);
-
-  const { user } = useAuth();
+  const [isSaving, setIsSaving] = useState(false);
+  const [createdAt, setCreatedAt] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     const fetchTask = async () => {
@@ -59,42 +48,34 @@ const TaskPage = () => {
 
       try {
         if (id === "new") {
-                     const newTask: Task = {
-             id: "new",
-             title: "Untitled Task",
-             description: "",
-             dueDate: "",
-             dueTime: "",
-             priority: "medium",
-             completed: "due",
-             createdAt: new Date().toISOString(),
-             pinned: false,
-             starred: false,
-           };
-           setTask(newTask);
-           setTitle(newTask.title);
-           setDescription(newTask.description);
-           setDueDate(newTask.dueDate || "");
-           setDueTime(newTask.dueTime || "");
-           setPriority(newTask.priority);
-           setPinned(false);
-           setStarred(false);
-                   } else if (id) {
-             const foundTask = await getTaskById(user.uid, id);
-             if (foundTask) {
-               const typedTask = foundTask as Task;
-               setTask(typedTask);
-               setTitle(typedTask.title);
-               setDescription(typedTask.description);
-               setDueDate(typedTask.dueDate || "");
-               setDueTime(typedTask.dueTime || "");
-               setPriority(typedTask.priority);
-               setPinned(typedTask.pinned || false);
-               setStarred(typedTask.starred || false);
-             } else {
-               navigate("/tasks");
-             }
-           }
+          setTitle("Initialize Protocol");
+          setDescription("");
+          setDueDate("");
+          setDueTime("");
+          setPriority("medium");
+          setCompleted(false);
+          setCreatedAt(new Date().toISOString());
+        } else if (id) {
+          const foundTask = await getTaskById(id);
+          if (foundTask) {
+            setTitle(foundTask.title);
+            setDescription(foundTask.description || "");
+            if (foundTask.due_date) {
+              const dateObj = new Date(foundTask.due_date);
+              setDueDate(format(dateObj, 'yyyy-MM-dd'));
+              setDueTime(format(dateObj, 'HH:mm'));
+            }
+            setPriority(foundTask.priority || "medium");
+            setCompleted(foundTask.completed || false);
+            setCreatedAt(foundTask.created_at);
+          } else {
+            toast.error("Protocol not found");
+            navigate("/tasks");
+          }
+        }
+      } catch (err) {
+        toast.error("Neural link sync failed");
+        navigate("/tasks");
       } finally {
         setLoading(false);
       }
@@ -106,74 +87,59 @@ const TaskPage = () => {
   const handleSave = async () => {
     if (!user) return;
 
-    const taskData = {
-      title: title.trim() || "Untitled Task",
+    let finalDueDate: string | undefined = undefined;
+    if (dueDate) {
+      if (dueTime) {
+        finalDueDate = new Date(`${dueDate}T${dueTime}`).toISOString();
+      } else {
+        finalDueDate = new Date(`${dueDate}T00:00:00`).toISOString();
+      }
+    }
+
+    const taskData: NewTask = {
+      title: title.trim() || "Initialize Protocol",
       description: description.trim(),
-      dueDate: dueDate || undefined,
-      dueTime: dueTime || undefined,
+      due_date: finalDueDate,
       priority,
-      completed: "due" as const,
-      pinned,
-      starred,
+      completed,
     };
 
     try {
-      if (task?.id === "new" || !task?.id) {
-        const newTaskData = {
-          ...taskData,
-          createdAt: new Date().toISOString(),
-        };
-        const newId = await createTask(user.uid, newTaskData);
-        toast.success("New Task created Successfully");
-        navigate(`/tasks/${newId}`, { replace: true });
-      } else {
-        await updateTask(user.uid, task.id, taskData);
-        navigate("/tasks");
-        toast.success("Task Updated successfully");
+      setIsSaving(true);
+      if (id === "new") {
+        await createTask(user.id, taskData);
+        toast.success("Objective initialized");
+      } else if (id) {
+        await updateTask(id, taskData);
+        toast.success("Protocol updated");
       }
+      navigate("/tasks");
     } catch (err) {
-      toast.error("Failed to save task");
+      toast.error("Sync failed");
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const handleDelete = async () => {
-    if (!user || !task?.id || task.id === "new") {
+    if (!user || !id || id === "new") {
       navigate("/tasks");
       return;
     }
-
-    if (!window.confirm("Are you sure you want to delete this Task?")) return;
-
+    if (!window.confirm("Purge this objective from the registry?")) return;
     try {
-      await deleteTask(user.uid, task.id);
-      toast.success("Task deleted successfully");
+      await deleteTask(id);
+      toast.success("Objective neutralized");
       navigate("/tasks");
     } catch (error) {
-      toast.error("Deletion of task failed");
+      toast.error("Purge sequence failed");
     }
   };
 
-  const toggleStarred = () => {
-    setStarred(!starred);
-  };
-
-  const togglePinned = () => {
-    setPinned(!pinned);
-  };
-
-  const isOverdue = task?.dueDate && task.dueTime && (() => {
+  const isOverdue = dueDate && !completed && (() => {
     try {
-      // HTML time input provides 24-hour format (HH:MM)
-      const [hours, minutes] = task.dueTime.split(':');
-      const hour = parseInt(hours);
-      const minute = parseInt(minutes);
-      
-      if (hour !== undefined && minute !== undefined) {
-        const dueDateTime = new Date(`${task.dueDate}T${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}:00`);
-        return dueDateTime < new Date();
-      }
-      
-      return false;
+      const targetDate = dueTime ? new Date(`${dueDate}T${dueTime}`) : new Date(`${dueDate}T23:59:59`);
+      return targetDate < new Date();
     } catch {
       return false;
     }
@@ -181,196 +147,192 @@ const TaskPage = () => {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
-        <p className="mt-4 text-slate-600 dark:text-slate-400">
-          Loading task...
-        </p>
+      <div className="flex flex-col items-center justify-center min-h-[60vh]">
+        <div className="w-16 h-16 glass rounded-2xl flex items-center justify-center mb-4">
+          <RotateCw className="text-primary animate-spin" size={24} />
+        </div>
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/50">Accessing Registry...</p>
       </div>
     );
   }
 
   return (
-    <div>
-      {/* Header section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
-        {/* Title and date */}
-        <div className="flex items-center">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+        <div className="flex items-start gap-6 group">
           <button
             onClick={() => navigate("/tasks")}
-            className="mr-3 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
+            className="mt-1 p-3 rounded-2xl glass border border-primary/5 text-aurora-on-surface-variant hover:text-primary hover:border-primary/20 transition-all active:scale-95"
           >
             <ArrowLeft size={20} />
           </button>
-          <div>
+          <div className="space-y-3 flex-1">
+            <div className="flex items-center gap-2 text-primary">
+              <Sparkles size={14} className="aurora-glow" />
+              <span className="text-[10px] font-black uppercase tracking-[0.2em]">Operational Command</span>
+            </div>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="text-3xl font-semibold bg-transparent border-0 outline-none w-full"
-              placeholder="Task title"
+              className="text-4xl md:text-5xl font-black bg-transparent border-0 outline-none w-full text-aurora-on-surface placeholder:text-aurora-on-surface-variant/20 tracking-tight leading-none"
+              placeholder="Initialize Protocol"
             />
-            {task?.createdAt && (
-              <div className="flex items-center text-sm text-slate-500 dark:text-slate-400 mt-1">
-                <Calendar size={14} className="mr-1" />
-                {format(new Date(task.createdAt), "MMMM d, yyyy")}
+            {createdAt && (
+              <div className="flex items-center text-[10px] font-bold text-aurora-on-surface-variant uppercase tracking-widest opacity-60">
+                <Calendar size={12} className="mr-2" />
+                Initialized on {format(new Date(createdAt), "MMMM d, yyyy")}
               </div>
             )}
           </div>
         </div>
 
-        {/* Action buttons */}
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={toggleStarred}
-            className={`p-2 rounded-full ${
-              starred
-                ? "text-warning-500"
-                : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-            }`}
+        <div className="flex items-center gap-4 lg:self-end">
+          <button 
+            onClick={handleSave} 
+            disabled={isSaving}
+            className="btn-aurora-primary px-8 py-3 text-xs font-black uppercase tracking-widest shadow-lg shadow-primary/20 flex items-center gap-2 disabled:opacity-50"
           >
-            <Star size={20} fill={starred ? "currentColor" : "none"} />
-          </button>
-
-          <button
-            onClick={togglePinned}
-            className={`p-2 rounded-full ${
-              pinned
-                ? "text-primary-500"
-                : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-            }`}
-          >
-            <Pin size={20} />
-          </button>
-
-          <button onClick={handleSave} className="button-primary">
-            <Save size={18} className="mr-1" />
-            Save
+            {isSaving ? <RotateCw className="animate-spin" size={16} /> : <Save size={16} />}
+            Secure Objective
           </button>
 
           <button
             onClick={handleDelete}
-            className="p-2 rounded-full text-slate-400 hover:text-error-600 dark:hover:text-error-400"
+            className="p-3 rounded-2xl glass border border-primary/5 text-aurora-on-surface-variant hover:text-error hover:border-error/20 transition-all active:scale-95"
+            aria-label="Purge objective"
           >
             <Trash2 size={20} />
           </button>
         </div>
       </div>
 
-      {/* Task details section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        {/* Description */}
-        <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-            Description
-          </label>
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Add task description..."
-            className="input w-full h-32 resize-none"
-          />
-        </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+        <div className="lg:col-span-2 space-y-10">
+          <div className="space-y-4">
+            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-aurora-on-surface-variant flex items-center gap-2">
+              Objective Context
+              <div className="h-[1px] flex-1 bg-primary/5" />
+            </label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Operational details awaiting input..."
+              className="input-aurora w-full h-48 resize-none p-6 text-sm font-medium leading-relaxed"
+            />
+          </div>
 
-        {/* Due Date, Time, and Priority - All on same line */}
-        <div className="md:col-span-2">
-          <div className="flex items-center gap-6">
-            {/* Due Date */}
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Due Date
-              </label>
-              <div className="flex items-center gap-2">
-                <Calendar size={16} className="text-slate-500" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="space-y-4">
+              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-aurora-on-surface-variant">Target Date</label>
+              <div className="relative group">
+                <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={16} />
                 <input
                   type="date"
                   value={dueDate}
                   onChange={(e) => setDueDate(e.target.value)}
-                  className="input flex-1"
+                  className="input-aurora pl-12 w-full py-3 text-sm font-bold appearance-none"
                 />
               </div>
             </div>
-            
-                         {/* Due Time */}
-             <div className="flex-1">
-               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                 Due Time
-               </label>
-               <div className="flex items-center gap-2">
-                 <Clock size={16} className="text-slate-500" />
-                 <input
-                   type="time"
-                   value={dueTime}
-                   onChange={(e) => setDueTime(e.target.value)}
-                   className="input flex-1"
-                 />
-               </div>
-             </div>
 
-            {/* Priority */}
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Priority
-              </label>
+            <div className="space-y-4">
+              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-aurora-on-surface-variant">Target Time</label>
+              <div className="relative group">
+                <Clock className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={16} />
+                <input
+                  type="time"
+                  value={dueTime}
+                  onChange={(e) => setDueTime(e.target.value)}
+                  className="input-aurora pl-12 w-full py-3 text-sm font-bold appearance-none"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-aurora-on-surface-variant">Priority Tier</label>
               <select
                 value={priority}
-                onChange={(e) => setPriority(e.target.value as "low" | "medium" | "high")}
-                className="input"
+                onChange={(e) => setPriority(e.target.value as any)}
+                className="input-aurora w-full py-3 px-6 text-sm font-black uppercase tracking-widest appearance-none cursor-pointer"
               >
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
+                <option value="low" className="bg-white">Tier III (Low)</option>
+                <option value="medium" className="bg-white">Tier II (Medium)</option>
+                <option value="high" className="bg-white">Tier I (High)</option>
               </select>
             </div>
           </div>
-          
-          {isOverdue && (
-            <div className="flex items-center text-error-600 dark:text-error-400 mt-2">
-              <Flag size={16} className="mr-1" />
-              <span className="text-sm font-medium">Task is overdue</span>
-            </div>
-          )}
-        </div>
-      </div>
 
-      {/* Task preview */}
-      <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-4">
-        <h3 className="text-lg font-medium mb-3">Task Preview</h3>
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <CheckCircle 
-              size={16} 
-              className="text-slate-400" 
-            />
-            <span className="font-medium">
-              {title || "Untitled Task"}
-            </span>
-          </div>
-          {description && (
-            <p className="text-sm text-slate-600 dark:text-slate-400">
-              {description}
-            </p>
-          )}
-          <div className="flex items-center gap-4 text-sm text-slate-500">
-            {dueDate && (
-              <div className="flex items-center">
-                <Calendar size={14} className="mr-1" />
-                {format(new Date(dueDate), 'MMM d, yyyy')}
-              </div>
+          <AnimatePresence>
+            {isOverdue && (
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="p-6 rounded-[2rem] glass border border-error/20 bg-error/5 flex items-center gap-4 text-error"
+              >
+                <AlertCircle className="aurora-glow" size={24} />
+                <div className="space-y-1">
+                  <h4 className="text-xs font-black uppercase tracking-widest">Temporal Infraction Detected</h4>
+                  <p className="text-[10px] font-bold opacity-70">The designated deadline has elapsed. Immediate intervention required.</p>
+                </div>
+              </motion.div>
             )}
-            {dueTime && (
-              <div className="flex items-center">
-                <Clock size={14} className="mr-1" />
-                {dueTime}
+          </AnimatePresence>
+        </div>
+
+        <div className="space-y-8">
+          <div className="space-y-6 sticky top-8">
+            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-aurora-on-surface-variant">Registry Preview</label>
+            <div className="glass-panel p-8 rounded-[3rem] border border-primary/5 shadow-xl shadow-primary/5 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-8">
+                {priority === 'high' && <Flag size={20} className="text-error" />}
               </div>
-            )}
-            <div className={`px-2 py-0.5 rounded-full text-xs ${
-              priority === 'low' ? 'bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-300' :
-              priority === 'medium' ? 'bg-warning-100 text-warning-800 dark:bg-warning-900/30 dark:text-warning-300' :
-              'bg-error-100 text-error-800 dark:bg-error-900/30 dark:text-error-300'
-            }`}>
-              {priority.charAt(0).toUpperCase() + priority.slice(1)} Priority
+
+              <div className="space-y-6">
+                <div className="flex items-center gap-4 pointer-events-none">
+                  <div className={`w-8 h-8 rounded-xl border-2 flex items-center justify-center transition-all ${completed ? "bg-primary border-primary text-white" : "border-primary/20 text-transparent"}`}>
+                    <CheckCircle size={18} />
+                  </div>
+                  <h3 className={`text-xl font-black text-aurora-on-surface leading-tight ${completed ? "line-through opacity-40" : ""}`}>
+                    {title || "Initialize Protocol"}
+                  </h3>
+                </div>
+
+                <p className="text-xs font-medium text-aurora-on-surface-variant leading-relaxed opacity-60 line-clamp-4">
+                  {description || "No operational details specified for this objective sector."}
+                </p>
+
+                <div className="pt-6 border-t border-primary/5 space-y-4">
+                  <div className="flex flex-col gap-2">
+                    <div className={`flex items-center text-[10px] font-black uppercase tracking-widest ${isOverdue ? "text-error" : "text-aurora-on-surface-variant"}`}>
+                      <Clock size={12} className="mr-2" />
+                      {dueTime || "00:00"}
+                      <span className="mx-2 opacity-20">|</span>
+                      {dueDate ? format(new Date(dueDate), "MMM d, yyyy") : "STND_TIME"}
+                    </div>
+                  </div>
+                  
+                  <div className={`inline-flex px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider border ${
+                    priority === 'high' ? "bg-error/10 text-error border-error/20" :
+                    priority === 'medium' ? "bg-secondary/10 text-secondary border-secondary/20" :
+                    "bg-success/10 text-success border-success/20"
+                  }`}>
+                    {priority} Priority
+                  </div>
+                </div>
+              </div>
             </div>
+            
+            <button 
+              onClick={() => setCompleted(!completed)}
+              className={`w-full py-4 rounded-[2rem] text-[10px] font-black uppercase tracking-[0.3em] transition-all border ${
+                completed 
+                  ? "bg-success/10 border-success/20 text-success" 
+                  : "glass border-primary/10 text-aurora-on-surface-variant hover:text-primary hover:border-primary/20"
+              }`}
+            >
+              {completed ? "Objective Secured" : "Secure Objective"}
+            </button>
           </div>
         </div>
       </div>
@@ -378,4 +340,4 @@ const TaskPage = () => {
   );
 };
 
-export default TaskPage; 
+export default TaskPage;

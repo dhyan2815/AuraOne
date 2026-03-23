@@ -108,7 +108,7 @@ const Settings = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
         <div className="lg:col-span-8 space-y-10">
-          <motion.div
+          <motion.div 
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             className="glass-panel p-10 rounded-[3rem] border border-primary/5 shadow-2xl shadow-primary/5 space-y-8"
@@ -186,7 +186,7 @@ const Settings = () => {
             </div>
           </motion.div>
 
-          <motion.div
+          <motion.div 
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.1 }}
@@ -214,7 +214,7 @@ const Settings = () => {
                         className="input-aurora w-full py-3 px-6 pr-12 text-sm font-bold"
                         placeholder="••••••••"
                       />
-                      <button
+                      <button 
                         onClick={() => setShowPasswords(p => ({...p, new: !p.new}))}
                         className="absolute right-4 top-1/2 -translate-y-1/2 text-primary/30 hover:text-primary transition-colors"
                       >
@@ -232,7 +232,7 @@ const Settings = () => {
                         className="input-aurora w-full py-3 px-6 pr-12 text-sm font-bold"
                         placeholder="••••••••"
                       />
-                      <button
+                      <button 
                          onClick={() => setShowPasswords(p => ({...p, confirm: !p.confirm}))}
                          className="absolute right-4 top-1/2 -translate-y-1/2 text-primary/30 hover:text-primary transition-colors"
                       >
@@ -242,7 +242,7 @@ const Settings = () => {
                   </div>
                </div>
                <div className="flex flex-col justify-end pb-1">
-                  <button
+                  <button 
                     onClick={handleChangePassword}
                     disabled={isChangingPassword || !newPassword || !confirmPassword}
                     className="btn-aurora-primary w-full py-4 text-[10px] font-black uppercase tracking-[0.3em] shadow-lg shadow-primary/20 flex items-center justify-center gap-3 disabled:opacity-50"
@@ -260,7 +260,7 @@ const Settings = () => {
             <h3 className="text-xs font-black uppercase tracking-[0.3em] text-aurora-on-surface flex items-center gap-3">
               <Info size={16} className="text-primary" /> Architecture
             </h3>
-
+            
             <div className="space-y-8">
                <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-[1.5rem] glass border border-primary/10 flex items-center justify-center">
@@ -276,7 +276,7 @@ const Settings = () => {
                   <p className="text-[11px] font-medium text-aurora-on-surface-variant leading-relaxed opacity-70">
                     AuraOne is an advanced productivity matrix integrating neural task management, rich-text archives, and bioluminescent temporal tracking.
                   </p>
-
+                  
                   <div className="space-y-3">
                      {[
                        { label: 'Neural Assistance', active: true },

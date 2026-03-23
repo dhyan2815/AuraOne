@@ -1,269 +1,117 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-
 @layer base {
   html {
-    font-family: "DM Sans", sans-serif;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    @apply antialiased;
   }
   
-  .login, .signup {
-    background-color: white;
-    color: black;
-  }
-
   body {
-    @apply text-slate-900 dark:text-slate-100 bg-background-light dark:bg-background-dark;
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
-    text-rendering: optimizeLegibility;
+    @apply text-aurora-on-surface bg-aurora-bg min-h-screen overflow-x-hidden;
+    background: 
+      radial-gradient(at 0% 0%, rgba(167, 139, 250, 0.15) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(129, 140, 248, 0.15) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(244, 114, 182, 0.15) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, rgba(167, 139, 250, 0.15) 0px, transparent 50%),
+      #faf8fd;
+    background-attachment: fixed;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-semibold leading-tight;
-  }
-  
-  h1 {
-    @apply text-3xl md:text-4xl;
-  }
-  
-  h2 {
-    @apply text-2xl md:text-3xl;
-  }
-  
-  h3 {
-    @apply text-xl md:text-2xl;
-  }
-  
-  h4 {
-    @apply text-lg md:text-xl;
-  }
-  
-  p {
-    @apply leading-relaxed;
+    @apply font-bold tracking-tight text-aurora-on-surface;
+    font-family: "Plus Jakarta Sans", sans-serif;
   }
 }
 
 @layer components {
-  .card {
-    @apply bg-white dark:bg-surface-dark rounded-card shadow-card p-4 transition-all duration-200 hover:shadow-card-hover;
+  /* Glassmorphism System */
+  .glass {
+    @apply bg-white/40 backdrop-blur-xl border border-white/20 shadow-aurora-glow;
   }
-  
-  .button {
-    @apply inline-flex items-center justify-center rounded-button px-4 py-2 text-sm font-medium transition-colors duration-200;
+
+  .glass-panel {
+    @apply bg-white/60 backdrop-blur-2xl border border-white/30 shadow-aurora-glow-lg;
   }
-  
-  .button-primary {
-    @apply button bg-primary-600 text-white hover:bg-primary-700;
+
+  .glass-card {
+    @apply glass rounded-xl p-6 transition-all duration-300 hover:bg-white/50 hover:shadow-aurora-glow-lg hover:-translate-y-1;
   }
-  
-  .button-secondary {
-    @apply button bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white hover:bg-slate-300 dark:hover:bg-slate-600;
+
+  /* Navigation Item */
+  .nav-item-active {
+    @apply bg-gradient-to-r from-primary/10 to-secondary/10 text-primary font-semibold;
+    @apply relative after:absolute after:left-0 after:top-1/2 after:-translate-y-1/2 after:w-1 after:h-8 after:bg-primary after:rounded-full;
   }
-  
-  .button-danger {
-    @apply button bg-error-600 text-white hover:bg-error-700;
+
+  /* Aurora Buttons */
+  .btn-aurora {
+    @apply inline-flex items-center justify-center rounded-full px-6 py-2.5 text-sm font-semibold transition-all duration-300;
   }
-  
-  .input {
-    @apply rounded-input border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500;
+
+  .btn-aurora-primary {
+    @apply btn-aurora bg-gradient-to-br from-primary to-secondary text-white shadow-xl shadow-primary/20 hover:shadow-2xl hover:shadow-primary/30 active:scale-95;
   }
-  
-  .badge {
-    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+
+  .btn-aurora-secondary {
+    @apply btn-aurora glass text-primary hover:bg-white/80;
   }
-  
-  .badge-primary {
-    @apply badge bg-primary-100 text-primary-800 dark:bg-primary-800 dark:text-primary-100;
+
+  /* Forms */
+  .input-aurora {
+    @apply rounded-lg bg-aurora-surface-high/50 px-4 py-2 border border-transparent transition-all duration-300;
+    @apply focus:outline-none focus:bg-white focus:border-primary/20 focus:ring-4 focus:ring-primary/5;
   }
-  
-  .badge-success {
-    @apply badge bg-success-100 text-success-800 dark:bg-success-800 dark:text-success-100;
-  }
-  
-  .badge-warning {
-    @apply badge bg-warning-100 text-warning-800 dark:bg-warning-800 dark:text-warning-100;
-  }
-  
-  .badge-error {
-    @apply badge bg-error-100 text-error-800 dark:bg-error-800 dark:text-error-100;
-  }
-  
-  .tooltip {
-    @apply absolute bg-slate-900 text-white px-2 py-1 text-xs rounded shadow-lg z-50;
+
+  /* Section Header */
+  .section-header {
+    @apply text-aurora-on-surface-variant font-medium tracking-widest text-[0.65rem] uppercase mb-4;
   }
 }
 
-/* Scrollbar Styles */
+/* Custom Scrollbar for Aurora Glass */
 ::-webkit-scrollbar {
-  @apply w-2;
+  @apply w-1.5;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-slate-100 dark:bg-slate-800 rounded-full;
+  @apply bg-transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-slate-300 dark:bg-slate-600 rounded-full;
+  @apply bg-primary/20 rounded-full hover:bg-primary/40 transition-colors;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-slate-400 dark:bg-slate-500;
+/* Typography Enhancements */
+.display-lg {
+  @apply text-5xl font-extrabold tracking-tighter leading-tight;
 }
 
-/* React Quill Editor Styles */
-.ql-editor {
-  @apply min-h-[300px] p-4 text-slate-900 dark:text-slate-100;
-  font-family: inherit;
-  line-height: 1.6;
-  font-size: 16px; /* Base font size for the editor */
+.headline-sm {
+  @apply text-2xl font-bold;
 }
 
-.ql-editor.ql-blank::before {
-  @apply text-slate-400 dark:text-slate-500;
-  font-style: normal;
+/* Background Animated Gradient Mesh */
+.aurora-mesh {
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  z-index: -1;
+  background: radial-gradient(circle at 50% 50%, #faf8fd, transparent),
+              radial-gradient(circle at 20% 30%, rgba(129, 140, 248, 0.2), transparent),
+              radial-gradient(circle at 80% 40%, rgba(167, 139, 250, 0.2), transparent),
+              radial-gradient(circle at 40% 80%, rgba(244, 114, 182, 0.2), transparent);
+  filter: blur(80px);
+  animation: aurora-move 20s ease-in-out infinite;
 }
 
-/* Dark mode support for Quill */
-.dark .ql-toolbar {
-  @apply bg-slate-800 border-slate-700;
-}
-
-.dark .ql-container {
-  @apply bg-slate-800 border-slate-700;
-}
-
-.dark .ql-editor {
-  @apply text-slate-100;
-}
-
-.dark .ql-stroke {
-  @apply stroke-slate-300;
-}
-
-.dark .ql-fill {
-  @apply fill-slate-300;
-}
-
-.dark .ql-picker {
-  @apply text-slate-300;
-}
-
-.dark .ql-picker-options {
-  @apply bg-slate-700 border-slate-600;
-}
-
-/* Custom Quill toolbar styling */
-.ql-toolbar {
-  @apply border-slate-200 bg-slate-50 rounded-t-lg;
-}
-
-.ql-container {
-  @apply border-slate-200 rounded-b-lg;
-}
-
-/* Remove default Quill focus styles */
-.ql-editor:focus {
-  @apply outline-none;
-}
-
-/* Custom Quill content styling */
-.ql-editor h1 {
-  @apply text-3xl font-bold mb-4 mt-6;
-}
-
-.ql-editor h2 {
-  @apply text-2xl font-bold mb-3 mt-5;
-}
-
-.ql-editor h3 {
-  @apply text-xl font-bold mb-2 mt-4;
-}
-
-.ql-editor p {
-  @apply mb-3;
-}
-
-.ql-editor ul, .ql-editor ol {
-  @apply mb-3 pl-6;
-}
-
-.ql-editor li {
-  @apply mb-1;
-}
-
-.ql-editor blockquote {
-  @apply border-l-4 border-slate-300 dark:border-slate-600 pl-4 py-2 my-4 italic bg-slate-50 dark:bg-slate-800;
-}
-
-.ql-editor code {
-  @apply bg-slate-100 dark:bg-slate-700 px-1 py-0.5 rounded text-sm font-mono;
-}
-
-.ql-editor pre {
-  @apply bg-slate-100 dark:bg-slate-700 p-4 rounded-lg overflow-x-auto my-4;
-}
-
-.ql-editor pre code {
-  @apply bg-transparent p-0;
-}
-
-/* Floating Card Animations */
-@keyframes float-slow {
-  0%, 100% {
-    transform: translateY(0px) rotate(3deg) translateX(0px);
-  }
-  25% {
-    transform: translateY(-8px) rotate(2deg) translateX(2px);
-  }
-  50% {
-    transform: translateY(-12px) rotate(4deg) translateX(-1px);
-  }
-  75% {
-    transform: translateY(-6px) rotate(1deg) translateX(3px);
-  }
-}
-
-@keyframes float-fast {
-  0%, 100% {
-    transform: translateY(0px) rotate(-3deg) translateX(0px);
-  }
-  20% {
-    transform: translateY(-10px) rotate(-1deg) translateX(-2px);
-  }
-  40% {
-    transform: translateY(-15px) rotate(-5deg) translateX(1px);
-  }
-  60% {
-    transform: translateY(-8px) rotate(-2deg) translateX(-3px);
-  }
-  80% {
-    transform: translateY(-12px) rotate(-4deg) translateX(2px);
-  }
-}
-
-@keyframes gentle-sway {
-  0%, 100% {
-    transform: rotate(0deg);
-  }
-  25% {
-    transform: rotate(1deg);
-  }
-  75% {
-    transform: rotate(-1deg);
-  }
-}
-
-.animate-float-slow {
-  animation: float-slow 6s ease-in-out infinite;
-}
-
-.animate-float-fast {
-  animation: float-fast 4s ease-in-out infinite;
-}
-
-.animate-gentle-sway {
-  animation: gentle-sway 3s ease-in-out infinite;
-}
+@keyframes aurora-move {
+  0%, 100% { transform: scale(1) translate(0, 0); }
+  33% { transform: scale(1.1) translate(2%, 2%); }
+  66% { transform: scale(0.9) translate(-2%, -1%); }
+}
