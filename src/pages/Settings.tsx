@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { User, Info, Eye, EyeOff, Camera } from "lucide-react";
+import { User, Info, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { supabase } from "../services/supabase";
 import toast from "react-hot-toast";
@@ -35,7 +35,6 @@ const Settings = () => {
   const [newName, setNewName] = useState("");
 
   // Password change form state
-  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
@@ -50,8 +49,8 @@ const Settings = () => {
   const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   /**
-   * Load user profile data from Firebase on component mount
-   * Fetches user information from Firestore and Firebase Auth metadata
+   * Load user profile data from Supabase on component mount
+   * Fetches user information from Supabase Auth
    */
   useEffect(() => {
     if (user) {
@@ -66,13 +65,13 @@ const Settings = () => {
   }, [user]);
 
   /**
-   * Update user's display name in Firestore
+   * Update user's display name in Supabase Auth
    * Validates input and provides user feedback
    */
   const handleUpdateName = async () => {
     if (!user || !newName.trim()) return;
 
-    const { data, error } = await supabase.auth.updateUser({
+    const { error } = await supabase.auth.updateUser({
       data: { name: newName.trim() },
     });
 
@@ -312,7 +311,6 @@ const Settings = () => {
                 onClick={handleChangePassword}
                 disabled={
                   isChangingPassword ||
-                  !currentPassword ||
                   !newPassword ||
                   !confirmPassword
                 }
