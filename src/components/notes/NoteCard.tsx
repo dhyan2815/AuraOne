@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { format } from "date-fns";
 import { Note } from "../../hooks/useNotes";
 import { motion } from "framer-motion";
+import { Card, CardContent } from "../ui/Card";
 
 interface NoteCardProps {
   note: Note;
@@ -24,83 +25,86 @@ const NoteCard = ({ note, viewMode }: NoteCardProps) => {
   if (viewMode === "list") {
     return (
       <Link to={`/notes/${note.id}`} className="block group">
-        <div className="glass p-4 rounded-2xl transition-all border border-transparent hover:border-primary/20 hover:bg-white/60 relative">
-          <div className="flex items-center gap-6">
-            <div className="w-10 h-10 rounded-xl glass flex items-center justify-center text-primary/40 group-hover:text-primary transition-colors">
-              <Sparkles size={20} />
-            </div>
-            
-            <div className="flex-1 min-w-0">
-              <h3 className="text-sm font-black text-aurora-on-surface truncate group-hover:text-primary transition-colors">
-                {note.title || 'Draft Protocol'}
-              </h3>
-              <p className="text-[10px] font-bold text-aurora-on-surface-variant line-clamp-1 opacity-60">
-                {cleanContent || "No data captured"}
-              </p>
-            </div>
+        <Card className="transition-all hover:border-primary/20 hover:bg-slate-50 dark:hover:bg-gray-800/60 relative">
+            <CardContent className="p-4">
+                <div className="flex items-center gap-6">
+                    <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-gray-800 border border-slate-200 dark:border-gray-700 flex items-center justify-center text-primary/60 group-hover:text-primary transition-colors">
+                        <Sparkles size={20} />
+                    </div>
 
-            <div className="flex items-center gap-4">
-              <div className="flex items-center text-[10px] font-black uppercase tracking-widest text-aurora-on-surface-variant/40">
-                <Calendar size={12} className="mr-1.5" />
-                {formattedDate}
-              </div>
-              {note.tags && note.tags.length > 0 && (
-                <div className="flex items-center gap-1">
-                  <Tag size={12} className="text-primary/30" />
-                  <span className="text-[9px] font-black uppercase text-primary/40 truncate max-w-[100px]">
-                    {note.tags[0]}
-                  </span>
+                    <div className="flex-1 min-w-0">
+                        <h3 className="text-sm font-bold text-text truncate group-hover:text-primary transition-colors">
+                            {note.title || 'Untitled Note'}
+                        </h3>
+                        <p className="text-xs text-slate-500 line-clamp-1">
+                            {cleanContent || "No additional content"}
+                        </p>
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center text-xs font-medium text-slate-400">
+                            <Calendar size={12} className="mr-1.5" />
+                            {formattedDate}
+                        </div>
+                        {note.tags && note.tags.length > 0 && (
+                            <div className="flex items-center gap-1.5">
+                            <Tag size={12} className="text-primary/40" />
+                            <span className="text-xs font-medium text-primary/80 truncate max-w-[100px]">
+                                {note.tags[0]}
+                            </span>
+                            </div>
+                        )}
+                        <MoreVertical size={14} className="text-slate-400 opacity-0 group-hover:opacity-100 transition-all" />
+                    </div>
                 </div>
-              )}
-              <MoreVertical size={14} className="text-aurora-on-surface-variant opacity-0 group-hover:opacity-100 transition-all" />
-            </div>
-          </div>
-        </div>
+            </CardContent>
+        </Card>
       </Link>
     );
   }
 
   return (
     <Link to={`/notes/${note.id}`} className="block h-full group">
-      <motion.div 
-        whileHover={{ y: -4 }}
-        className="glass h-full flex flex-col p-6 rounded-[2.5rem] transition-all border border-transparent hover:border-primary/20 hover:bg-white/60 relative shadow-sm hover:shadow-xl hover:shadow-primary/5"
-      >
-        <div className="flex justify-between items-start mb-6">
-          <div className="w-12 h-12 rounded-2xl glass flex items-center justify-center text-primary/30 group-hover:text-primary group-hover:aurora-glow transition-all">
-            <Sparkles size={24} />
-          </div>
-          <button className="p-2 rounded-xl glass border border-primary/5 text-aurora-on-surface-variant opacity-0 group-hover:opacity-100 transition-all hover:text-primary hover:border-primary/20">
-            <MoreVertical size={16} />
-          </button>
-        </div>
+      <motion.div whileHover={{ y: -5 }} className="h-full">
+        <Card className="h-full flex flex-col transition-all shadow-sm hover:shadow-xl hover:shadow-primary/10">
+            <CardContent className="p-6 flex flex-col flex-1">
+                <div className="flex justify-between items-start mb-6">
+                    <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-gray-800 border border-slate-200 dark:border-gray-700 flex items-center justify-center text-primary/60 group-hover:text-primary group-hover:scale-105 transition-all">
+                        <Sparkles size={24} />
+                    </div>
+                    <button onClick={(e) => e.preventDefault()} className="p-2 rounded-xl bg-slate-100 dark:bg-gray-800 border border-slate-200 dark:border-gray-700 text-slate-400 opacity-0 group-hover:opacity-100 transition-all hover:text-primary hover:border-primary/20">
+                        <MoreVertical size={16} />
+                    </button>
+                </div>
 
-        <div className="flex-1 mb-8">
-          <h3 className="text-xl font-black leading-tight text-aurora-on-surface mb-3 group-hover:text-primary transition-colors">
-            {note.title || 'Draft Protocol'}
-          </h3>
-          <p className="text-xs font-medium text-aurora-on-surface-variant line-clamp-4 leading-relaxed opacity-70">
-            {cleanContent || "System awaiting data input..."}
-          </p>
-        </div>
+                <div className="flex-1 mb-8">
+                    <h3 className="text-xl font-bold leading-tight text-text mb-3 group-hover:text-primary transition-colors">
+                        {note.title || 'Untitled Note'}
+                    </h3>
+                    <p className="text-sm text-slate-500 line-clamp-4 leading-relaxed">
+                        {cleanContent || "No additional content to display..."}
+                    </p>
+                </div>
 
-        <div className="flex items-center justify-between pt-5 border-t border-primary/5">
-          <div className="flex items-center text-[10px] font-black uppercase tracking-[0.2em] text-aurora-on-surface-variant/40">
-            <Calendar size={12} className="mr-2" />
-            {formattedDate}
-          </div>
+                <div className="flex items-center justify-between pt-5 border-t border-slate-200 dark:border-gray-700">
+                    <div className="flex items-center text-xs font-medium text-slate-400">
+                        <Calendar size={12} className="mr-2" />
+                        {formattedDate}
+                    </div>
 
-          <div className="flex gap-1.5">
-            {note.tags?.slice(0, 2).map(tag => (
-              <span key={tag} className="px-2 py-0.5 rounded-lg glass border border-primary/10 text-[9px] font-black uppercase tracking-wider text-primary/60">
-                {tag}
-              </span>
-            ))}
-          </div>
-        </div>
+                    <div className="flex gap-2">
+                        {note.tags?.slice(0, 2).map(tag => (
+                            <span key={tag} className="px-2 py-1 rounded-md bg-primary/10 text-[10px] font-bold uppercase text-primary">
+                                {tag}
+                            </span>
+                        ))}
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
       </motion.div>
     </Link>
   );
 };
 
-export default NoteCard;
+export default NoteCard;

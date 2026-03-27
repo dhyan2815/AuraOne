@@ -19,6 +19,29 @@
   }
 }
 
+@layer components {
+  .ProseMirror {
+    @apply min-h-[300px] p-4 outline-none;
+  }
+  .ProseMirror p {
+    @apply mb-4;
+  }
+  .ProseMirror h1, .ProseMirror h2, .ProseMirror h3 {
+    @apply mb-4 font-bold;
+  }
+  .ProseMirror h1 { @apply text-3xl; }
+  .ProseMirror h2 { @apply text-2xl; }
+  .ProseMirror h3 { @apply text-xl; }
+  .ProseMirror ul, .ProseMirror ol {
+    @apply pl-4 mb-4;
+  }
+  .ProseMirror ul { @apply list-disc; }
+  .ProseMirror ol { @apply list-decimal; }
+  .ProseMirror blockquote {
+    @apply pl-4 border-l-4 border-slate-300 dark:border-gray-600 text-slate-500 italic;
+  }
+}
+
 
 /* Custom Scrollbar for Aurora Glass */
 ::-webkit-scrollbar {

@@ -14,9 +14,18 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },
+    editorProps: {
+      attributes: {
+        class: 'prose dark:prose-invert prose-sm sm:prose-base lg:prose-lg xl:prose-2xl m-5 focus:outline-none',
+      },
+    }
   });
 
-  return <EditorContent editor={editor} />;
+  return (
+    <div className="w-full h-full bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 rounded-2xl overflow-hidden">
+      <EditorContent editor={editor} />
+    </div>
+  );
 };
 
 export default TiptapEditor;

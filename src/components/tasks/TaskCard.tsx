@@ -3,17 +3,30 @@ import { Link } from "react-router-dom";
 import { format } from "date-fns";
 import { Task } from "../../hooks/useTasks";
 import { motion } from "framer-motion";
+import { Card, CardContent } from "../ui/Card";
 
 interface TaskCardProps {
   task: Task;
   viewMode: "grid" | "list";
-  onToggleComplete?: (taskId: string) => void;
+  onToggleComplete?: (taskId: string, completed: boolean) => void;
 }
 
 const priorityConfig = {
-  low: { color: 'text-success', bg: 'bg-success/10', border: 'border-success/20' },
-  medium: { color: 'text-secondary', bg: 'bg-secondary/10', border: 'border-secondary/20' },
-  high: { color: 'text-error', bg: 'bg-error/10', border: 'border-error/20' },
+    low: {
+      text: 'text-slate-500',
+      bg: 'bg-slate-100 dark:bg-gray-700',
+      name: 'Low'
+    },
+    medium: {
+      text: 'text-yellow-600 dark:text-yellow-400',
+      bg: 'bg-yellow-400/10',
+      name: 'Medium'
+    },
+    high: {
+      text: 'text-red-600 dark:text-red-400',
+      bg: 'bg-red-500/10',
+      name: 'High'
+    },
 };
 
 const TaskCard = ({ task, viewMode, onToggleComplete }: TaskCardProps) => {
@@ -22,110 +35,105 @@ const TaskCard = ({ task, viewMode, onToggleComplete }: TaskCardProps) => {
   const isOverdue = task.due_date && new Date(task.due_date) < new Date() && !task.completed;
   const config = task.priority ? priorityConfig[task.priority] : priorityConfig.low;
 
+  const handleToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onToggleComplete?.(task.id, !task.completed);
+  };
+
   if (viewMode === "list") {
     return (
       <Link to={`/tasks/${task.id}`} className="block group">
-        <div className={`glass p-4 rounded-2xl transition-all border border-transparent hover:border-primary/20 hover:bg-white/60 relative ${task.completed ? "opacity-60" : ""}`}>
-          <div className="flex items-center gap-6">
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                onToggleComplete?.(task.id);
-              }}
-              className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
-                task.completed ? "bg-primary border-primary text-white" : "border-primary/20 group-hover:border-primary text-transparent"
-              }`}
-            >
-              <CheckCircle size={14} className={task.completed ? "opacity-100" : "opacity-0"} />
-            </button>
-
-            <div className="flex-1 min-w-0">
-              <h3 className={`text-sm font-black text-aurora-on-surface truncate ${task.completed ? "line-through opacity-50" : ""}`}>
-                {task.title}
-              </h3>
-            </div>
-
+        <Card className={`transition-all hover:border-primary/20 hover:bg-slate-50 dark:hover:bg-gray-800/60 relative ${task.completed ? "opacity-60" : ""}`}>
+          <CardContent className="p-4">
             <div className="flex items-center gap-4">
-              {task.due_date && (
-                <div className={`flex items-center text-[10px] font-bold ${isOverdue ? 'text-error' : 'text-aurora-on-surface-variant'}`}>
-                  <Calendar size={12} className="mr-1" />
-                  {formattedDueDate}
+              <button onClick={handleToggle} className="flex-shrink-0">
+                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${task.completed ? "bg-primary border-primary" : "border-slate-300 dark:border-gray-600 group-hover:border-primary"}`}>
+                  {task.completed && <CheckCircle size={14} className="text-white" />}
                 </div>
-              )}
-              {task.priority && (
-                <span className={`px-2 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider ${config.bg} ${config.color} border ${config.border}`}>
-                  {task.priority}
-                </span>
-              )}
-              <MoreVertical size={14} className="text-aurora-on-surface-variant opacity-0 group-hover:opacity-100 transition-all" />
+              </button>
+
+              <div className="flex-1 min-w-0">
+                <h3 className={`text-sm font-bold text-text truncate ${task.completed ? "line-through" : ""}`}>
+                  {task.title}
+                </h3>
+              </div>
+
+              <div className="flex items-center gap-4 text-xs text-slate-500 font-medium">
+                {task.due_date && (
+                  <div className={`flex items-center ${isOverdue ? 'text-red-500' : ''}`}>
+                    <Calendar size={12} className="mr-1.5" />
+                    {formattedDueDate}
+                  </div>
+                )}
+                {task.priority && (
+                  <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${config.bg} ${config.text}`}>
+                    {config.name}
+                  </span>
+                )}
+                <MoreVertical size={14} className="text-slate-400 opacity-0 group-hover:opacity-100 transition-all" />
+              </div>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </Link>
     );
   }
 
   return (
     <Link to={`/tasks/${task.id}`} className="block h-full group">
-      <motion.div 
-        whileHover={{ y: -4 }}
-        className={`glass h-full flex flex-col p-6 rounded-[2.5rem] transition-all border border-transparent hover:border-primary/20 hover:bg-white/60 relative ${task.completed ? "opacity-60" : ""} shadow-sm hover:shadow-xl hover:shadow-primary/5`}
-      >
-        <div className="flex justify-between items-start mb-4">
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onToggleComplete?.(task.id);
-            }}
-            className={`w-8 h-8 rounded-2xl flex items-center justify-center transition-all ${
-              task.completed ? "bg-primary text-white shadow-lg shadow-primary/20" : "glass border border-primary/20 text-primary/20 hover:text-primary hover:border-primary"
-            }`}
-          >
-            <CheckCircle size={18} />
-          </button>
-          
-          <div className="flex items-center gap-2">
-            {isOverdue && <Flag size={14} className="text-error animate-pulse" />}
-            <MoreVertical size={16} className="text-aurora-on-surface-variant opacity-0 group-hover:opacity-100 transition-all cursor-pointer" />
-          </div>
-        </div>
-
-        <div className="flex-1 mb-6">
-          <h3 className={`text-lg font-black leading-tight text-aurora-on-surface mb-2 ${task.completed ? "line-through opacity-50" : ""}`}>
-            {task.title}
-          </h3>
-          <p className={`text-xs font-medium text-aurora-on-surface-variant line-clamp-2 ${task.completed ? "opacity-40" : ""}`}>
-            {task.description || "Initialize registry details"}
-          </p>
-        </div>
-
-        <div className="flex items-center justify-between pt-4 border-t border-primary/5">
-          <div className="flex flex-col gap-1">
-            {task.due_date && (
-              <div className={`flex items-center text-[10px] font-black uppercase tracking-widest ${isOverdue ? "text-error" : "text-aurora-on-surface-variant"}`}>
-                <Clock size={12} className="mr-1.5" />
-                {dueTime}
+      <motion.div whileHover={{ y: -5 }} className="h-full">
+        <Card className={`h-full flex flex-col transition-all shadow-sm hover:shadow-xl hover:shadow-primary/10 ${task.completed ? "opacity-60" : ""}`}>
+          <CardContent className="p-6 flex flex-col flex-1">
+            <div className="flex justify-between items-start mb-4">
+              <button
+                onClick={handleToggle}
+                className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all ${
+                  task.completed
+                    ? "bg-primary text-white shadow-lg shadow-primary/20"
+                    : "bg-slate-100 dark:bg-gray-800 border border-slate-200 dark:border-gray-700 text-slate-300 dark:text-gray-600 hover:text-primary hover:border-primary"
+                }`}
+              >
+                <CheckCircle size={18} />
+              </button>
+              <div className="flex items-center gap-2">
+                {isOverdue && <Flag size={14} className="text-red-500" title="Overdue" />}
+                <MoreVertical size={16} className="text-slate-400 opacity-0 group-hover:opacity-100 transition-all" />
               </div>
-            )}
-            <div className="text-[9px] font-bold text-aurora-on-surface-variant/40 flex items-center">
-              <Calendar size={10} className="mr-1" />
-              {formattedDueDate || "No Deadline"}
             </div>
-          </div>
 
-          {task.priority && (
-            <span className={`px-2.5 py-1 rounded-xl text-[10px] font-black uppercase tracking-[0.1em] border ${config.bg} ${config.color} ${config.border}`}>
-              {task.priority}
-            </span>
-          )}
-        </div>
+            <div className="flex-1 mb-6">
+              <h3 className={`text-lg font-bold leading-tight text-text mb-2 ${task.completed ? "line-through" : ""}`}>
+                {task.title}
+              </h3>
+              <p className={`text-sm text-slate-500 line-clamp-2`}>
+                {task.description || "No description provided."}
+              </p>
+            </div>
+
+            <div className="pt-4 border-t border-slate-200 dark:border-gray-700 space-y-3">
+              {task.due_date && (
+                <div className="flex items-center justify-between text-xs font-medium text-slate-500">
+                  <span>Deadline</span>
+                  <span className={isOverdue ? "text-red-500 font-bold" : "font-bold text-text"}>
+                    {formattedDueDate}
+                  </span>
+                </div>
+              )}
+              {task.priority && (
+                 <div className="flex items-center justify-between text-xs font-medium text-slate-500">
+                   <span>Priority</span>
+                   <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${config.bg} ${config.text}`}>
+                     {config.name}
+                   </span>
+                 </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
       </motion.div>
     </Link>
   );
 };
 
 export default TaskCard;
-
- 
