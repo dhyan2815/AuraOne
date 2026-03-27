@@ -5,6 +5,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { CheckCircle, Clock, Trash2, LayoutList } from "lucide-react";
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from "framer-motion";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/Card";
 
 const TasksWidget = () => {
     const [tasks, setTasks] = useState<Task[]>([]);
@@ -59,82 +60,88 @@ const TasksWidget = () => {
 
     const displayTasks = tasks
         .filter((task) => !task.completed)
-        .sort((a, b) => {
-            return new Date(b.created_at || '').getTime() - new Date(a.created_at || '').getTime();
-        })
+        .sort((a, b) => new Date(b.created_at || '').getTime() - new Date(a.created_at || '').getTime())
         .slice(0, 4);
 
     return (
-        <div className="h-full flex flex-col">
-            <AnimatePresence mode="popLayout">
-                {displayTasks.length === 0 ? (
-                    <motion.div 
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="flex-1 flex flex-col items-center justify-center text-center p-4"
-                    >
-                        <div className="w-12 h-12 glass rounded-2xl flex items-center justify-center mb-3 shadow-sm">
-                            <LayoutList className="text-primary/40" />
+        <Card className="h-full flex flex-col">
+            <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                    <span>Upcoming Tasks</span>
+                    <LayoutList className="w-5 h-5 text-slate-400" />
+                </CardTitle>
+            </CardHeader>
+            <CardContent className="flex-1 flex flex-col">
+                <AnimatePresence mode="popLayout">
+                    {displayTasks.length === 0 ? (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="flex-1 flex flex-col items-center justify-center text-center p-4"
+                        >
+                            <div className="w-12 h-12 bg-slate-100 dark:bg-gray-800 border border-slate-200 dark:border-gray-700 rounded-2xl flex items-center justify-center mb-3 shadow-sm">
+                                <LayoutList className="text-primary/40" />
+                            </div>
+                            <p className="text-sm font-bold text-text">Nothing pending</p>
+                            <p className="text-xs text-slate-500 mt-1">Peace of mind achieved</p>
+                        </motion.div>
+                    ) : (
+                        <div className="space-y-3">
+                            {displayTasks.map((task, idx) => (
+                                <motion.div
+                                    layout
+                                    initial={{ opacity: 0, x: -10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: idx * 0.05 }}
+                                    key={task.id}
+                                    className="group flex items-center gap-3 p-3 bg-slate-50 dark:bg-gray-800/50 rounded-2xl hover:bg-white/50 dark:hover:bg-gray-700/50 transition-all cursor-pointer border border-slate-200 dark:border-gray-700"
+                                    onClick={() => navigate(`/tasks/${task.id}`)}
+                                >
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleToggleComplete(task.id, task.completed);
+                                        }}
+                                        className="p-1.5 rounded-xl bg-white dark:bg-gray-700 border border-slate-200 dark:border-gray-600 hover:bg-slate-100 dark:hover:bg-gray-600 transition-colors"
+                                    >
+                                        <CheckCircle size={14} className="text-slate-400 group-hover:text-primary transition-colors" />
+                                    </button>
+
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-bold truncate text-text">{task.title}</p>
+                                        <div className="flex items-center gap-3 mt-1">
+                                            <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-md bg-opacity-20 ${
+                                                task.priority === 'high' ? 'bg-red-500 text-red-700 dark:text-red-400'
+                                                : task.priority === 'medium' ? 'bg-yellow-500 text-yellow-700 dark:text-yellow-400'
+                                                : 'bg-slate-300 text-slate-600 dark:bg-gray-700 dark:text-gray-400'
+                                            }`}>
+                                                {task.priority || 'low'}
+                                            </span>
+                                            {task.due_date && (
+                                                <div className="flex items-center text-xs text-slate-500">
+                                                    <Clock size={12} className="mr-1" />
+                                                    {formatTime(task.due_date)}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleDeleteTask(task.id, task.title);
+                                        }}
+                                        className="opacity-0 group-hover:opacity-100 p-1.5 rounded-xl hover:bg-red-500/10 text-slate-500 hover:text-red-500 transition-all"
+                                    >
+                                        <Trash2 size={14} />
+                                    </button>
+                                </motion.div>
+                            ))}
                         </div>
-                        <p className="text-sm font-black text-aurora-on-surface">Nothing pending</p>
-                        <p className="text-[10px] uppercase tracking-widest font-bold text-aurora-on-surface-variant mt-1">Peace of mind achieved</p>
-                    </motion.div>
-                ) : (
-                    <div className="space-y-3">
-                        {displayTasks.map((task, idx) => (
-                            <motion.div
-                                layout
-                                initial={{ opacity: 0, x: -10 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: idx * 0.05 }}
-                                key={task.id}
-                                className="group flex items-center gap-3 p-3 glass rounded-2xl hover:bg-white/50 transition-all cursor-pointer border border-transparent hover:border-primary/10"
-                                onClick={() => navigate(`/tasks/${task.id}`)}
-                            >
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleToggleComplete(task.id, task.completed);
-                                    }}
-                                    className="p-1.5 rounded-xl glass hover:bg-white transition-colors"
-                                >
-                                    <CheckCircle size={14} className="text-aurora-on-surface-variant group-hover:text-primary transition-colors" />
-                                </button>
-                                
-                                <div className="flex-1 min-w-0">
-                                    <div className="flex items-center gap-2 mb-0.5">
-                                        <p className="text-sm font-black truncate text-aurora-on-surface">{task.title}</p>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <span className={`text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-lg glass-panel ${
-                                            task.priority === 'high' ? 'text-error' : task.priority === 'medium' ? 'text-secondary' : 'text-aurora-on-surface-variant'
-                                        }`}>
-                                            {task.priority || 'low'}
-                                        </span>
-                                        {task.due_date && (
-                                            <div className="flex items-center text-[10px] font-bold text-aurora-on-surface-variant">
-                                                <Clock size={10} className="mr-1" />
-                                                {formatTime(task.due_date)}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                                
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleDeleteTask(task.id, task.title);
-                                    }}
-                                    className="opacity-0 group-hover:opacity-100 p-1.5 rounded-xl hover:bg-error/10 text-aurora-on-surface-variant hover:text-error transition-all"
-                                >
-                                    <Trash2 size={14} />
-                                </button>
-                            </motion.div>
-                        ))}
-                    </div>
-                )}
-            </AnimatePresence>
-        </div>
+                    )}
+                </AnimatePresence>
+            </CardContent>
+        </Card>
     );
 };
 
