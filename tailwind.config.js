@@ -7,33 +7,12 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Aurora Glass Color Palette
-        primary: {
-          DEFAULT: '#4953bc',
-          container: '#818cf8',
-          fixed: '#e0e0ff',
-          dim: '#bdc2ff',
-        },
-        secondary: {
-          DEFAULT: '#674bb5',
-          container: '#ab8ffe',
-          fixed: '#e8ddff',
-          dim: '#cebdff',
-        },
-        tertiary: {
-          DEFAULT: '#a43073',
-          container: '#e869ac',
-          fixed: '#ffd8e7',
-          dim: '#ffafd3',
-        },
-        'aurora-bg': '#faf8fd',
-        'aurora-surface': '#faf8fd',
-        'aurora-surface-low': '#f5f3f8',
-        'aurora-surface-high': '#e9e7ec',
-        'aurora-surface-highest': '#e3e2e7',
-        'aurora-surface-lowest': '#ffffff',
-        'aurora-on-surface': '#1b1b1f',
-        'aurora-on-surface-variant': '#454653',
+        primary: '#2563EB',
+        secondary: '#3B82F6',
+        cta: '#F97316',
+        background: '#F8FAFC',
+        text: '#1E293B',
+        // Keeping semantic colors for now
         error: {
           DEFAULT: '#ba1a1a',
           container: '#ffdad6',
@@ -48,7 +27,7 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
       },
       spacing: {
         '0.5': '4px',
