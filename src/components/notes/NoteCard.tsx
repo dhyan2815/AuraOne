@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { format } from "date-fns";
 import { Note } from "../../hooks/useNotes";
 import { motion } from "framer-motion";
-import { Card, CardContent } from "../ui/Card";
+import Card from "../ui/Card";
 
 interface NoteCardProps {
   note: Note;
@@ -26,7 +26,7 @@ const NoteCard = ({ note, viewMode }: NoteCardProps) => {
     return (
       <Link to={`/notes/${note.id}`} className="block group">
         <Card className="transition-all hover:border-primary/20 hover:bg-slate-50 dark:hover:bg-gray-800/60 relative">
-            <CardContent className="p-4">
+            <div className="p-4">
                 <div className="flex items-center gap-6">
                     <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-gray-800 border border-slate-200 dark:border-gray-700 flex items-center justify-center text-primary/60 group-hover:text-primary transition-colors">
                         <Sparkles size={20} />
@@ -57,7 +57,7 @@ const NoteCard = ({ note, viewMode }: NoteCardProps) => {
                         <MoreVertical size={14} className="text-slate-400 opacity-0 group-hover:opacity-100 transition-all" />
                     </div>
                 </div>
-            </CardContent>
+            </div>
         </Card>
       </Link>
     );
@@ -67,7 +67,7 @@ const NoteCard = ({ note, viewMode }: NoteCardProps) => {
     <Link to={`/notes/${note.id}`} className="block h-full group">
       <motion.div whileHover={{ y: -5 }} className="h-full">
         <Card className="h-full flex flex-col transition-all shadow-sm hover:shadow-xl hover:shadow-primary/10">
-            <CardContent className="p-6 flex flex-col flex-1">
+            <div className="p-6 flex flex-col flex-1">
                 <div className="flex justify-between items-start mb-6">
                     <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-gray-800 border border-slate-200 dark:border-gray-700 flex items-center justify-center text-primary/60 group-hover:text-primary group-hover:scale-105 transition-all">
                         <Sparkles size={24} />
@@ -100,7 +100,7 @@ const NoteCard = ({ note, viewMode }: NoteCardProps) => {
                         ))}
                     </div>
                 </div>
-            </CardContent>
+            </div>
         </Card>
       </motion.div>
     </Link>

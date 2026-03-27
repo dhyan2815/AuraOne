@@ -5,7 +5,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { Calendar as CalendarIcon, Plus, X, ChevronRight, Clock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/Card";
+import Card from "../ui/Card";
 
 const CalendarWidget = () => {
     const navigate = useNavigate();
@@ -35,13 +35,13 @@ const CalendarWidget = () => {
 
     return (
         <Card className="h-full flex flex-col">
-            <CardHeader>
-                <CardTitle className="flex items-center justify-between">
+            <div className="p-6">
+                <div className="flex items-center justify-between">
                     <span>This Week</span>
                     <CalendarIcon className="w-5 h-5 text-slate-400" />
-                </CardTitle>
-            </CardHeader>
-            <CardContent className="flex-1 flex flex-col">
+                </div>
+            </div>
+            <div className="p-6 flex-1 flex flex-col">
                 <div className="flex space-x-3 mb-6 overflow-x-auto pb-1 no-scrollbar">
                     {days.map((day, idx) => {
                         const isSelected = isSameDay(day, selectedDate);
@@ -176,7 +176,7 @@ const CalendarWidget = () => {
                         )}
                     </AnimatePresence>
                 </div>
-            </CardContent>
+            </div>
         </Card>
     );
 };

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { ExternalLink, Newspaper, Globe } from "lucide-react";
 import { API_CONFIG } from "../../config/api";
 import { motion, AnimatePresence } from "framer-motion";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/Card";
+import Card from "../ui/Card";
 
 interface NewsItem {
   id: string;
@@ -10,6 +10,13 @@ interface NewsItem {
   source: string;
   url: string;
   publishedAt: string;
+}
+
+interface ApiNewsItem {
+  title: string;
+  source_id: string;
+  link: string;
+  pubDate: string;
 }
 
 const NewsWidget = () => {
@@ -27,7 +34,7 @@ const NewsWidget = () => {
         );
         if (!response.ok) throw new Error("Connection unstable");
         const data = await response.json();
-        const formattedNews = data.results.map((item: any, index: number) => ({
+        const formattedNews = data.results.map((item: ApiNewsItem, index: number) => ({
           id: index.toString(),
           title: item.title,
           source: item.source_id,
@@ -53,13 +60,13 @@ const NewsWidget = () => {
 
   return (
     <Card className="h-full flex flex-col">
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between">
+      <div className="p-4 border-b border-slate-200 dark:border-gray-700">
+        <div className="flex items-center justify-between">
           <span>Global Feed</span>
           <Newspaper className="w-5 h-5 text-slate-400" />
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="flex-1 flex flex-col">
+        </div>
+      </div>
+      <div className="flex-1 flex flex-col p-4">
         <AnimatePresence mode="wait">
           {loading ? (
             <motion.div
@@ -141,7 +148,7 @@ const NewsWidget = () => {
             </motion.div>
           )}
         </AnimatePresence>
-      </CardContent>
+      </div>
     </Card>
   );
 };

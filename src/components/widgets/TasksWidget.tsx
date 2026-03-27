@@ -5,7 +5,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { CheckCircle, Clock, Trash2, LayoutList } from "lucide-react";
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from "framer-motion";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/Card";
+import Card from "../ui/Card";
 
 const TasksWidget = () => {
     const [tasks, setTasks] = useState<Task[]>([]);
@@ -36,6 +36,7 @@ const TasksWidget = () => {
             setTasks(updated);
         } catch (error) {
             toast.error("Update failed");
+            console.error("Failed to update task:", error);
         }
     };
 
@@ -48,6 +49,7 @@ const TasksWidget = () => {
             setTasks(updated);
         } catch (error) {
             toast.error("Delete failed");
+            console.error("Failed to delete task:", error);
         }
     };
 
@@ -65,13 +67,13 @@ const TasksWidget = () => {
 
     return (
         <Card className="h-full flex flex-col">
-            <CardHeader>
-                <CardTitle className="flex items-center justify-between">
+            <div className="p-6">
+                <div className="flex items-center justify-between">
                     <span>Upcoming Tasks</span>
                     <LayoutList className="w-5 h-5 text-slate-400" />
-                </CardTitle>
-            </CardHeader>
-            <CardContent className="flex-1 flex flex-col">
+                </div>
+            </div>
+            <div className="p-6 flex-1 flex flex-col">
                 <AnimatePresence mode="popLayout">
                     {displayTasks.length === 0 ? (
                         <motion.div
@@ -140,7 +142,7 @@ const TasksWidget = () => {
                         </div>
                     )}
                 </AnimatePresence>
-            </CardContent>
+            </div>
         </Card>
     );
 };

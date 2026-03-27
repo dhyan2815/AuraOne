@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { MapPin, Droplets, Wind, MapPinOff, Sun, Cloud, CloudRain, CloudSnow, CloudSun } from "lucide-react";
 import { API_CONFIG } from "../../config/api";
 import { motion, AnimatePresence } from "framer-motion";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/Card";
+import Card from "../ui/Card";
 
 interface WeatherData {
   location: string;
@@ -15,6 +15,16 @@ interface WeatherData {
     temp: number;
     condition: string;
   }>;
+}
+
+interface ApiForecastItem {
+  dt: number;
+  main: {
+    temp: number;
+  };
+  weather: {
+    main: string;
+  }[];
 }
 
 const WeatherWidget = () => {
@@ -36,7 +46,7 @@ const WeatherWidget = () => {
 
       const position = await new Promise<GeolocationPosition>(
         (resolve, reject) => {
-          navigator.geolocation.getCurrentPosition(resolve, (error) => {
+          navigator.geolocation.getCurrentPosition(resolve, () => {
             setLocationPermission('denied');
             reject(new Error('location_permission_denied'));
           }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 });
@@ -59,9 +69,9 @@ const WeatherWidget = () => {
       const forecastData = await forecastResponse.json();
 
       const dailyForecast = forecastData.list
-        .reduce((acc: any[], item: any) => {
+        .reduce((acc: ApiForecastItem[], item: ApiForecastItem) => {
           const date = new Date(item.dt * 1000).toLocaleDateString();
-          if (!acc.find((day: any) => new Date(day.dt * 1000).toLocaleDateString() === date)) {
+          if (!acc.find((day) => new Date(day.dt * 1000).toLocaleDateString() === date)) {
             acc.push(item);
           }
           return acc;
@@ -74,7 +84,7 @@ const WeatherWidget = () => {
         condition: currentWeather.weather[0].main,
         humidity: currentWeather.main.humidity,
         windSpeed: Math.round(currentWeather.wind.speed * 2.237),
-        forecast: dailyForecast.map((day: any) => ({
+        forecast: dailyForecast.map((day: ApiForecastItem) => ({
           day: new Date(day.dt * 1000).toLocaleDateString("en-US", { weekday: "short" }),
           temp: Math.round(day.main.temp),
           condition: day.weather[0].main,
@@ -193,14 +203,14 @@ const WeatherWidget = () => {
 
   return (
     <Card className="h-full flex flex-col">
-      <CardHeader>
-        <CardTitle>Local Atmosphere</CardTitle>
-      </CardHeader>
-      <CardContent className="flex-1 flex flex-col">
+      <div className="p-4 border-b border-slate-200 dark:border-gray-700">
+        Local Atmosphere
+      </div>
+      <div className="flex-1 flex flex-col p-4">
         <AnimatePresence mode="wait">
           {renderContent()}
         </AnimatePresence>
-      </CardContent>
+      </div>
     </Card>
   );
 };

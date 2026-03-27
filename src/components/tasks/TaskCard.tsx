@@ -1,9 +1,9 @@
-import { Calendar, Clock, Flag, MoreVertical, CheckCircle } from "lucide-react";
+import { Calendar, Flag, MoreVertical, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
 import { Task } from "../../hooks/useTasks";
 import { motion } from "framer-motion";
-import { Card, CardContent } from "../ui/Card";
+import Card from "../ui/Card";
 
 interface TaskCardProps {
   task: Task;
@@ -31,8 +31,7 @@ const priorityConfig = {
 
 const TaskCard = ({ task, viewMode, onToggleComplete }: TaskCardProps) => {
   const formattedDueDate = task.due_date ? format(new Date(task.due_date), 'MMM d, yyyy') : '';
-  const dueTime = task.due_date ? format(new Date(task.due_date), 'p') : '';
-  const isOverdue = task.due_date && new Date(task.due_date) < new Date() && !task.completed;
+    const isOverdue = task.due_date && new Date(task.due_date) < new Date() && !task.completed;
   const config = task.priority ? priorityConfig[task.priority] : priorityConfig.low;
 
   const handleToggle = (e: React.MouseEvent) => {
@@ -45,7 +44,7 @@ const TaskCard = ({ task, viewMode, onToggleComplete }: TaskCardProps) => {
     return (
       <Link to={`/tasks/${task.id}`} className="block group">
         <Card className={`transition-all hover:border-primary/20 hover:bg-slate-50 dark:hover:bg-gray-800/60 relative ${task.completed ? "opacity-60" : ""}`}>
-          <CardContent className="p-4">
+          <div className="p-4">
             <div className="flex items-center gap-4">
               <button onClick={handleToggle} className="flex-shrink-0">
                 <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${task.completed ? "bg-primary border-primary" : "border-slate-300 dark:border-gray-600 group-hover:border-primary"}`}>
@@ -74,7 +73,7 @@ const TaskCard = ({ task, viewMode, onToggleComplete }: TaskCardProps) => {
                 <MoreVertical size={14} className="text-slate-400 opacity-0 group-hover:opacity-100 transition-all" />
               </div>
             </div>
-          </CardContent>
+          </div>
         </Card>
       </Link>
     );
@@ -84,7 +83,7 @@ const TaskCard = ({ task, viewMode, onToggleComplete }: TaskCardProps) => {
     <Link to={`/tasks/${task.id}`} className="block h-full group">
       <motion.div whileHover={{ y: -5 }} className="h-full">
         <Card className={`h-full flex flex-col transition-all shadow-sm hover:shadow-xl hover:shadow-primary/10 ${task.completed ? "opacity-60" : ""}`}>
-          <CardContent className="p-6 flex flex-col flex-1">
+          <div className="p-6 flex flex-col flex-1">
             <div className="flex justify-between items-start mb-4">
               <button
                 onClick={handleToggle}
@@ -97,7 +96,7 @@ const TaskCard = ({ task, viewMode, onToggleComplete }: TaskCardProps) => {
                 <CheckCircle size={18} />
               </button>
               <div className="flex items-center gap-2">
-                {isOverdue && <Flag size={14} className="text-red-500" title="Overdue" />}
+                {isOverdue && <span title="Overdue"><Flag size={14} className="text-red-500" /></span>}
                 <MoreVertical size={16} className="text-slate-400 opacity-0 group-hover:opacity-100 transition-all" />
               </div>
             </div>
@@ -129,7 +128,7 @@ const TaskCard = ({ task, viewMode, onToggleComplete }: TaskCardProps) => {
                  </div>
               )}
             </div>
-          </CardContent>
+          </div>
         </Card>
       </motion.div>
     </Link>

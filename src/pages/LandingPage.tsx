@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Calendar, CheckCircle, FileText, MessageSquare, Sparkles, Shield, ArrowRight, ChevronDown, Star, BarChart3 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import LandingPicture from "../assets/LandingImage.png";
-import { Card, CardContent } from "../components/ui/Card";
+import Card from "../components/ui/Card";
 
 const LandingPage = () => {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -164,13 +164,13 @@ const LandingPage = () => {
                         >
                             <div className="absolute -inset-8 bg-gradient-to-tr from-primary/20 to-secondary/20 blur-3xl rounded-full"></div>
                             <Card className="p-4 rounded-[2.5rem] shadow-2xl relative z-10">
-                                <CardContent className="p-0">
+                                <div className="p-0">
                                 <img
                                     src={LandingPicture}
                                     alt="Luminous Interface"
                                     className="w-full h-auto rounded-[2rem] shadow-inner"
                                 />
-                                </CardContent>
+                                </div>
                             </Card>
                         </motion.div>
                     </div>
@@ -202,13 +202,13 @@ const LandingPage = () => {
                                 className="group"
                             >
                             <Card className="h-full p-8 group cursor-default shadow-lg hover:shadow-xl transition-all">
-                               <CardContent className="p-0 flex flex-col items-start">
+                               <div className="p-0 flex flex-col items-start">
                                 <div className="w-14 h-14 bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 rounded-2xl flex items-center justify-center mb-8 shadow-lg group-hover:scale-110 group-hover:bg-primary/10 transition-all">
                                     {feature.icon}
                                 </div>
                                 <h3 className="text-xl font-bold mb-4 text-text">{feature.title}</h3>
                                 <p className="text-slate-500 font-medium leading-relaxed">{feature.description}</p>
-                               </CardContent>
+                               </div>
                             </Card>
                             </motion.div>
                         ))}
@@ -266,7 +266,7 @@ const LandingPage = () => {
             <section className="py-40 relative bg-slate-50 dark:bg-gray-900">
                 <div className="max-w-4xl mx-auto px-6 text-center">
                     <Card className="p-12 sm:p-20 rounded-[3rem] shadow-2xl">
-                       <CardContent className="p-0">
+                       <div className="p-0">
                         <h2 className="text-5xl font-extrabold mb-8 tracking-tighter text-text">
                             Join the <span className="text-secondary italic">Aura</span>.
                         </h2>
@@ -287,7 +287,7 @@ const LandingPage = () => {
                                 Visionary Login
                             </Link>
                         </div>
-                       </CardContent>
+                       </div>
                     </Card>
                 </div>
             </section>
