@@ -24,18 +24,15 @@ const Layout = () => {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden text-aurora-on-surface">
-      {/* Background Animated Gradient Mesh */}
-      <div className="aurora-mesh" aria-hidden="true" />
-      
-      <Sidebar 
-        isCollapsed={isSidebarCollapsed} 
-        onToggleCollapse={toggleSidebar} 
+    <div className="flex h-screen overflow-hidden bg-background text-text">
+      <Sidebar
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={toggleSidebar}
       />
-      
+
       <main className="flex-1 overflow-auto relative z-10">
         <div className="max-w-[1440px] mx-auto min-h-full">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
