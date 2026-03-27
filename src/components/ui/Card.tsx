@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 interface CardProps {
   title?: string;
@@ -23,37 +23,37 @@ const Card = ({
 }: CardProps) => {
   return (
     <div 
-      className={`bg-white dark:bg-slate-800 rounded-lg shadow-card overflow-hidden ${className}`}
+      className={`bg-white/40 dark:bg-gray-800/40 backdrop-blur-md border border-white/20 dark:border-white/10 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${className}`}
       onClick={onClick}
     >
       {title && (
-        <div className="flex items-center justify-between px-6 py-4 border-slate-100 dark:border-slate-700">
-          <h3 className="text-3xl font-semibold">{title}</h3>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-black/5 dark:border-white/5">
+          <h3 className="text-xl font-semibold text-text dark:text-white">{title}</h3>
           
           {actionLabel && (
             actionHref ? (
               <Link 
                 to={actionHref}
-                className="flex items-center text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+                className="flex items-center text-sm text-primary hover:underline"
               >
                 {actionIcon && <span className="mr-1">{actionIcon}</span>}
                 {actionLabel}
-                {!actionIcon && <ChevronRight size={16} className="ml-1" />}
+                {!actionIcon && <ArrowRight size={16} className="ml-1" />}
               </Link>
             ) : (
               <button
-                className="flex items-center text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+                className="flex items-center text-sm text-primary hover:underline"
               >
                 {actionIcon && <span className="mr-1">{actionIcon}</span>}
                 {actionLabel}
-                {!actionIcon && <ChevronRight size={16} className="ml-1" />}
+                {!actionIcon && <ArrowRight size={16} className="ml-1" />}
               </button>
             )
           )}
         </div>
       )}
       
-      <div className="p-4">
+      <div className="p-6">
         {children}
       </div>
     </div>

@@ -100,14 +100,14 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-primary/10 backdrop-blur-sm z-20 md:hidden"
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-20 md:hidden"
             onClick={closeSidebar}
           />
         )}
       </AnimatePresence>
 
       <button
-        className="fixed top-4 left-4 z-30 md:hidden glass p-2 rounded-lg text-primary shadow-lg"
+        className="fixed top-4 left-4 z-30 md:hidden bg-white/60 backdrop-blur-xl border border-white/20 dark:bg-gray-800/60 dark:border-white/10 p-2 rounded-lg text-text/80 shadow-lg"
         onClick={toggleSidebar}
       >
         {expanded ? <X size={20} /> : <Menu size={20} />}
@@ -120,7 +120,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
           x: expanded ? 0 : -256 
         }}
         transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-        className="fixed inset-y-0 left-0 z-20 glass-panel md:static md:translate-x-0 m-4 rounded-3xl overflow-hidden flex flex-col"
+        className="fixed inset-y-0 left-0 z-20 bg-white/60 backdrop-blur-2xl border border-white/30 dark:bg-gray-900/60 dark:border-white/10 md:static md:translate-x-0 m-4 rounded-3xl overflow-hidden flex flex-col"
       >
         {/* Header Section */}
         <div className="p-6 flex items-center justify-between border-b border-primary/5">
@@ -137,8 +137,8 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
                   <Sparkles className="text-white w-5 h-5" />
                 </div>
                 <div className="min-w-0">
-                  <h1 className="text-base font-bold text-aurora-on-surface truncate">AuraOne</h1>
-                  <span className="text-[0.65rem] font-medium uppercase tracking-widest text-primary/60 truncate block">
+                  <h1 className="text-base font-bold text-text dark:text-white truncate">AuraOne</h1>
+                  <span className="text-[0.65rem] font-medium uppercase tracking-widest text-primary/80 dark:text-primary/60 truncate block">
                     Productivity Hub
                   </span>
                 </div>
@@ -163,8 +163,8 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
               className={({ isActive }) =>
                 `flex items-center px-4 py-3 rounded-2xl transition-all duration-300 group min-h-[48px] ${
                   isActive
-                    ? "nav-item-active"
-                    : "text-aurora-on-surface-variant hover:bg-white/60 hover:text-primary"
+                    ? "bg-primary text-white font-semibold"
+                    : "text-slate-500 hover:bg-primary/10 hover:text-primary"
                 } ${isCollapsed ? 'justify-center px-0' : ''}`
               }
               title={isCollapsed ? item.label : undefined}
@@ -183,12 +183,12 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
           ))}
           
           <div className="pt-4 pb-2">
-            {!isCollapsed && <p className="section-header px-4">AI Interaction</p>}
+            {!isCollapsed && <p className="text-slate-400 font-medium tracking-widest text-[0.65rem] uppercase mb-4 px-4">AI Interaction</p>}
             <NavLink
               to="/chat"
               className={({ isActive }) =>
                 `flex items-center px-4 py-3 rounded-2xl transition-all duration-300 min-h-[48px] ${
-                  isActive ? "nav-item-active" : "text-aurora-on-surface-variant hover:bg-white/60 hover:text-primary"
+                  isActive ? "bg-primary text-white font-semibold" : "text-slate-500 hover:bg-primary/10 hover:text-primary"
                 } ${isCollapsed ? 'justify-center px-0' : ''}`
               }
             >
@@ -201,13 +201,13 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
         {/* User & Settings Section */}
         <div className="p-4 mt-auto border-t border-primary/5 space-y-2">
           {!isCollapsed && (
-            <div className="px-4 py-3 flex items-center gap-3 glass bg-white/40 rounded-2xl mb-4">
+            <div className="px-4 py-3 flex items-center gap-3 bg-white/40 dark:bg-gray-800/40 backdrop-blur-md border border-white/20 dark:border-white/10 rounded-2xl mb-4">
               <div className="w-8 h-8 rounded-full bg-secondary/10 flex items-center justify-center text-secondary font-bold text-xs ring-2 ring-white shadow-sm">
                 {userName.charAt(0).toUpperCase()}
               </div>
               <div className="min-w-0">
-                <p className="text-xs font-bold text-aurora-on-surface truncate">{userName}</p>
-                <p className="text-[0.6rem] text-primary/50 truncate">Premium Plan</p>
+                <p className="text-xs font-bold text-text dark:text-white truncate">{userName}</p>
+                <p className="text-[0.6rem] text-text/50 dark:text-white/50 truncate">Premium Plan</p>
               </div>
             </div>
           )}
@@ -215,7 +215,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
           <div className={`flex ${isCollapsed ? 'flex-col items-center' : 'items-center justify-between gap-2'} px-2`}>
             <button
               onClick={toggleTheme}
-              className="p-3 rounded-2xl text-primary/40 hover:text-primary hover:bg-white/80 transition-all"
+              className="p-3 rounded-2xl text-text/40 hover:text-primary hover:bg-primary/10 transition-all"
               title="Toggle Theme"
             >
               {theme === "light" ? <MoonIcon size={18} /> : <SunIcon size={18} />}
@@ -223,7 +223,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
             
             <NavLink
               to="/settings"
-              className="p-3 rounded-2xl text-primary/40 hover:text-primary hover:bg-white/80 transition-all"
+              className="p-3 rounded-2xl text-text/40 hover:text-primary hover:bg-primary/10 transition-all"
               title="Settings"
             >
               <SettingsIcon size={18} />
@@ -231,7 +231,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
 
             <button
               onClick={handleLogout}
-              className="p-3 rounded-2xl text-error/40 hover:text-error hover:bg-error/10 transition-all"
+              className="p-3 rounded-2xl text-red-500/60 hover:text-red-600 hover:bg-red-500/10 transition-all"
               title="Logout"
             >
               <LogOut size={18} />
