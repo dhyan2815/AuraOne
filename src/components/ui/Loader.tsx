@@ -16,9 +16,9 @@ const Loader = () => {
   const randomPunchline = punchlines[Math.floor(Math.random() * punchlines.length)];
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen w-screen bg-white dark:bg-slate-900">
-      <div className="w-12 h-12 border-4 border-primary-500 dark:border-primary-400 border-t-transparent rounded-full animate-spin mb-6"></div>
-      <p className="text-slate-600 dark:text-slate-400 text-lg font-medium animate-pulse">
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background/50 backdrop-blur-sm">
+      <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-6"></div>
+      <p className="text-text/80 dark:text-white/80 text-lg font-medium animate-pulse">
         {randomPunchline}
       </p>
     </div>
