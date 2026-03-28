@@ -1,146 +1,173 @@
 import { useEffect, useState } from 'react';
-import { Sparkles } from 'lucide-react';
-import WeatherWidget from '../components/widgets/WeatherWidget';
-import NewsWidget from '../components/widgets/NewsWidget';
-import TasksWidget from '../components/widgets/TasksWidget';
-import CalendarWidget from '../components/widgets/CalendarWidget';
 import { useAuth } from '../hooks/useAuth';
 import { motion } from 'framer-motion';
+import { Plus, ChevronLeft, ChevronRight } from 'lucide-react';
+import WeatherWidget from '../components/widgets/WeatherWidget';
+import TasksWidget from '../components/widgets/TasksWidget';
+import CalendarWidget from '../components/widgets/CalendarWidget';
+import NewsWidget from '../components/widgets/NewsWidget';
 
+// ─── Shared glass card base style ───────────────────────────────────────────
+const glassCard =
+  'rounded-[2rem] p-8 border border-white/30 relative overflow-hidden';
+const glassStyle = {
+  background: 'rgba(255,255,255,0.25)',
+  backdropFilter: 'blur(40px)',
+  WebkitBackdropFilter: 'blur(40px)',
+};
 
 const Dashboard = () => {
+  const { user } = useAuth();
+  const [greeting, setGreeting] = useState('Good morning');
+  const [userName, setUserName] = useState('');
 
-  const [greeting, setGreeting] = useState('');
-
-  // to set the greeting based on the current hour
   useEffect(() => {
-    const hour = new Date().getHours();
-    if (hour < 12) setGreeting('Good morning');
-    else if (hour < 18) setGreeting('Good afternoon');
+    const h = new Date().getHours();
+    if (h < 12) setGreeting('Good morning');
+    else if (h < 18) setGreeting('Good afternoon');
     else setGreeting('Good evening');
   }, []);
 
-  // Initialize state for the user's name
-  const [userName, setUserName] = useState('');
-
-  const { user } = useAuth();
-
-  // to fetch the user's name
   useEffect(() => {
     if (user) {
-      // Supabase stores custom user data in user_metadata
-      const name = user.user_metadata?.name || user.email;
-      setUserName(name);
+      setUserName(user.user_metadata?.name?.split(' ')[0] || user.email?.split('@')[0] || '');
     }
   }, [user]);
 
-
-  // Define animation variants for the container
+  // animation variants
   const container = {
     hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
+    show: { opacity: 1, transition: { staggerChildren: 0.08 } },
   };
-
-  // Define animation variants for the items
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 }
-  };
+  const item = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } };
 
   return (
-    <div className="space-y-10">
-      {/* Header Section */}
-      <motion.div 
-        initial={{ opacity: 0, x: -20 }}
+    <div className="p-8 max-w-[1440px] mx-auto w-full">
+      {/* ── Hero Heading ──────────────────────────────────── */}
+      <motion.div
+        className="mb-10"
+        initial={{ opacity: 0, x: -24 }}
         animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className="space-y-2"
+        transition={{ duration: 0.7, ease: 'easeOut' }}
       >
-        <h1 className="display-lg bg-gradient-to-br from-primary to-secondary bg-clip-text text-transparent italic">
-          {greeting}, {userName.split(' ')[0]} ✨
+        <h1
+          className="font-extrabold tracking-tight text-on-surface leading-tight"
+          style={{ fontSize: '3.25rem', fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+        >
+          {greeting}, {userName}{' '}
+          <span className="text-pink-400">✨</span>
         </h1>
-        <p className="text-aurora-on-surface-variant font-medium tracking-wide">
-          Your luminous workspace is ready for today's flow.
+        <p className="text-lg text-slate-500 mt-2 max-w-2xl">
+          Your sanctuary is ready. Focus on what matters most.
         </p>
       </motion.div>
 
-      {/* Stats/Quick Glance (Optional extra for premium feel) */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[
-          { label: 'Tasks', value: '12', color: 'primary' },
-          { label: 'Events', value: '3', color: 'secondary' },
-          { label: 'Unread', value: '5', color: 'tertiary' },
-          { label: 'Focus', value: '4h', color: 'primary' },
-        ].map((stat, i) => (
-          <motion.div
-            key={stat.label}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 + i * 0.1 }}
-            className="glass p-4 rounded-2xl flex flex-col justify-center items-center"
-          >
-            <span className="text-[0.6rem] uppercase tracking-widest text-primary/60 mb-1 font-bold">{stat.label}</span>
-            <span className="text-xl font-bold text-aurora-on-surface">{stat.value}</span>
-          </motion.div>
-        ))}
-      </div>
-
-      {/* Widget Grid */}
+      {/* ── Bento Grid ────────────────────────────────────── */}
       <motion.div
         variants={container}
         initial="hidden"
         animate="show"
-        className="grid grid-cols-1 md:grid-cols-3 gap-6"
+        className="grid grid-cols-12 gap-6"
       >
-        {/* Weather - Large spanning 2 cols */}
-        <motion.div variants={item} className="md:col-span-2">
-          <div className="glass-card h-full relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
-              <Sparkles className="w-32 h-32 text-primary" />
-            </div>
-            <p className="section-header">Atmosphere</p>
+        {/* ── Widget 1: Weather  (8/12 cols) ── */}
+        <motion.div
+          variants={item}
+          className={`col-span-12 lg:col-span-8 ${glassCard}`}
+          style={{
+            ...glassStyle,
+            boxShadow: '0 0 30px 0 rgba(129,140,248,0.12)',
+          }}
+        >
+          {/* decorative blur orb */}
+          <div className="absolute -right-10 -top-10 w-64 h-64 bg-indigo-400/10 blur-[80px] rounded-full pointer-events-none" />
+          <div className="relative z-10 h-full">
             <WeatherWidget />
           </div>
         </motion.div>
 
-        {/* Tasks Panel */}
-        <motion.div variants={item}>
-          <div className="glass-card h-full">
-            <div className="flex justify-between items-center mb-6">
-              <p className="section-header mb-0">Today's Flow</p>
-              <button className="text-[0.65rem] font-bold text-primary hover:underline">View All</button>
-            </div>
+        {/* ── Widget 2: Tasks Panel  (4/12 cols) ── */}
+        <motion.div
+          variants={item}
+          className={`col-span-12 lg:col-span-4 ${glassCard} flex flex-col`}
+          style={{
+            ...glassStyle,
+            boxShadow: '0 0 30px 0 rgba(171,143,254,0.12)',
+          }}
+        >
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-xl font-bold tracking-tight text-on-surface">
+              Today's Tasks
+            </h3>
+            <button
+              className="bg-indigo-100 text-indigo-600 p-2 rounded-full hover:bg-indigo-200 transition-colors"
+              title="Add task"
+            >
+              <Plus size={18} />
+            </button>
+          </div>
+          <div className="flex-1">
             <TasksWidget />
           </div>
         </motion.div>
 
-        {/* News Feed */}
-        <motion.div variants={item}>
-          <div className="glass-card h-full">
-            <p className="section-header">Insights</p>
-            <NewsWidget />
-          </div>
+        {/* ── Widget 3: Luminous Insights / News  (5/12 cols) ── */}
+        <motion.div
+          variants={item}
+          className={`col-span-12 lg:col-span-5 ${glassCard}`}
+          style={{
+            ...glassStyle,
+            boxShadow: '0 0 30px 0 rgba(232,105,172,0.12)',
+          }}
+        >
+          <h3 className="text-xl font-bold tracking-tight text-on-surface mb-6">
+            Luminous Insights
+          </h3>
+          <NewsWidget />
         </motion.div>
-        
-        {/* Calendar Widget spanning 2 columns if needed, but I'll keep it 1:2 or 2:1 */}
-        <motion.div variants={item} className="md:col-span-2">
-          <div className="glass-card h-full">
-            <div className="flex justify-between items-center mb-6">
-              <p className="section-header mb-0">Upcoming Moments</p>
-              <button className="text-[0.65rem] font-bold text-primary hover:underline">Full Calendar</button>
+
+        {/* ── Widget 4: Calendar  (7/12 cols) ── */}
+        <motion.div
+          variants={item}
+          className={`col-span-12 lg:col-span-7 ${glassCard} flex flex-col`}
+          style={{
+            ...glassStyle,
+            boxShadow: '0 0 30px 0 rgba(129,140,248,0.12)',
+          }}
+        >
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <h3 className="text-xl font-bold tracking-tight text-on-surface">
+                {new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}
+              </h3>
+              <p className="text-sm text-slate-500 mt-0.5">Your upcoming schedule</p>
             </div>
+            <div className="flex gap-2">
+              <button className="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center hover:bg-white transition-colors text-slate-500">
+                <ChevronLeft size={18} />
+              </button>
+              <button className="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center hover:bg-white transition-colors text-slate-500">
+                <ChevronRight size={18} />
+              </button>
+            </div>
+          </div>
+          <div className="flex-1">
             <CalendarWidget />
           </div>
         </motion.div>
       </motion.div>
+
+      {/* ── Floating Action Button ─────────────────────────── */}
+      <motion.button
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+        className="fixed bottom-8 right-8 w-16 h-16 rounded-full text-white flex items-center justify-center z-50 shadow-[0_10px_40px_rgba(73,83,188,0.40)]"
+        style={{ background: 'linear-gradient(135deg, #6366f1, #a855f7)' }}
+        title="Quick action"
+      >
+        <span className="text-2xl">✦</span>
+      </motion.button>
     </div>
   );
-
 };
 
 export default Dashboard;

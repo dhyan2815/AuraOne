@@ -1,50 +1,102 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import { motion } from 'framer-motion';
+import { Search, Moon, Sun, Bell } from 'lucide-react';
+import { useAuth } from '../../hooks/useAuth';
 
 const Layout = () => {
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const { user } = useAuth();
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    const saved = localStorage.getItem('theme');
+    if (saved === 'dark' || saved === 'light') return saved;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  });
 
-  // Load sidebar state from localStorage on mount
-  useEffect(() => {
-    const savedState = localStorage.getItem('sidebarCollapsed');
-    if (savedState !== null) {
-      setIsSidebarCollapsed(JSON.parse(savedState));
-    }
-  }, []);
-
-  // Save sidebar state to localStorage when it changes
-  useEffect(() => {
-    localStorage.setItem('sidebarCollapsed', JSON.stringify(isSidebarCollapsed));
-  }, [isSidebarCollapsed]);
-
-  const toggleSidebar = () => {
-    setIsSidebarCollapsed(!isSidebarCollapsed);
+  const toggleTheme = () => {
+    const next = theme === 'light' ? 'dark' : 'light';
+    setTheme(next);
+    localStorage.setItem('theme', next);
+    if (next === 'dark') document.documentElement.classList.add('dark');
+    else document.documentElement.classList.remove('dark');
   };
 
+  const userName = user?.user_metadata?.name || user?.email?.split('@')[0] || 'U';
+
   return (
-    <div className="flex h-screen overflow-hidden bg-background text-text">
-      <Sidebar
-        isCollapsed={isSidebarCollapsed}
-        onToggleCollapse={toggleSidebar}
+    <div className="flex min-h-screen text-on-surface bg-background overflow-hidden">
+      {/* Aurora mesh background */}
+      <div
+        aria-hidden="true"
+        className="fixed inset-0 z-0 pointer-events-none"
+        style={{
+          background: `
+            radial-gradient(circle at 20% 30%, rgba(129,140,248,0.15) 0%, transparent 40%),
+            radial-gradient(circle at 80% 20%, rgba(171,143,254,0.15) 0%, transparent 40%),
+            radial-gradient(circle at 50% 80%, rgba(232,105,172,0.10) 0%, transparent 50%)
+          `,
+        }}
       />
 
-      <main className="flex-1 overflow-auto relative z-10">
-        <div className="max-w-[1440px] mx-auto min-h-full">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-            className="px-6 py-8"
-          >
-            <Outlet />
-          </motion.div>
-        </div>
+      {/* Sidebar */}
+      <Sidebar />
+
+      {/* Main content */}
+      <main className="relative z-10 flex-1 flex flex-col h-screen overflow-y-auto">
+        {/* Top App Bar */}
+        <header
+          className="w-full h-16 sticky top-0 z-40 flex justify-between items-center px-8"
+          style={{
+            background: 'rgba(250,248,253,0.60)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            borderBottom: '1px solid rgba(198,197,213,0.20)',
+          }}
+        >
+          {/* Search */}
+          <div className="flex items-center gap-4 flex-1 max-w-md relative group">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+            <input
+              type="text"
+              placeholder="Search your luminous workspace..."
+              className="w-full bg-[#e9e7ec]/50 border-none rounded-full py-2 pl-10 pr-4 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-200 transition-all"
+            />
+          </div>
+
+          {/* Actions */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-full hover:bg-indigo-50/60 text-slate-500 transition-colors"
+            >
+              {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+            </button>
+
+            <button className="p-2 rounded-full hover:bg-indigo-50/60 text-slate-500 transition-colors relative">
+              <Bell size={20} />
+              <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-pink-400 rounded-full" />
+            </button>
+
+            <div className="w-px h-6 bg-slate-200 mx-1" />
+
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-400 flex items-center justify-center text-white text-sm font-bold shadow-md cursor-pointer">
+              {userName.charAt(0).toUpperCase()}
+            </div>
+          </div>
+        </header>
+
+        {/* Page content */}
+        <motion.div
+          className="flex-1"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, ease: 'easeOut' }}
+        >
+          <Outlet />
+        </motion.div>
       </main>
     </div>
   );
-
 };
 
 export default Layout;

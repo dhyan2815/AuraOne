@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
-import { ExternalLink, Newspaper, Globe } from "lucide-react";
+import { ExternalLink, Globe } from "lucide-react";
 import { API_CONFIG } from "../../config/api";
 import { motion, AnimatePresence } from "framer-motion";
-import Card from "../ui/Card";
 
 interface NewsItem {
   id: string;
   title: string;
   source: string;
   url: string;
+  imageUrl?: string;
   publishedAt: string;
 }
 
@@ -17,7 +17,10 @@ interface ApiNewsItem {
   source_id: string;
   link: string;
   pubDate: string;
+  image_url?: string;
 }
+
+const CATEGORIES = ["Trends", "Weekly Focus", "Insights"];
 
 const NewsWidget = () => {
   const [news, setNews] = useState<NewsItem[]>([]);
@@ -25,133 +28,119 @@ const NewsWidget = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchNews = async () => {
+    const fetch_ = async () => {
       try {
         setLoading(true);
-        setError(null);
-        const response = await fetch(
+        const res = await fetch(
           `${API_CONFIG.NEWS_API_URL}/news?apikey=${API_CONFIG.NEWS_API_KEY}&country=in&language=en`
         );
-        if (!response.ok) throw new Error("Connection unstable");
-        const data = await response.json();
-        const formattedNews = data.results.map((item: ApiNewsItem, index: number) => ({
-          id: index.toString(),
-          title: item.title,
-          source: item.source_id,
-          url: item.link,
-          publishedAt: item.pubDate,
-        }));
-        setNews(formattedNews);
+        if (!res.ok) throw new Error("Connection unstable");
+        const data = await res.json();
+        setNews(
+          data.results.slice(0, 4).map((item: ApiNewsItem, i: number) => ({
+            id: i.toString(),
+            title: item.title,
+            source: item.source_id,
+            url: item.link,
+            imageUrl: item.image_url,
+            publishedAt: item.pubDate,
+          }))
+        );
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to sync news");
+        setError(err instanceof Error ? err.message : "Failed");
       } finally {
         setLoading(false);
       }
     };
-    fetchNews();
+    fetch_();
   }, []);
 
-  const formatDate = (dateString: string) => {
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    } catch { return dateString; }
-  };
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-48 gap-3">
+        <Globe size={24} className="text-indigo-300 animate-spin" />
+        <p className="text-sm text-slate-400 animate-pulse font-semibold">Scanning feeds…</p>
+      </div>
+    );
+  }
+
+  if (error || news.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-48 gap-2">
+        <p className="text-sm text-slate-400">{error || "No articles found"}</p>
+      </div>
+    );
+  }
+
+  const [featured, ...rest] = news;
 
   return (
-    <Card className="h-full flex flex-col">
-      <div className="p-4 border-b border-slate-200 dark:border-gray-700">
-        <div className="flex items-center justify-between">
-          <span>Global Feed</span>
-          <Newspaper className="w-5 h-5 text-slate-400" />
-        </div>
-      </div>
-      <div className="flex-1 flex flex-col p-4">
-        <AnimatePresence mode="wait">
-          {loading ? (
-            <motion.div
-              key="loader"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex-1 flex flex-col items-center justify-center"
-            >
-              <div className="w-12 h-12 bg-slate-100 dark:bg-gray-800 border border-slate-200 dark:border-gray-700 rounded-2xl flex items-center justify-center mb-3">
-                <Globe className="text-primary animate-spin" size={24} />
-              </div>
-              <p className="text-sm font-bold text-slate-500 animate-pulse">Scanning Feeds...</p>
-            </motion.div>
-          ) : error ? (
-            <motion.div
-              key="error"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex-1 flex items-center justify-center p-4 text-center"
-            >
-              <div className="bg-red-500/10 p-4 rounded-lg">
-                <p className="text-xs font-bold text-red-500">{error}</p>
-              </div>
-            </motion.div>
-          ) : news.length === 0 ? (
-            <motion.div
-              key="empty"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex-1 flex flex-col items-center justify-center text-center"
-            >
-                <div className="w-12 h-12 bg-slate-100 dark:bg-gray-800 border border-slate-200 dark:border-gray-700 rounded-2xl flex items-center justify-center mb-3">
-                    <Newspaper className="text-primary/40" />
-                </div>
-                <p className="text-sm font-bold text-text">No news found</p>
-                <p className="text-xs text-slate-500 mt-1">Check back later</p>
-            </motion.div>
+    <AnimatePresence>
+      <div className="space-y-5">
+        {/* Featured article with image */}
+        <motion.a
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          href={featured.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group block cursor-pointer"
+        >
+          {featured.imageUrl ? (
+            <img
+              src={featured.imageUrl}
+              alt={featured.title}
+              className="w-full h-32 object-cover rounded-2xl mb-3 group-hover:scale-[1.02] transition-transform duration-300"
+            />
           ) : (
-            <motion.div
-              key="news-list"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="space-y-3"
-            >
-              {news.slice(0, 3).map((item, idx) => (
-                <motion.a
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: idx * 0.1 }}
-                  key={item.id}
-                  href={item.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group block p-3 bg-slate-50 dark:bg-gray-800/50 rounded-2xl hover:bg-white/50 dark:hover:bg-gray-700/50 transition-all border border-slate-200 dark:border-gray-700"
-                >
-                  <div className="flex justify-between items-start gap-4">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-md bg-primary/10 text-primary">
-                          {item.source}
-                        </span>
-                        <span className="text-xs text-slate-500">
-                          {formatDate(item.publishedAt)}
-                        </span>
-                      </div>
-                      <h4 className="text-sm font-bold text-text leading-snug line-clamp-2 group-hover:text-primary transition-colors">
-                        {item.title}
-                      </h4>
-                    </div>
-                    <div className="p-1.5 bg-white dark:bg-gray-700 border border-slate-200 dark:border-gray-600 rounded-xl group-hover:bg-primary group-hover:text-white transition-all shrink-0">
-                      <ExternalLink size={12} />
-                    </div>
-                  </div>
-                </motion.a>
-              ))}
-            </motion.div>
+            <div className="w-full h-32 rounded-2xl mb-3 bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center">
+              <Globe size={32} className="text-indigo-300" />
+            </div>
           )}
-        </AnimatePresence>
+          <p className="text-[10px] font-bold text-pink-500 uppercase tracking-widest mb-1">
+            {CATEGORIES[0]}
+          </p>
+          <h4 className="font-bold text-sm leading-snug text-on-surface group-hover:text-indigo-600 transition-colors line-clamp-2">
+            {featured.title}
+          </h4>
+        </motion.a>
+
+        {/* Smaller articles */}
+        {rest.slice(0, 2).map((item, idx) => (
+          <motion.a
+            key={item.id}
+            initial={{ opacity: 0, x: -8 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.1 + idx * 0.08 }}
+            href={item.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex gap-3 cursor-pointer group"
+          >
+            <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-indigo-50 flex items-center justify-center">
+              {item.imageUrl ? (
+                <img
+                  src={item.imageUrl}
+                  alt={item.title}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
+              ) : (
+                <ExternalLink size={16} className="text-indigo-300" />
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-0.5">
+                {CATEGORIES[idx + 1] || item.source}
+              </p>
+              <h4 className="font-bold text-xs leading-snug text-on-surface group-hover:text-indigo-600 transition-colors line-clamp-2">
+                {item.title}
+              </h4>
+            </div>
+          </motion.a>
+        ))}
       </div>
-    </Card>
+    </AnimatePresence>
   );
 };
 
 export default NewsWidget;
-

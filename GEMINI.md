@@ -26,5 +26,20 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
 ## Technical Context
 - **Framework:** React + Vite + TypeScript
 - **Styling:** Tailwind CSS + custom glassmorphism utilities in `index.css`.
-- **Primary Design System:** Being redefined based on the upcoming UI selection.
+- **Primary Design System:** Aurora Glass (actively implemented).
 - **MCP Server Context:** Stitch MCP used for high-fidelity design generation.
+
+---
+
+## Changelog
+
+### March 28, 2026: Dashboard — Exact Stitch HTML Match
+- **Objective:** Restore and exactly replicate the Stitch-generated Aurora Glass dashboard.
+- **Files Changed:**
+  - `Sidebar.tsx`: Pill-shaped gradient active nav (`from-indigo-500 to-purple-400 rounded-full`), glass sidebar bg, user profile card at bottom with avatar + logout.
+  - `Layout.tsx`: Added sticky Top App Bar with search input, dark mode toggle, bell notification, user avatar. Removed collapse toggle — sidebar is fixed-width on desktop.
+  - `Dashboard.tsx`: Complete 12-column bento grid — Weather (8col), Tasks (4col), News (5col), Calendar (7col), hero greeting, floating action button.
+  - `WeatherWidget.tsx`: Large 7xl temperature, location, feels-like, 3-day forecast icons, large decorative weather icon.
+  - `TasksWidget.tsx`: Circular checkbox buttons, completed task strikethrough, glass row styling.
+  - `CalendarWidget.tsx`: Proper Mon–Sun 7-col mini calendar grid, today pill highlight, event dots.
+  - `NewsWidget.tsx`: Featured article with hero image + two thumbnail articles with category labels.
