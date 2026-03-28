@@ -42,4 +42,17 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
   - `WeatherWidget.tsx`: Large 7xl temperature, location, feels-like, 3-day forecast icons, large decorative weather icon.
   - `TasksWidget.tsx`: Circular checkbox buttons, completed task strikethrough, glass row styling.
   - `CalendarWidget.tsx`: Proper Mon–Sun 7-col mini calendar grid, today pill highlight, event dots.
+  - `WeatherWidget.tsx`: Large 7xl temperature, location, feels-like, 3-day forecast icons, large decorative weather icon.
+  - `TasksWidget.tsx`: Circular checkbox buttons, completed task strikethrough, glass row styling.
+  - `CalendarWidget.tsx`: Proper Mon–Sun 7-col mini calendar grid, today pill highlight, event dots.
   - `NewsWidget.tsx`: Featured article with hero image + two thumbnail articles with category labels.
+
+### March 28, 2026: Notes, Tasks, Calendar/Events, Chat — Stitch HTML Integration
+- **Objective:** Implement all 4 remaining pages from Stitch-generated Aurora Glass HTML (located in `stitch-design-codes/`).
+- **Files Changed:**
+  - `Notes.tsx`: "Your Archives" hero, filter tabs (All/Personal/Work/Ideas), masonry 3-col glass note cards with color-coded tags, hover lift effect, empty state.
+  - `Tasks.tsx`: "Objective Registry" hero with active count badge, filter tabs (All/Today/Upcoming/Completed), 3 task groups (High Priority / Active Flow / Recently Achieved), glass card rows with circular checkboxes and priority badges.
+  - `Calendar.tsx`: "Temporal Matrix" hero, Mon–Sun 7-col interactive calendar grid, event dots, today highlighted with indigo pill, right panel with upcoming events (color-coded accent bars), inline add-event form, promotional promo card.
+  - `Chat.tsx`: Aura Pulse AI chat — left sessions sidebar with "New Chat" button + session list, main glass chat panel with Aura Pulse header, suggestion cards (empty state), message bubbles with animated typing indicator, glass input bar with mic + send.
+- **Design Source:** `stitch-design-codes/*.html` — user-provided Stitch HTML files.
+- **Branch:** `ui2`

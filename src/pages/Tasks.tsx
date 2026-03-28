@@ -1,194 +1,225 @@
-import { useState, useEffect, useCallback } from "react";
-import { Link } from "react-router-dom";
-import toast from 'react-hot-toast';
-import {
-  PlusIcon,
-  Clock,
-  FilterIcon,
-  CheckCheck,
-  Search,
-  GridIcon,
-  ListIcon,
-  Sparkles
-} from "lucide-react";
-import TaskCard from "../components/tasks/TaskCard";
+import { useState, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import { Plus, Check, Flag, Calendar, Clock, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  listenToTasks,
-  updateTask,
-  getTasks,
-  Task,
-} from "../hooks/useTasks";
+import { getTasks, updateTask, deleteTask, Task } from "../hooks/useTasks";
 import { useAuth } from "../hooks/useAuth";
-import { RealtimeChannel } from "@supabase/supabase-js";
+import toast from "react-hot-toast";
+
+const FILTERS = ["All", "Today", "Upcoming", "Completed"];
+
+const PRIORITY_STYLE: Record<string, string> = {
+  high:   "bg-red-50 text-red-500",
+  medium: "bg-amber-50 text-amber-600",
+  low:    "bg-emerald-50 text-emerald-600",
+};
 
 const Tasks = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [filter, setFilter] = useState<"all" | "completed" | "pending">("all");
+  const [activeFilter, setActiveFilter] = useState("All");
+  const navigate = useNavigate();
   const { user } = useAuth();
 
-  const fetchTasks = useCallback(async () => {
-    if (!user) return;
-    try {
-      const fetchedTasks = await getTasks(user.id);
-      setTasks(fetchedTasks);
-    } catch (error) {
-      toast.error("Protocol sync interrupted");
-    }
-  }, [user]);
-
-  useEffect(() => {
-    if (!user) return;
-    fetchTasks();
-    const channel: RealtimeChannel = listenToTasks(user.id, () => {
-      fetchTasks();
-    });
-    return () => {
-      channel.unsubscribe();
-    };
-  }, [user, fetchTasks]);
-
-  const handleToggleComplete = async (taskId: string) => {
-    const task = tasks.find(t => t.id === taskId);
-    if (!task) return;
-    const newStatus = !task.completed;
-    try {
-      await updateTask(taskId, { completed: newStatus });
-      toast.success(newStatus ? "Objective secured" : "Registry updated");
-      setTasks(prevTasks => prevTasks.map(t => t.id === taskId ? { ...t, completed: newStatus } : t));
-    } catch (error) {
-      toast.error("State transition failed");
-    }
+  const loadTasks = () => {
+    if (user) getTasks(user.id).then(setTasks);
   };
 
-  const filteredTasks = tasks.filter((task) => {
-    let statusFiltered = true;
-    if (filter === "completed") statusFiltered = task.completed === true;
-    if (filter === "pending") statusFiltered = task.completed === false;
-    let searchFiltered = true;
-    if (searchQuery) {
-      searchFiltered =
-        task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        !!(task.description && task.description.toLowerCase().includes(searchQuery.toLowerCase()));
-    }
-    return statusFiltered && searchFiltered;
-  });
+  useEffect(() => { loadTasks(); }, [user]);
 
-  const sortedTasks = [...filteredTasks].sort((a, b) => {
-    return new Date(b.created_at || '').getTime() - new Date(a.created_at || '').getTime();
-  });
+  const handleToggle = async (id: string, completed: boolean | undefined, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!user) return;
+    await updateTask(id, { completed: !completed });
+    toast.success(!completed ? "Objective achieved! ✦" : "Reactivated");
+    loadTasks();
+  };
+
+  const handleDelete = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!user) return;
+    await deleteTask(id);
+    toast.success("Task removed");
+    loadTasks();
+  };
+
+  const today = new Date().toDateString();
+  const filtered = useMemo(() => {
+    return tasks.filter((t) => {
+      if (activeFilter === "Completed") return !!t.completed;
+      if (activeFilter === "Today") return t.due_date && new Date(t.due_date).toDateString() === today && !t.completed;
+      if (activeFilter === "Upcoming") return t.due_date && new Date(t.due_date).toDateString() !== today && !t.completed;
+      return true;
+    });
+  }, [tasks, activeFilter, today]);
+
+  const highPriority = filtered.filter((t) => t.priority === "high" && !t.completed);
+  const activeFlow   = filtered.filter((t) => t.priority !== "high" && !t.completed);
+  const achieved     = filtered.filter((t) => !!t.completed);
+
+  const stagger = {
+    hidden: { opacity: 0 },
+    show: { opacity: 1, transition: { staggerChildren: 0.05 } },
+  };
+  const row = { hidden: { opacity: 0, x: -12 }, show: { opacity: 1, x: 0 } };
+
+  const TaskRow = ({ task }: { task: Task }) => {
+    const done = !!task.completed;
+    const priorityClass = task.priority ? PRIORITY_STYLE[task.priority] ?? PRIORITY_STYLE.low : PRIORITY_STYLE.low;
+    return (
+      <motion.div
+        variants={row}
+        onClick={() => navigate(`/tasks/${task.id}`)}
+        className={`bg-white/25 backdrop-blur-[40px] border border-white/30 rounded-[2rem] p-5 flex items-center gap-6 group cursor-pointer hover:translate-x-1 transition-all duration-300 ${done ? "opacity-60" : ""}`}
+      >
+        {/* Circular checkbox */}
+        <button
+          onClick={(e) => handleToggle(task.id, task.completed, e)}
+          className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 border-2 transition-colors ${
+            done ? "bg-indigo-500 border-indigo-500" : "border-indigo-300 group-hover:border-indigo-500"
+          }`}
+        >
+          {done && <Check size={13} className="text-white" strokeWidth={3} />}
+        </button>
+
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          <h4 className={`font-bold text-on-surface text-lg ${done ? "line-through text-slate-400" : ""}`}>
+            {task.title}
+          </h4>
+          <div className="flex items-center gap-4 mt-1 flex-wrap">
+            {task.due_date && (
+              <span className="text-xs font-semibold text-slate-400 flex items-center gap-1">
+                <Calendar size={12} />{new Date(task.due_date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+              </span>
+            )}
+            {!task.due_date && (
+              <span className="text-xs font-semibold text-slate-400 flex items-center gap-1">
+                <Clock size={12} />No due date
+              </span>
+            )}
+            {task.description && (
+              <span className="text-xs px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-500 truncate max-w-[120px]">
+                {task.description.slice(0, 20)}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Priority Badge */}
+        {task.priority && (
+          <span className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest flex items-center gap-1.5 ${priorityClass}`}>
+            <Flag size={10} />{task.priority}
+          </span>
+        )}
+
+        {/* Delete */}
+        <button
+          onClick={(e) => handleDelete(task.id, e)}
+          className="p-2 text-slate-300 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
+        >
+          <Trash2 size={15} />
+        </button>
+      </motion.div>
+    );
+  };
+
+  interface GroupProps { dot: string; label: string; list: Task[]; }
+  const Group = ({ dot, label, list }: GroupProps) => (
+    <AnimatePresence>
+      {list.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="mb-10"
+        >
+          <div className="flex items-center gap-3 mb-6 px-4">
+            <div className={`w-2 h-2 rounded-full ${dot}`} />
+            <h3 className="text-sm font-bold uppercase tracking-widest text-on-surface/60">{label}</h3>
+          </div>
+          <motion.div variants={stagger} initial="hidden" animate="show" className="space-y-4">
+            {list.map((t) => <TaskRow key={t.id} task={t} />)}
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-        <div className="space-y-2">
-          <div className="flex items-center gap-2 text-primary">
-            <Sparkles size={16} className="aurora-glow" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em]">Operations Center</span>
+    <div className="min-h-screen px-10 pt-12 pb-16 max-w-6xl mx-auto">
+      {/* ── Hero & Controls ── */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12">
+        <motion.div initial={{ opacity: 0, x: -24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }}>
+          <div className="flex items-center gap-4 mb-2">
+            <h1 className="text-4xl font-extrabold tracking-tight text-on-surface">
+              Objective Registry
+            </h1>
+            <span className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-xs font-bold tracking-widest uppercase">
+              {tasks.filter((t) => !t.completed).length} Active
+            </span>
           </div>
-          <h1 className="display-lg leading-tight text-aurora-on-surface">Task Registry</h1>
-        </div>
+          <p className="text-slate-500 font-medium">Curate your workflow and maintain tactical alignment.</p>
+        </motion.div>
 
-        <div className="flex flex-wrap items-center gap-4">
-          <div className="relative group w-full md:w-80">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-primary" size={18} />
-            <input
-              type="text"
-              placeholder="Search registry..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="input-aurora pl-12 w-full py-3"
-            />
-          </div>
-
-          <div className="flex items-center glass p-1 rounded-2xl border border-primary/5 shadow-sm">
-            <button
-              className={`p-2.5 rounded-xl transition-all ${viewMode === "grid" ? "bg-white text-primary shadow-sm" : "text-aurora-on-surface-variant hover:text-primary"}`}
-              onClick={() => setViewMode("grid")}
-            >
-              <GridIcon size={18} />
-            </button>
-            <button
-              className={`p-2.5 rounded-xl transition-all ${viewMode === "list" ? "bg-white text-primary shadow-sm" : "text-aurora-on-surface-variant hover:text-primary"}`}
-              onClick={() => setViewMode("list")}
-            >
-              <ListIcon size={18} />
-            </button>
-          </div>
-
-          <Link to="/tasks/new" className="btn-aurora-primary px-6 py-3 text-xs font-black uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-primary/20 hover:shadow-primary/30 active:scale-[0.98]">
-            <PlusIcon size={16} />
-            New Command
-          </Link>
-        </div>
-      </div>
-
-      <div className="flex flex-wrap items-center gap-3 mb-10">
-        {[
-          { id: 'all', label: 'All Protocols', icon: FilterIcon, color: 'primary' },
-          { id: 'pending', label: 'Active', icon: Clock, color: 'secondary' },
-          { id: 'completed', label: 'Secured', icon: CheckCheck, color: 'success' },
-        ].map((item) => (
-          <button
-            key={item.id}
-            onClick={() => setFilter(item.id as any)}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-wider transition-all border ${
-              filter === item.id 
-                ? `bg-${item.color}/10 border-${item.color}/20 text-${item.color} shadow-sm` 
-                : "glass border-transparent text-aurora-on-surface-variant hover:border-primary/20 hover:text-aurora-on-surface"
-            }`}
-          >
-            <item.icon size={14} />
-            {item.label}
-          </button>
-        ))}
-      </div>
-
-      <AnimatePresence mode="wait">
-        {sortedTasks.length === 0 ? (
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="flex flex-col items-center justify-center py-24 text-center glass-panel rounded-[3rem] border-dashed border-primary/10"
-          >
-            <div className="w-20 h-20 glass rounded-3xl flex items-center justify-center mb-6 shadow-sm text-primary/30">
-              <Sparkles size={40} />
-            </div>
-            <h3 className="text-xl font-black text-aurora-on-surface mb-2 italic tracking-tight">System Registry Empty</h3>
-            <p className="text-xs font-bold text-aurora-on-surface-variant max-w-xs mb-8 uppercase tracking-widest">
-              No objectives found in this sector.
-            </p>
-            <Link to="/tasks/new" className="btn-aurora-secondary px-8 py-3 text-[10px] font-black uppercase tracking-[0.2em]">
-              Initialize New Objective
-            </Link>
-          </motion.div>
-        ) : (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            layout
-            className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" : "space-y-4 max-w-5xl mx-auto"}
-          >
-            {sortedTasks.map((task: Task, idx) => (
-              <motion.div 
-                key={task.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.05 }}
-                layout
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="flex items-center gap-4 flex-wrap"
+        >
+          {/* Filter tabs */}
+          <div className="flex bg-white/40 backdrop-blur-md p-1.5 rounded-full border border-white/50 shadow-sm">
+            {FILTERS.map((f) => (
+              <button
+                key={f}
+                onClick={() => setActiveFilter(f)}
+                className={`px-6 py-2 rounded-full text-sm font-semibold transition-all ${
+                  activeFilter === f
+                    ? "bg-white text-indigo-600 shadow-sm"
+                    : "text-slate-500 hover:text-indigo-600"
+                }`}
               >
-                <TaskCard task={task} viewMode={viewMode} onToggleComplete={handleToggleComplete} />
-              </motion.div>
+                {f}
+              </button>
             ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </div>
+
+          {/* New Task CTA */}
+          <button
+            onClick={() => navigate("/tasks/new")}
+            className="flex items-center gap-2 bg-gradient-to-br from-indigo-600 to-purple-500 text-white px-8 py-3.5 rounded-full font-bold shadow-[0_10px_20px_-5px_rgba(73,83,188,0.3)] hover:scale-[1.02] active:scale-95 transition-all text-sm"
+          >
+            <Plus size={18} />
+            New Task
+          </button>
+        </motion.div>
+      </div>
+
+      {/* ── Task Groups ── */}
+      {tasks.length === 0 ? (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="flex flex-col items-center justify-center py-24 gap-4 text-center"
+        >
+          <p className="text-2xl font-bold text-slate-500">No objectives yet</p>
+          <p className="text-sm text-slate-400">Create your first task to begin the registry.</p>
+          <button
+            onClick={() => navigate("/tasks/new")}
+            className="mt-4 px-8 py-3 rounded-full text-white font-bold shadow-xl bg-gradient-to-r from-indigo-600 to-purple-500"
+          >
+            + New Task
+          </button>
+        </motion.div>
+      ) : (
+        <div className="space-y-2">
+          <Group dot="bg-red-400"     label="High Priority Objectives" list={highPriority} />
+          <Group dot="bg-amber-400"   label="Active Flow"              list={activeFlow} />
+          <Group dot="bg-slate-300"   label="Recently Achieved"        list={achieved} />
+        </div>
+      )}
     </div>
   );
 };
 
 export default Tasks;
-

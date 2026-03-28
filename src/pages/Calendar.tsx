@@ -1,75 +1,71 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
-import { PlusIcon, Trash2, Calendar as CalendarIcon, Clock, Sparkles, ChevronLeft, ChevronRight } from "lucide-react";
 import {
-  format,
-  addDays,
-  addMonths,
-  subMonths,
-  startOfMonth,
-  endOfMonth,
-  eachDayOfInterval,
-  isSameDay,
-  isToday,
-  parse,
-  startOfWeek,
-  endOfWeek
+  format, addMonths, subMonths,
+  startOfMonth, endOfMonth,
+  eachDayOfInterval, isSameDay, isToday,
+  startOfWeek, endOfWeek, parse,
+  isSameMonth
 } from "date-fns";
+import { ChevronLeft, ChevronRight, Plus, Clock, MapPin } from "lucide-react";
 import { getEvents, createEvent, deleteEvent, listenToEvents, Event } from "../hooks/useEvents";
 import { useAuth } from "../hooks/useAuth";
 import toast from "react-hot-toast";
 import { RealtimeChannel } from "@supabase/supabase-js";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+
+// Event accent colors cycling
+const EVENT_ACCENTS = [
+  { bar: "bg-indigo-500", dateBg: "bg-indigo-50", dateNum: "text-indigo-700", dateMon: "text-indigo-400", title: "group-hover:text-indigo-600" },
+  { bar: "bg-purple-500", dateBg: "bg-purple-50", dateNum: "text-purple-700", dateMon: "text-purple-400", title: "group-hover:text-purple-600" },
+  { bar: "bg-pink-500",   dateBg: "bg-pink-50",   dateNum: "text-pink-700",   dateMon: "text-pink-400",   title: "group-hover:text-pink-600" },
+];
+
+const DAY_HEADERS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 const Calendar = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [newEventTitle, setNewEventTitle] = useState("");
   const [newEventTime, setNewEventTime] = useState("");
+  const [showForm, setShowForm] = useState(false);
   const [events, setEvents] = useState<Event[]>([]);
-
   const { user } = useAuth();
 
   const fetchEvents = useCallback(async () => {
     if (!user) return;
     try {
-      const fetchedEvents = await getEvents(user.id);
-      setEvents(fetchedEvents);
-    } catch (error) {
-      toast.error("Temporal sync failed");
-    }
+      const fetched = await getEvents(user.id);
+      setEvents(fetched);
+    } catch { toast.error("Temporal sync failed"); }
   }, [user]);
 
   useEffect(() => {
     if (!user) return;
     fetchEvents();
-    const channel: RealtimeChannel = listenToEvents(user.id, () => {
-      fetchEvents();
-    });
-    return () => {
-      channel.unsubscribe();
-    };
+    const channel: RealtimeChannel = listenToEvents(user.id, fetchEvents);
+    return () => { channel.unsubscribe(); };
   }, [user, fetchEvents]);
-
-  const eventsForSelectedDate = useMemo(
-    () => events.filter((event) => isSameDay(new Date(event.start_time), selectedDate)),
-    [events, selectedDate]
-  );
-
-  const nextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
-  const prevMonth = () => setCurrentMonth(subMonths(currentMonth, 1));
 
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
-  const startDate = startOfWeek(monthStart, { weekStartsOn: 1 });
-  const endDate = endOfWeek(monthEnd, { weekStartsOn: 1 });
-  const calendarDays = eachDayOfInterval({ start: startDate, end: endDate });
+  const calStart = startOfWeek(monthStart, { weekStartsOn: 1 });
+  const calEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
+  const calendarDays = eachDayOfInterval({ start: calStart, end: calEnd });
 
-  const next6Days = Array.from({ length: 6 }, (_, i) => addDays(new Date(), i));
+  const eventsForDay = (day: Date) =>
+    events.filter((e) => isSameDay(new Date(e.start_time), day));
+
+  const upcomingEvents = useMemo(
+    () => events
+      .filter((e) => new Date(e.start_time) >= new Date())
+      .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())
+      .slice(0, 6),
+    [events]
+  );
 
   const handleAddEvent = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || !newEventTitle || !newEventTime) return;
-
     try {
       const startTime = parse(newEventTime, "HH:mm", selectedDate);
       await createEvent(user.id, {
@@ -78,236 +74,275 @@ const Calendar = () => {
         end_time: null,
         description: null,
       });
-      toast.success("Timeline entry secured");
+      toast.success("Event synchronized ✦");
       setNewEventTitle("");
       setNewEventTime("");
-    } catch (error) {
-      toast.error("Failed to append event");
-    }
+      setShowForm(false);
+      fetchEvents();
+    } catch { toast.error("Sync failed"); }
   };
 
-  const handleDeleteEvent = async (eventId: string) => {
-    if (!window.confirm('Neutralize this event from the timeline?')) return;
-    try {
-      await deleteEvent(eventId);
-      toast.success("Event neutralized");
-    } catch (err) {
-      toast.error("Neutralization failed");
-    }
+  const handleDeleteEvent = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    await deleteEvent(id);
+    toast.success("Event removed");
+    fetchEvents();
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div className="space-y-4">
-          <div className="flex items-center gap-2 text-primary">
-            <Sparkles size={16} className="aurora-glow" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em]">Temporal Matrix</span>
-          </div>
-          <h1 className="text-5xl font-black text-aurora-on-surface tracking-tight">Timeline</h1>
-        </div>
+    <div className="min-h-screen p-8">
+      <div className="max-w-[1400px] mx-auto grid grid-cols-12 gap-8">
 
-        <div className="flex items-center gap-3">
-          <div className="glass px-6 py-3 rounded-2xl border border-primary/5 flex items-center gap-4">
-             <button onClick={prevMonth} className="text-aurora-on-surface-variant hover:text-primary transition-colors">
-               <ChevronLeft size={20} />
-             </button>
-             <span className="text-sm font-black uppercase tracking-widest min-w-[140px] text-center">
-               {format(currentMonth, "MMMM yyyy")}
-             </span>
-             <button onClick={nextMonth} className="text-aurora-on-surface-variant hover:text-primary transition-colors">
-               <ChevronRight size={20} />
-             </button>
-          </div>
-          <button 
-            onClick={() => setCurrentMonth(new Date())}
-            className="glass px-4 py-3 rounded-2xl border border-primary/5 text-[10px] font-black uppercase tracking-widest hover:bg-white/40 transition-all"
+        {/* ── Left: Calendar hero + grid ── */}
+        <div className="col-span-12 lg:col-span-8 flex flex-col gap-8">
+
+          {/* Hero + Month Nav */}
+          <motion.div
+            className="flex items-end justify-between"
+            initial={{ opacity: 0, x: -24 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
           >
-            Today
-          </button>
-        </div>
-      </div>
+            <div>
+              <h1 className="text-[3.5rem] font-extrabold tracking-tight leading-none text-slate-900">
+                Temporal Matrix
+              </h1>
+              <p className="text-slate-500 mt-2 font-medium">
+                Navigating through your luminous timeline
+              </p>
+            </div>
+            <div className="flex items-center gap-4 bg-white/25 backdrop-blur-[40px] border border-white/30 shadow-[0_8px_32px_0_rgba(129,140,248,0.08)] px-6 py-3 rounded-2xl">
+              <button
+                onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
+                className="p-2 hover:bg-indigo-500/10 rounded-full transition-colors"
+              >
+                <ChevronLeft size={20} className="text-indigo-600" />
+              </button>
+              <span className="text-xl font-bold text-slate-800 min-w-[140px] text-center">
+                {format(currentMonth, "MMMM yyyy")}
+              </span>
+              <button
+                onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
+                className="p-2 hover:bg-indigo-500/10 rounded-full transition-colors"
+              >
+                <ChevronRight size={20} className="text-indigo-600" />
+              </button>
+            </div>
+          </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-        <div className="lg:col-span-8 space-y-8">
-          <div className="glass-panel p-8 rounded-[3rem] border border-primary/5 shadow-2xl shadow-primary/5">
-            <div className="grid grid-cols-7 mb-4">
-              {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
-                <div key={day} className="text-center text-[10px] font-black uppercase tracking-widest text-primary/40 py-4">
-                  {day}
+          {/* Calendar Grid */}
+          <motion.div
+            className="bg-white/25 backdrop-blur-[40px] border border-white/30 shadow-[0_8px_32px_0_rgba(129,140,248,0.08)] rounded-[2rem] p-8 overflow-hidden"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+          >
+            {/* Day Headers */}
+            <div className="grid grid-cols-7 gap-4 mb-6">
+              {DAY_HEADERS.map((d) => (
+                <div key={d} className="text-center text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-indigo-400">
+                  {d}
                 </div>
               ))}
             </div>
 
-            <div className="grid grid-cols-7 gap-3">
-              {calendarDays.map((day, i) => {
+            {/* Day Cells */}
+            <div className="grid grid-cols-7 gap-4">
+              {calendarDays.map((day) => {
+                const dayEvents = eventsForDay(day);
+                const isCurrentMonth = isSameMonth(day, currentMonth);
+                const isTodayDay = isToday(day);
                 const isSelected = isSameDay(day, selectedDate);
-                const dayEvents = events.filter((event) => isSameDay(new Date(event.start_time), day));
-                const isCurrentMonth = format(day, 'M') === format(currentMonth, 'M');
-
                 return (
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    key={i}
-                    onClick={() => setSelectedDate(day)}
-                    className={`h-32 rounded-[1.5rem] p-3 transition-all cursor-pointer relative group ${
-                      isSelected ? "glass border-primary/40 bg-white/60 shadow-lg" : 
-                      isCurrentMonth ? "glass border-primary/5 hover:bg-white/40" : "opacity-20 pointer-events-none"
+                  <div
+                    key={day.toString()}
+                    onClick={() => { setSelectedDate(day); setShowForm(true); }}
+                    className={`aspect-square relative flex flex-col items-center justify-center group cursor-pointer rounded-2xl transition-all ${
+                      isTodayDay
+                        ? ""
+                        : isSelected
+                        ? "ring-2 ring-indigo-400/50"
+                        : "hover:bg-indigo-50/50"
                     }`}
                   >
-                    <div className="flex justify-between items-start mb-2">
-                       <span className={`text-xs font-black ${isToday(day) ? "text-primary aurora-glow" : "text-aurora-on-surface-variant"}`}>
-                         {format(day, "d")}
-                       </span>
-                       {dayEvents.length > 0 && (
-                         <div className="w-1.5 h-1.5 rounded-full bg-primary aurora-glow" />
-                       )}
-                    </div>
-                    
-                    <div className="space-y-1 overflow-hidden">
-                      {dayEvents.slice(0, 2).map(e => (
-                        <div key={e.id} className="text-[9px] font-bold text-primary truncate bg-primary/5 px-2 py-0.5 rounded-lg border border-primary/10">
-                          {e.title}
-                        </div>
-                      ))}
-                      {dayEvents.length > 2 && (
-                        <div className="text-[8px] font-black uppercase tracking-wider text-primary/40 pl-1">
-                          + {dayEvents.length - 2} more
-                        </div>
-                      )}
-                    </div>
-                  </motion.div>
+                    {isTodayDay && (
+                      <div className="absolute inset-2 bg-indigo-600 rounded-2xl shadow-lg shadow-indigo-600/20" />
+                    )}
+                    <span
+                      className={`z-10 font-semibold text-sm transition-colors ${
+                        isTodayDay
+                          ? "text-white font-bold"
+                          : isCurrentMonth
+                          ? "text-slate-700 group-hover:text-indigo-600"
+                          : "text-slate-300"
+                      }`}
+                    >
+                      {format(day, "d")}
+                    </span>
+                    {dayEvents.length > 0 && (
+                      <div className="absolute bottom-3 flex gap-0.5 z-10">
+                        {dayEvents.slice(0, 3).map((_, i) => (
+                          <span
+                            key={i}
+                            className={`w-1 h-1 rounded-full ${isTodayDay ? "bg-white" : "bg-pink-400"}`}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 );
               })}
             </div>
-          </div>
+          </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="glass-panel p-8 rounded-[2.5rem] border border-primary/5 space-y-6">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-black uppercase tracking-widest text-aurora-on-surface-variant flex items-center gap-2">
-                  <Clock size={16} /> Day Intel
-                </h3>
-                <span className="text-[10px] font-bold opacity-40">{format(selectedDate, "MMM d, yyyy")}</span>
-              </div>
-              
-              <div className="space-y-4">
-                {eventsForSelectedDate.length === 0 ? (
-                  <div className="py-12 text-center space-y-2">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-aurora-on-surface-variant/40 italic">Registry Clear</p>
-                  </div>
-                ) : (
-                  eventsForSelectedDate.sort((a,b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime()).map(e => (
-                    <motion.div 
-                      layout
-                      initial={{ scale: 0.9, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      key={e.id} 
-                      className="glass p-4 rounded-2xl border border-primary/5 flex items-center justify-between group"
-                    >
-                      <div className="flex items-start gap-4">
-                        <div className="w-10 h-10 rounded-xl glass border border-primary/10 flex items-center justify-center text-primary/40">
-                          <Sparkles size={16} />
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-black text-aurora-on-surface">{e.title}</h4>
-                          <p className="text-[10px] font-bold text-primary/60 uppercase">{format(new Date(e.start_time), "p")}</p>
-                        </div>
-                      </div>
-                      <button onClick={() => handleDeleteEvent(e.id)} className="p-2 rounded-xl hover:bg-error/10 text-aurora-on-surface-variant hover:text-error transition-all opacity-0 group-hover:opacity-100">
-                        <Trash2 size={16} />
-                      </button>
-                    </motion.div>
-                  ))
-                )}
-              </div>
-            </div>
-
-            <div className="glass-panel p-8 rounded-[2.5rem] border border-primary/5 space-y-6">
-              <h3 className="text-sm font-black uppercase tracking-widest text-aurora-on-surface-variant flex items-center gap-2">
-                <PlusIcon size={16} /> Append Timeline
-              </h3>
-              
-              <form onSubmit={handleAddEvent} className="space-y-4">
-                <div className="space-y-2">
-                  <label className="text-[9px] font-black uppercase tracking-widest text-primary/40 ml-2">Objective Title</label>
+          {/* Add Event Form for Selected Date */}
+          <AnimatePresence>
+            {showForm && (
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 12 }}
+                className="bg-white/25 backdrop-blur-[40px] border border-white/30 rounded-[2rem] p-6"
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-bold text-slate-800 text-lg">
+                    Add event — {format(selectedDate, "MMM d, yyyy")}
+                  </h3>
+                  <button onClick={() => setShowForm(false)} className="text-slate-400 hover:text-slate-600 text-lg font-bold">×</button>
+                </div>
+                <form onSubmit={handleAddEvent} className="flex flex-col sm:flex-row gap-3">
                   <input
                     type="text"
-                    placeholder="New Matrix Node..."
                     value={newEventTitle}
                     onChange={(e) => setNewEventTitle(e.target.value)}
-                    className="input-aurora w-full py-3 px-6 text-xs font-bold"
-                    required
+                    placeholder="Event title…"
+                    className="flex-1 bg-white/50 border border-white/30 rounded-full px-5 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-300"
                   />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[9px] font-black uppercase tracking-widest text-primary/40 ml-2">Temporal Marker</label>
                   <input
                     type="time"
                     value={newEventTime}
                     onChange={(e) => setNewEventTime(e.target.value)}
-                    className="input-aurora w-full py-3 px-6 text-xs font-bold appearance-none"
-                    required
+                    className="bg-white/50 border border-white/30 rounded-full px-5 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-300"
                   />
-                </div>
-                <button type="submit" className="btn-aurora-primary w-full py-4 text-[10px] font-black uppercase tracking-[0.3em] shadow-lg shadow-primary/20">
-                  Secure Entry
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-
-        <div className="lg:col-span-4 space-y-8">
-          <div className="glass-panel p-8 rounded-[3rem] border border-primary/5 sticky top-8 space-y-8">
-            <h3 className="text-xs font-black uppercase tracking-[0.3em] text-aurora-on-surface flex items-center gap-3">
-              <CalendarIcon size={16} className="text-primary" /> Sector Forecast
-            </h3>
-            
-            <div className="space-y-2">
-              {next6Days.map((day) => {
-                const dayEvents = events.filter((e) => isSameDay(new Date(e.start_time), day));
-                const isSelected = isSameDay(day, selectedDate);
-
-                return (
-                  <motion.div
-                    whileHover={{ x: 4 }}
-                    key={day.getTime()}
-                    onClick={() => setSelectedDate(day)}
-                    className={`p-4 rounded-2xl transition-all cursor-pointer flex items-center gap-5 border ${
-                      isSelected ? "glass border-primary/30 bg-white/60 shadow-md" : "border-transparent hover:bg-white/20"
-                    }`}
+                  <button
+                    type="submit"
+                    className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 text-white font-bold text-sm shadow-lg hover:scale-[1.02] active:scale-95 transition-all"
                   >
-                    <div className={`w-12 h-12 rounded-2xl flex flex-col items-center justify-center border ${
-                      isToday(day) ? "bg-primary border-primary text-white shadow-lg shadow-primary/30" : "glass border-primary/10 text-aurora-on-surface-variant"
-                    }`}>
-                      <span className="text-[8px] font-black uppercase">{format(day, "EEE")}</span>
-                      <span className="text-sm font-black leading-none">{format(day, "d")}</span>
-                    </div>
+                    <Plus size={16} /> Add
+                  </button>
+                </form>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
 
-                    <div className="flex-1 min-w-0">
-                      <h4 className="text-[10px] font-black text-aurora-on-surface uppercase tracking-widest">{format(day, "MMMM d")}</h4>
-                      <p className={`text-[9px] font-bold uppercase transition-colors ${dayEvents.length > 0 ? "text-primary" : "text-aurora-on-surface-variant opacity-40"}`}>
-                        {dayEvents.length === 0 ? "Clear Registry" : `${dayEvents.length} Active Nodes`}
-                      </p>
-                    </div>
-                    
-                    {dayEvents.length > 0 && (
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary aurora-glow" />
-                    )}
-                  </motion.div>
-                );
-              })}
+        {/* ── Right: Upcoming Events ── */}
+        <div className="col-span-12 lg:col-span-4 flex flex-col gap-6 pt-2">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-xl font-bold text-slate-900">Synchronized Events</h3>
+            <button className="text-indigo-600 text-sm font-semibold hover:underline">View All</button>
+          </div>
+
+          <div className="space-y-4 overflow-y-auto max-h-[600px] pr-1">
+            <AnimatePresence>
+              {upcomingEvents.length === 0 ? (
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-sm text-slate-400 px-2"
+                >
+                  No upcoming events. Click a day to add one.
+                </motion.p>
+              ) : (
+                upcomingEvents.map((ev, idx) => {
+                  const accent = EVENT_ACCENTS[idx % EVENT_ACCENTS.length];
+                  const evDate = new Date(ev.start_time);
+                  return (
+                    <motion.div
+                      key={ev.id}
+                      initial={{ opacity: 0, x: 16 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 16 }}
+                      transition={{ delay: idx * 0.06 }}
+                      className="bg-white/25 backdrop-blur-[40px] border border-white/30 shadow-[0_8px_32px_0_rgba(129,140,248,0.08)] rounded-2xl p-4 flex gap-4 hover:translate-x-2 transition-transform cursor-pointer relative overflow-hidden group"
+                    >
+                      {/* Accent bar */}
+                      <div className={`w-1.5 absolute left-0 top-0 h-full ${accent.bar}`} />
+
+                      {/* Date chip */}
+                      <div className={`w-12 h-12 rounded-xl ${accent.dateBg} flex flex-col items-center justify-center flex-shrink-0`}>
+                        <span className={`text-[10px] font-bold uppercase ${accent.dateMon}`}>
+                          {format(evDate, "MMM")}
+                        </span>
+                        <span className={`text-lg font-black ${accent.dateNum}`}>
+                          {format(evDate, "dd")}
+                        </span>
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <h4 className={`font-bold text-slate-900 ${accent.title} transition-colors truncate`}>
+                          {ev.title}
+                        </h4>
+                        <div className="flex items-center gap-3 mt-1 flex-wrap">
+                          <span className="flex items-center gap-1 text-[0.6875rem] text-slate-500">
+                            <Clock size={11} /> {format(evDate, "hh:mm a")}
+                          </span>
+                          {ev.description && (
+                            <span className="flex items-center gap-1 text-[0.6875rem] text-slate-500">
+                              <MapPin size={11} />{ev.description}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={(e) => handleDeleteEvent(ev.id, e)}
+                        className="text-slate-300 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 flex-shrink-0"
+                      >
+                        ×
+                      </button>
+                    </motion.div>
+                  );
+                })
+              )}
+            </AnimatePresence>
+
+            {/* New Event CTA */}
+            <div className="mt-4 pt-2">
+              <button
+                onClick={() => setShowForm(true)}
+                className="w-full h-14 rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-bold text-base shadow-xl shadow-indigo-500/20 flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-95 transition-all"
+              >
+                <Plus size={20} />
+                New Event
+              </button>
             </div>
-            
-            <div className="p-6 rounded-[2rem] glass border border-primary/10 bg-primary/5">
-              <p className="text-[9px] font-black text-primary uppercase leading-relaxed text-center group">
-                <span className="inline-block animate-pulse mr-2">•</span>
-                Temporal Matrix Synchronized
-              </p>
+
+            {/* Promo card */}
+            <div className="mt-4 bg-white/25 backdrop-blur-[40px] border border-white/30 rounded-3xl p-6 overflow-hidden relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-indigo-200/40 to-purple-200/40" />
+              <div className="relative z-10">
+                <span className="bg-indigo-600 text-[10px] font-bold text-white px-2 py-1 rounded-full uppercase tracking-wider">
+                  Tip
+                </span>
+                <h5 className="text-base font-bold text-slate-900 mt-3">Sync with Aura AI</h5>
+                <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                  Let Aura AI manage your conflicts and optimize your temporal matrix automatically.
+                </p>
+                <button className="mt-4 px-4 py-2 bg-white/70 backdrop-blur-sm rounded-full text-indigo-600 text-xs font-bold hover:bg-white transition-colors">
+                  Learn More
+                </button>
+              </div>
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Floating AI Action Button */}
+      <div className="fixed bottom-8 right-8 z-50">
+        <button className="w-14 h-14 rounded-2xl bg-white/25 backdrop-blur-[40px] border border-white/30 shadow-[0_8px_32px_0_rgba(129,140,248,0.08)] flex items-center justify-center text-indigo-600 hover:rotate-12 transition-transform shadow-2xl text-2xl">
+          ✦
+        </button>
       </div>
     </div>
   );

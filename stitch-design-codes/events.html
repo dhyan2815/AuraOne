@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Temporal Matrix | Aurora</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary-container": "#3f1e8c",
+                        "surface-tint": "#4953bc",
+                        "on-secondary-fixed-variant": "#4f319c",
+                        "primary-container": "#818cf8",
+                        "surface-dim": "#dbd9de",
+                        "secondary-fixed": "#e8ddff",
+                        "on-tertiary-fixed-variant": "#85145a",
+                        "surface-container": "#efedf2",
+                        "inverse-surface": "#303034",
+                        "primary": "#4953bc",
+                        "on-secondary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "primary-fixed-dim": "#bdc2ff",
+                        "surface-bright": "#faf8fd",
+                        "tertiary-fixed": "#ffd8e7",
+                        "on-surface": "#1b1b1f",
+                        "on-error": "#ffffff",
+                        "background": "#faf8fd",
+                        "tertiary-container": "#e869ac",
+                        "outline": "#767684",
+                        "on-primary-fixed-variant": "#2f3aa3",
+                        "surface-container-low": "#f5f3f8",
+                        "surface-container-highest": "#e3e2e7",
+                        "error": "#ba1a1a",
+                        "secondary-container": "#ab8ffe",
+                        "tertiary-fixed-dim": "#ffafd3",
+                        "on-tertiary-fixed": "#3d0026",
+                        "primary-fixed": "#e0e0ff",
+                        "secondary-fixed-dim": "#cebdff",
+                        "secondary": "#674bb5",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed": "#000767",
+                        "tertiary": "#a43073",
+                        "on-primary": "#ffffff",
+                        "surface-variant": "#e3e2e7",
+                        "on-background": "#1b1b1f",
+                        "error-container": "#ffdad6",
+                        "surface": "#faf8fd",
+                        "surface-container-high": "#e9e7ec",
+                        "inverse-on-surface": "#f2f0f5",
+                        "on-secondary-fixed": "#21005e",
+                        "on-primary-container": "#101b8a",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-container": "#5e003d",
+                        "inverse-primary": "#bdc2ff",
+                        "outline-variant": "#c6c5d5",
+                        "on-surface-variant": "#454653"
+                    },
+                    fontFamily: {
+                        "headline": ["Plus Jakarta Sans"],
+                        "body": ["Plus Jakarta Sans"],
+                        "label": ["Plus Jakarta Sans"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .aurora-mesh {
+            background: radial-gradient(at 0% 0%, #818cf8 0px, transparent 50%),
+                radial-gradient(at 50% 0%, #ab8ffe 0px, transparent 50%),
+                radial-gradient(at 100% 0%, #e869ac 0px, transparent 50%),
+                radial-gradient(at 50% 100%, #818cf8 0px, transparent 50%);
+            background-color: #faf8fd;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(40px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(129, 140, 248, 0.08);
+        }
+    </style>
+</head>
+
+<body
+    class="aurora-mesh min-h-screen text-on-surface selection:bg-primary-container selection:text-on-primary-container">
+    <!-- SideNavBar Component -->
+    <aside
+        class="h-screen w-64 fixed left-0 top-0 z-40 flex flex-col h-full p-4 border-r border-indigo-50/10 bg-slate-50/50 dark:bg-slate-950/50 backdrop-blur-[20px] shadow-[inset_-1px_0_0_0_rgba(129,140,248,0.1)] font-plus-jakarta-sans text-[0.875rem] leading-relaxed">
+        <div class="flex items-center gap-3 px-4 mb-8">
+            <div
+                class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+            </div>
+            <div>
+                <h2 class="text-lg font-black text-slate-900 dark:text-slate-50 leading-tight">Aurora Workspace</h2>
+                <p class="text-[0.6875rem] uppercase tracking-[0.05em] text-slate-500">The Luminous Sanctuary</p>
+            </div>
+        </div>
+        <nav class="flex-1 space-y-1">
+            <a class="flex items-center gap-3 text-slate-500 dark:text-slate-400 px-4 py-2 hover:translate-x-1 transition-transform hover:bg-white/20 dark:hover:bg-slate-800/20 rounded-xl"
+                href="#">
+                <span class="material-symbols-outlined">dashboard</span>
+                Dashboard
+            </a>
+            <a class="flex items-center gap-3 text-slate-500 dark:text-slate-400 px-4 py-2 hover:translate-x-1 transition-transform hover:bg-white/20 dark:hover:bg-slate-800/20 rounded-xl"
+                href="#">
+                <span class="material-symbols-outlined">description</span>
+                Notes
+            </a>
+            <a class="flex items-center gap-3 text-slate-500 dark:text-slate-400 px-4 py-2 hover:translate-x-1 transition-transform hover:bg-white/20 dark:hover:bg-slate-800/20 rounded-xl"
+                href="#">
+                <span class="material-symbols-outlined">check_circle</span>
+                Tasks
+            </a>
+            <!-- Active State: Events maps to Temporal Matrix -->
+            <a class="flex items-center gap-3 bg-gradient-to-r from-indigo-500/10 to-purple-500/5 text-indigo-700 dark:text-indigo-300 rounded-xl px-4 py-2 border-l-4 border-indigo-500"
+                href="#">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">event</span>
+                Events
+            </a>
+            <a class="flex items-center gap-3 text-slate-500 dark:text-slate-400 px-4 py-2 hover:translate-x-1 transition-transform hover:bg-white/20 dark:hover:bg-slate-800/20 rounded-xl"
+                href="#">
+                <span class="material-symbols-outlined">auto_awesome</span>
+                Aura AI Chat
+            </a>
+        </nav>
+        <div class="mt-auto space-y-1">
+            <button
+                class="w-full mb-4 py-3 px-4 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-bold shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 transition-all">
+                <span class="material-symbols-outlined text-sm">add</span>
+                New Project
+            </button>
+            <a class="flex items-center gap-3 text-slate-500 dark:text-slate-400 px-4 py-2 hover:translate-x-1 transition-transform hover:bg-white/20 dark:hover:bg-slate-800/20 rounded-xl"
+                href="#">
+                <span class="material-symbols-outlined">settings</span>
+                Settings
+            </a>
+            <a class="flex items-center gap-3 text-slate-500 dark:text-slate-400 px-4 py-2 hover:translate-x-1 transition-transform hover:bg-white/20 dark:hover:bg-slate-800/20 rounded-xl"
+                href="#">
+                <span class="material-symbols-outlined">help</span>
+                Support
+            </a>
+        </div>
+    </aside>
+    <!-- TopAppBar Component -->
+    <header
+        class="docked full-width top-0 sticky z-50 flex justify-between items-center w-full px-6 py-3 max-w-full bg-white/25 dark:bg-slate-900/25 backdrop-blur-[40px] shadow-[0_0_30px_0_rgba(129,140,248,0.08)] tonal-shift-no-border shadow-sm shadow-indigo-500/5 pl-72">
+        <div class="flex items-center gap-6">
+            <h1
+                class="text-xl font-bold bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent font-plus-jakarta-sans antialiased tracking-tight">
+                Aurora</h1>
+            <div class="relative">
+                <span
+                    class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+                <input
+                    class="bg-white/40 dark:bg-slate-800/40 border-none rounded-full pl-10 pr-4 py-1.5 text-sm focus:ring-2 focus:ring-indigo-500/20 w-64 transition-all"
+                    placeholder="Search the matrix..." type="text" />
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <button class="p-2 rounded-full hover:bg-white/40 dark:hover:bg-slate-800/40 transition-all duration-300">
+                <span class="material-symbols-outlined text-slate-600">dark_mode</span>
+            </button>
+            <button
+                class="p-2 rounded-full hover:bg-white/40 dark:hover:bg-slate-800/40 transition-all duration-300 relative">
+                <span class="material-symbols-outlined text-slate-600">notifications</span>
+                <span class="absolute top-2 right-2 w-2 h-2 bg-pink-500 rounded-full border border-white"></span>
+            </button>
+            <div class="flex items-center gap-3 ml-2 pl-4 border-l border-indigo-100/20">
+                <div class="text-right">
+                    <p class="text-xs font-bold text-slate-900">Elena Vance</p>
+                    <p class="text-[10px] text-slate-500">Creative Lead</p>
+                </div>
+                <img alt="User profile" class="w-8 h-8 rounded-full object-cover ring-2 ring-indigo-500/20"
+                    data-alt="professional portrait of a creative woman with a friendly expression in a modern office setting"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuAb63akZoFT9mTufUgh1CS4eGHC-lmc7pH6teTWe3fzPVrkdIq5S6COZ6i_KRVFxhL9NYWVDW19bAFiXU2WU2zOZrjS0jLUGz9t79I41l_gWyHVtDE2zeg3L0O15cT5S_k-pUX-ZAkr5oDLF0O4DhXhX9-dxJ5f0-UAiuxOBPfJ8tv4tSDEJiAE9PUt_8nnCj_lLD33RQJgJp0y36q86kSAgGpZhfXNbboBw5Qb-IZ4ZeAmDn0AAIc2liKdOPTu1kf2dREYIh5o2cI" />
+            </div>
+        </div>
+    </header>
+    <main class="pl-64 pt-6 min-h-[calc(100vh-64px)] overflow-hidden">
+        <div class="p-8 max-w-[1400px] mx-auto grid grid-cols-12 gap-8">
+            <!-- Left/Center: Temporal Matrix Hero & Grid -->
+            <div class="col-span-12 lg:col-span-8 flex flex-col gap-8">
+                <!-- Hero Section -->
+                <div class="flex items-end justify-between">
+                    <div>
+                        <h2 class="text-[3.5rem] font-extrabold tracking-tight leading-none text-slate-900">Temporal
+                            Matrix</h2>
+                        <p class="text-slate-500 mt-2 font-medium">Navigating through the luminous timeline of July 2024
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-4 glass-card px-6 py-3 rounded-2xl">
+                        <button class="p-2 hover:bg-indigo-500/10 rounded-full transition-colors group">
+                            <span
+                                class="material-symbols-outlined text-indigo-600 group-active:scale-90 transition-transform">chevron_left</span>
+                        </button>
+                        <span class="text-xl font-bold text-slate-800 px-4 min-w-[140px] text-center">July 2024</span>
+                        <button class="p-2 hover:bg-indigo-500/10 rounded-full transition-colors group">
+                            <span
+                                class="material-symbols-outlined text-indigo-600 group-active:scale-90 transition-transform">chevron_right</span>
+                        </button>
+                    </div>
+                </div>
+                <!-- Monthly Grid -->
+                <div class="glass-card rounded-[2rem] p-8 overflow-hidden">
+                    <div class="grid grid-cols-7 gap-4 mb-6">
+                        <div class="text-center text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-indigo-400">
+                            Mon</div>
+                        <div class="text-center text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-indigo-400">
+                            Tue</div>
+                        <div class="text-center text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-indigo-400">
+                            Wed</div>
+                        <div class="text-center text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-indigo-400">
+                            Thu</div>
+                        <div class="text-center text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-indigo-400">
+                            Fri</div>
+                        <div class="text-center text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-indigo-400">
+                            Sat</div>
+                        <div class="text-center text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-indigo-400">
+                            Sun</div>
+                    </div>
+                    <div class="grid grid-cols-7 gap-4">
+                        <!-- Empty states for previous month -->
+                        <div class="aspect-square flex items-center justify-center text-slate-300 font-medium">24</div>
+                        <div class="aspect-square flex items-center justify-center text-slate-300 font-medium">25</div>
+                        <div class="aspect-square flex items-center justify-center text-slate-300 font-medium">26</div>
+                        <div class="aspect-square flex items-center justify-center text-slate-300 font-medium">27</div>
+                        <div class="aspect-square flex items-center justify-center text-slate-300 font-medium">28</div>
+                        <div class="aspect-square flex items-center justify-center text-slate-300 font-medium">29</div>
+                        <div class="aspect-square flex items-center justify-center text-slate-300 font-medium">30</div>
+                        <!-- Month Days -->
+                        <div
+                            class="aspect-square relative flex flex-col items-center justify-center group cursor-pointer">
+                            <span class="z-10 font-semibold group-hover:text-indigo-600 transition-colors">1</span>
+                        </div>
+                        <div
+                            class="aspect-square relative flex flex-col items-center justify-center group cursor-pointer">
+                            <span class="z-10 font-semibold group-hover:text-indigo-600 transition-colors">2</span>
+                        </div>
+                        <div
+                            class="aspect-square relative flex flex-col items-center justify-center group cursor-pointer ring-2 ring-indigo-500/40 rounded-2xl">
+                            <span class="z-10 font-semibold text-indigo-600">3</span>
+                            <div class="absolute bottom-3 flex gap-1">
+                                <span class="w-1 h-1 bg-tertiary-container rounded-full"></span>
+                            </div>
+                        </div>
+                        <div
+                            class="aspect-square relative flex flex-col items-center justify-center group cursor-pointer">
+                            <span class="z-10 font-semibold group-hover:text-indigo-600 transition-colors">4</span>
+                        </div>
+                        <div
+                            class="aspect-square relative flex flex-col items-center justify-center group cursor-pointer">
+                            <span class="z-10 font-semibold group-hover:text-indigo-600 transition-colors">5</span>
+                            <div class="absolute bottom-3 flex gap-1">
+                                <span class="w-1 h-1 bg-tertiary-container rounded-full"></span>
+                                <span class="w-1 h-1 bg-tertiary-container rounded-full"></span>
+                            </div>
+                        </div>
+                        <div
+                            class="aspect-square relative flex flex-col items-center justify-center group cursor-pointer">
+                            <span class="z-10 font-semibold group-hover:text-indigo-600 transition-colors">6</span>
+                        </div>
+                        <div
+                            class="aspect-square relative flex flex-col items-center justify-center group cursor-pointer">
+                            <span class="z-10 font-semibold group-hover:text-indigo-600 transition-colors">7</span>
+                        </div>
+                        <!-- Row 2 -->
+                        <div
+                            class="aspect-square relative flex flex-col items-center justify-center group cursor-pointer">
+                            <span class="z-10 font-semibold group-hover:text-indigo-600 transition-colors">8</span>
+                        </div>
+                        <!-- Today State -->
+                        <div
+                            class="aspect-square relative flex flex-col items-center justify-center group cursor-pointer">
+                            <div class="absolute inset-2 bg-indigo-600 rounded-2xl shadow-lg shadow-indigo-600/20">
+                            </div>
+                            <span class="z-10 font-bold text-white">9</span>
+                            <div class="absolute bottom-4 flex gap-1 z-10">
+                                <span class="w-1 h-1 bg-white rounded-full"></span>
+                            </div>
+                        </div>
+                        <div
+                            class="aspect-square relative flex flex-col items-center justify-center group cursor-pointer">
+                            <span class="z-10 font-semibold group-hover:text-indigo-600 transition-colors">10</span>
+                        </div>
+                        <div
+                            class="aspect-square relative flex flex-col items-center justify-center group cursor-pointer">
+                            <span class="z-10 font-semibold group-hover:text-indigo-600 transition-colors">11</span>
+                        </div>
+                        <div
+                            class="aspect-square relative flex flex-col items-center justify-center group cursor-pointer">
+                            <span class="z-10 font-semibold group-hover:text-indigo-600 transition-colors">12</span>
+                            <div class="absolute bottom-3 flex gap-1">
+                                <span class="w-1 h-1 bg-tertiary-container rounded-full"></span>
+                            </div>
+                        </div>
+                        <div
+                            class="aspect-square relative flex flex-col items-center justify-center group cursor-pointer">
+                            <span class="z-10 font-semibold group-hover:text-indigo-600 transition-colors">13</span>
+                        </div>
+                        <div
+                            class="aspect-square relative flex flex-col items-center justify-center group cursor-pointer">
+                            <span class="z-10 font-semibold group-hover:text-indigo-600 transition-colors">14</span>
+                        </div>
+                        <!-- ... Continues for the rest of the grid ... -->
+                        <!-- Fill remaining spaces for visual balance -->
+                        <div
+                            class="aspect-square relative flex flex-col items-center justify-center group cursor-pointer">
+                            <span class="z-10 font-semibold group-hover:text-indigo-600 transition-colors">15</span>
+                        </div>
+                        <div
+                            class="aspect-square relative flex flex-col items-center justify-center group cursor-pointer">
+                            <span class="z-10 font-semibold group-hover:text-indigo-600 transition-colors">16</span>
+                        </div>
+                        <div
+                            class="aspect-square relative flex flex-col items-center justify-center group cursor-pointer">
+                            <span class="z-10 font-semibold group-hover:text-indigo-600 transition-colors">17</span>
+                        </div>
+                        <div
+                            class="aspect-square relative flex flex-col items-center justify-center group cursor-pointer">
+                            <span class="z-10 font-semibold group-hover:text-indigo-600 transition-colors">18</span>
+                        </div>
+                        <div
+                            class="aspect-square relative flex flex-col items-center justify-center group cursor-pointer">
+                            <span class="z-10 font-semibold group-hover:text-indigo-600 transition-colors">19</span>
+                        </div>
+                        <div
+                            class="aspect-square relative flex flex-col items-center justify-center group cursor-pointer">
+                            <span class="z-10 font-semibold group-hover:text-indigo-600 transition-colors">20</span>
+                        </div>
+                        <div
+                            class="aspect-square relative flex flex-col items-center justify-center group cursor-pointer">
+                            <span class="z-10 font-semibold group-hover:text-indigo-600 transition-colors">21</span>
+                        </div>
+                        <div
+                            class="aspect-square relative flex flex-col items-center justify-center group cursor-pointer">
+                            <span class="z-10 font-semibold group-hover:text-indigo-600 transition-colors">22</span>
+                        </div>
+                        <div
+                            class="aspect-square relative flex flex-col items-center justify-center group cursor-pointer">
+                            <span class="z-10 font-semibold group-hover:text-indigo-600 transition-colors">23</span>
+                        </div>
+                        <div
+                            class="aspect-square relative flex flex-col items-center justify-center group cursor-pointer">
+                            <span class="z-10 font-semibold group-hover:text-indigo-600 transition-colors">24</span>
+                        </div>
+                        <div
+                            class="aspect-square relative flex flex-col items-center justify-center group cursor-pointer">
+                            <span class="z-10 font-semibold group-hover:text-indigo-600 transition-colors">25</span>
+                        </div>
+                        <div
+                            class="aspect-square relative flex flex-col items-center justify-center group cursor-pointer">
+                            <span class="z-10 font-semibold group-hover:text-indigo-600 transition-colors">26</span>
+                        </div>
+                        <div
+                            class="aspect-square relative flex flex-col items-center justify-center group cursor-pointer">
+                            <span class="z-10 font-semibold group-hover:text-indigo-600 transition-colors">27</span>
+                        </div>
+                        <div
+                            class="aspect-square relative flex flex-col items-center justify-center group cursor-pointer">
+                            <span class="z-10 font-semibold group-hover:text-indigo-600 transition-colors">28</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Right Panel: Upcoming Events -->
+            <div class="col-span-12 lg:col-span-4 flex flex-col gap-6">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-xl font-bold text-slate-900">Synchronized Events</h3>
+                    <button class="text-indigo-600 text-sm font-semibold hover:underline transition-all">View
+                        All</button>
+                </div>
+                <div class="space-y-4 overflow-y-auto max-h-[700px] pr-2 custom-scrollbar">
+                    <!-- Event Card 1 -->
+                    <div
+                        class="glass-card rounded-2xl p-4 flex gap-4 hover:translate-x-2 transition-transform cursor-pointer relative overflow-hidden group">
+                        <div class="w-1.5 h-full bg-indigo-500 absolute left-0 top-0"></div>
+                        <div
+                            class="w-12 h-12 rounded-xl bg-indigo-50 flex flex-col items-center justify-center shrink-0">
+                            <span class="text-xs font-bold text-indigo-400 uppercase">Jul</span>
+                            <span class="text-lg font-black text-indigo-700">09</span>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">Design
+                                Alignment Summit</h4>
+                            <div class="flex items-center gap-3 mt-1">
+                                <span class="flex items-center gap-1 text-[0.6875rem] text-slate-500">
+                                    <span class="material-symbols-outlined text-sm">schedule</span> 10:30 AM
+                                </span>
+                                <span class="flex items-center gap-1 text-[0.6875rem] text-slate-500">
+                                    <span class="material-symbols-outlined text-sm">location_on</span> Prism Hall A
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Event Card 2 -->
+                    <div
+                        class="glass-card rounded-2xl p-4 flex gap-4 hover:translate-x-2 transition-transform cursor-pointer relative overflow-hidden group">
+                        <div class="w-1.5 h-full bg-purple-500 absolute left-0 top-0"></div>
+                        <div
+                            class="w-12 h-12 rounded-xl bg-purple-50 flex flex-col items-center justify-center shrink-0">
+                            <span class="text-xs font-bold text-purple-400 uppercase">Jul</span>
+                            <span class="text-lg font-black text-purple-700">12</span>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-bold text-slate-900 group-hover:text-purple-600 transition-colors">Quantum
+                                Code Review</h4>
+                            <div class="flex items-center gap-3 mt-1">
+                                <span class="flex items-center gap-1 text-[0.6875rem] text-slate-500">
+                                    <span class="material-symbols-outlined text-sm">schedule</span> 02:00 PM
+                                </span>
+                                <span class="flex items-center gap-1 text-[0.6875rem] text-slate-500">
+                                    <span class="material-symbols-outlined text-sm">videocam</span> Aurora Meet
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Event Card 3 -->
+                    <div
+                        class="glass-card rounded-2xl p-4 flex gap-4 hover:translate-x-2 transition-transform cursor-pointer relative overflow-hidden group">
+                        <div class="w-1.5 h-full bg-pink-500 absolute left-0 top-0"></div>
+                        <div class="w-12 h-12 rounded-xl bg-pink-50 flex flex-col items-center justify-center shrink-0">
+                            <span class="text-xs font-bold text-pink-400 uppercase">Jul</span>
+                            <span class="text-lg font-black text-pink-700">15</span>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-bold text-slate-900 group-hover:text-pink-600 transition-colors">Neural Arts
+                                Workshop</h4>
+                            <div class="flex items-center gap-3 mt-1">
+                                <span class="flex items-center gap-1 text-[0.6875rem] text-slate-500">
+                                    <span class="material-symbols-outlined text-sm">schedule</span> 04:30 PM
+                                </span>
+                                <span class="flex items-center gap-1 text-[0.6875rem] text-slate-500">
+                                    <span class="material-symbols-outlined text-sm">location_on</span> Creative Labs
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- CTA Section in Right Panel -->
+                    <div class="mt-4 pt-6">
+                        <button
+                            class="w-full h-14 rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-bold text-lg shadow-xl shadow-indigo-500/20 flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-95 transition-all">
+                            <span class="material-symbols-outlined">add_circle</span>
+                            New Event
+                        </button>
+                    </div>
+                    <!-- Promotional Card -->
+                    <div class="mt-8 glass-card rounded-3xl p-6 overflow-hidden relative group">
+                        <img alt="Futuristic workspace"
+                            class="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:scale-110 transition-transform duration-700"
+                            data-alt="close-up of a high-tech glowing computer circuit board with soft blue and pink neon lighting accents"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhsKW1hm0Za8JJRc_d6Xsp63zJkUlh_nucPd1MzoAsKiNu2m3JjaBVLuZ7D39Yl5k1dMFBnhq9TBLAwjEHeIRskvJVaduh-AdN2mtExW_Dc98yAoI3upLWvmSm1Avo0rDDbfIUxGRiGahLERixhL1yEikZkT74NpdbszrRd0Iql79vPf4tnSjBsNCodCzVoBsh2vuIOaZR6MnDd1k9x8xo3OVZj8BnIAArOAqWCfWnGn26IbvzLjwBsvK2VQiwGOj-snRGHqSeM-4" />
+                        <div class="relative z-10">
+                            <span
+                                class="bg-indigo-600 text-[10px] font-bold text-white px-2 py-1 rounded-full uppercase tracking-wider">Upgrade</span>
+                            <h5 class="text-lg font-bold text-slate-900 mt-3">Sync with Aura AI</h5>
+                            <p class="text-xs text-slate-600 mt-1 leading-relaxed">Let Aura AI manage your conflicts and
+                                optimize your temporal matrix automatically.</p>
+                            <button
+                                class="mt-4 px-4 py-2 bg-white/50 backdrop-blur rounded-full text-indigo-600 text-xs font-bold hover:bg-white transition-colors">Learn
+                                More</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <!-- Floating Action Button for AI (Optional Contextual Element) -->
+    <div class="fixed bottom-8 right-8 z-50">
+        <button
+            class="w-14 h-14 rounded-2xl glass-card flex items-center justify-center text-indigo-600 hover:rotate-12 transition-transform shadow-2xl">
+            <span class="material-symbols-outlined text-3xl"
+                style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+        </button>
+    </div>
+</body>
+
+</html>
