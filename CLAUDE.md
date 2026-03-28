@@ -2,6 +2,25 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## MEMORY DISCIPLINE (ENFORCED EVERY SESSION)
+- Before any response: load latest memory.
+- After every command execution or session end: 
+  • Record exact command + full output summary
+  • Key decisions / lessons
+  • Date-stamped entry
+- Never skip this step.
+
+# PROJECT-LEVEL MEMORY DIRECTIVE (HIGHEST PRIORITY)
+- You have a dedicated project memory directory at .claude/memory/
+- This directory is git-tracked and shared with the team.
+- At the END of every single session AND after every command I execute:
+  1. Summarize: commands run, output, decisions, errors, learnings.
+  2. Append or update the relevant file in .claude/memory/ (use daily-YYYY-MM-DD.md for sessions, or topic files).
+  3. Update .claude/memory/MEMORY.md as the index.
+- Never write memory outside this directory.
+- Before starting any task, read the latest .claude/memory/MEMORY.md and any relevant topic files.
+- Treat this as your permanent long-term memory for this project.
+
 ## Common Commands
 - **Run Development Server**: `npm run dev` - Starts the Vite development server for the frontend.
 - **Run Backend Server**: `npm run dev:server` - Starts the backend server using nodemon. **Note**: The `server/index.js` file does not currently exist, so this command will fail until the backend is implemented.
