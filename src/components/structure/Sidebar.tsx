@@ -6,7 +6,6 @@ import {
   CheckSquare,
   Calendar as CalendarIcon,
   Settings as SettingsIcon,
-  Sparkles,
   MessagesSquare,
   LogOut,
   Menu,
@@ -15,6 +14,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../../hooks/useAuth";
 import toast from "react-hot-toast";
+import Logo from "./Logo";
 
 const Sidebar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -47,7 +47,7 @@ const Sidebar = () => {
   ];
 
   const SidebarContent = () => (
-    <div className="h-screen w-64 flex flex-col py-6 space-y-1 relative overflow-hidden"
+    <div className="h-screen w-56 flex flex-col py-4 space-y-1 relative overflow-hidden"
       style={{
         background: "rgba(255,255,255,0.20)",
         backdropFilter: "blur(40px)",
@@ -57,20 +57,18 @@ const Sidebar = () => {
       }}>
 
       {/* Brand */}
-      <div className="px-6 mb-6">
-        <div className="flex items-center gap-2">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-200/50">
-            <Sparkles className="w-5 h-5 text-white" />
-          </div>
-          <span className="text-xl font-bold tracking-tight text-indigo-600">AuraOne</span>
-        </div>
-        <p className="text-xs font-medium tracking-wide text-slate-500 mt-1 pl-0.5">
+      <div className="px-4 mb-4">
+        <Logo 
+          iconClassName="w-8 h-8 drop-shadow-md"
+          textClassName="text-xl"
+        />
+        <p className="text-[10px] font-medium tracking-wide text-slate-500 mt-1 pl-0.5">
           The Luminous Workspace
         </p>
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 px-4 space-y-1">
+      <nav className="flex-1 px-3 space-y-0.5">
         {navItems.map((item) => (
           <NavLink
             key={item.path}
@@ -78,8 +76,8 @@ const Sidebar = () => {
             onClick={() => setMobileOpen(false)}
             className={({ isActive }) =>
               isActive
-                ? "flex items-center gap-3 bg-gradient-to-r from-indigo-500 to-purple-400 text-white rounded-full mx-2 px-4 py-3 shadow-lg shadow-indigo-200/50 scale-95 transition-all"
-                : "flex items-center gap-3 text-slate-600 hover:text-indigo-600 hover:bg-white/40 rounded-full px-4 py-3 mx-2 transition-all"
+                ? "flex items-center gap-2.5 bg-gradient-to-r from-indigo-500 to-purple-400 text-white rounded-full mx-1 px-3.5 py-2.5 shadow-lg shadow-indigo-200/50 transition-all"
+                : "flex items-center gap-2.5 text-slate-600 hover:text-indigo-600 hover:bg-white/40 rounded-full px-3.5 py-2.5 mx-1 transition-all"
             }
           >
             {item.icon}
@@ -89,13 +87,13 @@ const Sidebar = () => {
       </nav>
 
       {/* Footer */}
-      <div className="px-4 mt-auto">
+      <div className="px-3 mt-auto">
         <NavLink
           to="/settings"
           className={({ isActive }) =>
             isActive
-              ? "flex items-center gap-3 bg-gradient-to-r from-indigo-500 to-purple-400 text-white rounded-full mx-2 px-4 py-3 shadow-lg shadow-indigo-200/50 scale-95 transition-all"
-              : "flex items-center gap-3 text-slate-600 hover:text-indigo-600 hover:bg-white/40 rounded-full px-4 py-3 mx-2 transition-all"
+              ? "flex items-center gap-2.5 bg-gradient-to-r from-indigo-500 to-purple-400 text-white rounded-full mx-1 px-3.5 py-2.5 shadow-lg shadow-indigo-200/50 transition-all"
+              : "flex items-center gap-2.5 text-slate-600 hover:text-indigo-600 hover:bg-white/40 rounded-full px-3.5 py-2.5 mx-1 transition-all"
           }
         >
           <SettingsIcon size={20} />
@@ -103,21 +101,21 @@ const Sidebar = () => {
         </NavLink>
 
         {/* User Profile Card */}
-        <div className="mt-4 mx-2 flex items-center gap-3 px-4 py-3 rounded-3xl border border-white/20"
+        <div className="mt-3 mx-1 flex items-center gap-2.5 px-3 py-2.5 rounded-2xl border border-white/20"
           style={{ background: "rgba(255,255,255,0.30)" }}>
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-400 to-purple-400 flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-md">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-400 flex items-center justify-center text-white font-bold text-xs flex-shrink-0 shadow-md">
             {userName.charAt(0).toUpperCase()}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-bold truncate text-slate-800">{userName}</p>
-            <p className="text-[10px] text-slate-500 uppercase tracking-widest">Premium Plan</p>
+            <p className="text-xs font-bold truncate text-slate-800">{userName}</p>
+            <p className="text-[9px] text-slate-500 uppercase tracking-widest">Premium</p>
           </div>
           <button
             onClick={handleLogout}
             title="Logout"
-            className="p-1.5 rounded-full text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all flex-shrink-0"
+            className="p-1 rounded-full text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all flex-shrink-0"
           >
-            <LogOut size={15} />
+            <LogOut size={13} />
           </button>
         </div>
       </div>

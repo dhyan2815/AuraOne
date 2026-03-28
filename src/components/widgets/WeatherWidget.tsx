@@ -149,13 +149,13 @@ const WeatherWidget = () => {
             </span>
           </div>
 
-          <div className="flex items-baseline gap-4">
-            <span className="text-7xl font-bold tracking-tighter text-on-surface">
+          <div className="flex items-baseline gap-3">
+            <span className="text-5xl font-bold tracking-tighter text-on-surface">
               {weather.temperature}°
             </span>
             <div className="flex flex-col">
-              <span className="text-2xl font-semibold text-on-surface">{weather.condition}</span>
-              <span className="text-slate-500 text-sm">Feels like {weather.feelsLike}°</span>
+              <span className="text-xl font-semibold text-on-surface">{weather.condition}</span>
+              <span className="text-slate-500 text-xs">Feels like {weather.feelsLike}°</span>
             </div>
           </div>
 
@@ -179,7 +179,7 @@ const WeatherWidget = () => {
 
         {/* Right: large icon */}
         <div className="hidden md:block opacity-20">
-          <WeatherIcon condition={weather.condition} className="w-36 h-36 text-indigo-400" />
+          <WeatherIcon condition={weather.condition} className="w-24 h-24 text-indigo-400" />
         </div>
       </motion.div>
     </AnimatePresence>

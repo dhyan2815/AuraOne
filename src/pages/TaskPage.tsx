@@ -9,7 +9,6 @@ import {
   Trash2,
   CheckCircle,
   Flag,
-  Sparkles,
   RotateCw,
   AlertCircle
 } from "lucide-react";
@@ -23,6 +22,7 @@ import {
 } from "../hooks/useTasks";
 import { useAuth } from "../hooks/useAuth";
 import { motion, AnimatePresence } from "framer-motion";
+import Logo from "../components/structure/Logo";
 
 const TaskPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -168,7 +168,7 @@ const TaskPage = () => {
           </button>
           <div className="space-y-3 flex-1">
             <div className="flex items-center gap-2 text-primary">
-              <Sparkles size={14} className="aurora-glow" />
+              <Logo iconOnly iconClassName="w-3.5 h-3.5 drop-shadow-sm" />
               <span className="text-[10px] font-black uppercase tracking-[0.2em]">Operational Command</span>
             </div>
             <input

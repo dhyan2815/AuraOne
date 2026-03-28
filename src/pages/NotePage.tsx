@@ -7,7 +7,6 @@ import {
   Calendar,
   Save,
   Trash2,
-  Sparkles,
   Cloud,
   RotateCw
 } from "lucide-react";
@@ -22,6 +21,7 @@ import {
 } from "../hooks/useNotes";
 import { useAuth } from "../hooks/useAuth";
 import { motion } from "framer-motion";
+import Logo from "../components/structure/Logo";
 
 const NotePage = () => {
   const [note, setNote] = useState<Note | null>(null);
@@ -177,7 +177,7 @@ const NotePage = () => {
           </button>
           <div className="space-y-3 flex-1">
             <div className="flex items-center gap-2 text-primary">
-              <Sparkles size={14} className="aurora-glow" />
+              <Logo iconOnly iconClassName="w-3.5 h-3.5 drop-shadow-sm" />
               <span className="text-[10px] font-black uppercase tracking-[0.2em]">Editing Protocol</span>
             </div>
             <input

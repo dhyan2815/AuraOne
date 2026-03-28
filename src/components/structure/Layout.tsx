@@ -45,7 +45,7 @@ const Layout = () => {
       <main className="relative z-10 flex-1 flex flex-col h-screen overflow-y-auto">
         {/* Top App Bar */}
         <header
-          className="w-full h-16 sticky top-0 z-40 flex justify-between items-center px-8"
+          className="w-full h-12 sticky top-0 z-40 flex justify-between items-center px-5"
           style={{
             background: 'rgba(250,248,253,0.60)',
             backdropFilter: 'blur(12px)',
@@ -54,32 +54,32 @@ const Layout = () => {
           }}
         >
           {/* Search */}
-          <div className="flex items-center gap-4 flex-1 max-w-md relative group">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+          <div className="flex items-center gap-3 flex-1 max-w-sm relative group">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
             <input
               type="text"
-              placeholder="Search your luminous workspace..."
-              className="w-full bg-[#e9e7ec]/50 border-none rounded-full py-2 pl-10 pr-4 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-200 transition-all"
+              placeholder="Search workspace..."
+              className="w-full bg-[#e9e7ec]/50 border-none rounded-full py-1.5 pl-9 pr-4 text-xs text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-200 transition-all"
             />
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-full hover:bg-indigo-50/60 text-slate-500 transition-colors"
+              className="p-1.5 rounded-full hover:bg-indigo-50/60 text-slate-500 transition-colors"
             >
-              {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+              {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
             </button>
 
-            <button className="p-2 rounded-full hover:bg-indigo-50/60 text-slate-500 transition-colors relative">
-              <Bell size={20} />
-              <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-pink-400 rounded-full" />
+            <button className="p-1.5 rounded-full hover:bg-indigo-50/60 text-slate-500 transition-colors relative">
+              <Bell size={16} />
+              <span className="absolute top-1.5 right-1.5 w-1 h-1 bg-pink-400 rounded-full" />
             </button>
 
-            <div className="w-px h-6 bg-slate-200 mx-1" />
+            <div className="w-px h-5 bg-slate-200 mx-1" />
 
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-400 flex items-center justify-center text-white text-sm font-bold shadow-md cursor-pointer">
+            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-400 to-purple-400 flex items-center justify-center text-white text-xs font-bold shadow-md cursor-pointer">
               {userName.charAt(0).toUpperCase()}
             </div>
           </div>

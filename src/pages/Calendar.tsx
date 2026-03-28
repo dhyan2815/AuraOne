@@ -90,11 +90,11 @@ const Calendar = () => {
   };
 
   return (
-    <div className="min-h-screen p-8">
-      <div className="max-w-[1400px] mx-auto grid grid-cols-12 gap-8">
+    <div className="min-h-screen p-5">
+      <div className="max-w-[1300px] mx-auto grid grid-cols-12 gap-5">
 
         {/* ── Left: Calendar hero + grid ── */}
-        <div className="col-span-12 lg:col-span-8 flex flex-col gap-8">
+        <div className="col-span-12 lg:col-span-8 flex flex-col gap-6">
 
           {/* Hero + Month Nav */}
           <motion.div
@@ -104,10 +104,10 @@ const Calendar = () => {
             transition={{ duration: 0.6 }}
           >
             <div>
-              <h1 className="text-[3.5rem] font-extrabold tracking-tight leading-none text-slate-900">
+              <h1 className="text-2xl font-extrabold tracking-tight leading-none text-slate-900">
                 Temporal Matrix
               </h1>
-              <p className="text-slate-500 mt-2 font-medium">
+              <p className="text-sm text-slate-500 mt-2 font-medium">
                 Navigating through your luminous timeline
               </p>
             </div>
@@ -132,7 +132,7 @@ const Calendar = () => {
 
           {/* Calendar Grid */}
           <motion.div
-            className="bg-white/25 backdrop-blur-[40px] border border-white/30 shadow-[0_8px_32px_0_rgba(129,140,248,0.08)] rounded-[2rem] p-8 overflow-hidden"
+            className="bg-white/25 backdrop-blur-[40px] border border-white/30 shadow-[0_8px_32px_0_rgba(129,140,248,0.08)] rounded-3xl p-5 overflow-hidden"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
@@ -239,7 +239,7 @@ const Calendar = () => {
         {/* ── Right: Upcoming Events ── */}
         <div className="col-span-12 lg:col-span-4 flex flex-col gap-6 pt-2">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-xl font-bold text-slate-900">Synchronized Events</h3>
+            <h3 className="text-base font-bold text-slate-900">Synchronized Events</h3>
             <button className="text-indigo-600 text-sm font-semibold hover:underline">View All</button>
           </div>
 

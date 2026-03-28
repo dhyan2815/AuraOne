@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Calendar, CheckCircle, FileText, MessageSquare, Sparkles, Shield, ArrowRight, ChevronDown, Star, BarChart3 } from "lucide-react";
+import { Calendar, CheckCircle, FileText, MessageSquare, Shield, ArrowRight, ChevronDown, Star, BarChart3 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import LandingPicture from "../assets/LandingImage.png";
 import Card from "../components/ui/Card";
+import Logo from "../components/structure/Logo";
 
 const LandingPage = () => {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -73,12 +74,9 @@ const LandingPage = () => {
                 <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
                     <button
                         onClick={scrollToTop}
-                        className="flex items-center space-x-3 hover:opacity-80 transition-opacity cursor-pointer group"
+                        className="hover:opacity-80 transition-opacity cursor-pointer inline-block"
                     >
-                        <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform">
-                            <Sparkles className="w-5 h-5 text-white" />
-                        </div>
-                        <span className="text-2xl font-bold tracking-tighter text-text">AuraOne</span>
+                        <Logo iconClassName="w-10 h-10" textClassName="text-2xl" />
                     </button>
 
                     <div className="hidden md:flex items-center space-x-8">
@@ -297,12 +295,7 @@ const LandingPage = () => {
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
                         <div className="col-span-2 space-y-6">
-                            <div className="flex items-center space-x-3">
-                                <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center">
-                                    <Sparkles className="w-4 h-4 text-white" />
-                                </div>
-                                <span className="text-2xl font-bold tracking-tighter text-text">AuraOne</span>
-                            </div>
+                            <Logo iconClassName="w-8 h-8" textClassName="text-2xl" />
                             <p className="text-slate-500 max-w-sm font-medium leading-relaxed">
                                 Curating focus in a world of distraction. Built with love for the dreamers and the doers.
                             </p>

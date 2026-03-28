@@ -6,10 +6,11 @@ import WeatherWidget from '../components/widgets/WeatherWidget';
 import TasksWidget from '../components/widgets/TasksWidget';
 import CalendarWidget from '../components/widgets/CalendarWidget';
 import NewsWidget from '../components/widgets/NewsWidget';
+import Logo from '../components/structure/Logo';
 
 // ─── Shared glass card base style ───────────────────────────────────────────
 const glassCard =
-  'rounded-[2rem] p-8 border border-white/30 relative overflow-hidden';
+  'rounded-3xl p-5 border border-white/30 relative overflow-hidden';
 const glassStyle = {
   background: 'rgba(255,255,255,0.25)',
   backdropFilter: 'blur(40px)',
@@ -42,22 +43,22 @@ const Dashboard = () => {
   const item = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } };
 
   return (
-    <div className="p-8 max-w-[1440px] mx-auto w-full">
+    <div className="p-5 max-w-[1440px] mx-auto w-full">
       {/* ── Hero Heading ──────────────────────────────────── */}
       <motion.div
-        className="mb-10"
+        className="mb-6"
         initial={{ opacity: 0, x: -24 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.7, ease: 'easeOut' }}
       >
         <h1
-          className="font-extrabold tracking-tight text-on-surface leading-tight"
-          style={{ fontSize: '3.25rem', fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+          className="text-3xl font-extrabold tracking-tight text-on-surface leading-tight"
+          style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
         >
           {greeting}, {userName}{' '}
-          <span className="text-pink-400">✨</span>
+          <Logo iconOnly iconClassName="w-6 h-6 inline-block mb-1 opacity-80" />
         </h1>
-        <p className="text-lg text-slate-500 mt-2 max-w-2xl">
+        <p className="text-sm text-slate-500 mt-1 max-w-xl">
           Your sanctuary is ready. Focus on what matters most.
         </p>
       </motion.div>
@@ -67,7 +68,7 @@ const Dashboard = () => {
         variants={container}
         initial="hidden"
         animate="show"
-        className="grid grid-cols-12 gap-6"
+        className="grid grid-cols-12 gap-4"
       >
         {/* ── Widget 1: Weather  (8/12 cols) ── */}
         <motion.div
@@ -94,8 +95,8 @@ const Dashboard = () => {
             boxShadow: '0 0 30px 0 rgba(171,143,254,0.12)',
           }}
         >
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-bold tracking-tight text-on-surface">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-base font-bold tracking-tight text-on-surface">
               Today's Tasks
             </h3>
             <button
@@ -119,7 +120,7 @@ const Dashboard = () => {
             boxShadow: '0 0 30px 0 rgba(232,105,172,0.12)',
           }}
         >
-          <h3 className="text-xl font-bold tracking-tight text-on-surface mb-6">
+          <h3 className="text-base font-bold tracking-tight text-on-surface mb-4">
             Luminous Insights
           </h3>
           <NewsWidget />
@@ -134,19 +135,19 @@ const Dashboard = () => {
             boxShadow: '0 0 30px 0 rgba(129,140,248,0.12)',
           }}
         >
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex justify-between items-center mb-3">
             <div>
-              <h3 className="text-xl font-bold tracking-tight text-on-surface">
+              <h3 className="text-base font-bold tracking-tight text-on-surface">
                 {new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}
               </h3>
-              <p className="text-sm text-slate-500 mt-0.5">Your upcoming schedule</p>
+              <p className="text-xs text-slate-500 mt-0.5">Your upcoming schedule</p>
             </div>
             <div className="flex gap-2">
-              <button className="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center hover:bg-white transition-colors text-slate-500">
-                <ChevronLeft size={18} />
+              <button className="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center hover:bg-white transition-colors text-slate-500">
+                <ChevronLeft size={15} />
               </button>
-              <button className="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center hover:bg-white transition-colors text-slate-500">
-                <ChevronRight size={18} />
+              <button className="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center hover:bg-white transition-colors text-slate-500">
+                <ChevronRight size={15} />
               </button>
             </div>
           </div>
@@ -160,11 +161,11 @@ const Dashboard = () => {
       <motion.button
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
-        className="fixed bottom-8 right-8 w-16 h-16 rounded-full text-white flex items-center justify-center z-50 shadow-[0_10px_40px_rgba(73,83,188,0.40)]"
+        className="fixed bottom-6 right-6 w-12 h-12 rounded-full text-white flex items-center justify-center z-50 shadow-[0_10px_40px_rgba(73,83,188,0.40)]"
         style={{ background: 'linear-gradient(135deg, #6366f1, #a855f7)' }}
         title="Quick action"
       >
-        <span className="text-2xl">✦</span>
+        <Logo iconOnly iconClassName="w-6 h-6 drop-shadow-[0_0_8px_rgba(255,255,255,0.8)] filter invert brightness-200" />
       </motion.button>
     </div>
   );

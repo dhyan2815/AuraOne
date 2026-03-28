@@ -115,9 +115,9 @@ const NewsWidget = () => {
             href={item.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex gap-3 cursor-pointer group"
+            className="flex gap-2 cursor-pointer group"
           >
-            <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-indigo-50 flex items-center justify-center">
+            <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-indigo-50 flex items-center justify-center">
               {item.imageUrl ? (
                 <img
                   src={item.imageUrl}

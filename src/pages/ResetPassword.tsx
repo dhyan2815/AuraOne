@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../services/supabase";
 import { useNavigate } from "react-router-dom";
-import { Eye, EyeOff, CheckCircle, Sparkles, ShieldCheck, RotateCw } from "lucide-react";
+import { Eye, EyeOff, CheckCircle, ShieldCheck, RotateCw } from "lucide-react";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
+import Logo from "../components/structure/Logo";
 
 const ResetPassword = () => {
   const navigate = useNavigate();
@@ -62,9 +63,7 @@ const ResetPassword = () => {
         <div className="glass-panel p-12 rounded-[3.5rem] border border-primary/5 shadow-2xl shadow-primary/5 space-y-10">
           {/* Logo */}
           <div className="flex flex-col items-center text-center space-y-4">
-            <div className="w-16 h-16 rounded-[1.5rem] glass border border-primary/10 flex items-center justify-center text-primary relative group">
-              <Sparkles size={32} className="aurora-glow group-hover:scale-110 transition-transform" />
-            </div>
+            <Logo iconOnly iconClassName="w-16 h-16 drop-shadow-xl p-3" />
             <div className="space-y-1">
               <h1 className="text-3xl font-black text-aurora-on-surface tracking-tighter">Key Re-encryption</h1>
               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/40">Secure Access Protocol</p>

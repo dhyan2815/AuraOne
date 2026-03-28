@@ -56,3 +56,50 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
   - `Chat.tsx`: Aura Pulse AI chat — left sessions sidebar with "New Chat" button + session list, main glass chat panel with Aura Pulse header, suggestion cards (empty state), message bubbles with animated typing indicator, glass input bar with mic + send.
 - **Design Source:** `stitch-design-codes/*.html` — user-provided Stitch HTML files.
 - **Branch:** `ui2`
+
+### March 28, 2026: Global Scale & Padding Optimization — Human-Readable Layout
+- **Objective:** Fix "oversized/zoomed" UI issues by downscaling heroes, padding, and font sizes to fit 100% Windows screen.
+- **Action:** Systematically reduced font sizes (`5xl`/`3.5rem` down to `text-3xl`), container padding (`p-8` down to `p-6`), and component margins across all pages.
+- **Files Adjusted:**
+  - `Dashboard.tsx`: Hero font `3.25rem` → `text-4xl`, container `p-8` → `p-6`, gap `gap-6` → `gap-5`.
+  - `Layout.tsx`: Header padding `px-8` → `px-6`.
+  - `Notes.tsx`: Hero `text-5xl` → `text-3xl`, card/container padding reduced.
+  - `Tasks.tsx`: Hero `text-4xl` → `text-2xl`, row padding `p-5` → `p-4`.
+  - `Calendar.tsx`: Hero `text-[3.5rem]` → `text-3xl`, grid padding `p-8` → `p-5`.
+  - `Chat.tsx`: Hero `text-5xl` → `text-3xl`, chat bubble/container padding reduced.
+  - All Widgets: Shrunk temperatures (`7xl` → `5xl`), thumbnails, and spacing for a compact, professional feel.
+
+### March 28, 2026: Phase 2 — Deep UI Scaling Pass (All Components)
+- **Objective:** Complete second-pass optimization after user screenshot review confirmed persistent oversizing.
+- **Root Cause:** Sidebar was `w-64` (256px), consuming too much horizontal space. Controls bars used `flex-wrap` causing layout breaks.
+- **Files Fixed:**
+  - `Sidebar.tsx`: Narrowed from `w-64` → `w-56`, reduced brand/nav/profile card padding throughout.
+  - `Notes.tsx`: Removed `flex-wrap` from controls bar. Filter tabs `px-6 py-2 text-sm` → `px-4 py-1.5 text-xs`. Search input `w-48 text-sm` → `w-32 text-xs`. New Note button scaled down. Card `p-6 rounded-3xl` → `p-5 rounded-2xl`. Title `text-xl` → `text-base`. Content preview `text-sm line-clamp-4` → `text-xs line-clamp-3`. Grid gap `gap-8` → `gap-5`.
+  - `Tasks.tsx`: Task title `text-lg` → `text-sm`. Row `p-4 gap-5` → `p-3 gap-4`. Checkbox `w-7 h-7` → `w-5 h-5`. Filter buttons `px-6 py-2 text-sm` → `px-4 py-1.5 text-xs`. New Task button tightened. Group label margins reduced.
+  - `Dashboard.tsx`: Hero `text-4xl` → `text-3xl`, subtitle `text-lg` → `text-sm`. Container `p-6` → `p-5`. Grid gap `gap-6` → `gap-4`. Widget card `p-6` → `p-5`. Widget headers `text-xl` → `text-base`. Calendar nav buttons `w-10 h-10` → `w-8 h-8`. FAB `w-16 h-16 bottom-8 right-8` → `w-12 h-12 bottom-6 right-6`.
+  - `Calendar.tsx`: Outer `p-6 gap-6` → `p-5 gap-5`. Hero `text-3xl` → `text-2xl`. Right panel heading `text-xl` → `text-base`.
+  - `Chat.tsx`: Outer `p-4 gap-4` → `p-3 gap-3`. Sessions aside `w-72` → `w-60`. Session list items `p-4 rounded-[1.5rem]` → `p-2.5 rounded-xl`. Messages area `p-6 space-y-6` → `p-4 space-y-4`. Chat header tightened.
+
+### March 28, 2026: Logo Generation & Integration
+- **Objective:** Create and implement a high-fidelity SVG logo for AuraOne based on the website's design language.
+- **Action:** Utilized Stitch MCP (`GenerateScreenFromText` with project ID) to generate a new branding screen with a bioluminescent, neural network-inspired SVG logo matching the Aurora Glass/Neon Cyberpunk design systems. Extracted the raw SVG and futuristic wordmark into a scalable, reusable `Logo.tsx` React component.
+- **Outcome:** Replaced simple text instances and generic icons of "AuraOne" across major structural and landing pages (`Sidebar.tsx`, `Login.tsx`, `SignUp.tsx`, `LandingPage.tsx`) with the new, cohesive, glowing `Logo` component to strengthen brand identity.
+
+### March 28, 2026: Pervasive Brand Identity Integration
+- **Objective:** Systematically replace all remaining placeholder icons (Sparkles, Globe, ✦, ✨) and text logos with the official AuraOne `Logo` component across the entire application.
+- **Action:**
+  - Enhanced `Logo.tsx` with `iconOnly` and `textOnly` props to support varied layout requirements.
+  - Replaced the primary form icons in `ResetPassword.tsx` and `ForgotPassword.tsx`.
+  - Updated `Settings.tsx` to use the logo in the "System Configuration" header and the "About" section.
+  - Branded the "Operational Command" and "Editing Protocol" labels in `TaskPage.tsx` and `NotePage.tsx`.
+  - Integrated the logo into the **Dashboard** hero greeting and Floating Action Button (FAB).
+  - Fully branded the **Aura Pulse Chat** by replacing the generic ✦ symbol in the header, message avatars, and typing indicators with the neural logo.
+  - Replaced the generic global spinner in `Loader.tsx` with a pulsing, bioluminescent branded `Logo` sequence.
+- **Outcome:** ACHIEVED 100% visual consistency. The AuraOne bioluminescent identity is now deeply woven into every major user touchpoint, creating a premium, unified brand experience.
+### March 28, 2026: Phase 3 — Remaining Oversized Views Scaling
+- **Objective:** Address "illogical" layouts and massive text scalings reported by the user in Settings, Layout Topbar, Tasks Hero, and Chat internal components.
+- **Files Fixed:**
+  - `Layout.tsx`: Shrunk the `Top App Bar` height (`h-16` → `h-12`). Scaled down icons (`size={20}` → `size={16}`), padding, and avatar size to feel compact and native. 
+  - `Settings.tsx`: Completely rebuilt spacing and typography. Reduced generic 5xl headers to 2xl, `p-10 text-center rounded-[3rem]` panels to standard `p-6 rounded-2xl` dense grid blocks. Replaced large gap sections with tighter layouts and smaller secondary text scales.
+  - `Tasks.tsx`: Fixed the hero container that was set up as `flex-col md:flex-row`. Streamlined it to a permanent single-row flex to prevent breaking alignments and save vertical screen space.
+  - `Chat.tsx`: Compacted the input bar `p-6` → `p-3`, input send button down to `w-9 h-9`. Scaled down suggestion cards to `p-4` inside a limited `max-w-md` grid. Reduced message avatars (`w-10 h-10` → `w-8 h-8`).

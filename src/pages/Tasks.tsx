@@ -69,24 +69,24 @@ const Tasks = () => {
       <motion.div
         variants={row}
         onClick={() => navigate(`/tasks/${task.id}`)}
-        className={`bg-white/25 backdrop-blur-[40px] border border-white/30 rounded-[2rem] p-5 flex items-center gap-6 group cursor-pointer hover:translate-x-1 transition-all duration-300 ${done ? "opacity-60" : ""}`}
+        className={`bg-white/25 backdrop-blur-[40px] border border-white/30 rounded-xl p-3 flex items-center gap-4 group cursor-pointer hover:translate-x-1 transition-all duration-300 ${done ? "opacity-60" : ""}`}
       >
         {/* Circular checkbox */}
         <button
           onClick={(e) => handleToggle(task.id, task.completed, e)}
-          className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 border-2 transition-colors ${
+          className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 border-2 transition-colors ${
             done ? "bg-indigo-500 border-indigo-500" : "border-indigo-300 group-hover:border-indigo-500"
           }`}
         >
-          {done && <Check size={13} className="text-white" strokeWidth={3} />}
+          {done && <Check size={10} className="text-white" strokeWidth={3} />}
         </button>
 
         {/* Content */}
         <div className="flex-1 min-w-0">
-          <h4 className={`font-bold text-on-surface text-lg ${done ? "line-through text-slate-400" : ""}`}>
+          <h4 className={`font-semibold text-on-surface text-sm ${done ? "line-through text-slate-400" : ""}`}>
             {task.title}
           </h4>
-          <div className="flex items-center gap-4 mt-1 flex-wrap">
+          <div className="flex items-center gap-3 mt-0.5 flex-wrap">
             {task.due_date && (
               <span className="text-xs font-semibold text-slate-400 flex items-center gap-1">
                 <Calendar size={12} />{new Date(task.due_date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
@@ -107,8 +107,8 @@ const Tasks = () => {
 
         {/* Priority Badge */}
         {task.priority && (
-          <span className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest flex items-center gap-1.5 ${priorityClass}`}>
-            <Flag size={10} />{task.priority}
+          <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider flex items-center gap-1 ${priorityClass}`}>
+            <Flag size={9} />{task.priority}
           </span>
         )}
 
@@ -133,11 +133,11 @@ const Tasks = () => {
           exit={{ opacity: 0 }}
           className="mb-10"
         >
-          <div className="flex items-center gap-3 mb-6 px-4">
-            <div className={`w-2 h-2 rounded-full ${dot}`} />
-            <h3 className="text-sm font-bold uppercase tracking-widest text-on-surface/60">{label}</h3>
+          <div className="flex items-center gap-2 mb-4 px-3">
+            <div className={`w-1.5 h-1.5 rounded-full ${dot}`} />
+            <h3 className="text-xs font-bold uppercase tracking-widest text-on-surface/60">{label}</h3>
           </div>
-          <motion.div variants={stagger} initial="hidden" animate="show" className="space-y-4">
+          <motion.div variants={stagger} initial="hidden" animate="show" className="space-y-2">
             {list.map((t) => <TaskRow key={t.id} task={t} />)}
           </motion.div>
         </motion.div>
@@ -146,37 +146,40 @@ const Tasks = () => {
   );
 
   return (
-    <div className="min-h-screen px-10 pt-12 pb-16 max-w-6xl mx-auto">
+    <div className="min-h-screen px-6 pt-6 pb-10 max-w-5xl mx-auto flex flex-col gap-8">
       {/* ── Hero & Controls ── */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12">
-        <motion.div initial={{ opacity: 0, x: -24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }}>
-          <div className="flex items-center gap-4 mb-2">
-            <h1 className="text-4xl font-extrabold tracking-tight text-on-surface">
-              Objective Registry
-            </h1>
-            <span className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-xs font-bold tracking-widest uppercase">
-              {tasks.filter((t) => !t.completed).length} Active
-            </span>
+      <section className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <motion.div 
+          initial={{ opacity: 0, x: -20 }} 
+          animate={{ opacity: 1, x: 0 }} 
+          transition={{ duration: 0.5 }}
+          className="flex flex-col gap-1"
+        >
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-black tracking-tight text-on-surface">Objective Registry</h1>
+            <div className="px-2.5 py-0.5 bg-indigo-500/10 text-indigo-600 rounded-full text-[10px] font-black tracking-widest uppercase border border-indigo-500/20">
+              {tasks.filter((t) => !t.completed).length} Total
+            </div>
           </div>
-          <p className="text-slate-500 font-medium">Curate your workflow and maintain tactical alignment.</p>
+          <p className="text-sm text-slate-500 font-medium opacity-80">Orchestrate your focus and maintain tactical momentum.</p>
         </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="flex items-center gap-4 flex-wrap"
+          transition={{ delay: 0.1 }}
+          className="flex items-center gap-3"
         >
           {/* Filter tabs */}
-          <div className="flex bg-white/40 backdrop-blur-md p-1.5 rounded-full border border-white/50 shadow-sm">
+          <div className="flex bg-white/40 backdrop-blur-xl p-1 rounded-2xl border border-white/50 shadow-sm shadow-indigo-500/5">
             {FILTERS.map((f) => (
               <button
                 key={f}
                 onClick={() => setActiveFilter(f)}
-                className={`px-6 py-2 rounded-full text-sm font-semibold transition-all ${
+                className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all duration-300 ${
                   activeFilter === f
-                    ? "bg-white text-indigo-600 shadow-sm"
-                    : "text-slate-500 hover:text-indigo-600"
+                    ? "bg-white text-indigo-600 shadow-md shadow-indigo-500/10 scale-[1.02]"
+                    : "text-slate-500 hover:text-indigo-600 hover:bg-white/50"
                 }`}
               >
                 {f}
@@ -184,31 +187,33 @@ const Tasks = () => {
             ))}
           </div>
 
-          {/* New Task CTA */}
           <button
             onClick={() => navigate("/tasks/new")}
-            className="flex items-center gap-2 bg-gradient-to-br from-indigo-600 to-purple-500 text-white px-8 py-3.5 rounded-full font-bold shadow-[0_10px_20px_-5px_rgba(73,83,188,0.3)] hover:scale-[1.02] active:scale-95 transition-all text-sm"
+            className="flex items-center gap-2 bg-gradient-to-br from-indigo-600 to-purple-500 text-white px-5 py-2.5 rounded-2xl font-black shadow-lg shadow-indigo-500/20 text-xs hover:scale-105 active:scale-95 transition-all"
           >
-            <Plus size={18} />
-            New Task
+            <Plus size={14} strokeWidth={3} />
+            New
           </button>
         </motion.div>
-      </div>
+      </section>
 
       {/* ── Task Groups ── */}
       {tasks.length === 0 ? (
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="flex flex-col items-center justify-center py-24 gap-4 text-center"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="flex-1 flex flex-col items-center justify-center py-32 rounded-[2rem] border-2 border-dashed border-indigo-200/50 bg-indigo-50/10"
         >
-          <p className="text-2xl font-bold text-slate-500">No objectives yet</p>
-          <p className="text-sm text-slate-400">Create your first task to begin the registry.</p>
+          <div className="w-16 h-16 rounded-3xl bg-white shadow-xl shadow-indigo-500/5 flex items-center justify-center text-indigo-500 mb-6">
+            <Plus size={32} strokeWidth={1.5} />
+          </div>
+          <h2 className="text-xl font-black text-slate-800 tracking-tight">Begin your registry</h2>
+          <p className="text-sm text-slate-500 mt-2 max-w-[240px]">Create your first objective to initialize the neural matrix.</p>
           <button
             onClick={() => navigate("/tasks/new")}
-            className="mt-4 px-8 py-3 rounded-full text-white font-bold shadow-xl bg-gradient-to-r from-indigo-600 to-purple-500"
+            className="mt-8 px-10 py-3.5 rounded-2xl text-white font-black text-xs uppercase tracking-widest shadow-xl shadow-indigo-500/20 bg-gradient-to-r from-indigo-600 to-purple-500 hover:scale-105 active:scale-95 transition-all"
           >
-            + New Task
+            Initialize Task
           </button>
         </motion.div>
       ) : (

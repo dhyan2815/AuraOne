@@ -4,11 +4,11 @@ import { useNavigate, Link, useLocation } from "react-router-dom";
 import {
     Eye,
     EyeOff,
-    Sparkles,
     ArrowRight,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
+import Logo from "../components/structure/Logo";
 
 const SignUp = () => {
     const navigate = useNavigate();
@@ -87,12 +87,9 @@ const SignUp = () => {
         <div className="max-w-[1440px] mx-auto px-6 flex items-center justify-between">
           <Link
             to="/"
-            className="flex items-center space-x-3 hover:opacity-80 transition-opacity cursor-pointer group"
+            className="hover:opacity-80 transition-opacity cursor-pointer inline-block"
           >
-            <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform">
-              <Sparkles className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-2xl font-black tracking-tighter text-aurora-on-surface">AuraOne</span>
+            <Logo iconClassName="w-10 h-10" textClassName="text-2xl" />
           </Link>
 
           <div className="flex items-center space-x-8">
@@ -261,12 +258,7 @@ const SignUp = () => {
       {/* Enhanced Footer */}
       <footer className="py-20 border-t border-primary/5">
         <div className="max-w-[1440px] mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-white" />
-            </div>
-            <span className="text-2xl font-black tracking-tighter">AuraOne</span>
-          </div>
+          <Logo iconClassName="w-8 h-8" textClassName="text-2xl" />
           <p className="text-xs font-black uppercase tracking-widest text-primary/40">&copy; 2026 AuraOne Registry. Developed by Dhyan Patel</p>
         </div>
       </footer>

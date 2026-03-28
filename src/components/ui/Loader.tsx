@@ -1,3 +1,4 @@
+import Logo from '../structure/Logo';
 
 const Loader = () => {
   const punchlines = [
@@ -17,7 +18,9 @@ const Loader = () => {
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background/50 backdrop-blur-sm">
-      <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-6"></div>
+      <div className="mb-8 animate-pulse">
+        <Logo iconOnly iconClassName="w-20 h-20 drop-shadow-[0_0_20px_rgba(163,166,255,0.6)]" />
+      </div>
       <p className="text-text/80 dark:text-white/80 text-lg font-medium animate-pulse">
         {randomPunchline}
       </p>

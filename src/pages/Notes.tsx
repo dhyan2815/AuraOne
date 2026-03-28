@@ -17,7 +17,7 @@ const TAG_BADGE: Record<string, { bg: string; text: string }> = {
 };
 
 const glassCard =
-  "bg-white/40 backdrop-blur-[40px] border border-white/30 rounded-[2rem] p-8 group hover:-translate-y-2 transition-all duration-300 shadow-xl shadow-indigo-500/5";
+  "bg-white/40 backdrop-blur-[40px] border border-white/30 rounded-2xl p-5 group hover:-translate-y-1 transition-all duration-300 shadow-xl shadow-indigo-500/5";
 
 const Notes = () => {
   const [notes, setNotes] = useState<Note[]>([]);
@@ -61,36 +61,36 @@ const Notes = () => {
     TAG_BADGE[tag] ?? TAG_BADGE.General;
 
   return (
-    <div className="min-h-screen px-12 pt-10 pb-16">
+    <div className="min-h-screen px-8 pt-6 pb-12">
       {/* ── Hero ── */}
       <motion.section
-        className="mb-12"
+        className="mb-8"
         initial={{ opacity: 0, x: -24 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <h1 className="text-5xl font-extrabold text-on-surface tracking-tight mb-4">
+      <h1 className="text-2xl font-extrabold text-on-surface tracking-tight mb-1.5">
           Your Archives
         </h1>
-        <p className="text-lg text-slate-500 max-w-2xl font-medium leading-relaxed">
-          Relive your journey. Every thought, sketch, and breakthrough captured in one timeless sanctuary.
+        <p className="text-sm text-slate-500 max-w-xl font-medium leading-relaxed">
+          Every thought, sketch, and breakthrough — captured.
         </p>
       </motion.section>
 
       {/* ── Controls Bar ── */}
       <motion.section
-        className="mb-10 flex flex-wrap items-center justify-between gap-6"
+        className="mb-6 flex items-center justify-between gap-4"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15 }}
       >
         {/* Filter Tabs */}
-        <div className="flex items-center gap-1 p-1.5 bg-white/40 backdrop-blur-md rounded-2xl border border-white/20 shadow-sm">
+        <div className="flex items-center gap-0.5 p-1 bg-white/40 backdrop-blur-md rounded-xl border border-white/20 shadow-sm flex-shrink-0">
           {FILTERS.map((f) => (
             <button
               key={f}
               onClick={() => setActiveFilter(f)}
-              className={`px-6 py-2 rounded-xl text-sm font-semibold transition-all ${
+              className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                 activeFilter === f
                   ? "bg-white text-indigo-600 shadow-sm"
                   : "text-slate-500 hover:text-indigo-600"
@@ -101,25 +101,25 @@ const Notes = () => {
           ))}
         </div>
 
-        {/* Right: search + sort + new note */}
-        <div className="flex items-center gap-3">
-          <div className="flex items-center bg-white/40 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 shadow-sm gap-2">
-            <Search size={14} className="text-slate-400" />
+        {/* Right: search + new note */}
+        <div className="flex items-center gap-2">
+          <div className="flex items-center bg-white/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/20 shadow-sm gap-2">
+            <Search size={13} className="text-slate-400 flex-shrink-0" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search archives..."
-              className="bg-transparent border-none focus:ring-0 text-sm w-48 placeholder-slate-400 text-slate-700 outline-none"
+              placeholder="Search..."
+              className="bg-transparent border-none focus:ring-0 text-xs w-32 placeholder-slate-400 text-slate-700 outline-none"
             />
           </div>
           <Link to="/notes/new">
             <motion.button
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.97 }}
-              className="flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-indigo-600 to-purple-500 text-white font-bold shadow-xl shadow-indigo-500/20 hover:scale-105 transition-transform text-sm"
+              className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-indigo-600 to-purple-500 text-white font-bold shadow-lg shadow-indigo-500/20 text-xs"
             >
-              <PlusIcon size={16} />
+              <PlusIcon size={13} />
               New Note
             </motion.button>
           </Link>
@@ -152,7 +152,7 @@ const Notes = () => {
             variants={container}
             initial="hidden"
             animate="show"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
           >
             {filtered.map((note) => {
               const tag = note.tags?.[0] ?? "General";
@@ -164,7 +164,7 @@ const Notes = () => {
               return (
                 <motion.div key={note.id} variants={card} className={glassCard}>
                   {/* Tag + Date */}
-                  <div className="flex justify-between items-start mb-6">
+                  <div className="flex justify-between items-start mb-3">
                     <span className={`px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase ${badge.bg} ${badge.text}`}>
                       {tag}
                     </span>
@@ -173,18 +173,18 @@ const Notes = () => {
 
                   {/* Title */}
                   <Link to={`/notes/${note.id}`}>
-                    <h3 className="text-xl font-bold text-on-surface mb-3 group-hover:text-indigo-600 transition-colors cursor-pointer">
+                    <h3 className="text-base font-bold text-on-surface mb-2 group-hover:text-indigo-600 transition-colors cursor-pointer">
                       {note.title}
                     </h3>
                   </Link>
 
                   {/* Preview */}
-                  <p className="text-slate-500 leading-relaxed mb-6 text-sm line-clamp-4">
+                  <p className="text-slate-500 leading-relaxed mb-4 text-xs line-clamp-3">
                     {note.content || "No content yet…"}
                   </p>
 
                   {/* Footer */}
-                  <div className="flex items-center justify-between pt-6 border-t border-white/10">
+                  <div className="flex items-center justify-between pt-3 border-t border-white/10">
                     <div className="flex gap-2">
                       {(note.tags || []).slice(0, 3).map((_: string, i: number) => (
                         <div

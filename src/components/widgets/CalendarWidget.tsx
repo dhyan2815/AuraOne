@@ -62,7 +62,7 @@ const CalendarWidget = () => {
   return (
     <div className="h-full flex flex-col">
       {/* Mini calendar grid */}
-      <div className="grid grid-cols-7 gap-y-2 text-center mb-6">
+      <div className="grid grid-cols-7 gap-y-1 text-center mb-4">
         {DAYS_OF_WEEK.map((d) => (
           <span key={d} className="text-[10px] font-bold text-slate-400 uppercase tracking-widest py-1">
             {d}
@@ -77,7 +77,7 @@ const CalendarWidget = () => {
             <button
               key={day.toISOString()}
               onClick={() => setSelectedDate(day)}
-              className={`relative mx-auto w-9 h-9 flex items-center justify-center rounded-full text-sm font-bold transition-all ${
+              className={`relative mx-auto w-8 h-8 flex items-center justify-center rounded-full text-xs font-bold transition-all ${
                 today && !selected
                   ? "bg-indigo-500 text-white shadow-lg shadow-indigo-200/60"
                   : selected

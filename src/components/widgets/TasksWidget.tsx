@@ -65,7 +65,7 @@ const TasksWidget = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.06 }}
               onClick={() => navigate(`/tasks/${task.id}`)}
-              className={`flex items-center gap-4 p-4 rounded-2xl border cursor-pointer transition-all group ${
+              className={`flex items-center gap-3 p-3 rounded-2xl border cursor-pointer transition-all group ${
                 isCompleted
                   ? "bg-white/20 border-white/30 opacity-60"
                   : "bg-white/40 border-white/50 hover:shadow-lg hover:shadow-purple-100/50"
