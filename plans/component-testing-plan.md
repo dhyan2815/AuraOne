@@ -48,3 +48,20 @@ The success of this plan will be verified by:
 1.  All new dependencies being correctly installed.
 2.  The `npm test` command running without errors.
 3.  All tests in `test/components.test.tsx` passing successfully.
+
+### Phase 2: Additional Enhancements (Optional)
+
+- **Expand component coverage** – add tests for `Loader.tsx`, `TiptapEditor.tsx`, `Sidebar.tsx`, `Layout.tsx`, and any other reusable UI pieces.
+- **State & context wrappers** – create a `test/utils/renderWithProviders.tsx` helper that renders components inside required providers (Zustand store, auth/theme context).
+- **Mock external services** – stub Supabase, AI, and any fetch‑based APIs using `sinon` or `msw` in the test setup.
+- **Accessibility checks** – run `axe-core` in each test and assert `violations.length === 0`.
+- **Coverage reporting** – add `nyc` (or `c8`) to the `npm test` script:
+  ```json
+  "test": "nyc mocha --require test/setup.js \"test/**/*.test.tsx\""
+  ```
+  and generate an HTML report.
+- **Async & error handling tests** – use `await findBy*` / `waitFor` to verify loading and error UI for components that fetch data.
+- **Theming / dark‑mode validation** – mount components with a `dark` class on the root and assert the correct CSS classes appear.
+- **Update test script** – ensure the JSDOM setup is always required by adding `--require test/setup.js` if not already present.
+
+These steps can be performed after the baseline suite is green, providing richer confidence while keeping the initial effort minimal.

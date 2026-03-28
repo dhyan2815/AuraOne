@@ -36,4 +36,9 @@ The frontend is a single-page application built with React, Vite, and TypeScript
   - `@google/generative-ai`
 
 ### Backend
+
+## RECENT UPDATES
+- **COMPONENT TESTING INITIATIVE**: Added testing libraries (`chai`, `@testing-library/react`, `@testing-library/jest-dom`, `jsdom`, `@types/chai`) to `devDependencies` and configured Mocha to run with a JSDOM setup file (`test/setup.js`). Created `test/components.test.tsx` with **full interaction** coverage for the `Card` component (render, props, and user interaction tests). Updated the `npm test` script to execute the new test suite. Documented this progress in the project plan and memory state files.
+
+### Backend
 The backend is intended to be a Node.js application using Express and Mongoose for MongoDB interaction. However, the `server/index.js` file and any other backend-related files have not been created yet. The scripts in `package.json` (`server` and `dev:server`) are placeholders for future development.
