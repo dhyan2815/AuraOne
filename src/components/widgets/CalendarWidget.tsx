@@ -159,7 +159,7 @@ const CalendarWidget = () => {
                 >
                   <div className="w-1.5 h-10 bg-indigo-500 rounded-full group-hover:bg-indigo-600 transition-colors" />
                   <div className="flex-1">
-                    <p className="text-sm font-bold text-on-surface">{event.title}</p>
+                    <p className="text-sm font-bold text-text">{event.title}</p>
                     <p className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
                       <Clock size={11} />
                       {format(new Date(event.start_time), "p")}

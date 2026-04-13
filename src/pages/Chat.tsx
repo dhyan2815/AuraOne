@@ -136,7 +136,7 @@ const Chat = () => {
           <Plus size={16} className="text-white opacity-80 group-hover:opacity-100 transition-opacity" />
         </motion.button>
 
-        <div className="flex-1 bg-white/30 backdrop-blur-2xl border border-white/40 rounded-3xl p-3 flex flex-col gap-2 overflow-hidden shadow-sm shadow-indigo-500/5">
+        <div className="flex-1 bg-white/30 backdrop-blur-lg border border-white/40 rounded-3xl p-3 flex flex-col gap-2 overflow-hidden shadow-sm shadow-indigo-500/5">
           <div className="flex items-center justify-between px-2 mb-1">
             <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">History</h3>
           </div>
@@ -177,7 +177,7 @@ const Chat = () => {
       </aside>
 
       {/* ── Main Chat ── */}
-      <section className="flex-1 flex flex-col bg-white/20 backdrop-blur-3xl border border-white/40 rounded-[2.5rem] overflow-hidden relative shadow-inner">
+      <section className="flex-1 flex flex-col bg-white/20 backdrop-blur-xl border border-white/40 rounded-[2.5rem] overflow-hidden relative shadow-inner">
         {/* Chat Header */}
         <div className="px-6 py-4 border-b border-white/30 flex items-center justify-between bg-white/10 backdrop-blur-md z-10">
           <div className="flex items-center gap-3">
@@ -229,7 +229,7 @@ const Chat = () => {
                       whileHover={{ y: -5, scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => setInput(s.title)}
-                      className="bg-white/40 backdrop-blur-2xl border border-white/60 p-6 rounded-[2rem] text-left shadow-lg shadow-indigo-500/5 hover:bg-white/60 hover:border-indigo-300 transition-all group"
+                      className="bg-white/40 backdrop-blur-lg border border-white/60 p-6 rounded-[2rem] text-left shadow-lg shadow-indigo-500/5 hover:bg-white/60 hover:border-indigo-300 transition-all group"
                     >
                       <div className="w-10 h-10 rounded-2xl bg-white shadow-inner flex items-center justify-center text-lg mb-4 group-hover:bg-indigo-50 transition-colors">
                         {s.icon}
@@ -263,7 +263,7 @@ const Chat = () => {
                     <div className={`max-w-[80%] px-6 py-4 text-sm font-medium leading-relaxed shadow-lg transition-all ${
                       msg.role === "user"
                         ? "bg-indigo-600 text-white rounded-[2rem] rounded-tr-sm shadow-indigo-500/20"
-                        : "bg-white/80 backdrop-blur-2xl border border-white/50 text-slate-700 rounded-[2rem] rounded-tl-sm"
+                        : "bg-white/80 backdrop-blur-lg border border-white/50 text-slate-700 rounded-[2rem] rounded-tl-sm"
                     }`}>
                       <div className="whitespace-pre-wrap break-words">{msg.content}</div>
                     </div>
@@ -275,7 +275,7 @@ const Chat = () => {
                     <div className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-indigo-600 to-pink-500 flex items-center justify-center shadow-md">
                       <Logo iconOnly iconClassName="w-5 h-5 filter brightness-0 invert" />
                     </div>
-                    <div className="bg-white/60 backdrop-blur-2xl border border-white/50 rounded-[2rem] rounded-tl-sm px-6 py-4 flex items-center gap-1.5 shadow-sm">
+                    <div className="bg-white/60 backdrop-blur-lg border border-white/50 rounded-[2rem] rounded-tl-sm px-6 py-4 flex items-center gap-1.5 shadow-sm">
                       {[1, 2, 3].map((i) => (
                         <div key={i} className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: `${i * 0.1}s` }} />
                       ))}
@@ -291,7 +291,7 @@ const Chat = () => {
         {/* Floating Input Area */}
         <div className="absolute bottom-8 left-0 w-full px-8 z-30">
           <div className="max-w-2xl mx-auto">
-            <div className={`bg-white/70 backdrop-blur-3xl border border-white/60 rounded-[2rem] p-2.5 flex items-end gap-3 shadow-2xl shadow-indigo-500/10 transition-all ${
+            <div className={`bg-white/70 backdrop-blur-xl border border-white/60 rounded-[2rem] p-2.5 flex items-end gap-3 shadow-2xl shadow-indigo-500/10 transition-all ${
               input.length > 40 ? "rounded-3xl" : ""
             }`}>
               <button className="p-3 text-slate-400 hover:text-indigo-600 transition-colors bg-white/50 rounded-2xl border border-white/40">

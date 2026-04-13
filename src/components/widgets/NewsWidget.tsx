@@ -100,7 +100,7 @@ const NewsWidget = () => {
           <p className="text-[10px] font-bold text-pink-500 uppercase tracking-widest mb-1">
             {CATEGORIES[0]}
           </p>
-          <h4 className="font-bold text-sm leading-snug text-on-surface group-hover:text-indigo-600 transition-colors line-clamp-2">
+          <h4 className="font-bold text-sm leading-snug text-text group-hover:text-indigo-600 transition-colors line-clamp-2">
             {featured.title}
           </h4>
         </motion.a>
@@ -132,7 +132,7 @@ const NewsWidget = () => {
               <p className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-0.5">
                 {CATEGORIES[idx + 1] || item.source}
               </p>
-              <h4 className="font-bold text-xs leading-snug text-on-surface group-hover:text-indigo-600 transition-colors line-clamp-2">
+              <h4 className="font-bold text-xs leading-snug text-text group-hover:text-indigo-600 transition-colors line-clamp-2">
                 {item.title}
               </h4>
             </div>

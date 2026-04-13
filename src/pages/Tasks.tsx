@@ -83,7 +83,7 @@ const Tasks = () => {
 
         {/* Content */}
         <div className="flex-1 min-w-0">
-          <h4 className={`font-semibold text-on-surface text-sm ${done ? "line-through text-slate-400" : ""}`}>
+          <h4 className={`font-semibold text-text text-sm ${done ? "line-through text-slate-400" : ""}`}>
             {task.title}
           </h4>
           <div className="flex items-center gap-3 mt-0.5 flex-wrap">
@@ -135,7 +135,7 @@ const Tasks = () => {
         >
           <div className="flex items-center gap-2 mb-4 px-3">
             <div className={`w-1.5 h-1.5 rounded-full ${dot}`} />
-            <h3 className="text-xs font-bold uppercase tracking-widest text-on-surface/60">{label}</h3>
+            <h3 className="text-xs font-bold uppercase tracking-widest text-text/60">{label}</h3>
           </div>
           <motion.div variants={stagger} initial="hidden" animate="show" className="space-y-2">
             {list.map((t) => <TaskRow key={t.id} task={t} />)}
@@ -156,7 +156,7 @@ const Tasks = () => {
           className="flex flex-col gap-1"
         >
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-black tracking-tight text-on-surface">Objective Registry</h1>
+            <h1 className="text-2xl font-black tracking-tight text-text">Objective Registry</h1>
             <div className="px-2.5 py-0.5 bg-indigo-500/10 text-indigo-600 rounded-full text-[10px] font-black tracking-widest uppercase border border-indigo-500/20">
               {tasks.filter((t) => !t.completed).length} Total
             </div>

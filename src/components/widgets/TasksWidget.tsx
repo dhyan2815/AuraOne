@@ -85,7 +85,7 @@ const TasksWidget = () => {
 
               {/* Info */}
               <div className="flex-1 min-w-0">
-                <p className={`text-sm font-bold ${isCompleted ? "line-through text-slate-400" : "text-on-surface"}`}>
+                <p className={`text-sm font-bold ${isCompleted ? "line-through text-slate-400" : "text-text"}`}>
                   {task.title}
                 </p>
                 <p className="text-xs text-slate-500 mt-0.5">

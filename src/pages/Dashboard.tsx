@@ -52,7 +52,7 @@ const Dashboard = () => {
         transition={{ duration: 0.7, ease: 'easeOut' }}
       >
         <h1
-          className="text-3xl font-extrabold tracking-tight text-on-surface leading-tight"
+          className="text-3xl font-extrabold tracking-tight text-text leading-tight"
           style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
         >
           {greeting}, {userName}{' '}
@@ -96,7 +96,7 @@ const Dashboard = () => {
           }}
         >
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-base font-bold tracking-tight text-on-surface">
+            <h3 className="text-base font-bold tracking-tight text-text">
               Today's Tasks
             </h3>
             <button
@@ -120,7 +120,7 @@ const Dashboard = () => {
             boxShadow: '0 0 30px 0 rgba(232,105,172,0.12)',
           }}
         >
-          <h3 className="text-base font-bold tracking-tight text-on-surface mb-4">
+          <h3 className="text-base font-bold tracking-tight text-text mb-4">
             Luminous Insights
           </h3>
           <NewsWidget />
@@ -137,7 +137,7 @@ const Dashboard = () => {
         >
           <div className="flex justify-between items-center mb-3">
             <div>
-              <h3 className="text-base font-bold tracking-tight text-on-surface">
+              <h3 className="text-base font-bold tracking-tight text-text">
                 {new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">Your upcoming schedule</p>

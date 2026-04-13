@@ -23,12 +23,12 @@ const Card = ({
 }: CardProps) => {
   return (
     <div 
-      className={`bg-white/40 dark:bg-gray-800/40 backdrop-blur-md border border-white/20 dark:border-white/10 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${className}`}
+      className={`bg-white/40 backdrop-blur-md border border-white/20 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${className}`}
       onClick={onClick}
     >
       {title && (
-        <div className="flex items-center justify-between px-6 py-4 border-b border-black/5 dark:border-white/5">
-          <h3 className="text-xl font-semibold text-text dark:text-white">{title}</h3>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-black/5">
+          <h3 className="text-xl font-semibold text-text">{title}</h3>
           
           {actionLabel && (
             actionHref ? (
@@ -42,6 +42,7 @@ const Card = ({
               </Link>
             ) : (
               <button
+                onClick={onClick}
                 className="flex items-center text-sm text-primary hover:underline"
               >
                 {actionIcon && <span className="mr-1">{actionIcon}</span>}

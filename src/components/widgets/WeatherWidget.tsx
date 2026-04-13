@@ -150,11 +150,11 @@ const WeatherWidget = () => {
           </div>
 
           <div className="flex items-baseline gap-3">
-            <span className="text-5xl font-bold tracking-tighter text-on-surface">
+            <span className="text-5xl font-bold tracking-tighter text-text">
               {weather.temperature}°
             </span>
             <div className="flex flex-col">
-              <span className="text-xl font-semibold text-on-surface">{weather.condition}</span>
+              <span className="text-xl font-semibold text-text">{weather.condition}</span>
               <span className="text-slate-500 text-xs">Feels like {weather.feelsLike}°</span>
             </div>
           </div>
@@ -171,7 +171,7 @@ const WeatherWidget = () => {
               <div key={i} className="flex flex-col items-center gap-1.5">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{d.day}</span>
                 <WeatherIcon condition={d.condition} className="w-5 h-5 text-indigo-400" />
-                <span className="text-sm font-bold text-on-surface">{d.temp}°</span>
+                <span className="text-sm font-bold text-text">{d.temp}°</span>
               </div>
             ))}
           </div>

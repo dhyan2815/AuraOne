@@ -24,7 +24,7 @@ const Layout = () => {
   const userName = user?.user_metadata?.name || user?.email?.split('@')[0] || 'U';
 
   return (
-    <div className="flex min-h-screen text-on-surface bg-background overflow-hidden">
+    <div className="flex min-h-screen text-text bg-background overflow-hidden">
       {/* Aurora mesh background */}
       <div
         aria-hidden="true"

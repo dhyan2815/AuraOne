@@ -69,7 +69,7 @@ const Notes = () => {
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.6 }}
       >
-      <h1 className="text-2xl font-extrabold text-on-surface tracking-tight mb-1.5">
+      <h1 className="text-2xl font-extrabold text-text tracking-tight mb-1.5">
           Your Archives
         </h1>
         <p className="text-sm text-slate-500 max-w-xl font-medium leading-relaxed">
@@ -173,7 +173,7 @@ const Notes = () => {
 
                   {/* Title */}
                   <Link to={`/notes/${note.id}`}>
-                    <h3 className="text-base font-bold text-on-surface mb-2 group-hover:text-indigo-600 transition-colors cursor-pointer">
+                    <h3 className="text-base font-bold text-text mb-2 group-hover:text-indigo-600 transition-colors cursor-pointer">
                       {note.title}
                     </h3>
                   </Link>
