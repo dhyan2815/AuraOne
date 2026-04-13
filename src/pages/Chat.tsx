@@ -124,158 +124,160 @@ const Chat = () => {
 
   return (
     <div className="flex overflow-hidden p-3 gap-3" style={{ height: "calc(100vh - 64px)" }}>
-
       {/* ── Left Sidebar: Sessions ── */}
-      <aside className="w-60 flex flex-col gap-2 flex-shrink-0">
-        {/* New Chat button */}
-        <button
+      <aside className="w-64 flex flex-col gap-3 flex-shrink-0">
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
           onClick={handleNewSession}
-          className="bg-white/25 backdrop-blur-[40px] border border-white/30 w-full py-2.5 px-4 rounded-2xl flex items-center justify-between group hover:bg-white/40 transition-all duration-300"
+          className="bg-indigo-600 shadow-lg shadow-indigo-500/20 w-full py-3 px-4 rounded-2xl flex items-center justify-between group transition-all duration-300"
         >
-          <span className="font-bold text-slate-700 text-xs">New Chat</span>
-          <div className="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center group-hover:scale-110 transition-transform">
-            <Plus size={12} />
-          </div>
-        </button>
+          <span className="font-bold text-white text-xs tracking-wide">New Session</span>
+          <Plus size={16} className="text-white opacity-80 group-hover:opacity-100 transition-opacity" />
+        </motion.button>
 
-        {/* Sessions list */}
-        <div className="flex-1 bg-white/25 backdrop-blur-[40px] border border-white/30 rounded-2xl p-2 flex flex-col gap-1 overflow-hidden">
-          <h3 className="px-3 py-1.5 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-            Recent Sessions
-          </h3>
-          <div className="flex-1 overflow-y-auto space-y-1 pr-1" style={{ scrollbarWidth: "thin", scrollbarColor: "rgba(129,140,248,0.2) transparent" }}>
+        <div className="flex-1 bg-white/30 backdrop-blur-2xl border border-white/40 rounded-3xl p-3 flex flex-col gap-2 overflow-hidden shadow-sm shadow-indigo-500/5">
+          <div className="flex items-center justify-between px-2 mb-1">
+            <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">History</h3>
+          </div>
+          <div className="flex-1 overflow-y-auto space-y-1.5 pr-1 custom-scrollbar">
             {sessions.length === 0 && (
-              <p className="text-xs text-slate-400 px-3 py-2">No sessions yet. Start a new chat!</p>
+              <div className="py-8 text-center px-4">
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">No history recorded</p>
+              </div>
             )}
             {sessions.map((s) => (
-              <div
+              <motion.div
                 key={s.id}
                 onClick={() => setSelectedSession(s.id)}
-                className={`p-2.5 rounded-xl cursor-pointer group flex items-start justify-between gap-2 transition-all ${
+                className={`p-3 rounded-2xl cursor-pointer group flex items-center justify-between gap-3 transition-all duration-300 border ${
                   selectedSession === s.id
-                    ? "bg-white/60 shadow-sm border border-white/50"
-                    : "bg-white/20 hover:bg-white/40"
+                    ? "bg-white shadow-md border-white/50"
+                    : "bg-white/10 border-transparent hover:bg-white/30"
                 }`}
               >
                 <div className="flex-1 min-w-0">
-                  <p className={`text-xs font-bold truncate mb-0.5 ${selectedSession === s.id ? "text-slate-700" : "text-slate-600"}`}>
+                  <p className={`text-xs font-bold truncate ${selectedSession === s.id ? "text-indigo-600" : "text-slate-600"}`}>
                     {s.name || "Untitled Session"}
                   </p>
-                  <p className="text-[10px] text-slate-400">
-                    {s.created_at ? new Date(s.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : ""}
+                  <p className="text-[9px] font-medium text-slate-400 mt-0.5 opacity-70">
+                    {s.created_at ? new Date(s.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : ""}
                   </p>
                 </div>
                 <button
                   onClick={(e) => handleDeleteSession(s.id, e)}
-                  className="p-1 text-slate-300 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all flex-shrink-0"
+                  className="p-1.5 text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
                 >
                   <Trash2 size={12} />
                 </button>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
       </aside>
 
       {/* ── Main Chat ── */}
-      <section className="flex-1 flex flex-col bg-white/25 backdrop-blur-[40px] border border-white/30 rounded-3xl overflow-hidden relative">
-
+      <section className="flex-1 flex flex-col bg-white/20 backdrop-blur-3xl border border-white/40 rounded-[2.5rem] overflow-hidden relative shadow-inner">
         {/* Chat Header */}
-        <div className="px-4 py-3 border-b border-white/30 flex items-center justify-between bg-white/10 backdrop-blur-md">
+        <div className="px-6 py-4 border-b border-white/30 flex items-center justify-between bg-white/10 backdrop-blur-md z-10">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 to-pink-400 flex items-center justify-center text-white shadow-md">
-              <Logo iconOnly iconClassName="w-5 h-5 filter brightness-0 invert drop-shadow-[0_0_5px_rgba(255,255,255,0.8)]" />
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-pink-500 flex items-center justify-center text-white shadow-lg">
+              <Logo iconOnly iconClassName="w-5 h-5 filter brightness-0 invert" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-slate-800">Aura Pulse</h2>
+              <h2 className="text-base font-black text-slate-800 tracking-tight">Aura Pulse</h2>
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-[10px] font-semibold text-emerald-600 uppercase tracking-wider">Online</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest">Neural Sync Active</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ scrollbarWidth: "thin", scrollbarColor: "rgba(129,140,248,0.2) transparent" }}>
+        {/* Messages / Canvas */}
+        <div className="flex-1 overflow-y-auto p-4 custom-scrollbar relative">
+          {/* Background decoration */}
+          <div className="absolute inset-0 pointer-events-none opacity-30 overflow-hidden">
+            <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-indigo-200/40 blur-[120px] rounded-full" />
+            <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-purple-200/40 blur-[100px] rounded-full" />
+          </div>
+
           <AnimatePresence mode="popLayout">
             {messages.length === 0 && !loading ? (
               <motion.div
                 key="empty"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="h-full flex flex-col items-center justify-center text-center space-y-8"
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="h-full flex flex-col items-center justify-center text-center space-y-12 relative z-10 p-6"
               >
-                <div className="space-y-2">
-                  <h2 className="text-lg font-extrabold tracking-tight text-slate-800">
-                    Hello, {displayName}
+                <div className="space-y-4">
+                  <div className="w-20 h-20 rounded-[2.5rem] bg-white shadow-2xl shadow-indigo-500/10 flex items-center justify-center mx-auto mb-8 border border-white/50">
+                    <Logo iconOnly iconClassName="w-12 h-12" />
+                  </div>
+                  <h2 className="text-3xl font-black tracking-tighter text-slate-800">
+                    Synchronize your <span className="text-indigo-600">Intent</span>
                   </h2>
-                  <p className="text-xs text-slate-500 font-medium max-w-xs mx-auto">
-                    How can Aura Pulse help you today?
+                  <p className="text-sm text-slate-500 font-medium max-w-[320px] mx-auto leading-relaxed opacity-80">
+                    Aura Pulse amplifies your cognitive reach through neural-patterned AI orchestration.
                   </p>
                 </div>
 
-                {/* Suggestion cards */}
-                <div className="grid grid-cols-2 gap-3 w-full max-w-md">
+                <div className="grid grid-cols-2 gap-4 w-full max-w-xl">
                   {SUGGESTIONS.map((s, i) => (
-                    <button
+                    <motion.button
                       key={i}
+                      whileHover={{ y: -5, scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                       onClick={() => setInput(s.title)}
-                      className="bg-white/25 backdrop-blur-[40px] border border-white/30 p-4 rounded-2xl text-left hover:bg-white/40 transition-all group"
+                      className="bg-white/40 backdrop-blur-2xl border border-white/60 p-6 rounded-[2rem] text-left shadow-lg shadow-indigo-500/5 hover:bg-white/60 hover:border-indigo-300 transition-all group"
                     >
-                      <span className="text-lg mb-1.5 block">{s.icon}</span>
-                      <p className="text-xs font-bold text-slate-700 group-hover:text-indigo-600 transition-colors">{s.title}</p>
-                      <p className="text-[10px] text-slate-400 mt-0.5 leading-relaxed">{s.sub}</p>
-                    </button>
+                      <div className="w-10 h-10 rounded-2xl bg-white shadow-inner flex items-center justify-center text-lg mb-4 group-hover:bg-indigo-50 transition-colors">
+                        {s.icon}
+                      </div>
+                      <p className="text-xs font-black text-slate-800 tracking-tight group-hover:text-indigo-600 transition-colors uppercase">{s.title}</p>
+                      <p className="text-[10px] text-slate-400 font-bold mt-1.5 leading-normal opacity-80">{s.sub}</p>
+                    </motion.button>
                   ))}
                 </div>
               </motion.div>
             ) : (
-              <div className="space-y-6 max-w-4xl mx-auto pb-4">
+              <div className="space-y-8 max-w-3xl mx-auto pb-32 pt-6 relative z-10">
                 {messages.map((msg, idx) => (
                   <motion.div
                     key={msg.id || idx}
-                    initial={{ opacity: 0, y: 10, scale: 0.98 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    className={`flex gap-4 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className={`flex items-start gap-4 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}
                   >
-                    {/* Avatar */}
-                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm text-xs font-bold ${
+                    <div className={`w-9 h-9 rounded-2xl flex items-center justify-center flex-shrink-0 border shadow-md ${
                       msg.role === "ai"
-                        ? "bg-gradient-to-tr from-indigo-600 to-pink-400 text-white"
-                        : "bg-indigo-600 text-white"
+                        ? "bg-gradient-to-tr from-indigo-600 to-pink-500 border-white/20"
+                        : "bg-white border-indigo-100 text-indigo-600"
                     }`}>
                       {msg.role === "ai" ? (
-                        <Logo iconOnly iconClassName="w-5 h-5 filter brightness-0 invert drop-shadow-[0_0_5px_rgba(255,255,255,0.8)]" />
+                        <Logo iconOnly iconClassName="w-5 h-5 filter brightness-0 invert" />
                       ) : (
-                        displayName[0].toUpperCase()
+                        <span className="text-xs font-black">{displayName[0].toUpperCase()}</span>
                       )}
                     </div>
-
-                    {/* Bubble */}
-                    <div className={`max-w-[70%] p-4 text-sm font-medium leading-relaxed shadow-sm ${
+                    <div className={`max-w-[80%] px-6 py-4 text-sm font-medium leading-relaxed shadow-lg transition-all ${
                       msg.role === "user"
-                        ? "bg-indigo-50/80 border border-indigo-100 text-slate-700 rounded-3xl rounded-tr-md"
-                        : "bg-white/80 backdrop-blur-[40px] border border-white/50 text-slate-700 rounded-3xl rounded-tl-md"
+                        ? "bg-indigo-600 text-white rounded-[2rem] rounded-tr-sm shadow-indigo-500/20"
+                        : "bg-white/80 backdrop-blur-2xl border border-white/50 text-slate-700 rounded-[2rem] rounded-tl-sm"
                     }`}>
                       <div className="whitespace-pre-wrap break-words">{msg.content}</div>
                     </div>
                   </motion.div>
                 ))}
 
-                {/* Typing indicator */}
                 {loading && (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-3">
-                    <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 to-pink-400 flex items-center justify-center text-white flex-shrink-0 shadow-sm">
-                      <Logo iconOnly iconClassName="w-5 h-5 filter brightness-0 invert drop-shadow-[0_0_5px_rgba(255,255,255,0.8)]" />
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-4">
+                    <div className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-indigo-600 to-pink-500 flex items-center justify-center shadow-md">
+                      <Logo iconOnly iconClassName="w-5 h-5 filter brightness-0 invert" />
                     </div>
-                    <div className="bg-white/80 border border-white/50 rounded-2xl rounded-tl-md px-4 py-2.5 flex items-center gap-1.5">
-                      {[0.1, 0.2, 0.3].map((d, i) => (
-                        <div
-                          key={i}
-                          className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce"
-                          style={{ animationDelay: `${d}s` }}
-                        />
+                    <div className="bg-white/60 backdrop-blur-2xl border border-white/50 rounded-[2rem] rounded-tl-sm px-6 py-4 flex items-center gap-1.5 shadow-sm">
+                      {[1, 2, 3].map((i) => (
+                        <div key={i} className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: `${i * 0.1}s` }} />
                       ))}
                     </div>
                   </motion.div>
@@ -286,42 +288,45 @@ const Chat = () => {
           </AnimatePresence>
         </div>
 
-        {/* Input Bar */}
-        <div className="p-3 bg-white/10 backdrop-blur-md border-t border-white/20">
-          <div
-            className="bg-white/25 backdrop-blur-[40px] border border-white/30 max-w-4xl mx-auto rounded-2xl p-1.5 flex items-center gap-2 shadow-lg shadow-indigo-500/10"
-          >
-            <button className="p-2 text-slate-400 hover:text-indigo-500 transition-colors ml-1">
-              <Paperclip size={15} />
-            </button>
-            <textarea
-              ref={textareaRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Type a message or ask a question..."
-              rows={1}
-              disabled={loading || !selectedSession}
-              className="flex-1 bg-transparent border-none focus:ring-0 text-sm py-2 text-slate-700 placeholder:text-slate-400 resize-none outline-none disabled:opacity-50"
-            />
-            <div className="flex items-center gap-1.5 mr-1">
-              <button className="p-2 text-slate-400 hover:text-indigo-500 transition-colors">
-                <Mic size={15} />
+        {/* Floating Input Area */}
+        <div className="absolute bottom-8 left-0 w-full px-8 z-30">
+          <div className="max-w-2xl mx-auto">
+            <div className={`bg-white/70 backdrop-blur-3xl border border-white/60 rounded-[2rem] p-2.5 flex items-end gap-3 shadow-2xl shadow-indigo-500/10 transition-all ${
+              input.length > 40 ? "rounded-3xl" : ""
+            }`}>
+              <button className="p-3 text-slate-400 hover:text-indigo-600 transition-colors bg-white/50 rounded-2xl border border-white/40">
+                <Paperclip size={18} strokeWidth={2.5} />
               </button>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handleSend}
-                disabled={loading || !input.trim() || !selectedSession}
-                className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-600 to-purple-400 text-white flex items-center justify-center shadow-md shadow-indigo-300/50 disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                <Send size={14} />
-              </motion.button>
+              <textarea
+                ref={textareaRef}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Message Aura Pulse..."
+                rows={1}
+                disabled={loading || !selectedSession}
+                className="flex-1 bg-transparent border-none focus:ring-0 text-sm font-bold py-3 text-slate-800 placeholder:text-slate-400 resize-none outline-none scrollbar-none"
+                style={{ maxHeight: "180px" }}
+              />
+              <div className="flex items-center gap-2">
+                <button className="p-3 text-slate-400 hover:text-indigo-600 transition-colors bg-white/50 rounded-2xl border border-white/40">
+                  <Mic size={18} strokeWidth={2.5} />
+                </button>
+                <motion.button
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleSend}
+                  disabled={loading || !input.trim() || !selectedSession}
+                  className="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-xl shadow-indigo-600/30 disabled:opacity-30 disabled:grayscale disabled:scale-100 transition-all"
+                >
+                  <Send size={18} strokeWidth={2.5} />
+                </motion.button>
+              </div>
             </div>
+            <p className="text-center text-[9px] font-black text-slate-400 mt-3 uppercase tracking-[0.25em] opacity-60">
+              Neural Network Integrated · Safe Mode Active
+            </p>
           </div>
-          <p className="text-center text-[9px] text-slate-400 mt-2 font-medium uppercase tracking-widest">
-            Aura Pulse can make mistakes. Verify important info.
-          </p>
         </div>
       </section>
     </div>
