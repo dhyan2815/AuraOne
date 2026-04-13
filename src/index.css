@@ -1,68 +1,183 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  /* FIXED: Critical box-sizing reset - prevents padding/margin bloat */
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
   html {
-    font-family: "Inter", sans-serif;
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
     @apply antialiased;
+    /* Prevent unwanted font size scaling */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   body {
     @apply text-text bg-background;
     background-attachment: fixed;
+    /* FIXED: Ensure body doesn't have default margins */
+    margin: 0;
+    padding: 0;
+    line-height: 1.5;
   }
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-bold tracking-tight text-text;
+    /* FIXED: Reset default heading margins */
+    margin: 0;
+  }
+
+  /* FIXED: Reset all default margins and padding that cause bloat */
+  p, ul, ol, blockquote, figure {
+    margin: 0;
+    padding: 0;
   }
 }
 
-@layer components {
-  .ProseMirror {
-    @apply min-h-[300px] p-4 outline-none;
-  }
-  .ProseMirror p {
-    @apply mb-4;
-  }
-  .ProseMirror h1, .ProseMirror h2, .ProseMirror h3 {
-    @apply mb-4 font-bold;
-  }
-  .ProseMirror h1 { @apply text-3xl; }
-  .ProseMirror h2 { @apply text-2xl; }
-  .ProseMirror h3 { @apply text-xl; }
-  .ProseMirror ul, .ProseMirror ol {
-    @apply pl-4 mb-4;
-  }
-  .ProseMirror ul { @apply list-disc; }
-  .ProseMirror ol { @apply list-decimal; }
-  .ProseMirror blockquote {
-    @apply pl-4 border-l-4 border-slate-300 dark:border-gray-600 text-slate-500 italic;
-  }
-}
-
-
-/* Custom Scrollbar for Aurora Glass */
+/* FIXED: Global scrollbar - single definition (moved from multiple places) */
 ::-webkit-scrollbar {
-  @apply w-1.5;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-transparent;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
   @apply bg-primary/20 rounded-full hover:bg-primary/40 transition-colors;
 }
 
-/* Typography Enhancements */
-.display-lg {
-  @apply text-5xl font-extrabold tracking-tighter leading-tight;
+/* Firefox scrollbar */
+* {
+  scrollbar-color: rgba(37, 99, 235, 0.2) transparent;
+  scrollbar-width: thin;
 }
 
-.headline-sm {
-  @apply text-2xl font-bold;
-}
+@layer components {
+  /* FIXED: ProseMirror - add max-width and explicit sizing */
+  .ProseMirror {
+    @apply min-h-[300px] w-full max-w-full p-4 outline-none text-base;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
 
-
+  .ProseMirror p {
+    @apply mb-3 leading-relaxed;
+  }
+
+  .ProseMirror h1,
+  .ProseMirror h2,
+  .ProseMirror h3 {
+    @apply mb-3 font-bold mt-4;
+  }
+
+  .ProseMirror h1 {
+    @apply text-3xl;
+  }
+
+  .ProseMirror h2 {
+    @apply text-2xl;
+  }
+
+  .ProseMirror h3 {
+    @apply text-xl;
+  }
+
+  .ProseMirror ul,
+  .ProseMirror ol {
+    @apply pl-6 mb-3;
+  }
+
+  .ProseMirror ul {
+    @apply list-disc;
+  }
+
+  .ProseMirror ol {
+    @apply list-decimal;
+  }
+
+  .ProseMirror blockquote {
+    @apply pl-4 border-l-4 border-slate-300 dark:border-gray-600 text-slate-500 italic my-3;
+  }
+
+  /* Typography Enhancements */
+  .display-lg {
+    @apply text-5xl font-extrabold tracking-tighter leading-tight;
+    margin: 0;
+  }
+
+  .headline-sm {
+    @apply text-2xl font-bold;
+    margin: 0;
+  }
+
+  /* FIXED: Glass morphism components with proper sizing */
+  .glass {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    /* FIXED: Ensure glass doesn't expand uncontrollably */
+    display: block;
+  }
+
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    /* FIXED: Proper containment */
+    display: block;
+  }
+
+  /* FIXED: Input with explicit max-width and sizing */
+  .input-aurora {
+    @apply w-full max-w-full bg-white/60 border border-primary/10 rounded-xl px-4 py-3 text-sm font-medium text-slate-700 placeholder:text-slate-400/70 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all;
+    /* FIXED: Prevent input expansion */
+    box-sizing: border-box;
+    display: block;
+  }
+
+  /* FIXED: Buttons with explicit sizing */
+  .btn-aurora-primary {
+    @apply inline-flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-500 text-white font-bold py-3 px-6 rounded-2xl shadow-lg hover:opacity-90 transition-all active:scale-[0.98];
+    white-space: nowrap;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-aurora-secondary {
+    @apply inline-flex items-center justify-center gap-2 bg-white/60 backdrop-blur-sm border border-primary/10 text-slate-700 font-bold py-3 px-6 rounded-2xl hover:bg-white/80 transition-all;
+    white-space: nowrap;
+    border: 1px solid rgba(37, 99, 235, 0.1);
+    cursor: pointer;
+  }
+
+  .section-header {
+    @apply text-[10px] font-black uppercase tracking-[0.2em] text-primary/50;
+    margin: 0;
+  }
+
+  .aurora-glow {
+    @apply shadow-[0_0_20px_rgba(99,102,241,0.3)];
+  }
+
+  /* FIXED: Aurora mesh with proper background sizing */
+  .aurora-mesh {
+    background: 
+      radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 80% 30%, rgba(168, 85, 247, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 50% 70%, rgba(232, 105, 172, 0.10) 0%, transparent 50%),
+      linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.95) 100%);
+    background-attachment: fixed;
+  }
+
+  /* FIXED: Removed duplicate custom-scrollbar - using global instead */
+}
