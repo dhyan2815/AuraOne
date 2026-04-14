@@ -1,6 +1,7 @@
 // src/components/editor/TiptapEditor.tsx
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import { useEffect } from 'react';
 
 interface TiptapEditorProps {
   content: string;
@@ -16,13 +17,21 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
     },
     editorProps: {
       attributes: {
-        class: 'prose dark:prose-invert prose-sm sm:prose-base lg:prose-lg xl:prose-2xl m-5 focus:outline-none',
+        class: 'ProseMirror prose prose-slate dark:prose-invert max-w-none focus:outline-none',
       },
     }
   });
 
+  useEffect(() => {
+    if (!editor) return;
+    const current = editor.getHTML();
+    if (content !== current) {
+      editor.commands.setContent(content || '', false);
+    }
+  }, [content, editor]);
+
   return (
-    <div className="w-full h-full bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 rounded-2xl overflow-hidden">
+    <div className="h-full w-full overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-gray-700 dark:bg-gray-800">
       <EditorContent editor={editor} />
     </div>
   );

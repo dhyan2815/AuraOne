@@ -16,6 +16,7 @@
     /* Prevent unwanted font size scaling */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    min-height: 100%;
   }
 
   body {
@@ -25,6 +26,12 @@
     margin: 0;
     padding: 0;
     line-height: 1.5;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  #root {
+    min-height: 100vh;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -177,6 +184,22 @@
       radial-gradient(circle at 50% 70%, rgba(232, 105, 172, 0.10) 0%, transparent 50%),
       linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.95) 100%);
     background-attachment: fixed;
+  }
+
+  .app-page {
+    @apply w-full max-w-7xl mx-auto px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8;
+  }
+
+  .app-page-tight {
+    @apply w-full max-w-5xl mx-auto px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8;
+  }
+
+  .app-page-header {
+    @apply flex flex-col gap-3 md:flex-row md:items-end md:justify-between;
+  }
+
+  .glass-card {
+    @apply bg-white/30 backdrop-blur-[40px] border border-white/30 shadow-xl shadow-indigo-500/5;
   }
 
   /* FIXED: Removed duplicate custom-scrollbar - using global instead */

@@ -90,15 +90,15 @@ const Calendar = () => {
   };
 
   return (
-    <div className="min-h-screen p-5">
-      <div className="max-w-[1300px] mx-auto grid grid-cols-12 gap-5">
+    <div className="app-page">
+      <div className="grid max-w-7xl grid-cols-12 gap-5 mx-auto">
 
         {/* ── Left: Calendar hero + grid ── */}
         <div className="col-span-12 lg:col-span-8 flex flex-col gap-6">
 
           {/* Hero + Month Nav */}
           <motion.div
-            className="flex items-end justify-between"
+            className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between"
             initial={{ opacity: 0, x: -24 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
@@ -111,7 +111,7 @@ const Calendar = () => {
                 Navigating through your luminous timeline
               </p>
             </div>
-            <div className="flex items-center gap-4 bg-white/25 backdrop-blur-[40px] border border-white/30 shadow-[0_8px_32px_0_rgba(129,140,248,0.08)] px-6 py-3 rounded-2xl">
+            <div className="flex items-center justify-between gap-2 rounded-2xl border border-white/30 bg-white/25 px-4 py-3 shadow-[0_8px_32px_0_rgba(129,140,248,0.08)] backdrop-blur-[40px] sm:gap-4 sm:px-6">
               <button
                 onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
                 className="p-2 hover:bg-indigo-500/10 rounded-full transition-colors"
@@ -237,13 +237,13 @@ const Calendar = () => {
         </div>
 
         {/* ── Right: Upcoming Events ── */}
-        <div className="col-span-12 lg:col-span-4 flex flex-col gap-6 pt-2">
+        <div className="col-span-12 flex flex-col gap-6 pt-2 lg:col-span-4">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-base font-bold text-slate-900">Synchronized Events</h3>
             <button className="text-indigo-600 text-sm font-semibold hover:underline">View All</button>
           </div>
 
-          <div className="space-y-4 overflow-y-auto max-h-[600px] pr-1">
+          <div className="space-y-4 pr-1">
             <AnimatePresence>
               {upcomingEvents.length === 0 ? (
                 <motion.p
@@ -339,7 +339,7 @@ const Calendar = () => {
       </div>
 
       {/* Floating AI Action Button */}
-      <div className="fixed bottom-8 right-8 z-50">
+      <div className="fixed bottom-6 right-6 z-30 hidden lg:block">
         <button className="w-14 h-14 rounded-2xl bg-white/25 backdrop-blur-[40px] border border-white/30 shadow-[0_8px_32px_0_rgba(129,140,248,0.08)] flex items-center justify-center text-indigo-600 hover:rotate-12 transition-transform shadow-2xl text-2xl">
           ✦
         </button>

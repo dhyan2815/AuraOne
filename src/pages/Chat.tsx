@@ -123,9 +123,9 @@ const Chat = () => {
   const displayName = user?.email?.split("@")[0] ?? "User";
 
   return (
-    <div className="flex overflow-hidden p-3 gap-3" style={{ height: "calc(100vh - 64px)" }}>
+    <div className="app-page flex min-h-[calc(100dvh-3.5rem)] flex-col gap-4 lg:grid lg:grid-cols-[18rem_minmax(0,1fr)]">
       {/* ── Left Sidebar: Sessions ── */}
-      <aside className="w-64 flex flex-col gap-3 flex-shrink-0">
+      <aside className="flex min-h-0 flex-col gap-3 lg:max-h-[calc(100dvh-8rem)]">
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
@@ -136,7 +136,7 @@ const Chat = () => {
           <Plus size={16} className="text-white opacity-80 group-hover:opacity-100 transition-opacity" />
         </motion.button>
 
-        <div className="flex-1 bg-white/30 backdrop-blur-lg border border-white/40 rounded-3xl p-3 flex flex-col gap-2 overflow-hidden shadow-sm shadow-indigo-500/5">
+        <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-hidden rounded-3xl border border-white/40 bg-white/30 p-3 shadow-sm shadow-indigo-500/5 backdrop-blur-lg">
           <div className="flex items-center justify-between px-2 mb-1">
             <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">History</h3>
           </div>
@@ -177,7 +177,7 @@ const Chat = () => {
       </aside>
 
       {/* ── Main Chat ── */}
-      <section className="flex-1 flex flex-col bg-white/20 backdrop-blur-xl border border-white/40 rounded-[2.5rem] overflow-hidden relative shadow-inner">
+      <section className="relative flex min-h-[70dvh] min-w-0 flex-1 flex-col overflow-hidden rounded-[2.5rem] border border-white/40 bg-white/20 shadow-inner backdrop-blur-xl lg:max-h-[calc(100dvh-8rem)]">
         {/* Chat Header */}
         <div className="px-6 py-4 border-b border-white/30 flex items-center justify-between bg-white/10 backdrop-blur-md z-10">
           <div className="flex items-center gap-3">
@@ -195,7 +195,7 @@ const Chat = () => {
         </div>
 
         {/* Messages / Canvas */}
-        <div className="flex-1 overflow-y-auto p-4 custom-scrollbar relative">
+        <div className="custom-scrollbar relative flex-1 overflow-y-auto p-4 sm:p-5">
           {/* Background decoration */}
           <div className="absolute inset-0 pointer-events-none opacity-30 overflow-hidden">
             <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-indigo-200/40 blur-[120px] rounded-full" />
@@ -208,7 +208,7 @@ const Chat = () => {
                 key="empty"
                 initial={{ opacity: 0, scale: 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="h-full flex flex-col items-center justify-center text-center space-y-12 relative z-10 p-6"
+                className="relative z-10 flex h-full flex-col items-center justify-center space-y-10 p-4 text-center sm:p-6"
               >
                 <div className="space-y-4">
                   <div className="w-20 h-20 rounded-[2.5rem] bg-white shadow-2xl shadow-indigo-500/10 flex items-center justify-center mx-auto mb-8 border border-white/50">
@@ -222,7 +222,7 @@ const Chat = () => {
                   </p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 w-full max-w-xl">
+                <div className="grid w-full max-w-xl grid-cols-1 gap-4 sm:grid-cols-2">
                   {SUGGESTIONS.map((s, i) => (
                     <motion.button
                       key={i}
@@ -241,7 +241,7 @@ const Chat = () => {
                 </div>
               </motion.div>
             ) : (
-              <div className="space-y-8 max-w-3xl mx-auto pb-32 pt-6 relative z-10">
+              <div className="relative z-10 mx-auto max-w-3xl space-y-8 pb-6 pt-6">
                 {messages.map((msg, idx) => (
                   <motion.div
                     key={msg.id || idx}
@@ -260,7 +260,7 @@ const Chat = () => {
                         <span className="text-xs font-black">{displayName[0].toUpperCase()}</span>
                       )}
                     </div>
-                    <div className={`max-w-[80%] px-6 py-4 text-sm font-medium leading-relaxed shadow-lg transition-all ${
+                    <div className={`max-w-[min(100%,42rem)] px-5 py-4 text-sm font-medium leading-relaxed shadow-lg transition-all sm:px-6 ${
                       msg.role === "user"
                         ? "bg-indigo-600 text-white rounded-[2rem] rounded-tr-sm shadow-indigo-500/20"
                         : "bg-white/80 backdrop-blur-lg border border-white/50 text-slate-700 rounded-[2rem] rounded-tl-sm"
@@ -289,8 +289,8 @@ const Chat = () => {
         </div>
 
         {/* Floating Input Area */}
-        <div className="absolute bottom-8 left-0 w-full px-8 z-30">
-          <div className="max-w-2xl mx-auto">
+        <div className="sticky bottom-0 left-0 z-30 w-full border-t border-white/20 bg-white/10 px-4 pb-4 pt-3 backdrop-blur-md sm:px-6">
+          <div className="mx-auto max-w-2xl">
             <div className={`bg-white/70 backdrop-blur-xl border border-white/60 rounded-[2rem] p-2.5 flex items-end gap-3 shadow-2xl shadow-indigo-500/10 transition-all ${
               input.length > 40 ? "rounded-3xl" : ""
             }`}>
@@ -305,7 +305,7 @@ const Chat = () => {
                 placeholder="Message Aura Pulse..."
                 rows={1}
                 disabled={loading || !selectedSession}
-                className="flex-1 bg-transparent border-none focus:ring-0 text-sm font-bold py-3 text-slate-800 placeholder:text-slate-400 resize-none outline-none scrollbar-none"
+                className="flex-1 resize-none bg-transparent border-none py-3 text-sm font-bold text-slate-800 outline-none placeholder:text-slate-400 focus:ring-0 scrollbar-none"
                 style={{ maxHeight: "180px" }}
               />
               <div className="flex items-center gap-2">

@@ -43,7 +43,7 @@ const Dashboard = () => {
   const item = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } };
 
   return (
-    <div className="p-5 max-w-[1440px] mx-auto w-full">
+    <div className="app-page">
       {/* ── Hero Heading ──────────────────────────────────── */}
       <motion.div
         className="mb-6"
@@ -68,7 +68,7 @@ const Dashboard = () => {
         variants={container}
         initial="hidden"
         animate="show"
-        className="grid grid-cols-12 gap-4"
+        className="grid grid-cols-12 gap-4 lg:gap-5"
       >
         {/* ── Widget 1: Weather  (8/12 cols) ── */}
         <motion.div
@@ -161,7 +161,7 @@ const Dashboard = () => {
       <motion.button
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
-        className="fixed bottom-6 right-6 w-12 h-12 rounded-full text-white flex items-center justify-center z-50 shadow-[0_10px_40px_rgba(73,83,188,0.40)]"
+        className="fixed bottom-5 right-5 z-30 hidden h-12 w-12 items-center justify-center rounded-full text-white shadow-[0_10px_40px_rgba(73,83,188,0.40)] lg:flex"
         style={{ background: 'linear-gradient(135deg, #6366f1, #a855f7)' }}
         title="Quick action"
       >

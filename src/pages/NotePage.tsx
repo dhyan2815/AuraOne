@@ -165,9 +165,9 @@ const NotePage = () => {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="app-page-tight space-y-8">
       {/* Header section */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+      <div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-center">
         <div className="flex items-start gap-6 group">
           <button
             onClick={() => navigate("/notes")}
@@ -270,7 +270,7 @@ const NotePage = () => {
       <motion.div 
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="glass-panel rounded-[3rem] p-8 min-h-[500px] border border-primary/5 shadow-2xl shadow-primary/5"
+        className="glass-panel min-h-[500px] rounded-[3rem] border border-primary/5 p-4 shadow-2xl shadow-primary/5 sm:p-6 lg:p-8"
       >
         <div className="prose prose-aurora max-w-none">
           <TiptapEditor content={content} onChange={setContent} />
@@ -280,4 +280,4 @@ const NotePage = () => {
   );
 };
 
-export default NotePage;
+export default NotePage;

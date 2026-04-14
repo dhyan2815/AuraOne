@@ -146,9 +146,9 @@ const Tasks = () => {
   );
 
   return (
-    <div className="min-h-screen px-6 pt-6 pb-10 max-w-5xl mx-auto flex flex-col gap-8">
+    <div className="app-page-tight flex flex-col gap-8">
       {/* ── Hero & Controls ── */}
-      <section className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <section className="app-page-header gap-6">
         <motion.div 
           initial={{ opacity: 0, x: -20 }} 
           animate={{ opacity: 1, x: 0 }} 
@@ -168,10 +168,10 @@ const Tasks = () => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="flex items-center gap-3"
+          className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center"
         >
           {/* Filter tabs */}
-          <div className="flex bg-white/40 backdrop-blur-xl p-1 rounded-2xl border border-white/50 shadow-sm shadow-indigo-500/5">
+          <div className="flex flex-wrap bg-white/40 backdrop-blur-xl p-1 rounded-2xl border border-white/50 shadow-sm shadow-indigo-500/5">
             {FILTERS.map((f) => (
               <button
                 key={f}
@@ -189,7 +189,7 @@ const Tasks = () => {
 
           <button
             onClick={() => navigate("/tasks/new")}
-            className="flex items-center gap-2 bg-gradient-to-br from-indigo-600 to-purple-500 text-white px-5 py-2.5 rounded-2xl font-black shadow-lg shadow-indigo-500/20 text-xs hover:scale-105 active:scale-95 transition-all"
+            className="flex items-center justify-center gap-2 bg-gradient-to-br from-indigo-600 to-purple-500 text-white px-5 py-2.5 rounded-2xl font-black shadow-lg shadow-indigo-500/20 text-xs hover:scale-105 active:scale-95 transition-all"
           >
             <Plus size={14} strokeWidth={3} />
             New

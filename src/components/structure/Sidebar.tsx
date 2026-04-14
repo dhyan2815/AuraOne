@@ -47,7 +47,7 @@ const Sidebar = () => {
   ];
 
   const SidebarContent = () => (
-    <div className="h-screen w-56 flex flex-col py-4 space-y-1 relative overflow-hidden"
+    <div className="relative flex h-dvh w-64 flex-col overflow-hidden py-4 space-y-1"
       style={{
         background: "rgba(255,255,255,0.20)",
         backdropFilter: "blur(40px)",
@@ -126,7 +126,7 @@ const Sidebar = () => {
     <>
       {/* Mobile toggle */}
       <button
-        className="fixed top-4 left-4 z-50 md:hidden p-2 rounded-xl bg-white/60 backdrop-blur-sm border border-white/30 shadow-md text-indigo-600"
+        className="fixed left-4 top-3 z-50 rounded-xl border border-white/30 bg-white/70 p-2 text-indigo-600 shadow-md backdrop-blur-sm md:hidden"
         onClick={() => setMobileOpen(!mobileOpen)}
       >
         {mobileOpen ? <X size={20} /> : <Menu size={20} />}

@@ -81,8 +81,8 @@ const LandingPage = () => {
 
                     <div className="hidden md:flex items-center space-x-8">
                         <button onClick={scrollToFeatures} className="text-sm font-medium text-slate-500 hover:text-primary transition-colors">Features</button>
-                        <Link to="/about" className="text-sm font-medium text-slate-500 hover:text-primary transition-colors">About</Link>
-                        <Link to="/pricing" className="text-sm font-medium text-slate-500 hover:text-primary transition-colors">Pricing</Link>
+                        <button onClick={scrollToTop} className="text-sm font-medium text-slate-500 hover:text-primary transition-colors">About</button>
+                        <Link to="/signup" className="text-sm font-medium text-slate-500 hover:text-primary transition-colors">Pricing</Link>
                     </div>
 
                     <div className="flex items-center space-x-4">

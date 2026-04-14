@@ -61,7 +61,7 @@ const Notes = () => {
     TAG_BADGE[tag] ?? TAG_BADGE.General;
 
   return (
-    <div className="min-h-screen px-8 pt-6 pb-12">
+    <div className="app-page">
       {/* ── Hero ── */}
       <motion.section
         className="mb-8"
@@ -79,13 +79,13 @@ const Notes = () => {
 
       {/* ── Controls Bar ── */}
       <motion.section
-        className="mb-6 flex items-center justify-between gap-4"
+        className="mb-6 flex flex-col items-stretch justify-between gap-4 lg:flex-row lg:items-center"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15 }}
       >
         {/* Filter Tabs */}
-        <div className="flex items-center gap-0.5 p-1 bg-white/40 backdrop-blur-md rounded-xl border border-white/20 shadow-sm flex-shrink-0">
+        <div className="flex flex-wrap items-center gap-1 rounded-xl border border-white/20 bg-white/40 p-1 shadow-sm backdrop-blur-md">
           {FILTERS.map((f) => (
             <button
               key={f}
@@ -102,22 +102,22 @@ const Notes = () => {
         </div>
 
         {/* Right: search + new note */}
-        <div className="flex items-center gap-2">
-          <div className="flex items-center bg-white/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/20 shadow-sm gap-2">
+        <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
+          <div className="flex items-center gap-2 rounded-full border border-white/20 bg-white/40 px-3 py-1.5 shadow-sm backdrop-blur-md">
             <Search size={13} className="text-slate-400 flex-shrink-0" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search..."
-              className="bg-transparent border-none focus:ring-0 text-xs w-32 placeholder-slate-400 text-slate-700 outline-none"
+              className="w-full bg-transparent border-none text-xs text-slate-700 outline-none placeholder-slate-400 focus:ring-0 sm:w-40"
             />
           </div>
           <Link to="/notes/new">
             <motion.button
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.97 }}
-              className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-indigo-600 to-purple-500 text-white font-bold shadow-lg shadow-indigo-500/20 text-xs"
+              className="flex w-full items-center justify-center gap-1.5 rounded-full bg-gradient-to-r from-indigo-600 to-purple-500 px-4 py-2 text-xs font-bold text-white shadow-lg shadow-indigo-500/20 sm:w-auto"
             >
               <PlusIcon size={13} />
               New Note
@@ -210,7 +210,7 @@ const Notes = () => {
 
       {/* Load More */}
       {filtered.length > 0 && (
-        <div className="mt-16 flex justify-center">
+        <div className="mt-12 flex justify-center">
           <button className="px-10 py-4 bg-white/40 backdrop-blur-[40px] border border-white/30 rounded-[2rem] font-bold text-indigo-600 hover:bg-white/60 transition-all flex items-center gap-3 shadow-xl shadow-indigo-500/5">
             <span>View Older Archives</span>
             <span className="text-lg">↓</span>

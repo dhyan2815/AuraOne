@@ -157,8 +157,8 @@ const TaskPage = () => {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+    <div className="app-page-tight space-y-10">
+      <div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-center">
         <div className="flex items-start gap-6 group">
           <button
             onClick={() => navigate("/tasks")}
@@ -187,7 +187,7 @@ const TaskPage = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-4 lg:self-end">
+        <div className="flex flex-wrap items-center gap-4 lg:self-end">
           <button 
             onClick={handleSave} 
             disabled={isSaving}
@@ -207,7 +207,7 @@ const TaskPage = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+      <div className="grid grid-cols-1 gap-10 lg:grid-cols-3 lg:gap-12">
         <div className="lg:col-span-2 space-y-10">
           <div className="space-y-4">
             <label className="text-[10px] font-black uppercase tracking-[0.2em] text-aurora-on-surface-variant flex items-center gap-2">
@@ -281,7 +281,7 @@ const TaskPage = () => {
         </div>
 
         <div className="space-y-8">
-          <div className="space-y-6 sticky top-8">
+          <div className="space-y-6 lg:sticky lg:top-8">
             <label className="text-[10px] font-black uppercase tracking-[0.2em] text-aurora-on-surface-variant">Registry Preview</label>
             <div className="glass-panel p-8 rounded-[3rem] border border-primary/5 shadow-xl shadow-primary/5 relative overflow-hidden group">
               <div className="absolute top-0 right-0 p-8">

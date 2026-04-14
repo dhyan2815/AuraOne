@@ -24,7 +24,7 @@ const Layout = () => {
   const userName = user?.user_metadata?.name || user?.email?.split('@')[0] || 'U';
 
   return (
-    <div className="flex min-h-screen text-text bg-background overflow-hidden">
+    <div className="flex min-h-screen text-text bg-background overflow-x-hidden">
       {/* Aurora mesh background */}
       <div
         aria-hidden="true"
@@ -42,10 +42,10 @@ const Layout = () => {
       <Sidebar />
 
       {/* Main content */}
-      <main className="relative z-10 flex-1 flex flex-col h-screen overflow-y-auto">
+      <main className="relative z-10 flex min-h-screen min-w-0 flex-1 flex-col overflow-x-hidden">
         {/* Top App Bar */}
         <header
-          className="w-full h-12 sticky top-0 z-40 flex justify-between items-center px-5"
+          className="sticky top-0 z-40 flex h-14 w-full items-center justify-between gap-4 px-4 sm:px-5"
           style={{
             background: 'rgba(250,248,253,0.60)',
             backdropFilter: 'blur(12px)',
@@ -54,7 +54,7 @@ const Layout = () => {
           }}
         >
           {/* Search */}
-          <div className="flex items-center gap-3 flex-1 max-w-sm relative group">
+          <div className="relative hidden max-w-sm flex-1 items-center gap-3 group md:flex">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
             <input
               type="text"
@@ -64,7 +64,7 @@ const Layout = () => {
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 sm:gap-2.5">
             <button
               onClick={toggleTheme}
               className="p-1.5 rounded-full hover:bg-indigo-50/60 text-slate-500 transition-colors"
@@ -87,7 +87,7 @@ const Layout = () => {
 
         {/* Page content */}
         <motion.div
-          className="flex-1"
+          className="flex-1 min-w-0"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, ease: 'easeOut' }}

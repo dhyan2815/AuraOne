@@ -76,7 +76,7 @@ const Settings = () => {
   const glassCard = "bg-white/30 backdrop-blur-[40px] border border-white/30 rounded-2xl p-6 shadow-xl shadow-indigo-500/5";
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-6 space-y-6">
+    <div className="app-page-tight space-y-6">
       {/* ── Hero ── */}
       <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
         <div className="flex items-center gap-2 mb-1">
