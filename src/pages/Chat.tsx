@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Send, Trash2, Plus, Paperclip, Mic, Sparkles } from "lucide-react";
+import { Send, Trash2, Plus, Paperclip, Mic } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import {
   getSessions, createNewSession, deleteSession, Session,
