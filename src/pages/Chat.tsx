@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Send, Trash2, Plus, Paperclip, Mic, Sparkles, X } from "lucide-react";
+import { Send, Trash2, Plus, Paperclip, Mic, Sparkles } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import {
   getSessions, createNewSession, deleteSession, Session,
@@ -123,113 +123,115 @@ const Chat = () => {
   const displayName = user?.email?.split("@")[0] ?? "User";
 
   return (
-    <div className="app-page flex min-h-[calc(100dvh-3.5rem)] flex-col gap-4 lg:grid lg:grid-cols-[20rem_minmax(0,1fr)]">
+    <div className="app-page flex min-h-[calc(100dvh-4rem)] flex-col gap-4 lg:grid lg:grid-cols-[18rem_1fr]">
       {/* ── Left Sidebar: Sessions ── */}
-      <aside className="flex min-h-0 flex-col gap-4 lg:max-h-[calc(100dvh-8rem)]">
+      <aside className="flex min-h-0 flex-col gap-3 lg:max-h-[calc(100dvh-8rem)]">
         <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+          whileHover={{ scale: 1.01 }}
+          whileTap={{ scale: 0.99 }}
           onClick={handleNewSession}
-          className="bg-primary shadow-xl shadow-primary/20 w-full py-4 px-6 rounded-2xl flex items-center justify-between group transition-all duration-300"
+          className="bg-primary shadow-lg shadow-primary/10 w-full py-3 px-4 rounded-xl flex items-center justify-center gap-2 group transition-all duration-300"
         >
-          <span className="font-black text-white text-xs uppercase tracking-widest">NEW CHAT</span>
-          <Plus size={18} className="text-white" strokeWidth={3} />
+          <Plus size={16} className="text-white" strokeWidth={2.5} />
+          <span className="font-bold text-white text-xs tracking-wide">New Chat</span>
         </motion.button>
 
-        <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden rounded-[2rem] border border-primary/10 glass p-3 shadow-2xl shadow-primary/5 transition-colors duration-500">
-          <div className="flex items-center justify-between px-3 mt-2">
-            <h3 className="text-[10px] font-black text-text-variant uppercase tracking-[0.25em] opacity-60">Chat History</h3>
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-primary/10 glass shadow-sm transition-colors duration-500">
+          <div className="px-4 py-3 border-b border-primary/5 bg-primary/5">
+            <h3 className="text-[11px] font-bold text-text-variant uppercase tracking-wider opacity-70">Recent Conversations</h3>
           </div>
-          <div className="flex-1 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
+          <div className="flex-1 overflow-y-auto custom-scrollbar p-2">
             {sessions.length === 0 && (
               <div className="py-12 text-center px-4">
-                <p className="text-[10px] text-text-variant/40 font-black uppercase tracking-[0.2em] leading-relaxed">No chats found.<br/>Start a new conversation.</p>
+                <p className="text-[11px] text-text-variant/40 font-bold uppercase tracking-wider leading-relaxed">No history found</p>
               </div>
             )}
-            {sessions.map((s) => (
-              <motion.div
-                key={s.id}
-                onClick={() => setSelectedSession(s.id)}
-                className={`p-4 rounded-2xl cursor-pointer group flex items-center justify-between gap-4 transition-all duration-300 border ${
-                  selectedSession === s.id
-                    ? "bg-primary/10 border-primary/20 shadow-lg shadow-primary/5"
-                    : "bg-transparent border-transparent hover:bg-primary/5 hover:translate-x-1"
-                }`}
-              >
-                <div className="flex-1 min-w-0">
-                  <p className={`text-xs font-bold truncate ${selectedSession === s.id ? "text-primary" : "text-text"}`}>
-                    {s.name || "New Chat"}
-                  </p>
-                  <p className="text-[9px] font-black text-text-variant/50 uppercase tracking-widest mt-1">
-                    {s.created_at ? format(new Date(s.created_at), "MMM dd") : ""}
-                  </p>
-                </div>
-                <button
-                  onClick={(e) => handleDeleteSession(s.id, e)}
-                  className="p-1.5 text-text-variant/20 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
+            <div className="space-y-1">
+              {sessions.map((s) => (
+                <motion.div
+                  key={s.id}
+                  onClick={() => setSelectedSession(s.id)}
+                  className={`px-3 py-2.5 rounded-lg cursor-pointer group flex items-center justify-between gap-3 transition-all duration-200 border ${
+                    selectedSession === s.id
+                      ? "bg-primary/10 border-primary/20 text-primary shadow-sm"
+                      : "bg-transparent border-transparent hover:bg-primary/5 text-text-variant hover:text-text"
+                  }`}
                 >
-                  <Trash2 size={14} />
-                </button>
-              </motion.div>
-            ))}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-semibold truncate">
+                      {s.name || "New Chat"}
+                    </p>
+                    <p className="text-[10px] font-medium opacity-50 mt-0.5">
+                      {s.created_at ? format(new Date(s.created_at), "MMM dd") : ""}
+                    </p>
+                  </div>
+                  <button
+                    onClick={(e) => handleDeleteSession(s.id, e)}
+                    className="p-1 text-text-variant/30 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
       </aside>
 
       {/* ── Main Chat ── */}
-      <section className="relative flex min-h-[70dvh] min-w-0 flex-1 flex-col overflow-hidden rounded-[3rem] border border-primary/10 glass shadow-2xl shadow-primary/5 transition-colors duration-500 lg:max-h-[calc(100dvh-8rem)]">
+      <section className="relative flex min-h-[70dvh] min-w-0 flex-1 flex-col overflow-hidden rounded-2xl border border-primary/10 glass shadow-sm transition-colors duration-500 lg:max-h-[calc(100dvh-8rem)]">
         {/* Chat Header */}
-        <div className="px-8 py-5 border-b border-primary/5 flex items-center justify-between bg-primary/5 backdrop-blur-md z-10">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white shadow-xl shadow-primary/20">
-              <Logo iconOnly iconClassName="w-6 h-6 filter brightness-0 invert" />
+        <div className="px-6 h-14 border-b border-primary/5 flex items-center justify-between bg-primary/5 backdrop-blur-md z-10">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white shadow-md shadow-primary/10">
+              <Logo iconOnly iconClassName="w-4.5 h-4.5 filter brightness-0 invert" />
             </div>
             <div>
-              <h2 className="text-lg font-black text-text tracking-tight uppercase tracking-[0.1em]">Aura Assistant</h2>
-              <div className="flex items-center gap-2 mt-0.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-glow shadow-emerald-500/50" />
-                <span className="text-[9px] font-black text-emerald-500 uppercase tracking-[0.2em] opacity-80">Connected & Ready</span>
+              <h2 className="text-sm font-bold text-text tracking-wide uppercase">Aura Assistant</h2>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-tight opacity-80">AI Online</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Messages / Canvas */}
-        <div className="custom-scrollbar relative flex-1 overflow-y-auto p-4 sm:p-8">
+        <div className="custom-scrollbar relative flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
           <AnimatePresence mode="popLayout">
             {messages.length === 0 && !loading ? (
               <motion.div
                 key="empty"
-                initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="relative z-10 flex h-full flex-col items-center justify-center space-y-12 p-4 text-center"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="relative z-10 flex h-full flex-col items-center justify-center space-y-8 p-4 text-center pb-20"
               >
                 <div className="space-y-4">
-                  <div className="w-24 h-24 rounded-[3rem] bg-primary/5 glass shadow-2xl flex items-center justify-center mx-auto mb-10 border border-primary/10">
-                    <Logo iconOnly iconClassName="w-14 h-14" />
+                  <div className="w-16 h-16 rounded-2xl bg-primary/5 glass shadow-sm flex items-center justify-center mx-auto mb-6 border border-primary/10">
+                    <Logo iconOnly iconClassName="w-9 h-9" />
                   </div>
-                  <h2 className="text-4xl font-extrabold tracking-tighter text-text" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                    Ask Aura <span className="text-primary italic">Anything</span>
+                  <h2 className="text-2xl font-bold tracking-tight text-text" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                    Welcome to <span className="text-primary">Aura Assistant</span>
                   </h2>
-                  <p className="text-sm text-text-variant font-medium max-w-[340px] mx-auto leading-relaxed opacity-60">
-                    Ask me anything to help organize your day, manage your tasks, or brainstorm new ideas.
+                  <p className="text-xs text-text-variant font-medium max-w-[280px] mx-auto leading-relaxed opacity-60">
+                    How can I help you optimize your neural workflow today?
                   </p>
                 </div>
 
-                <div className="grid w-full max-w-2xl grid-cols-2 gap-4">
+                <div className="grid w-full max-w-lg grid-cols-2 gap-3">
                   {SUGGESTIONS.map((s, i) => (
                     <motion.button
                       key={i}
-                      whileHover={{ y: -6, scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
+                      whileHover={{ y: -2, scale: 1.01 }}
+                      whileTap={{ scale: 0.99 }}
                       onClick={() => setInput(s.title)}
-                      className="glass border border-primary/5 p-6 rounded-[2.5rem] text-left hover:border-primary/20 hover:shadow-2xl hover:shadow-primary/5 transition-all group"
+                      className="glass border border-primary/5 p-4 rounded-xl text-left hover:border-primary/20 hover:bg-primary/5 transition-all group"
                     >
-                      <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform">
+                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-base mb-3 group-hover:scale-110 transition-transform">
                         {s.icon}
                       </div>
-                      <p className="text-[10px] font-black text-text uppercase tracking-widest group-hover:text-primary transition-colors">{s.title}</p>
-                      <p className="text-[10px] text-text-variant font-medium mt-1.5 leading-normal opacity-60">{s.sub}</p>
+                      <p className="text-[10px] font-bold text-text uppercase tracking-wider group-hover:text-primary transition-colors">{s.title}</p>
+                      <p className="text-[10px] text-text-variant font-medium mt-1 leading-normal opacity-60">{s.sub}</p>
                     </motion.button>
                   ))}
                 </div>
@@ -243,21 +245,21 @@ const Chat = () => {
                     animate={{ opacity: 1, y: 0 }}
                     className={`flex items-start gap-5 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}
                   >
-                    <div className={`w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg ${
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm ${
                       msg.role === "ai"
                         ? "bg-gradient-to-tr from-primary to-secondary border border-white/20"
                         : "glass border border-primary/20 text-primary"
                     }`}>
                       {msg.role === "ai" ? (
-                        <Logo iconOnly iconClassName="w-6 h-6 filter brightness-0 invert" />
+                        <Logo iconOnly iconClassName="w-4 h-4 filter brightness-0 invert" />
                       ) : (
-                        <span className="text-xs font-black uppercase tracking-widest">{displayName[0]}</span>
+                        <span className="text-[11px] font-bold uppercase">{displayName[0]}</span>
                       )}
                     </div>
-                    <div className={`max-w-[85%] px-6 py-4.5 text-sm font-medium leading-relaxed shadow-2xl transition-all ${
+                    <div className={`max-w-[80%] px-4 py-2.5 text-sm font-medium leading-relaxed transition-all ${
                       msg.role === "user"
-                        ? "bg-primary text-white rounded-[2.5rem] rounded-tr-sm shadow-primary/20"
-                        : "glass border border-primary/5 text-text rounded-[2.5rem] rounded-tl-sm"
+                        ? "bg-primary text-white rounded-2xl rounded-tr-sm shadow-md shadow-primary/10"
+                        : "glass border border-primary/5 text-text rounded-2xl rounded-tl-sm shadow-sm"
                     }`}>
                       <div className="whitespace-pre-wrap break-words">{msg.content}</div>
                     </div>
@@ -265,13 +267,13 @@ const Chat = () => {
                 ))}
 
                 {loading && (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-5">
-                    <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-primary to-secondary flex items-center justify-center shadow-lg">
-                      <Logo iconOnly iconClassName="w-6 h-6 filter brightness-0 invert" />
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-4">
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-primary to-secondary flex items-center justify-center shadow-sm">
+                      <Logo iconOnly iconClassName="w-4 h-4 filter brightness-0 invert" />
                     </div>
-                    <div className="glass border border-primary/5 rounded-[2.5rem] rounded-tl-sm px-8 py-5 flex items-center gap-2 shadow-sm">
+                    <div className="glass border border-primary/5 rounded-2xl rounded-tl-sm px-5 py-3 flex items-center gap-1 shadow-sm">
                       {[1, 2, 3].map((i) => (
-                        <div key={i} className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce shadow-glow shadow-primary/50" style={{ animationDelay: `${i * 0.1}s` }} />
+                        <div key={i} className="w-1 h-1 bg-primary rounded-full animate-bounce" style={{ animationDelay: `${i * 0.1}s` }} />
                       ))}
                     </div>
                   </motion.div>
@@ -283,43 +285,40 @@ const Chat = () => {
         </div>
 
         {/* Floating Input Area */}
-        <div className="sticky bottom-0 left-0 z-30 w-full border-t border-primary/5 glass-panel px-6 pb-6 pt-4">
+        <div className="sticky bottom-0 left-0 z-30 w-full border-t border-primary/5 glass-panel px-4 pb-4 pt-4">
           <div className="mx-auto max-w-3xl">
-            <div className={`glass border border-primary/10 rounded-[2.5rem] p-3 flex items-end gap-3 shadow-2xl shadow-primary/10 transition-all ${
-              input.length > 40 ? "rounded-3xl" : ""
-            }`}>
-              <button className="p-3.5 text-text-variant hover:text-primary transition-all rounded-2xl hover:bg-primary/5">
-                <Paperclip size={20} strokeWidth={2} />
+            <div className={`glass border border-primary/15 rounded-xl p-1.5 flex items-end gap-1.5 shadow-xl shadow-primary/5 transition-all`}>
+              <button className="p-2.5 text-text-variant hover:text-primary transition-all rounded-lg hover:bg-primary/5">
+                <Paperclip size={18} strokeWidth={2} />
               </button>
               <textarea
                 ref={textareaRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Ask me anything..."
+                placeholder="Message Aura Assistant..."
                 rows={1}
                 disabled={loading || !selectedSession}
-                className="flex-1 resize-none bg-transparent border-none py-3.5 text-sm font-bold text-text outline-none placeholder:text-text-variant/30 focus:ring-0 scrollbar-none"
+                className="flex-1 resize-none bg-transparent border-none py-2.5 text-sm font-medium text-text outline-none placeholder:text-text-variant/40 focus:ring-0 scrollbar-none"
                 style={{ maxHeight: "150px" }}
               />
-              <div className="flex items-center gap-2">
-                <button className="p-3.5 text-text-variant hover:text-primary transition-all rounded-2xl hover:bg-primary/5">
-                  <Mic size={20} strokeWidth={2} />
+              <div className="flex items-center gap-1">
+                <button className="p-2.5 text-text-variant hover:text-primary transition-all rounded-lg hover:bg-primary/5">
+                  <Mic size={18} strokeWidth={2} />
                 </button>
                 <motion.button
-                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={handleSend}
                   disabled={loading || !input.trim() || !selectedSession}
-                  className="w-14 h-14 rounded-2xl bg-primary text-white flex items-center justify-center shadow-2xl shadow-primary/30 disabled:opacity-20 disabled:grayscale transition-all"
+                  className="w-10 h-10 rounded-lg bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/20 disabled:opacity-20 disabled:grayscale transition-all"
                 >
-                  <Send size={20} strokeWidth={3} />
+                  <Send size={16} strokeWidth={2.5} />
                 </motion.button>
               </div>
             </div>
-            <div className="flex items-center justify-center gap-2 mt-4 opacity-40">
-              <Sparkles size={10} className="text-primary" />
-              <p className="text-[9px] font-black text-text-variant uppercase tracking-[0.4em]">Secured with AuraOne AI</p>
+            <div className="flex items-center justify-center gap-1.5 mt-3 opacity-30">
+              <p className="text-[10px] font-bold text-text-variant uppercase tracking-widest text-center">Neural Matrix Protected</p>
             </div>
           </div>
         </div>

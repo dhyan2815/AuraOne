@@ -101,7 +101,7 @@ const Dashboard = () => {
           className="col-span-12 lg:col-span-5 glass p-6 lg:p-8 rounded-[2.5rem] border border-primary/5 shadow-2xl shadow-primary/5 transition-all duration-500"
         >
           <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-text mb-6 opacity-60">
-            LATEST UPDATES
+            LATEST NEWS
           </h3>
           <NewsWidget />
         </motion.div>
