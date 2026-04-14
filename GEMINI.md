@@ -140,5 +140,5 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
   - **Asset Pruning**: Permanently deleted 7 unused image and video assets from `src/assets/` (`flat-illustration-1.jpg`, `flat-illustration-2.jpg`, `flat-illustration-3.png`, `illustration.jpg`, `LandingVideo.mp4`, `LandingVideo2.mp4`, `project_flow.png`).
   - **Legacy Config Removal**: Deleted `firebase.json` and `logo.html` (legacy playbooks/configs no longer relevant post-Supabase migration).
   - **Dependency Optimization**: Updated `package.json` to remove unused server-side and client-side dependencies including `mongoose`, `express`, `axios`, `@ai-sdk/google`, `@google/generative-ai`, `nodemon`, and `proxyquire`. Cleaned up the `scripts` section to remove obsolete server commands.
-  - **Verification**: Verified that all remaining components and assets are actively imported and functional within the application.
+  - **Verification**: Verified that all remaining components and assets are actively imported and functional within the application. Corrected the favicon path in `index.html` to follow Vite root-absolute standards. Added `CLAUDE.md` to `.gitignore` and untracked it from git.
 - **Outcome**: A leaner, more professional codebase with significantly reduced complexity and zero reliance on deprecated backend or AI SDKs.
