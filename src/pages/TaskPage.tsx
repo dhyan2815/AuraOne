@@ -48,7 +48,7 @@ const TaskPage = () => {
 
       try {
         if (id === "new") {
-          setTitle("Initialize Protocol");
+          setTitle("Untitled Task");
           setDescription("");
           setDueDate("");
           setDueTime("");
@@ -69,12 +69,12 @@ const TaskPage = () => {
             setCompleted(foundTask.completed || false);
             setCreatedAt(foundTask.created_at);
           } else {
-            toast.error("Protocol not found");
+            toast.error("Task not found");
             navigate("/tasks");
           }
         }
       } catch (err) {
-        toast.error("Neural link sync failed");
+        toast.error("Failed to load task");
         navigate("/tasks");
       } finally {
         setLoading(false);
@@ -97,7 +97,7 @@ const TaskPage = () => {
     }
 
     const taskData: NewTask = {
-      title: title.trim() || "Initialize Protocol",
+      title: title.trim() || "Untitled Task",
       description: description.trim(),
       due_date: finalDueDate,
       priority,
@@ -108,10 +108,10 @@ const TaskPage = () => {
       setIsSaving(true);
       if (id === "new") {
         await createTask(user.id, taskData);
-        toast.success("Objective initialized");
+        toast.success("Task created");
       } else if (id) {
         await updateTask(id, taskData);
-        toast.success("Protocol updated");
+        toast.success("Task updated");
       }
       navigate("/tasks");
     } catch (err) {
@@ -126,10 +126,10 @@ const TaskPage = () => {
       navigate("/tasks");
       return;
     }
-    if (!window.confirm("Purge this objective from the registry?")) return;
+    if (!window.confirm("Delete this task?")) return;
     try {
       await deleteTask(id);
-      toast.success("Objective neutralized");
+      toast.success("Task deleted");
       navigate("/tasks");
     } catch (error) {
       toast.error("Purge sequence failed");
@@ -151,7 +151,7 @@ const TaskPage = () => {
         <div className="w-16 h-16 glass rounded-2xl flex items-center justify-center mb-4">
           <RotateCw className="text-primary animate-spin" size={24} />
         </div>
-        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/50">Accessing Registry...</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/50">Loading task...</p>
       </div>
     );
   }
@@ -169,14 +169,14 @@ const TaskPage = () => {
           <div className="space-y-3 flex-1">
             <div className="flex items-center gap-2 text-primary">
               <Logo iconOnly iconClassName="w-3.5 h-3.5 drop-shadow-sm" />
-              <span className="text-[10px] font-black uppercase tracking-[0.2em]">Operational Command</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.2em]">Task Editor</span>
             </div>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className="text-4xl md:text-5xl font-black bg-transparent border-0 outline-none w-full text-aurora-on-surface placeholder:text-aurora-on-surface-variant/20 tracking-tight leading-none"
-              placeholder="Initialize Protocol"
+              placeholder="Untitled Task"
             />
             {createdAt && (
               <div className="flex items-center text-[10px] font-bold text-aurora-on-surface-variant uppercase tracking-widest opacity-60">
@@ -194,13 +194,13 @@ const TaskPage = () => {
             className="btn-aurora-primary px-8 py-3 text-xs font-black uppercase tracking-widest shadow-lg shadow-primary/20 flex items-center gap-2 disabled:opacity-50"
           >
             {isSaving ? <RotateCw className="animate-spin" size={16} /> : <Save size={16} />}
-            Secure Objective
+            Save Task
           </button>
 
           <button
             onClick={handleDelete}
             className="p-3 rounded-2xl glass border border-primary/5 text-aurora-on-surface-variant hover:text-error hover:border-error/20 transition-all active:scale-95"
-            aria-label="Purge objective"
+            aria-label="Delete task"
           >
             <Trash2 size={20} />
           </button>
@@ -211,13 +211,13 @@ const TaskPage = () => {
         <div className="lg:col-span-2 space-y-10">
           <div className="space-y-4">
             <label className="text-[10px] font-black uppercase tracking-[0.2em] text-aurora-on-surface-variant flex items-center gap-2">
-              Objective Context
+              Task Details
               <div className="h-[1px] flex-1 bg-primary/5" />
             </label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Operational details awaiting input..."
+              placeholder="Add task details and notes..."
               className="input-aurora w-full h-48 resize-none p-6 text-sm font-medium leading-relaxed"
             />
           </div>
@@ -250,7 +250,7 @@ const TaskPage = () => {
             </div>
 
             <div className="space-y-4">
-              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-aurora-on-surface-variant">Priority Tier</label>
+              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-aurora-on-surface-variant">Priority</label>
               <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as any)}
@@ -272,8 +272,8 @@ const TaskPage = () => {
               >
                 <AlertCircle className="aurora-glow" size={24} />
                 <div className="space-y-1">
-                  <h4 className="text-xs font-black uppercase tracking-widest">Temporal Infraction Detected</h4>
-                  <p className="text-[10px] font-bold opacity-70">The designated deadline has elapsed. Immediate intervention required.</p>
+                  <h4 className="text-xs font-black uppercase tracking-widest">Task is overdue</h4>
+                  <p className="text-[10px] font-bold opacity-70">This task is past its due date and still incomplete.</p>
                 </div>
               </motion.div>
             )}
@@ -282,7 +282,7 @@ const TaskPage = () => {
 
         <div className="space-y-8">
           <div className="space-y-6 lg:sticky lg:top-8">
-            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-aurora-on-surface-variant">Registry Preview</label>
+            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-aurora-on-surface-variant">Task Preview</label>
             <div className="glass-panel p-8 rounded-[3rem] border border-primary/5 shadow-xl shadow-primary/5 relative overflow-hidden group">
               <div className="absolute top-0 right-0 p-8">
                 {priority === 'high' && <Flag size={20} className="text-error" />}
@@ -294,12 +294,12 @@ const TaskPage = () => {
                     <CheckCircle size={18} />
                   </div>
                   <h3 className={`text-xl font-black text-aurora-on-surface leading-tight ${completed ? "line-through opacity-40" : ""}`}>
-                    {title || "Initialize Protocol"}
+                    {title || "Untitled Task"}
                   </h3>
                 </div>
 
                 <p className="text-xs font-medium text-aurora-on-surface-variant leading-relaxed opacity-60 line-clamp-4">
-                  {description || "No operational details specified for this objective sector."}
+                  {description || "No task details added yet."}
                 </p>
 
                 <div className="pt-6 border-t border-primary/5 space-y-4">
@@ -331,7 +331,7 @@ const TaskPage = () => {
                   : "glass border-primary/10 text-aurora-on-surface-variant hover:text-primary hover:border-primary/20"
               }`}
             >
-              {completed ? "Objective Secured" : "Secure Objective"}
+              {completed ? "Task completed" : "Save Task"}
             </button>
           </div>
         </div>
@@ -341,3 +341,6 @@ const TaskPage = () => {
 };
 
 export default TaskPage;
+
+
+

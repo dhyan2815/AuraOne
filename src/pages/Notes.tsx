@@ -70,10 +70,10 @@ const Notes = () => {
         transition={{ duration: 0.6 }}
       >
       <h1 className="text-2xl font-extrabold text-text tracking-tight mb-1.5">
-          Your Archives
+          Notes
         </h1>
         <p className="text-sm text-slate-500 max-w-xl font-medium leading-relaxed">
-          Every thought, sketch, and breakthrough — captured.
+          Capture ideas, meeting notes, and drafts in one searchable place.
         </p>
       </motion.section>
 
@@ -136,7 +136,7 @@ const Notes = () => {
             exit={{ opacity: 0 }}
             className="flex flex-col items-center justify-center py-24 gap-4 text-center"
           >
-            <p className="text-2xl font-bold text-slate-500">No archives found</p>
+            <p className="text-2xl font-bold text-slate-500">No notes found</p>
             <p className="text-sm text-slate-400 max-w-sm">
               Your first note is waiting to be captured.
             </p>
@@ -212,7 +212,7 @@ const Notes = () => {
       {filtered.length > 0 && (
         <div className="mt-12 flex justify-center">
           <button className="px-10 py-4 bg-white/40 backdrop-blur-[40px] border border-white/30 rounded-[2rem] font-bold text-indigo-600 hover:bg-white/60 transition-all flex items-center gap-3 shadow-xl shadow-indigo-500/5">
-            <span>View Older Archives</span>
+            <span>View Older Notes</span>
             <span className="text-lg">↓</span>
           </button>
         </div>
@@ -222,3 +222,5 @@ const Notes = () => {
 };
 
 export default Notes;
+
+

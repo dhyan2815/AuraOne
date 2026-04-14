@@ -46,7 +46,7 @@ const NotePage = () => {
 
       try {
         if (id === "new") {
-          setTitle("Draft Protocol");
+          setTitle("Untitled Note");
           setContent("");
           setTags([]);
           setNote(null);
@@ -54,16 +54,16 @@ const NotePage = () => {
           const foundNote = await getNoteById(id);
           if (foundNote) {
             setNote(foundNote);
-            setTitle(foundNote.title || "Draft Protocol");
+            setTitle(foundNote.title || "Untitled Note");
             setTags(foundNote.tags || []);
             setContent(foundNote.content || "");
           } else {
-            toast.error("Protocol not found");
+            toast.error("Note not found");
             navigate("/notes");
           }
         }
       } catch (error) {
-        toast.error("Neural link sync failed");
+        toast.error("Failed to load note");
         navigate("/notes");
       } finally {
         setLoading(false);
@@ -77,7 +77,7 @@ const NotePage = () => {
     if (!user) return;
 
     const noteData = {
-      title: title.trim() || "Draft Protocol",
+      title: title.trim() || "Untitled Note",
       tags,
       content,
       is_archived: note?.is_archived || false,
@@ -88,20 +88,20 @@ const NotePage = () => {
       if (!note?.id || id === 'new') {
         const newNote = await createNote(user.id, noteData);
         if (!isAutoSave) {
-          toast.success("Memory archive established");
+          toast.success("Note created");
         }
         setLastSaved(new Date());
         navigate(`/notes/${newNote.id}`, { replace: true });
       } else {
         await updateNote(note.id, noteData);
         if (!isAutoSave) {
-          toast.success("Archive updated");
+          toast.success("Note updated");
         }
         setLastSaved(new Date());
       }
     } catch (err) {
       if (!isAutoSave) {
-        toast.error("Memory sync failed");
+        toast.error("Failed to save note");
       }
     } finally {
       setAutoSaving(false);
@@ -132,13 +132,13 @@ const NotePage = () => {
       navigate("/notes");
       return;
     }
-    if (!window.confirm("Purge this memory from archive?")) return;
+    if (!window.confirm("Delete this note?")) return;
     try {
       await deleteNote(note.id);
-      toast.success("Protocol neutralized");
+      toast.success("Note deleted");
       navigate("/notes");
     } catch (error) {
-      toast.error("Archive integrity maintained");
+      toast.error("Delete failed");
     }
   };
 
@@ -159,7 +159,7 @@ const NotePage = () => {
         <div className="w-16 h-16 glass rounded-2xl flex items-center justify-center mb-4">
           <RotateCw className="text-primary animate-spin" size={24} />
         </div>
-        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/50">Recalibrating Archive...</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/50">Loading note...</p>
       </div>
     );
   }
@@ -178,19 +178,19 @@ const NotePage = () => {
           <div className="space-y-3 flex-1">
             <div className="flex items-center gap-2 text-primary">
               <Logo iconOnly iconClassName="w-3.5 h-3.5 drop-shadow-sm" />
-              <span className="text-[10px] font-black uppercase tracking-[0.2em]">Editing Protocol</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.2em]">Note Editor</span>
             </div>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className="text-4xl md:text-5xl font-black bg-transparent border-0 outline-none w-full text-aurora-on-surface placeholder:text-aurora-on-surface-variant/20 tracking-tight leading-none"
-              placeholder="Draft Protocol"
+              placeholder="Untitled Note"
             />
             {note?.created_at && (
               <div className="flex items-center text-[10px] font-bold text-aurora-on-surface-variant uppercase tracking-widest opacity-60">
                 <Calendar size={12} className="mr-2" />
-                Captured on {format(new Date(note.created_at), "MMMM d, yyyy")}
+                Created on {format(new Date(note.created_at), "MMMM d, yyyy")}
               </div>
             )}
           </div>
@@ -206,7 +206,7 @@ const NotePage = () => {
             ) : lastSaved ? (
               <div className="flex items-center text-success/60">
                 <Cloud size={14} className="mr-2" />
-                <span>Last Sync: {format(lastSaved, "HH:mm")}</span>
+                <span>Saved at {format(lastSaved, "HH:mm")}</span>
               </div>
             ) : (
               <span className="text-aurora-on-surface-variant/40 italic">System Ready</span>
@@ -215,13 +215,13 @@ const NotePage = () => {
 
           <button onClick={() => handleSave(false)} className="btn-aurora-primary px-8 py-3 text-xs font-black uppercase tracking-widest shadow-lg shadow-primary/20 flex items-center gap-2">
             <Save size={16} />
-            Commit Changes
+            Save Note
           </button>
 
           <button
             onClick={handleDelete}
             className="p-3 rounded-2xl glass border border-primary/5 text-aurora-on-surface-variant hover:text-error hover:border-error/20 transition-all active:scale-95"
-            aria-label="Delete protocol"
+            aria-label="Delete note"
           >
             <Trash2 size={20} />
           </button>
@@ -281,3 +281,6 @@ const NotePage = () => {
 };
 
 export default NotePage;
+
+
+

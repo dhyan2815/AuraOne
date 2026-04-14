@@ -30,7 +30,7 @@ const Tasks = () => {
     e.stopPropagation();
     if (!user) return;
     await updateTask(id, { completed: !completed });
-    toast.success(!completed ? "Objective achieved! ✦" : "Reactivated");
+    toast.success(!completed ? "Task completed" : "Reactivated");
     loadTasks();
   };
 
@@ -156,12 +156,12 @@ const Tasks = () => {
           className="flex flex-col gap-1"
         >
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-black tracking-tight text-text">Objective Registry</h1>
+            <h1 className="text-2xl font-black tracking-tight text-text">Tasks</h1>
             <div className="px-2.5 py-0.5 bg-indigo-500/10 text-indigo-600 rounded-full text-[10px] font-black tracking-widest uppercase border border-indigo-500/20">
               {tasks.filter((t) => !t.completed).length} Total
             </div>
           </div>
-          <p className="text-sm text-slate-500 font-medium opacity-80">Orchestrate your focus and maintain tactical momentum.</p>
+          <p className="text-sm text-slate-500 font-medium opacity-80">Track work by priority, due date, and completion status.</p>
         </motion.div>
 
         <motion.div
@@ -207,20 +207,20 @@ const Tasks = () => {
           <div className="w-16 h-16 rounded-3xl bg-white shadow-xl shadow-indigo-500/5 flex items-center justify-center text-indigo-500 mb-6">
             <Plus size={32} strokeWidth={1.5} />
           </div>
-          <h2 className="text-xl font-black text-slate-800 tracking-tight">Begin your registry</h2>
-          <p className="text-sm text-slate-500 mt-2 max-w-[240px]">Create your first objective to initialize the neural matrix.</p>
+          <h2 className="text-xl font-black text-slate-800 tracking-tight">Create your first task</h2>
+          <p className="text-sm text-slate-500 mt-2 max-w-[240px]">Add a task to start organizing your work.</p>
           <button
             onClick={() => navigate("/tasks/new")}
             className="mt-8 px-10 py-3.5 rounded-2xl text-white font-black text-xs uppercase tracking-widest shadow-xl shadow-indigo-500/20 bg-gradient-to-r from-indigo-600 to-purple-500 hover:scale-105 active:scale-95 transition-all"
           >
-            Initialize Task
+            Create Task
           </button>
         </motion.div>
       ) : (
         <div className="space-y-2">
-          <Group dot="bg-red-400"     label="High Priority Objectives" list={highPriority} />
-          <Group dot="bg-amber-400"   label="Active Flow"              list={activeFlow} />
-          <Group dot="bg-slate-300"   label="Recently Achieved"        list={achieved} />
+          <Group dot="bg-red-400"     label="High Priority" list={highPriority} />
+          <Group dot="bg-amber-400"   label="Open Tasks"              list={activeFlow} />
+          <Group dot="bg-slate-300"   label="Completed"        list={achieved} />
         </div>
       )}
     </div>
@@ -228,3 +228,7 @@ const Tasks = () => {
 };
 
 export default Tasks;
+
+
+
+

@@ -115,7 +115,7 @@ const Chat = () => {
     return (
       <div className="flex flex-col items-center justify-center h-[calc(100vh-4rem)]">
         <div className="w-16 h-16 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-4" />
-        <p className="text-xs font-black uppercase tracking-widest text-indigo-400 animate-pulse">Initializing Pulse…</p>
+        <p className="text-xs font-black uppercase tracking-widest text-indigo-400 animate-pulse">Loading chat...</p>
       </div>
     );
   }
@@ -185,10 +185,10 @@ const Chat = () => {
               <Logo iconOnly iconClassName="w-5 h-5 filter brightness-0 invert" />
             </div>
             <div>
-              <h2 className="text-base font-black text-slate-800 tracking-tight">Aura Pulse</h2>
+              <h2 className="text-base font-black text-slate-800 tracking-tight">Chat</h2>
               <div className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest">Neural Sync Active</span>
+                <span className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest">AI assistant online</span>
               </div>
             </div>
           </div>
@@ -215,10 +215,10 @@ const Chat = () => {
                     <Logo iconOnly iconClassName="w-12 h-12" />
                   </div>
                   <h2 className="text-3xl font-black tracking-tighter text-slate-800">
-                    Synchronize your <span className="text-indigo-600">Intent</span>
+                    Start a <span className="text-indigo-600">conversation</span>
                   </h2>
                   <p className="text-sm text-slate-500 font-medium max-w-[320px] mx-auto leading-relaxed opacity-80">
-                    Aura Pulse amplifies your cognitive reach through neural-patterned AI orchestration.
+                    Ask Aura AI to summarize, plan, draft, and brainstorm in a focused workspace.
                   </p>
                 </div>
 
@@ -302,7 +302,7 @@ const Chat = () => {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Message Aura Pulse..."
+                placeholder="Message Chat..."
                 rows={1}
                 disabled={loading || !selectedSession}
                 className="flex-1 resize-none bg-transparent border-none py-3 text-sm font-bold text-slate-800 outline-none placeholder:text-slate-400 focus:ring-0 scrollbar-none"
@@ -324,7 +324,7 @@ const Chat = () => {
               </div>
             </div>
             <p className="text-center text-[9px] font-black text-slate-400 mt-3 uppercase tracking-[0.25em] opacity-60">
-              Neural Network Integrated · Safe Mode Active
+              AI workspace active
             </p>
           </div>
         </div>
@@ -334,3 +334,6 @@ const Chat = () => {
 };
 
 export default Chat;
+
+
+

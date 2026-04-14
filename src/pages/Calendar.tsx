@@ -105,10 +105,10 @@ const Calendar = () => {
           >
             <div>
               <h1 className="text-2xl font-extrabold tracking-tight leading-none text-slate-900">
-                Temporal Matrix
+                Events
               </h1>
               <p className="text-sm text-slate-500 mt-2 font-medium">
-                Navigating through your luminous timeline
+                Review your calendar and upcoming schedule.
               </p>
             </div>
             <div className="flex items-center justify-between gap-2 rounded-2xl border border-white/30 bg-white/25 px-4 py-3 shadow-[0_8px_32px_0_rgba(129,140,248,0.08)] backdrop-blur-[40px] sm:gap-4 sm:px-6">
@@ -239,7 +239,7 @@ const Calendar = () => {
         {/* ── Right: Upcoming Events ── */}
         <div className="col-span-12 flex flex-col gap-6 pt-2 lg:col-span-4">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-base font-bold text-slate-900">Synchronized Events</h3>
+            <h3 className="text-base font-bold text-slate-900">Upcoming Events</h3>
             <button className="text-indigo-600 text-sm font-semibold hover:underline">View All</button>
           </div>
 
@@ -327,7 +327,7 @@ const Calendar = () => {
                 </span>
                 <h5 className="text-base font-bold text-slate-900 mt-3">Sync with Aura AI</h5>
                 <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                  Let Aura AI manage your conflicts and optimize your temporal matrix automatically.
+                  Let Aura AI help you review conflicts and improve your schedule.
                 </p>
                 <button className="mt-4 px-4 py-2 bg-white/70 backdrop-blur-sm rounded-full text-indigo-600 text-xs font-bold hover:bg-white transition-colors">
                   Learn More
@@ -349,3 +349,4 @@ const Calendar = () => {
 };
 
 export default Calendar;
+

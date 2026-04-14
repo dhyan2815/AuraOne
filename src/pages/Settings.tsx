@@ -81,7 +81,7 @@ const Settings = () => {
       <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
         <div className="flex items-center gap-2 mb-1">
           <Logo iconOnly iconClassName="w-3.5 h-3.5" />
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400">System Configuration</span>
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400">Account Settings</span>
         </div>
         <h1 className="text-2xl font-extrabold text-slate-800 tracking-tight">Settings</h1>
         <p className="text-sm text-slate-500 mt-0.5">Manage your account and preferences.</p>
@@ -289,3 +289,4 @@ const Settings = () => {
 };
 
 export default Settings;
+

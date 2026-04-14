@@ -59,7 +59,7 @@ const Dashboard = () => {
           <Logo iconOnly iconClassName="w-6 h-6 inline-block mb-1 opacity-80" />
         </h1>
         <p className="text-sm text-slate-500 mt-1 max-w-xl">
-          Your sanctuary is ready. Focus on what matters most.
+          Your dashboard gives you a quick view of the work that needs attention.
         </p>
       </motion.div>
 
@@ -97,7 +97,7 @@ const Dashboard = () => {
         >
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-base font-bold tracking-tight text-text">
-              Today's Tasks
+              Tasks
             </h3>
             <button
               className="bg-indigo-100 text-indigo-600 p-2 rounded-full hover:bg-indigo-200 transition-colors"
@@ -111,7 +111,7 @@ const Dashboard = () => {
           </div>
         </motion.div>
 
-        {/* ── Widget 3: Luminous Insights / News  (5/12 cols) ── */}
+        {/* ── Widget 3: News / News  (5/12 cols) ── */}
         <motion.div
           variants={item}
           className={`col-span-12 lg:col-span-5 ${glassCard}`}
@@ -121,7 +121,7 @@ const Dashboard = () => {
           }}
         >
           <h3 className="text-base font-bold tracking-tight text-text mb-4">
-            Luminous Insights
+            News
           </h3>
           <NewsWidget />
         </motion.div>
@@ -172,3 +172,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
