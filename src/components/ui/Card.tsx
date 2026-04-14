@@ -23,7 +23,7 @@ const Card = ({
 }: CardProps) => {
   return (
     <div 
-      className={`bg-white/40 backdrop-blur-md border border-white/20 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${className}`}
+      className={`glass rounded-2xl shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${className}`}
       onClick={onClick}
     >
       {title && (

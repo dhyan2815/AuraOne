@@ -10,7 +10,8 @@ import {
   CheckCircle,
   Flag,
   RotateCw,
-  AlertCircle
+  AlertCircle,
+  X
 } from "lucide-react";
 import { format } from "date-fns";
 import {
@@ -48,7 +49,7 @@ const TaskPage = () => {
 
       try {
         if (id === "new") {
-          setTitle("Untitled Task");
+          setTitle("New Task");
           setDescription("");
           setDueDate("");
           setDueTime("");
@@ -69,12 +70,12 @@ const TaskPage = () => {
             setCompleted(foundTask.completed || false);
             setCreatedAt(foundTask.created_at);
           } else {
-            toast.error("Task not found");
+            toast.error("Objective not found");
             navigate("/tasks");
           }
         }
       } catch (err) {
-        toast.error("Failed to load task");
+        toast.error("Uplink failed");
         navigate("/tasks");
       } finally {
         setLoading(false);
@@ -97,7 +98,7 @@ const TaskPage = () => {
     }
 
     const taskData: NewTask = {
-      title: title.trim() || "Untitled Task",
+      title: title.trim() || "Untitled Protocol",
       description: description.trim(),
       due_date: finalDueDate,
       priority,
@@ -108,14 +109,14 @@ const TaskPage = () => {
       setIsSaving(true);
       if (id === "new") {
         await createTask(user.id, taskData);
-        toast.success("Task created");
+        toast.success("Task Saved");
       } else if (id) {
         await updateTask(id, taskData);
-        toast.success("Task updated");
+        toast.success("Task Updated");
       }
       navigate("/tasks");
     } catch (err) {
-      toast.error("Sync failed");
+      toast.error("Transmission interruption");
     } finally {
       setIsSaving(false);
     }
@@ -126,13 +127,13 @@ const TaskPage = () => {
       navigate("/tasks");
       return;
     }
-    if (!window.confirm("Delete this task?")) return;
+    if (!window.confirm("Delete this task permanently?")) return;
     try {
       await deleteTask(id);
-      toast.success("Task deleted");
+      toast.success("Task Deleted");
       navigate("/tasks");
     } catch (error) {
-      toast.error("Purge sequence failed");
+      toast.error("Purge system error");
     }
   };
 
@@ -148,40 +149,41 @@ const TaskPage = () => {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh]">
-        <div className="w-16 h-16 glass rounded-2xl flex items-center justify-center mb-4">
+        <div className="w-16 h-16 glass rounded-2xl flex items-center justify-center mb-4 transition-colors duration-500">
           <RotateCw className="text-primary animate-spin" size={24} />
         </div>
-        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/50">Loading task...</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/50 animate-pulse">Loading Task...</p>
       </div>
     );
   }
 
   return (
-    <div className="app-page-tight space-y-10">
-      <div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-center">
-        <div className="flex items-start gap-6 group">
+    <div className="app-page-tight space-y-10 px-4 sm:px-0">
+      <div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
+        <div className="flex items-start gap-8 group flex-1">
           <button
             onClick={() => navigate("/tasks")}
-            className="mt-1 p-3 rounded-2xl glass border border-primary/5 text-aurora-on-surface-variant hover:text-primary hover:border-primary/20 transition-all active:scale-95"
+            className="mt-1 p-4 rounded-2xl glass border border-primary/5 text-text-variant hover:text-primary hover:border-primary/20 transition-all active:scale-95 shadow-xl"
           >
             <ArrowLeft size={20} />
           </button>
-          <div className="space-y-3 flex-1">
+          <div className="flex-1 space-y-4">
             <div className="flex items-center gap-2 text-primary">
-              <Logo iconOnly iconClassName="w-3.5 h-3.5 drop-shadow-sm" />
-              <span className="text-[10px] font-black uppercase tracking-[0.2em]">Task Editor</span>
+              <Logo iconOnly iconClassName="w-4 h-4" />
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] ml-1">Task Details</span>
             </div>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="text-4xl md:text-5xl font-black bg-transparent border-0 outline-none w-full text-aurora-on-surface placeholder:text-aurora-on-surface-variant/20 tracking-tight leading-none"
-              placeholder="Untitled Task"
+              className="text-4xl lg:text-5xl font-extrabold bg-transparent border-0 outline-none w-full text-text placeholder:text-text-variant/10 tracking-tighter leading-none"
+              placeholder="Enter Task Title..."
+              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
             />
             {createdAt && (
-              <div className="flex items-center text-[10px] font-bold text-aurora-on-surface-variant uppercase tracking-widest opacity-60">
-                <Calendar size={12} className="mr-2" />
-                Initialized on {format(new Date(createdAt), "MMMM d, yyyy")}
+              <div className="flex items-center text-[10px] font-black text-text-variant uppercase tracking-[0.2em] opacity-60">
+                <Calendar size={12} className="mr-2 text-primary" />
+                Created On: {format(new Date(createdAt), "MMMM d, yyyy")}
               </div>
             )}
           </div>
@@ -191,15 +193,15 @@ const TaskPage = () => {
           <button 
             onClick={handleSave} 
             disabled={isSaving}
-            className="btn-aurora-primary px-8 py-3 text-xs font-black uppercase tracking-widest shadow-lg shadow-primary/20 flex items-center gap-2 disabled:opacity-50"
+            className="btn-aurora px-10 py-3.5 shadow-xl shadow-primary/20 disabled:opacity-50"
           >
-            {isSaving ? <RotateCw className="animate-spin" size={16} /> : <Save size={16} />}
+            {isSaving ? <RotateCw className="animate-spin" size={18} /> : <Save size={18} />}
             Save Task
           </button>
 
           <button
             onClick={handleDelete}
-            className="p-3 rounded-2xl glass border border-primary/5 text-aurora-on-surface-variant hover:text-error hover:border-error/20 transition-all active:scale-95"
+            className="p-4 rounded-2xl glass border border-primary/5 text-text-variant hover:text-red-500 hover:border-red-500/20 transition-all active:scale-95 shadow-lg shadow-red-500/5"
             aria-label="Delete task"
           >
             <Trash2 size={20} />
@@ -207,115 +209,132 @@ const TaskPage = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-10 lg:grid-cols-3 lg:gap-12">
-        <div className="lg:col-span-2 space-y-10">
+      <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12">
+        <div className="lg:col-span-8 space-y-12">
           <div className="space-y-4">
-            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-aurora-on-surface-variant flex items-center gap-2">
-              Task Details
-              <div className="h-[1px] flex-1 bg-primary/5" />
+            <label className="text-[10px] font-black uppercase tracking-[0.3em] text-text-variant flex items-center gap-3 ml-1 opacity-60">
+              Description
+              <div className="h-px flex-1 bg-primary/10" />
             </label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Add task details and notes..."
-              className="input-aurora w-full h-48 resize-none p-6 text-sm font-medium leading-relaxed"
+              placeholder="Add a detailed description for this task..."
+              className="input-aurora w-full h-64 resize-none p-8 text-base font-medium leading-relaxed"
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="space-y-4">
-              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-aurora-on-surface-variant">Target Date</label>
+              <label className="text-[10px] font-black uppercase tracking-[0.3em] text-text-variant opacity-60 ml-1">Due Date</label>
               <div className="relative group">
-                <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={16} />
+                <Calendar className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={18} />
                 <input
                   type="date"
                   value={dueDate}
                   onChange={(e) => setDueDate(e.target.value)}
-                  className="input-aurora pl-12 w-full py-3 text-sm font-bold appearance-none"
+                  className="input-aurora pl-14 w-full py-4 text-sm font-bold appearance-none"
                 />
               </div>
             </div>
 
             <div className="space-y-4">
-              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-aurora-on-surface-variant">Target Time</label>
+              <label className="text-[10px] font-black uppercase tracking-[0.3em] text-text-variant opacity-60 ml-1">Time</label>
               <div className="relative group">
-                <Clock className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={16} />
+                <Clock className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={18} />
                 <input
                   type="time"
                   value={dueTime}
                   onChange={(e) => setDueTime(e.target.value)}
-                  className="input-aurora pl-12 w-full py-3 text-sm font-bold appearance-none"
+                  className="input-aurora pl-14 w-full py-4 text-sm font-bold appearance-none"
                 />
               </div>
             </div>
 
             <div className="space-y-4">
-              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-aurora-on-surface-variant">Priority</label>
-              <select
-                value={priority}
-                onChange={(e) => setPriority(e.target.value as any)}
-                className="input-aurora w-full py-3 px-6 text-sm font-black uppercase tracking-widest appearance-none cursor-pointer"
-              >
-                <option value="low" className="bg-white">Tier III (Low)</option>
-                <option value="medium" className="bg-white">Tier II (Medium)</option>
-                <option value="high" className="bg-white">Tier I (High)</option>
-              </select>
+              <label className="text-[10px] font-black uppercase tracking-[0.3em] text-text-variant opacity-60 ml-1">Priority Level</label>
+              <div className="relative">
+                <select
+                    value={priority}
+                    onChange={(e) => setPriority(e.target.value as any)}
+                    className="input-aurora w-full py-4 px-8 text-[10px] font-black uppercase tracking-widest appearance-none cursor-pointer"
+                >
+                    <option value="low" className="bg-background">Low Priority</option>
+                    <option value="medium" className="bg-background">Medium Priority</option>
+                    <option value="high" className="bg-background">High Priority</option>
+                </select>
+                <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-primary/40">
+                    <Flag size={14} />
+                </div>
+              </div>
             </div>
           </div>
 
           <AnimatePresence>
             {isOverdue && (
               <motion.div 
-                initial={{ opacity: 0, scale: 0.95 }}
+                initial={{ opacity: 0, scale: 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="p-6 rounded-[2rem] glass border border-error/20 bg-error/5 flex items-center gap-4 text-error"
+                exit={{ opacity: 0, scale: 0.98 }}
+                className="p-8 rounded-[2.5rem] glass border border-red-500/20 bg-red-500/5 flex items-center gap-6 text-red-500 shadow-2xl shadow-red-500/5"
               >
-                <AlertCircle className="aurora-glow" size={24} />
-                <div className="space-y-1">
-                  <h4 className="text-xs font-black uppercase tracking-widest">Task is overdue</h4>
-                  <p className="text-[10px] font-bold opacity-70">This task is past its due date and still incomplete.</p>
+                <AlertCircle className="shrink-0" size={32} strokeWidth={2.5} />
+                <div className="space-y-1.5">
+                  <h4 className="text-xs font-black uppercase tracking-[0.2em]">Task Overdue</h4>
+                  <p className="text-[10px] font-bold opacity-70 leading-relaxed uppercase tracking-widest">This task is past its due date and needs to be completed.</p>
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
 
-        <div className="space-y-8">
+        <div className="lg:col-span-4 space-y-8">
           <div className="space-y-6 lg:sticky lg:top-8">
-            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-aurora-on-surface-variant">Task Preview</label>
-            <div className="glass-panel p-8 rounded-[3rem] border border-primary/5 shadow-xl shadow-primary/5 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 p-8">
-                {priority === 'high' && <Flag size={20} className="text-error" />}
+            <label className="text-[10px] font-black uppercase tracking-[0.3em] text-text-variant opacity-60 ml-1">Task Preview</label>
+            <div className="glass-panel p-10 rounded-[3rem] border border-primary/5 shadow-2xl transition-colors duration-500 relative overflow-hidden group">
+              {/* Background accent */}
+              <div className={`absolute top-0 right-0 w-32 h-32 blur-[60px] opacity-20 transition-all duration-700 ${
+                priority === 'high' ? "bg-red-500" :
+                priority === 'medium' ? "bg-secondary" :
+                "bg-emerald-500"
+              }`} />
+
+              <div className="absolute top-0 right-0 p-10">
+                <Flag size={20} className={`transition-colors duration-500 ${
+                    priority === 'high' ? "text-red-500 animate-pulse" :
+                    priority === 'medium' ? "text-secondary" :
+                    "text-emerald-500"
+                }`} strokeWidth={3} />
               </div>
 
-              <div className="space-y-6">
-                <div className="flex items-center gap-4 pointer-events-none">
-                  <div className={`w-8 h-8 rounded-xl border-2 flex items-center justify-center transition-all ${completed ? "bg-primary border-primary text-white" : "border-primary/20 text-transparent"}`}>
-                    <CheckCircle size={18} />
+              <div className="space-y-8 relative z-10">
+                <div className="flex items-center gap-5 pointer-events-none">
+                  <div className={`w-10 h-10 rounded-2xl border-2 flex items-center justify-center transition-all duration-500 shadow-xl ${completed ? "bg-primary border-primary text-white shadow-primary/30" : "border-primary/20 text-transparent"}`}>
+                    <CheckCircle size={24} strokeWidth={3} />
                   </div>
-                  <h3 className={`text-xl font-black text-aurora-on-surface leading-tight ${completed ? "line-through opacity-40" : ""}`}>
+                  <h3 className={`text-2xl font-black text-text tracking-tighter leading-tight ${completed ? "line-through opacity-40 grayscale" : ""}`}>
                     {title || "Untitled Task"}
                   </h3>
                 </div>
 
-                <p className="text-xs font-medium text-aurora-on-surface-variant leading-relaxed opacity-60 line-clamp-4">
-                  {description || "No task details added yet."}
+                <p className="text-xs font-medium text-text-variant leading-relaxed opacity-60 line-clamp-6">
+                  {description || "No description provided."}
                 </p>
 
-                <div className="pt-6 border-t border-primary/5 space-y-4">
-                  <div className="flex flex-col gap-2">
-                    <div className={`flex items-center text-[10px] font-black uppercase tracking-widest ${isOverdue ? "text-error" : "text-aurora-on-surface-variant"}`}>
-                      <Clock size={12} className="mr-2" />
+                <div className="pt-8 border-t border-primary/5 space-y-6">
+                  <div className="flex flex-col gap-3">
+                    <div className={`flex items-center text-[10px] font-black uppercase tracking-[0.2em] ${isOverdue ? "text-red-500" : "text-text-variant opacity-80"}`}>
+                      <Clock size={12} className="mr-2.5 text-primary" strokeWidth={3} />
                       {dueTime || "00:00"}
-                      <span className="mx-2 opacity-20">|</span>
-                      {dueDate ? format(new Date(dueDate), "MMM d, yyyy") : "STND_TIME"}
+                      <span className="mx-3 opacity-20">|</span>
+                      {dueDate ? format(new Date(dueDate), "MMM dd, yyyy") : "No Date"}
                     </div>
                   </div>
                   
-                  <div className={`inline-flex px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider border ${
-                    priority === 'high' ? "bg-error/10 text-error border-error/20" :
-                    priority === 'medium' ? "bg-secondary/10 text-secondary border-secondary/20" :
-                    "bg-success/10 text-success border-success/20"
+                  <div className={`inline-flex px-5 py-2 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] border shadow-lg ${
+                    priority === 'high' ? "bg-red-500/10 text-red-500 border-red-500/20 shadow-red-500/10" :
+                    priority === 'medium' ? "bg-secondary/10 text-secondary border-secondary/20 shadow-secondary/10" :
+                    "bg-emerald-500/10 text-emerald-500 border-emerald-500/20 shadow-emerald-500/10"
                   }`}>
                     {priority} Priority
                   </div>
@@ -325,14 +344,14 @@ const TaskPage = () => {
             
             <button 
               onClick={() => setCompleted(!completed)}
-              className={`w-full py-4 rounded-[2rem] text-[10px] font-black uppercase tracking-[0.3em] transition-all border ${
+              className={`w-full py-5 rounded-[2.5rem] text-[10px] font-black uppercase tracking-[0.4em] transition-all border shadow-2xl ${
                 completed 
-                  ? "bg-success/10 border-success/20 text-success" 
-                  : "glass border-primary/10 text-aurora-on-surface-variant hover:text-primary hover:border-primary/20"
+                  ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500 shadow-emerald-500/10" 
+                  : "glass border-primary/10 text-text-variant hover:text-primary hover:border-primary/20 shadow-primary/5"
               }`}
             >
-              {completed ? "Task completed" : "Save Task"}
-            </button>
+            {completed ? "Completed" : "Mark as Finished"}
+          </button>
           </div>
         </div>
       </div>
@@ -341,6 +360,3 @@ const TaskPage = () => {
 };
 
 export default TaskPage;
-
-
-

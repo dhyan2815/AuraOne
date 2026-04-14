@@ -67,10 +67,10 @@ const LandingPage = () => {
     };
 
     return (
-        <div className="min-h-screen font-sans text-text bg-background">
+        <div className="min-h-screen font-sans text-text bg-background transition-colors duration-500">
 
             {/* Navigation */}
-            <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'py-3 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-white/20 dark:border-gray-700/50' : 'py-6 bg-transparent'}`}>
+            <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'py-3 bg-background/80 backdrop-blur-lg border-b border-primary/10 shadow-lg shadow-primary/5' : 'py-6 bg-transparent'}`}>
                 <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
                     <button
                         onClick={scrollToTop}
@@ -80,23 +80,23 @@ const LandingPage = () => {
                     </button>
 
                     <div className="hidden md:flex items-center space-x-8">
-                        <button onClick={scrollToFeatures} className="text-sm font-medium text-slate-500 hover:text-primary transition-colors">Features</button>
-                        <button onClick={scrollToTop} className="text-sm font-medium text-slate-500 hover:text-primary transition-colors">About</button>
-                        <Link to="/signup" className="text-sm font-medium text-slate-500 hover:text-primary transition-colors">Pricing</Link>
+                        <button onClick={scrollToFeatures} className="text-sm font-bold text-text-variant hover:text-primary transition-colors">Features</button>
+                        <button onClick={scrollToTop} className="text-sm font-bold text-text-variant hover:text-primary transition-colors">About</button>
+                        <Link to="/signup" className="text-sm font-bold text-text-variant hover:text-primary transition-colors">Pricing</Link>
                     </div>
 
                     <div className="flex items-center space-x-4">
                         <Link
                             to="/login"
-                            className="text-sm font-bold text-slate-500 hover:text-primary transition-colors"
+                            className="text-sm font-bold text-text-variant hover:text-primary transition-colors px-2"
                         >
-                            Sign In
+                            Log In
                         </Link>
                         <Link
                             to="/signup"
-                            className="bg-primary text-white font-bold py-2 px-6 rounded-lg shadow-md hover:bg-primary/90 transition-all"
+                            className="bg-primary text-white font-black py-2.5 px-6 rounded-full shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all uppercase tracking-widest text-[10px]"
                         >
-                            Get Started
+                            Join Aura
                         </Link>
                     </div>
                 </div>
@@ -104,7 +104,7 @@ const LandingPage = () => {
 
             {/* Hero Section */}
             <section className="relative pt-48 pb-32 overflow-hidden">
-                <div className="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-700/20 [mask-image:linear-gradient(to_bottom,white,transparent)]"></div>
+                <div className="absolute inset-0 bg-grid-slate-500/5 dark:bg-grid-white/5 [mask-image:linear-gradient(to_bottom,white,transparent)]"></div>
                 <div className="max-w-7xl mx-auto px-6 relative">
                     <div className="grid lg:grid-cols-2 gap-16 items-center">
                         <motion.div
@@ -117,39 +117,39 @@ const LandingPage = () => {
                                 Your Workspace,<br />
                                 Redefined in <span className="text-primary italic">Light</span>.
                             </h1>
-                            <p className="text-xl text-slate-500 font-medium leading-relaxed max-w-xl">
+                            <p className="text-xl text-text-variant font-medium leading-relaxed max-w-xl">
                                 Experience productivity as a sanctuary. AuraOne harmonizes tasks, notes, and AI intelligence within a breathtaking luminous environment.
                             </p>
 
                             <div className="flex flex-col sm:flex-row gap-4 pt-4">
                                 <Link
                                     to="/signup"
-                                    className="inline-flex items-center justify-center bg-primary text-white font-bold py-4 px-8 rounded-lg group text-lg shadow-lg hover:shadow-xl hover:bg-primary/90 transition-all"
+                                    className="inline-flex items-center justify-center bg-primary text-white font-black py-4 px-10 rounded-2xl group text-sm shadow-xl shadow-primary/20 hover:shadow-primary/30 hover:bg-primary/90 transition-all uppercase tracking-[0.2em]"
                                 >
                                     Start Your Flow
                                     <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                                 </Link>
                                 <button
                                     onClick={scrollToFeatures}
-                                    className="inline-flex items-center justify-center bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-slate-200 dark:border-gray-700 text-text font-bold py-4 px-8 rounded-lg group text-lg shadow-lg hover:shadow-xl transition-all"
+                                    className="inline-flex items-center justify-center glass border border-primary/10 text-text font-black py-4 px-10 rounded-2xl group text-sm shadow-xl shadow-primary/5 hover:border-primary/20 transition-all uppercase tracking-[0.2em]"
                                 >
-                                    Explore Features
+                                    The Capability
                                     <ChevronDown className="ml-2 w-5 h-5 group-hover:translate-y-1 transition-transform" />
                                 </button>
                             </div>
 
                             <div className="flex items-center gap-12 pt-8">
                                 <div className="text-center">
-                                    <p className="text-3xl font-black text-primary">10k+</p>
-                                    <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Visionaries</p>
+                                    <p className="text-4xl font-black text-primary">10k+</p>
+                                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-text-variant opacity-60">Dreamers</p>
                                 </div>
                                 <div className="text-center">
-                                    <p className="text-3xl font-black text-secondary">99.9%</p>
-                                    <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Uptime</p>
+                                    <p className="text-4xl font-black text-tertiary">99%</p>
+                                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-text-variant opacity-60">Consistency</p>
                                 </div>
                                 <div className="text-center">
-                                    <p className="text-3xl font-black text-cta">4.9/5</p>
-                                    <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Rating</p>
+                                    <p className="text-4xl font-black text-cta">4.9</p>
+                                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-text-variant opacity-60">Synthesis</p>
                                 </div>
                             </div>
                         </motion.div>
@@ -160,54 +160,50 @@ const LandingPage = () => {
                             transition={{ duration: 1, ease: "easeOut" }}
                             className="relative"
                         >
-                            <div className="absolute -inset-8 bg-gradient-to-tr from-primary/20 to-secondary/20 blur-3xl rounded-full"></div>
-                            <Card className="p-4 rounded-[2.5rem] shadow-2xl relative z-10">
-                                <div className="p-0">
+                            <div className="absolute -inset-16 bg-gradient-to-tr from-primary/30 to-tertiary/20 blur-[120px] rounded-full pointer-events-none opacity-50"></div>
+                            <div className="glass p-3 rounded-[3rem] shadow-2xl relative z-10 border border-primary/10 overflow-hidden transform hover:scale-[1.01] transition-transform duration-700">
                                 <img
                                     src={LandingPicture}
                                     alt="Luminous Interface"
-                                    className="w-full h-auto rounded-[2rem] shadow-inner"
+                                    className="w-full h-auto rounded-[2.5rem] shadow-inner"
                                 />
-                                </div>
-                            </Card>
+                            </div>
                         </motion.div>
                     </div>
                 </div>
             </section>
 
             {/* Features Section */}
-            <section id="features" className="py-32 relative bg-slate-50 dark:bg-gray-900">
+            <section id="features" className="py-32 relative bg-primary/5 dark:bg-slate-900/40 border-y border-primary/5">
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="text-center mb-24 space-y-4">
-                        <p className="text-sm font-bold uppercase tracking-widest text-primary">Capabilities</p>
+                        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Foundational Modules</p>
                         <h2 className="text-4xl lg:text-6xl font-extrabold tracking-tighter text-text">
                             Crafted for the Modern Mind.
                         </h2>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                         {[
-                            { icon: <Calendar className="w-6 h-6 text-primary" />, title: "Ethereal Calendar", description: "A weightless scheduling experience that brings clarity to your temporal flow." },
-                            { icon: <CheckCircle className="w-6 h-6 text-secondary" />, title: "Fluid Tasks", description: "Prioritize with grace. Manage your output with intuitive focus systems." },
-                            { icon: <MessageSquare className="w-6 h-6 text-cta" />, title: "Aura Intelligence", description: "Advanced AI assistance that converses with you, not just for you." },
-                            { icon: <FileText className="w-6 h-6 text-primary" />, title: "Rich Typography", description: "Note-taking that feels like editorial design. Every word deserves beauty." },
-                            { icon: <BarChart3 className="w-6 h-6 text-secondary" />, title: "Deep Insights", description: "Visualize your cognitive patterns and optimize your peak productivity hours." },
-                            { icon: <Shield className="w-6 h-6 text-cta" />, title: "Fortified Privacy", description: "Your sanctuary is protected by enterprise-grade encryption and ethical AI." }
+                            { icon: <Calendar className="w-6 h-6" />, title: "Temporal Matrix", description: "A weightless scheduling experience that brings clarity to your temporal flow." },
+                            { icon: <CheckCircle className="w-6 h-6" />, title: "Objective Registry", description: "Prioritize with grace. Manage your output with intuitive focus systems." },
+                            { icon: <MessageSquare className="w-6 h-6" />, title: "Neural Pulse", description: "Advanced AI assistance that converses with you, not just for you." },
+                            { icon: <FileText className="w-6 h-6" />, title: "Insight Archives", description: "Note-taking that feels like editorial design. Every word deserves beauty." },
+                            { icon: <BarChart3 className="w-6 h-6" />, title: "Cognitive Stats", description: "Visualize your cognitive patterns and optimize your peak productivity hours." },
+                            { icon: <Shield className="w-6 h-6" />, title: "Secure Perimeter", description: "Your sanctuary is protected by enterprise-grade encryption and ethical AI." }
                         ].map((feature, index) => (
                             <motion.div
                                 key={index}
-                                whileHover={{ y: -10 }}
+                                whileHover={{ y: -8 }}
                                 className="group"
                             >
-                            <Card className="h-full p-8 group cursor-default shadow-lg hover:shadow-xl transition-all">
-                               <div className="p-0 flex flex-col items-start">
-                                <div className="w-14 h-14 bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 rounded-2xl flex items-center justify-center mb-8 shadow-lg group-hover:scale-110 group-hover:bg-primary/10 transition-all">
+                            <div className="glass h-full p-8 rounded-3xl border border-primary/10 group-hover:border-primary/30 group-hover:bg-primary/5 group-hover:shadow-2xl group-hover:shadow-primary/5 transition-all duration-300">
+                                <div className="w-14 h-14 bg-primary/10 border border-primary/10 rounded-2xl flex items-center justify-center mb-8 shadow-inner group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-500 text-primary">
                                     {feature.icon}
                                 </div>
-                                <h3 className="text-xl font-bold mb-4 text-text">{feature.title}</h3>
-                                <p className="text-slate-500 font-medium leading-relaxed">{feature.description}</p>
-                               </div>
-                            </Card>
+                                <h3 className="text-xl font-bold mb-4 text-text group-hover:text-primary transition-colors">{feature.title}</h3>
+                                <p className="text-text-variant font-medium leading-relaxed">{feature.description}</p>
+                            </div>
                             </motion.div>
                         ))}
                     </div>
@@ -215,7 +211,7 @@ const LandingPage = () => {
             </section>
 
             {/* Testimonials */}
-            <section className="py-32 overflow-hidden">
+            <section className="py-32 overflow-hidden bg-background">
                 <div className="max-w-7xl mx-auto px-6 relative">
                     <div className="max-w-4xl mx-auto text-center space-y-12">
                         <AnimatePresence mode="wait">
@@ -227,21 +223,21 @@ const LandingPage = () => {
                                 transition={{ duration: 0.6 }}
                                 className="space-y-10"
                             >
-                                <div className="flex justify-center gap-1">
+                                <div className="flex justify-center gap-1 opacity-60">
                                     {[...Array(5)].map((_, i) => (
-                                        <Star key={i} className={`w-5 h-5 ${i < testimonials[currentTestimonial].rating ? 'text-secondary fill-secondary' : 'text-primary/20'}`} />
+                                        <Star key={i} className={`w-4 h-4 ${i < testimonials[currentTestimonial].rating ? 'text-primary fill-primary' : 'text-primary/20'}`} />
                                     ))}
                                 </div>
-                                <blockquote className="text-4xl lg:text-5xl font-black italic tracking-tighter leading-tight text-primary/80">
+                                <blockquote className="text-4xl lg:text-5xl font-black italic tracking-tighter leading-tight text-text">
                                     "{testimonials[currentTestimonial].content}"
                                 </blockquote>
                                 <div className="flex items-center justify-center gap-4">
-                                    <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-gray-800 border border-slate-200 dark:border-gray-700 flex items-center justify-center font-black text-secondary ring-4 ring-white dark:ring-gray-900 shadow-xl">
+                                    <div className="w-12 h-12 rounded-full bg-primary/10 border border-primary/10 flex items-center justify-center font-black text-primary shadow-xl">
                                         {testimonials[currentTestimonial].name.charAt(0)}
                                     </div>
                                     <div className="text-left">
                                         <p className="font-bold text-lg text-text">{testimonials[currentTestimonial].name}</p>
-                                        <p className="text-sm font-medium text-primary/80 uppercase tracking-[0.2em]">{testimonials[currentTestimonial].role}</p>
+                                        <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em] opacity-80">{testimonials[currentTestimonial].role}</p>
                                     </div>
                                 </div>
                             </motion.div>
@@ -252,7 +248,7 @@ const LandingPage = () => {
                                 <button
                                     key={i}
                                     onClick={() => setCurrentTestimonial(i)}
-                                    className={`h-1.5 transition-all duration-500 rounded-full ${i === currentTestimonial ? 'w-10 bg-secondary shadow-lg shadow-secondary/30' : 'w-4 bg-primary/20 hover:bg-primary/30'}`}
+                                    className={`h-1.5 transition-all duration-500 rounded-full ${i === currentTestimonial ? 'w-10 bg-primary shadow-lg shadow-primary/30' : 'w-4 bg-primary/20 hover:bg-primary/40'}`}
                                 />
                             ))}
                         </div>
@@ -261,68 +257,67 @@ const LandingPage = () => {
             </section>
 
             {/* CTA Section */}
-            <section className="py-40 relative bg-slate-50 dark:bg-gray-900">
+            <section className="py-40 relative bg-primary/5 dark:bg-slate-900/40 border-t border-primary/5">
                 <div className="max-w-4xl mx-auto px-6 text-center">
-                    <Card className="p-12 sm:p-20 rounded-[3rem] shadow-2xl">
-                       <div className="p-0">
-                        <h2 className="text-5xl font-extrabold mb-8 tracking-tighter text-text">
-                            Join the <span className="text-secondary italic">Aura</span>.
+                    <div className="glass p-12 sm:p-20 rounded-[3rem] shadow-2xl border border-primary/10 relative overflow-hidden group">
+                        <div className="absolute -inset-48 bg-gradient-to-tr from-primary/10 to-transparent blur-[100px] pointer-events-none opacity-30 group-hover:opacity-50 transition-opacity"></div>
+                        <h2 className="text-5xl font-extrabold mb-8 tracking-tighter text-text relative z-10">
+                            Join the <span className="text-primary italic">Aura</span>.
                         </h2>
-                        <p className="text-xl text-slate-500 font-medium mb-12 max-w-2xl mx-auto">
+                        <p className="text-xl text-text-variant font-medium mb-12 max-w-2xl mx-auto relative z-10">
                             Elevate your digital presence. Start your journey into the Luminous Workspace today.
                         </p>
-                        <div className="flex flex-col sm:flex-row gap-6 justify-center">
+                        <div className="flex flex-col sm:flex-row gap-6 justify-center relative z-10">
                             <Link
                                 to="/signup"
-                                className="bg-primary text-white font-bold py-4 px-12 rounded-lg text-xl shadow-lg hover:shadow-xl hover:bg-primary/90 transition-all"
+                                className="bg-primary text-white font-black py-4 px-12 rounded-2xl text-sm shadow-xl shadow-primary/20 hover:bg-primary/90 transition-all uppercase tracking-[0.2em]"
                             >
-                                Get Started Free
+                                Initiate Profile
                             </Link>
                             <Link
                                 to="/login"
-                                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-slate-200 dark:border-gray-700 text-text font-bold py-4 px-12 rounded-lg text-xl shadow-lg hover:shadow-xl transition-all"
+                                className="glass border border-primary/20 text-text font-black py-4 px-12 rounded-2xl text-sm shadow-xl hover:border-primary/40 transition-all uppercase tracking-[0.2em]"
                             >
                                 Visionary Login
                             </Link>
                         </div>
-                       </div>
-                    </Card>
+                    </div>
                 </div>
             </section>
 
             {/* Footer */}
-            <footer className="py-20 border-t border-slate-200 dark:border-gray-800">
+            <footer className="py-20 border-t border-primary/5 bg-background">
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
                         <div className="col-span-2 space-y-6">
                             <Logo iconClassName="w-8 h-8" textClassName="text-2xl" />
-                            <p className="text-slate-500 max-w-sm font-medium leading-relaxed">
+                            <p className="text-text-variant max-w-sm font-medium leading-relaxed opacity-70">
                                 Curating focus in a world of distraction. Built with love for the dreamers and the doers.
                             </p>
                         </div>
 
                         <div className="space-y-6">
-                            <p className="text-sm font-bold uppercase tracking-widest text-slate-400">Sanctuary</p>
+                            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary opacity-60">Architect</p>
                             <ul className="space-y-4 font-bold text-sm">
-                                <li><button onClick={scrollToFeatures} className="hover:text-primary transition-colors">Experience</button></li>
-                                <li><Link to="/login" className="hover:text-primary transition-colors">Join Us</Link></li>
-                                <li><a href="https://dhyan-patel.onrender.com" target="_blank" className="hover:text-primary transition-colors">Developer</a></li>
+                                <li><button onClick={scrollToFeatures} className="text-text-variant hover:text-primary transition-colors">Experience</button></li>
+                                <li><Link to="/login" className="text-text-variant hover:text-primary transition-colors">Join Us</Link></li>
+                                <li><a href="https://dhyan-patel.onrender.com" target="_blank" className="text-text-variant hover:text-primary transition-colors">Developer Profile</a></li>
                             </ul>
                         </div>
 
                         <div className="space-y-6">
-                            <p className="text-sm font-bold uppercase tracking-widest text-slate-400">Philosophy</p>
+                            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary opacity-60">Philosophy</p>
                             <ul className="space-y-4 font-bold text-sm">
-                                <li><span className="text-primary/40">Beta Phase</span></li>
-                                <li><span className="text-secondary/40">Design First</span></li>
-                                <li><span className="text-cta/40">Privacy Centric</span></li>
+                                <li><span className="text-primary">Luminous Flow</span></li>
+                                <li><span className="text-tertiary">Ethical AI</span></li>
+                                <li><span className="text-cta">Privacy First</span></li>
                             </ul>
                         </div>
                     </div>
 
-                    <div className="pt-8 border-t border-slate-200 dark:border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4">
-                        <p className="text-xs font-black uppercase tracking-widest text-slate-400">&copy; 2026 AuraOne Registry. All rights reserved.</p>
-                        <p className="text-xs font-black uppercase tracking-widest text-secondary/40">Designed by Dhyan Patel</p>
+                    <div className="pt-8 border-t border-primary/5 flex flex-col md:flex-row justify-between items-center gap-4">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-text-variant opacity-40">&copy; 2026 AuraOne Intelligence. All rights reserved.</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-primary opacity-40">System Release 1.4.2</p>
                     </div>
                 </div>
             </footer>

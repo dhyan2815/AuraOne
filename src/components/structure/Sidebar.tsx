@@ -26,8 +26,8 @@ const navItems = [
 
 const navLinkClass = (isActive: boolean) =>
   isActive
-    ? "mx-1 flex items-center gap-2.5 rounded-full bg-gradient-to-r from-indigo-500 to-purple-400 px-3.5 py-2.5 text-white shadow-lg shadow-indigo-200/50 transition-all"
-    : "mx-1 flex items-center gap-2.5 rounded-full px-3.5 py-2.5 text-slate-600 transition-all hover:bg-white/40 hover:text-indigo-600 dark:text-slate-300 dark:hover:bg-slate-800/70 dark:hover:text-indigo-300";
+    ? "mx-1 flex items-center gap-2.5 rounded-full bg-gradient-to-r from-indigo-500 to-purple-400 px-3.5 py-2.5 text-white shadow-lg shadow-indigo-500/20 transition-all font-bold"
+    : "mx-1 flex items-center gap-2.5 rounded-full px-3.5 py-2.5 text-text-variant transition-all hover:bg-primary/5 hover:text-primary";
 
 const Sidebar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -50,15 +50,12 @@ const Sidebar = () => {
 
   const SidebarContent = () => (
     <div
-      className="relative flex h-dvh w-56 flex-col overflow-hidden py-4"
+      className="relative flex h-dvh w-56 flex-col overflow-hidden py-4 glass border-r border-white/10"
       style={{
-        background: "rgba(255,255,255,0.20)",
-        backdropFilter: "blur(40px)",
-        WebkitBackdropFilter: "blur(40px)",
-        borderRight: "1px solid rgba(255,255,255,0.15)",
-        boxShadow: "0 0 30px 0 rgba(129,140,248,0.08)",
+        boxShadow: "0 0 30px 0 rgba(129,140,248,0.06)",
       }}
     >
+
       <div className="mb-4 px-4">
         <Logo iconClassName="h-8 w-8 drop-shadow-md" textClassName="text-xl" />
         <p className="mt-1 pl-0.5 text-[10px] font-medium tracking-wide text-slate-500 dark:text-slate-400">
@@ -86,7 +83,7 @@ const Sidebar = () => {
           <span className="text-sm font-semibold">Settings</span>
         </NavLink>
 
-        <div className="mx-1 mt-4 rounded-2xl border border-white/20 bg-white/30 px-3 py-3 dark:border-slate-700/60 dark:bg-slate-900/50">
+        <div className="mx-1 mt-4 rounded-2xl border border-primary/10 bg-primary/5 px-3 py-3">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-purple-400 text-xs font-bold text-white shadow-md">
               {userName.charAt(0).toUpperCase()}

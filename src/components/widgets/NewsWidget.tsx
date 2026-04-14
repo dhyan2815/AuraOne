@@ -58,8 +58,8 @@ const NewsWidget = () => {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center h-48 gap-3">
-        <Globe size={24} className="text-indigo-300 animate-spin" />
-        <p className="text-sm text-slate-400 animate-pulse font-semibold">Scanning feeds…</p>
+        <Globe size={24} className="text-primary/60 animate-spin" />
+        <p className="text-sm text-text-variant animate-pulse font-semibold">Scanning feeds…</p>
       </div>
     );
   }
@@ -67,7 +67,7 @@ const NewsWidget = () => {
   if (error || news.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-48 gap-2">
-        <p className="text-sm text-slate-400">{error || "No articles found"}</p>
+        <p className="text-sm text-text-variant">{error || "No articles found"}</p>
       </div>
     );
   }
@@ -76,7 +76,7 @@ const NewsWidget = () => {
 
   return (
     <AnimatePresence>
-      <div className="space-y-5">
+      <div className="space-y-4">
         {/* Featured article with image */}
         <motion.a
           initial={{ opacity: 0, y: 8 }}
@@ -90,17 +90,17 @@ const NewsWidget = () => {
             <img
               src={featured.imageUrl}
               alt={featured.title}
-              className="w-full h-32 object-cover rounded-2xl mb-3 group-hover:scale-[1.02] transition-transform duration-300"
+              className="w-full h-32 object-cover rounded-2xl mb-3 group-hover:scale-[1.02] transition-transform duration-300 shadow-lg shadow-indigo-500/5"
             />
           ) : (
-            <div className="w-full h-32 rounded-2xl mb-3 bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center">
-              <Globe size={32} className="text-indigo-300" />
+            <div className="w-full h-32 rounded-2xl mb-3 bg-gradient-to-br from-primary/10 to-purple-500/10 flex items-center justify-center border border-primary/5">
+              <Globe size={32} className="text-primary/40" />
             </div>
           )}
-          <p className="text-[10px] font-bold text-pink-500 uppercase tracking-widest mb-1">
+          <p className="text-[10px] font-bold text-tertiary uppercase tracking-widest mb-1">
             {CATEGORIES[0]}
           </p>
-          <h4 className="font-bold text-sm leading-snug text-text group-hover:text-indigo-600 transition-colors line-clamp-2">
+          <h4 className="font-bold text-sm leading-snug text-text group-hover:text-primary transition-colors line-clamp-2">
             {featured.title}
           </h4>
         </motion.a>
@@ -115,9 +115,9 @@ const NewsWidget = () => {
             href={item.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex gap-2 cursor-pointer group"
+            className="flex gap-3 cursor-pointer group"
           >
-            <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-indigo-50 flex items-center justify-center">
+            <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-primary/5 flex items-center justify-center border border-primary/5">
               {item.imageUrl ? (
                 <img
                   src={item.imageUrl}
@@ -125,14 +125,14 @@ const NewsWidget = () => {
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                 />
               ) : (
-                <ExternalLink size={16} className="text-indigo-300" />
+                <ExternalLink size={16} className="text-primary/40" />
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-0.5">
+              <p className="text-[10px] font-bold text-primary uppercase tracking-widest mb-0.5">
                 {CATEGORIES[idx + 1] || item.source}
               </p>
-              <h4 className="font-bold text-xs leading-snug text-text group-hover:text-indigo-600 transition-colors line-clamp-2">
+              <h4 className="font-bold text-xs leading-snug text-text group-hover:text-primary transition-colors line-clamp-2">
                 {item.title}
               </h4>
             </div>

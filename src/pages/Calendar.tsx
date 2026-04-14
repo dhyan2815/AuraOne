@@ -6,7 +6,7 @@ import {
   startOfWeek, endOfWeek, parse,
   isSameMonth
 } from "date-fns";
-import { ChevronLeft, ChevronRight, Plus, Clock, MapPin } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Clock, MapPin, X } from "lucide-react";
 import { getEvents, createEvent, deleteEvent, listenToEvents, Event } from "../hooks/useEvents";
 import { useAuth } from "../hooks/useAuth";
 import toast from "react-hot-toast";
@@ -15,9 +15,9 @@ import { motion, AnimatePresence } from "framer-motion";
 
 // Event accent colors cycling
 const EVENT_ACCENTS = [
-  { bar: "bg-indigo-500", dateBg: "bg-indigo-50", dateNum: "text-indigo-700", dateMon: "text-indigo-400", title: "group-hover:text-indigo-600" },
-  { bar: "bg-purple-500", dateBg: "bg-purple-50", dateNum: "text-purple-700", dateMon: "text-purple-400", title: "group-hover:text-purple-600" },
-  { bar: "bg-pink-500",   dateBg: "bg-pink-50",   dateNum: "text-pink-700",   dateMon: "text-pink-400",   title: "group-hover:text-pink-600" },
+  { bar: "bg-primary", dateBg: "bg-primary/10", dateNum: "text-primary", dateMon: "text-primary/60", title: "group-hover:text-primary" },
+  { bar: "bg-secondary", dateBg: "bg-secondary/10", dateNum: "text-secondary", dateMon: "text-secondary/60", title: "group-hover:text-secondary" },
+  { bar: "bg-tertiary",   dateBg: "bg-tertiary/10",   dateNum: "text-tertiary",   dateMon: "text-tertiary/60",   title: "group-hover:text-tertiary" },
 ];
 
 const DAY_HEADERS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -36,7 +36,7 @@ const Calendar = () => {
     try {
       const fetched = await getEvents(user.id);
       setEvents(fetched);
-    } catch { toast.error("Temporal sync failed"); }
+    } catch { toast.error("Schedule sync failed"); }
   }, [user]);
 
   useEffect(() => {
@@ -104,35 +104,35 @@ const Calendar = () => {
             transition={{ duration: 0.6 }}
           >
             <div>
-              <h1 className="text-2xl font-extrabold tracking-tight leading-none text-slate-900">
-                Events
+              <h1 className="text-3xl font-extrabold tracking-tight leading-none text-text" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                Events Calendar
               </h1>
-              <p className="text-sm text-slate-500 mt-2 font-medium">
-                Review your calendar and upcoming schedule.
+              <p className="text-sm text-text-variant mt-2 font-medium">
+                Manage your appointments, deadlines, and upcoming events.
               </p>
             </div>
-            <div className="flex items-center justify-between gap-2 rounded-2xl border border-white/30 bg-white/25 px-4 py-3 shadow-[0_8px_32px_0_rgba(129,140,248,0.08)] backdrop-blur-[40px] sm:gap-4 sm:px-6">
+            <div className="flex items-center justify-between gap-2 rounded-2xl border border-primary/10 glass px-4 py-3 shadow-xl shadow-primary/5 sm:gap-4 sm:px-6 transition-colors duration-500">
               <button
                 onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-                className="p-2 hover:bg-indigo-500/10 rounded-full transition-colors"
+                className="p-2 hover:bg-primary/10 rounded-full transition-colors text-primary"
               >
-                <ChevronLeft size={20} className="text-indigo-600" />
+                <ChevronLeft size={20} />
               </button>
-              <span className="text-xl font-bold text-slate-800 min-w-[140px] text-center">
+              <span className="text-xl font-bold text-text min-w-[140px] text-center">
                 {format(currentMonth, "MMMM yyyy")}
               </span>
               <button
                 onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-                className="p-2 hover:bg-indigo-500/10 rounded-full transition-colors"
+                className="p-2 hover:bg-primary/10 rounded-full transition-colors text-primary"
               >
-                <ChevronRight size={20} className="text-indigo-600" />
+                <ChevronRight size={20} />
               </button>
             </div>
           </motion.div>
 
           {/* Calendar Grid */}
           <motion.div
-            className="bg-white/25 backdrop-blur-[40px] border border-white/30 shadow-[0_8px_32px_0_rgba(129,140,248,0.08)] rounded-3xl p-5 overflow-hidden"
+            className="glass shadow-2xl shadow-primary/5 rounded-[2.5rem] p-6 lg:p-8 overflow-hidden transition-colors duration-500"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
@@ -140,14 +140,14 @@ const Calendar = () => {
             {/* Day Headers */}
             <div className="grid grid-cols-7 gap-4 mb-6">
               {DAY_HEADERS.map((d) => (
-                <div key={d} className="text-center text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-indigo-400">
+                <div key={d} className="text-center text-[0.6875rem] font-bold uppercase tracking-[0.2em] text-primary/60">
                   {d}
                 </div>
               ))}
             </div>
 
             {/* Day Cells */}
-            <div className="grid grid-cols-7 gap-4">
+            <div className="grid grid-cols-7 gap-3 sm:gap-4">
               {calendarDays.map((day) => {
                 const dayEvents = eventsForDay(day);
                 const isCurrentMonth = isSameMonth(day, currentMonth);
@@ -157,24 +157,24 @@ const Calendar = () => {
                   <div
                     key={day.toString()}
                     onClick={() => { setSelectedDate(day); setShowForm(true); }}
-                    className={`aspect-square relative flex flex-col items-center justify-center group cursor-pointer rounded-2xl transition-all ${
+                    className={`aspect-square relative flex flex-col items-center justify-center group cursor-pointer rounded-2xl transition-all duration-300 ${
                       isTodayDay
                         ? ""
                         : isSelected
-                        ? "ring-2 ring-indigo-400/50"
-                        : "hover:bg-indigo-50/50"
+                        ? "bg-primary/10 ring-2 ring-primary/40 shadow-lg shadow-primary/10 scale-[1.05] z-10"
+                        : "hover:bg-primary/5"
                     }`}
                   >
                     {isTodayDay && (
-                      <div className="absolute inset-2 bg-indigo-600 rounded-2xl shadow-lg shadow-indigo-600/20" />
+                      <div className="absolute inset-1 sm:inset-2 bg-primary rounded-2xl shadow-lg shadow-primary/30" />
                     )}
                     <span
-                      className={`z-10 font-semibold text-sm transition-colors ${
+                      className={`z-10 font-bold text-sm transition-colors ${
                         isTodayDay
-                          ? "text-white font-bold"
+                          ? "text-white"
                           : isCurrentMonth
-                          ? "text-slate-700 group-hover:text-indigo-600"
-                          : "text-slate-300"
+                          ? "text-text group-hover:text-primary"
+                          : "text-text/20"
                       }`}
                     >
                       {format(day, "d")}
@@ -184,7 +184,7 @@ const Calendar = () => {
                         {dayEvents.slice(0, 3).map((_, i) => (
                           <span
                             key={i}
-                            className={`w-1 h-1 rounded-full ${isTodayDay ? "bg-white" : "bg-pink-400"}`}
+                            className={`w-1 h-1 rounded-full ${isTodayDay ? "bg-white" : "bg-tertiary"}`}
                           />
                         ))}
                       </div>
@@ -199,36 +199,43 @@ const Calendar = () => {
           <AnimatePresence>
             {showForm && (
               <motion.div
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 12 }}
-                className="bg-white/25 backdrop-blur-[40px] border border-white/30 rounded-[2rem] p-6"
+                initial={{ opacity: 0, y: 12, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 12, scale: 0.98 }}
+                className="glass rounded-[2rem] p-6 lg:p-8"
               >
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-bold text-slate-800 text-lg">
-                    Add event — {format(selectedDate, "MMM d, yyyy")}
-                  </h3>
-                  <button onClick={() => setShowForm(false)} className="text-slate-400 hover:text-slate-600 text-lg font-bold">×</button>
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h3 className="font-bold text-text text-xl">
+                      Add Event
+                    </h3>
+                    <p className="text-xs text-text-variant font-bold uppercase tracking-widest mt-1">
+                      {format(selectedDate, "MMMM d, yyyy")}
+                    </p>
+                  </div>
+                  <button onClick={() => setShowForm(false)} className="text-text-variant hover:text-text transition-colors">
+                    <X size={20} />
+                  </button>
                 </div>
-                <form onSubmit={handleAddEvent} className="flex flex-col sm:flex-row gap-3">
+                <form onSubmit={handleAddEvent} className="flex flex-col sm:flex-row gap-4">
                   <input
                     type="text"
                     value={newEventTitle}
                     onChange={(e) => setNewEventTitle(e.target.value)}
                     placeholder="Event title…"
-                    className="flex-1 bg-white/50 border border-white/30 rounded-full px-5 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                    className="flex-1 input-aurora"
                   />
                   <input
                     type="time"
                     value={newEventTime}
                     onChange={(e) => setNewEventTime(e.target.value)}
-                    className="bg-white/50 border border-white/30 rounded-full px-5 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                    className="input-aurora sm:w-40"
                   />
                   <button
                     type="submit"
-                    className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 text-white font-bold text-sm shadow-lg hover:scale-[1.02] active:scale-95 transition-all"
+                    className="btn-aurora px-8 shadow-xl shadow-primary/20"
                   >
-                    <Plus size={16} /> Add
+                    <Plus size={18} /> Schedule
                   </button>
                 </form>
               </motion.div>
@@ -239,17 +246,17 @@ const Calendar = () => {
         {/* ── Right: Upcoming Events ── */}
         <div className="col-span-12 flex flex-col gap-6 pt-2 lg:col-span-4">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-base font-bold text-slate-900">Upcoming Events</h3>
-            <button className="text-indigo-600 text-sm font-semibold hover:underline">View All</button>
+            <h3 className="text-base font-bold text-text tracking-tight uppercase tracking-[0.2em] text-[10px]">Upcoming Events</h3>
+            <button className="text-primary text-xs font-black uppercase hover:underline">View All</button>
           </div>
 
           <div className="space-y-4 pr-1">
-            <AnimatePresence>
+            <AnimatePresence mode="popLayout">
               {upcomingEvents.length === 0 ? (
                 <motion.p
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="text-sm text-slate-400 px-2"
+                  className="text-sm text-text-variant px-4 py-8 text-center glass rounded-2xl"
                 >
                   No upcoming events. Click a day to add one.
                 </motion.p>
@@ -260,18 +267,19 @@ const Calendar = () => {
                   return (
                     <motion.div
                       key={ev.id}
-                      initial={{ opacity: 0, x: 16 }}
+                      layout
+                      initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 16 }}
-                      transition={{ delay: idx * 0.06 }}
-                      className="bg-white/25 backdrop-blur-[40px] border border-white/30 shadow-[0_8px_32px_0_rgba(129,140,248,0.08)] rounded-2xl p-4 flex gap-4 hover:translate-x-2 transition-transform cursor-pointer relative overflow-hidden group"
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ delay: idx * 0.05 }}
+                      className="glass rounded-2xl p-4 flex gap-4 hover:translate-x-2 transition-transform cursor-pointer relative overflow-hidden group border border-primary/5"
                     >
                       {/* Accent bar */}
                       <div className={`w-1.5 absolute left-0 top-0 h-full ${accent.bar}`} />
 
                       {/* Date chip */}
-                      <div className={`w-12 h-12 rounded-xl ${accent.dateBg} flex flex-col items-center justify-center flex-shrink-0`}>
-                        <span className={`text-[10px] font-bold uppercase ${accent.dateMon}`}>
+                      <div className={`w-12 h-12 rounded-xl ${accent.dateBg} flex flex-col items-center justify-center flex-shrink-0 transition-colors`}>
+                        <span className={`text-[10px] font-black uppercase ${accent.dateMon}`}>
                           {format(evDate, "MMM")}
                         </span>
                         <span className={`text-lg font-black ${accent.dateNum}`}>
@@ -280,16 +288,16 @@ const Calendar = () => {
                       </div>
 
                       <div className="flex-1 min-w-0">
-                        <h4 className={`font-bold text-slate-900 ${accent.title} transition-colors truncate`}>
+                        <h4 className={`font-bold text-text ${accent.title} transition-colors truncate`}>
                           {ev.title}
                         </h4>
                         <div className="flex items-center gap-3 mt-1 flex-wrap">
-                          <span className="flex items-center gap-1 text-[0.6875rem] text-slate-500">
-                            <Clock size={11} /> {format(evDate, "hh:mm a")}
+                          <span className="flex items-center gap-1 text-[0.6875rem] text-text-variant font-bold">
+                            <Clock size={11} className="text-primary" /> {format(evDate, "hh:mm a")}
                           </span>
                           {ev.description && (
-                            <span className="flex items-center gap-1 text-[0.6875rem] text-slate-500">
-                              <MapPin size={11} />{ev.description}
+                            <span className="flex items-center gap-1 text-[0.6875rem] text-text-variant font-bold truncate">
+                              <MapPin size={11} className="text-primary" />{ev.description}
                             </span>
                           )}
                         </div>
@@ -297,9 +305,9 @@ const Calendar = () => {
 
                       <button
                         onClick={(e) => handleDeleteEvent(ev.id, e)}
-                        className="text-slate-300 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 flex-shrink-0"
+                        className="text-text-variant hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 flex-shrink-0"
                       >
-                        ×
+                        <X size={16} />
                       </button>
                     </motion.div>
                   );
@@ -311,7 +319,7 @@ const Calendar = () => {
             <div className="mt-4 pt-2">
               <button
                 onClick={() => setShowForm(true)}
-                className="w-full h-14 rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-bold text-base shadow-xl shadow-indigo-500/20 flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-95 transition-all"
+                className="w-full h-14 rounded-2xl bg-gradient-to-r from-primary via-secondary to-tertiary text-white font-black text-sm shadow-xl shadow-primary/20 flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-95 transition-all uppercase tracking-[0.2em]"
               >
                 <Plus size={20} />
                 New Event
@@ -319,17 +327,17 @@ const Calendar = () => {
             </div>
 
             {/* Promo card */}
-            <div className="mt-4 bg-white/25 backdrop-blur-[40px] border border-white/30 rounded-3xl p-6 overflow-hidden relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-indigo-200/40 to-purple-200/40" />
+            <div className="mt-4 glass rounded-[2rem] p-6 overflow-hidden relative group">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-tertiary/10 opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="relative z-10">
-                <span className="bg-indigo-600 text-[10px] font-bold text-white px-2 py-1 rounded-full uppercase tracking-wider">
+                <span className="bg-primary text-[10px] font-black text-white px-3 py-1 rounded-full uppercase tracking-wider">
                   Tip
                 </span>
-                <h5 className="text-base font-bold text-slate-900 mt-3">Sync with Aura AI</h5>
-                <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                <h5 className="text-base font-extrabold text-text mt-4">Sync with Aura AI</h5>
+                <p className="text-xs text-text-variant mt-2 leading-relaxed font-medium">
                   Let Aura AI help you review conflicts and improve your schedule.
                 </p>
-                <button className="mt-4 px-4 py-2 bg-white/70 backdrop-blur-sm rounded-full text-indigo-600 text-xs font-bold hover:bg-white transition-colors">
+                <button className="mt-5 px-6 py-2 bg-text text-background dark:bg-primary dark:text-white rounded-full text-[10px] font-black hover:scale-105 transition-transform uppercase tracking-widest shadow-lg">
                   Learn More
                 </button>
               </div>
@@ -337,16 +345,8 @@ const Calendar = () => {
           </div>
         </div>
       </div>
-
-      {/* Floating AI Action Button */}
-      <div className="fixed bottom-6 right-6 z-30 hidden lg:block">
-        <button className="w-14 h-14 rounded-2xl bg-white/25 backdrop-blur-[40px] border border-white/30 shadow-[0_8px_32px_0_rgba(129,140,248,0.08)] flex items-center justify-center text-indigo-600 hover:rotate-12 transition-transform shadow-2xl text-2xl">
-          ✦
-        </button>
-      </div>
     </div>
   );
 };
 
 export default Calendar;
-

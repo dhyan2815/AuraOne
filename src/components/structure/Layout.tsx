@@ -21,15 +21,15 @@ const Layout = () => {
   };
 
   return (
-    <div className="flex min-h-screen overflow-x-hidden bg-background text-text dark:bg-slate-950 dark:text-slate-100">
+    <div className="flex min-h-screen overflow-x-hidden bg-background text-text transition-colors duration-300">
       <div
         aria-hidden="true"
         className="pointer-events-none fixed inset-0 z-0"
         style={{
           background: `
-            radial-gradient(circle at 20% 30%, ${theme === 'dark' ? 'rgba(99,102,241,0.22)' : 'rgba(129,140,248,0.15)'} 0%, transparent 40%),
-            radial-gradient(circle at 80% 20%, ${theme === 'dark' ? 'rgba(168,85,247,0.20)' : 'rgba(171,143,254,0.15)'} 0%, transparent 40%),
-            radial-gradient(circle at 50% 80%, ${theme === 'dark' ? 'rgba(236,72,153,0.16)' : 'rgba(232,105,172,0.10)'} 0%, transparent 50%)
+            radial-gradient(circle at 20% 30%, ${theme === 'dark' ? 'rgba(99,102,241,0.18)' : 'rgba(129,140,248,0.12)'} 0%, transparent 45%),
+            radial-gradient(circle at 80% 20%, ${theme === 'dark' ? 'rgba(168,85,247,0.16)' : 'rgba(171,143,254,0.12)'} 0%, transparent 45%),
+            radial-gradient(circle at 50% 80%, ${theme === 'dark' ? 'rgba(236,72,153,0.12)' : 'rgba(232,105,172,0.08)'} 0%, transparent 55%)
           `,
         }}
       />
@@ -39,16 +39,11 @@ const Layout = () => {
       <main className="relative z-10 flex min-h-screen min-w-0 flex-1 flex-col overflow-x-hidden">
         <motion.button
           onClick={toggleTheme}
-          className="fixed bottom-6 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-full shadow-2xl transition-all"
+          className="fixed bottom-6 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-full shadow-2xl transition-all glass hover:scale-110 active:scale-95"
           style={{
-            background: theme === 'dark' ? 'rgba(30, 41, 59, 0.8)' : 'rgba(255, 255, 255, 0.8)',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
-            border: theme === 'dark' ? '1px solid rgba(148, 163, 184, 0.2)' : '1px solid rgba(198, 197, 213, 0.3)',
+            borderColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.05)',
             color: theme === 'dark' ? '#fbbf24' : '#6366f1',
           }}
-          whileHover={{ scale: 1.1, shadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)' }}
-          whileTap={{ scale: 0.9 }}
           aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
         >
           <motion.div
@@ -61,6 +56,7 @@ const Layout = () => {
             {theme === 'dark' ? <Sun size={22} /> : <Moon size={22} />}
           </motion.div>
         </motion.button>
+
 
         <motion.div
           className="flex-1 min-w-0"

@@ -4,19 +4,31 @@ import animate from 'tailwindcss-animate'
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   darkMode: 'class',
+  safelist: [
+    'border-primary/10',
+    'focus:ring-primary/20',
+    'text-text/30',
+    'text-primary/50',
+    'bg-primary/20',
+    'bg-primary/40',
+  ],
   theme: {
     extend: {
       colors: {
-        primary: '#2563EB',
-        secondary: '#3B82F6',
-        tertiary: '#8B5CF6',
+        primary: 'rgb(var(--color-primary) / <alpha-value>)',
+        secondary: 'rgb(var(--color-secondary) / <alpha-value>)',
+        tertiary: 'rgb(var(--color-tertiary) / <alpha-value>)',
         cta: '#F97316',
-        background: '#F8FAFC',
-        text: '#1E293B',
-        'on-surface': '#1E293B',
-        'on-surface-variant': '#64748B',
-        'aurora-on-surface': '#1E293B',
-        'aurora-on-surface-variant': '#64748B',
+        background: 'rgb(var(--color-background) / <alpha-value>)',
+        text: {
+          DEFAULT: 'rgb(var(--color-text) / <alpha-value>)',
+          variant: 'rgb(var(--color-text-variant) / <alpha-value>)',
+        },
+        'on-surface': 'rgb(var(--color-text) / <alpha-value>)',
+        'on-surface-variant': 'rgb(var(--color-text-variant) / <alpha-value>)',
+        'aurora-on-surface': 'rgb(var(--color-text) / <alpha-value>)',
+        'aurora-on-surface-variant': 'rgb(var(--color-text-variant) / <alpha-value>)',
+
         error: {
           DEFAULT: '#ba1a1a',
           container: '#ffdad6',

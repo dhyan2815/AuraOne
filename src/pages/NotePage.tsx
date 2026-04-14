@@ -8,7 +8,10 @@ import {
   Save,
   Trash2,
   Cloud,
-  RotateCw
+  RotateCw,
+  X,
+  History,
+  FileText
 } from "lucide-react";
 import { format } from "date-fns";
 import TiptapEditor from "../components/editor/TiptapEditor";
@@ -20,7 +23,7 @@ import {
   Note,
 } from "../hooks/useNotes";
 import { useAuth } from "../hooks/useAuth";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Logo from "../components/structure/Logo";
 
 const NotePage = () => {
@@ -88,14 +91,14 @@ const NotePage = () => {
       if (!note?.id || id === 'new') {
         const newNote = await createNote(user.id, noteData);
         if (!isAutoSave) {
-          toast.success("Note created");
+          toast.success("Note Created");
         }
         setLastSaved(new Date());
         navigate(`/notes/${newNote.id}`, { replace: true });
       } else {
         await updateNote(note.id, noteData);
         if (!isAutoSave) {
-          toast.success("Note updated");
+          toast.success("Note Updated");
         }
         setLastSaved(new Date());
       }
@@ -132,13 +135,13 @@ const NotePage = () => {
       navigate("/notes");
       return;
     }
-    if (!window.confirm("Delete this note?")) return;
+    if (!window.confirm("Delete this note permanently?")) return;
     try {
       await deleteNote(note.id);
-      toast.success("Note deleted");
+      toast.success("Note Deleted");
       navigate("/notes");
     } catch (error) {
-      toast.error("Delete failed");
+      toast.error("Failed to delete note");
     }
   };
 
@@ -156,131 +159,147 @@ const NotePage = () => {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh]">
-        <div className="w-16 h-16 glass rounded-2xl flex items-center justify-center mb-4">
+        <div className="w-16 h-16 glass rounded-2xl flex items-center justify-center mb-4 transition-colors duration-500">
           <RotateCw className="text-primary animate-spin" size={24} />
         </div>
-        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/50">Loading note...</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary animate-pulse">Loading Note...</p>
       </div>
     );
   }
 
   return (
-    <div className="app-page-tight space-y-8">
+    <div className="app-page-tight space-y-10">
       {/* Header section */}
-      <div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-center">
-        <div className="flex items-start gap-6 group">
+      <div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
+        <div className="flex items-start gap-8 group flex-1">
           <button
             onClick={() => navigate("/notes")}
-            className="mt-1 p-3 rounded-2xl glass border border-primary/5 text-aurora-on-surface-variant hover:text-primary hover:border-primary/20 transition-all active:scale-95"
+            className="mt-1 p-4 rounded-2xl glass border border-primary/5 text-text-variant hover:text-primary hover:border-primary/20 transition-all active:scale-95 shadow-lg"
           >
             <ArrowLeft size={20} />
           </button>
-          <div className="space-y-3 flex-1">
+          <div className="flex-1 space-y-4">
             <div className="flex items-center gap-2 text-primary">
-              <Logo iconOnly iconClassName="w-3.5 h-3.5 drop-shadow-sm" />
-              <span className="text-[10px] font-black uppercase tracking-[0.2em]">Note Editor</span>
+              <Logo iconOnly iconClassName="w-4 h-4" />
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] ml-1">Note Editor</span>
             </div>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="text-4xl md:text-5xl font-black bg-transparent border-0 outline-none w-full text-aurora-on-surface placeholder:text-aurora-on-surface-variant/20 tracking-tight leading-none"
-              placeholder="Untitled Note"
+              className="text-4xl lg:text-5xl font-extrabold bg-transparent border-0 outline-none w-full text-text placeholder:text-text-variant/10 tracking-tighter leading-none"
+              placeholder="Note Title..."
+              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
             />
             {note?.created_at && (
-              <div className="flex items-center text-[10px] font-bold text-aurora-on-surface-variant uppercase tracking-widest opacity-60">
-                <Calendar size={12} className="mr-2" />
-                Created on {format(new Date(note.created_at), "MMMM d, yyyy")}
+              <div className="flex items-center gap-4">
+                <div className="flex items-center text-[10px] font-black text-text-variant uppercase tracking-[0.2em] opacity-60">
+                    <Calendar size={12} className="mr-2 text-primary" />
+                    Created Date: {format(new Date(note.created_at), "MMMM d, yyyy")}
+                </div>
+                <div className="w-px h-3 bg-primary/20" />
+                <div className="flex items-center text-[10px] font-black text-text-variant uppercase tracking-[0.2em] opacity-60">
+                    <History size={12} className="mr-2 text-primary" />
+                    Last Edited: {lastSaved ? format(lastSaved, "HH:mm") : "Just now"}
+                </div>
               </div>
             )}
           </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-4 lg:self-end">
-          <div className="flex items-center gap-3 px-4 py-2 rounded-2xl glass border border-primary/5 text-[10px] font-black uppercase tracking-wider">
+          <div className="flex items-center gap-3 px-6 py-3 rounded-2xl glass border border-primary/10 text-[10px] font-black uppercase tracking-widest transition-colors duration-500">
             {autoSaving ? (
-              <div className="flex items-center text-primary group">
+              <div className="flex items-center text-primary">
                 <RotateCw size={12} className="animate-spin mr-2" />
-                <span>Synchronizing...</span>
+                <span>Saving...</span>
               </div>
             ) : lastSaved ? (
-              <div className="flex items-center text-success/60">
+              <div className="flex items-center text-emerald-500">
                 <Cloud size={14} className="mr-2" />
-                <span>Saved at {format(lastSaved, "HH:mm")}</span>
+                <span>Saved</span>
               </div>
             ) : (
-              <span className="text-aurora-on-surface-variant/40 italic">System Ready</span>
+              <span className="text-text-variant/40 italic">Ready</span>
             )}
           </div>
 
-          <button onClick={() => handleSave(false)} className="btn-aurora-primary px-8 py-3 text-xs font-black uppercase tracking-widest shadow-lg shadow-primary/20 flex items-center gap-2">
-            <Save size={16} />
+          <button onClick={() => handleSave(false)} className="btn-aurora px-8 py-3.5 shadow-xl shadow-primary/20">
+            <Save size={18} />
             Save Note
           </button>
 
           <button
             onClick={handleDelete}
-            className="p-3 rounded-2xl glass border border-primary/5 text-aurora-on-surface-variant hover:text-error hover:border-error/20 transition-all active:scale-95"
-            aria-label="Delete note"
+            className="p-3.5 rounded-2xl glass border border-primary/5 text-text-variant hover:text-red-500 hover:border-red-500/20 transition-all active:scale-95 shadow-lg shadow-red-500/5"
+            aria-label="Terminate note"
           >
             <Trash2 size={20} />
           </button>
         </div>
       </div>
 
-      {/* Tag section */}
-      <div className="flex flex-wrap items-center gap-3 p-1">
-        <div className="w-10 h-10 rounded-xl glass flex items-center justify-center text-primary/40">
-          <Tag size={18} />
-        </div>
+      {/* Editor & Sidebar container */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        <div className="lg:col-span-12 space-y-6">
+            {/* Tag section */}
+            <div className="flex flex-wrap items-center gap-4 p-2 glass rounded-2xl border border-primary/5">
+                <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center text-primary/40 shrink-0">
+                    <Tag size={18} strokeWidth={2.5} />
+                </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          {tags.map((tag) => (
-            <motion.div
-              layout
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              key={tag}
-              className="flex items-center gap-2 glass border border-primary/10 pl-3 pr-2 py-1.5 rounded-xl group/tag"
+                <div className="flex flex-wrap items-center gap-3">
+                    <AnimatePresence mode="popLayout">
+                        {tags.map((tag) => (
+                            <motion.div
+                                layout
+                                initial={{ scale: 0.8, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                exit={{ scale: 0.8, opacity: 0 }}
+                                key={tag}
+                                className="flex items-center gap-3 glass border border-primary/10 pl-4 pr-3 py-2 rounded-xl group/tag"
+                            >
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">{tag}</span>
+                                <button
+                                    onClick={() => removeTag(tag)}
+                                    className="p-1 rounded-md hover:bg-red-500/10 hover:text-red-500 transition-colors opacity-30 group-hover/tag:opacity-100"
+                                >
+                                    <X size={12} />
+                                </button>
+                            </motion.div>
+                        ))}
+                    </AnimatePresence>
+
+                    <div className="relative group/input ml-2">
+                        <input
+                            type="text"
+                            value={newTag}
+                            onChange={(e) => setNewTag(e.target.value)}
+                            onKeyDown={(e) => e.key === "Enter" && addTag()}
+                            placeholder="Add Tag..."
+                            className="bg-transparent border-0 border-b-2 border-primary/10 outline-none text-[10px] font-black uppercase tracking-[0.2em] py-2 w-32 focus:w-48 focus:border-primary transition-all placeholder:text-text-variant/20 text-text"
+                        />
+                    </div>
+                </div>
+            </div>
+
+            {/* Editor section */}
+            <motion.div 
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                className="glass rounded-[3.5rem] border border-primary/5 p-6 shadow-2xl transition-colors duration-500 sm:p-8 lg:p-12 relative overflow-hidden"
             >
-              <span className="text-[10px] font-black uppercase tracking-wider text-primary">{tag}</span>
-              <button
-                onClick={() => removeTag(tag)}
-                className="w-4 h-4 rounded-md flex items-center justify-center hover:bg-error/10 hover:text-error transition-colors opacity-40 group-hover/tag:opacity-100"
-              >
-                &times;
-              </button>
+                {/* Background aura effect inside terminal */}
+                <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/2" />
+                
+                <div className="prose prose-aurora max-w-none relative z-10 min-h-[600px]">
+                    <TiptapEditor content={content} onChange={setContent} />
+                </div>
             </motion.div>
-          ))}
-
-          <div className="relative group/input ml-2">
-            <input
-              type="text"
-              value={newTag}
-              onChange={(e) => setNewTag(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && addTag()}
-              placeholder="Add Tag..."
-              className="bg-transparent border-0 border-b border-primary/10 outline-none text-[10px] font-black uppercase tracking-wider py-1.5 w-24 focus:w-40 focus:border-primary transition-all placeholder:text-aurora-on-surface-variant/20"
-            />
-          </div>
         </div>
       </div>
-
-      {/* Editor section */}
-      <motion.div 
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        className="glass-panel min-h-[500px] rounded-[3rem] border border-primary/5 p-4 shadow-2xl shadow-primary/5 sm:p-6 lg:p-8"
-      >
-        <div className="prose prose-aurora max-w-none">
-          <TiptapEditor content={content} onChange={setContent} />
-        </div>
-      </motion.div>
     </div>
   );
 };
 
 export default NotePage;
-
-
-

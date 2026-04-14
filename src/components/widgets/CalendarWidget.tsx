@@ -62,9 +62,9 @@ const CalendarWidget = () => {
   return (
     <div className="h-full flex flex-col">
       {/* Mini calendar grid */}
-      <div className="grid grid-cols-7 gap-y-1 text-center mb-4">
+      <div className="grid grid-cols-7 gap-y-2 text-center mb-6">
         {DAYS_OF_WEEK.map((d) => (
-          <span key={d} className="text-[10px] font-bold text-slate-400 uppercase tracking-widest py-1">
+          <span key={d} className="text-[9px] font-black text-text-variant uppercase tracking-[0.2em] py-1 opacity-50">
             {d}
           </span>
         ))}
@@ -77,17 +77,17 @@ const CalendarWidget = () => {
             <button
               key={day.toISOString()}
               onClick={() => setSelectedDate(day)}
-              className={`relative mx-auto w-8 h-8 flex items-center justify-center rounded-full text-xs font-bold transition-all ${
+              className={`relative mx-auto w-8 h-8 flex items-center justify-center rounded-xl text-xs font-black transition-all duration-300 ${
                 today && !selected
-                  ? "bg-indigo-500 text-white shadow-lg shadow-indigo-200/60"
+                  ? "bg-primary text-white shadow-lg shadow-primary/30"
                   : selected
-                  ? "bg-indigo-100 text-indigo-700 ring-2 ring-indigo-400"
-                  : "text-slate-700 hover:bg-white/60"
+                  ? "bg-primary text-white shadow-xl shadow-primary/40 ring-2 ring-primary/20 scale-110"
+                  : "text-text hover:bg-primary/10 hover:scale-105"
               }`}
             >
               {format(day, "d")}
-              {marked && (
-                <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-pink-400 rounded-full" />
+              {marked && !selected && !today && (
+                <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-tertiary rounded-full shadow-[0_0_5px_rgba(139,92,246,0.6)]" />
               )}
             </button>
           );
@@ -95,21 +95,21 @@ const CalendarWidget = () => {
       </div>
 
       {/* Divider */}
-      <div className="border-t border-white/20 pt-4 flex-1">
+      <div className="border-t border-primary/10 pt-6 flex-1">
         <AnimatePresence mode="wait">
           {showAddForm ? (
             <motion.form
               key="form"
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
               onSubmit={handleAddEvent}
-              className="space-y-3 bg-white/30 rounded-2xl p-4 border border-white/30"
+              className="space-y-3 glass border border-primary/10 rounded-2xl p-5 shadow-2xl shadow-primary/5"
             >
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-xs font-bold text-indigo-600 uppercase tracking-wide">New Event</span>
-                <button type="button" onClick={() => setShowAddForm(false)} className="p-1 rounded-full hover:bg-slate-100 transition-colors">
-                  <X size={13} />
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Temporal Event</span>
+                <button type="button" onClick={() => setShowAddForm(false)} className="p-1.5 rounded-xl hover:bg-primary/10 transition-colors text-text-variant active:scale-90">
+                  <X size={14} />
                 </button>
               </div>
               <input
@@ -117,18 +117,18 @@ const CalendarWidget = () => {
                 type="text"
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
-                placeholder="What's happening?"
-                className="w-full bg-white/60 border border-white/40 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                placeholder="Synchronize identity…"
+                className="input-aurora w-full py-3 px-4 text-xs font-bold"
               />
               <input
                 required
                 type="time"
                 value={newTime}
                 onChange={(e) => setNewTime(e.target.value)}
-                className="w-full bg-white/60 border border-white/40 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                className="input-aurora w-full py-3 px-4 text-xs font-bold"
               />
-              <button type="submit" className="w-full bg-indigo-500 text-white font-bold py-2 rounded-xl text-sm hover:bg-indigo-600 transition-colors">
-                Schedule
+              <button type="submit" className="btn-aurora w-full py-3 text-xs tracking-widest mt-2 uppercase shadow-lg shadow-primary/10">
+                Commit Event
               </button>
             </motion.form>
           ) : eventsForSelected.length === 0 ? (
@@ -136,45 +136,49 @@ const CalendarWidget = () => {
               key="empty"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="flex flex-col items-center justify-center py-4 gap-2"
+              className="flex flex-col items-center justify-center py-6 gap-3 text-center"
             >
-              <p className="text-sm text-slate-400">No events on {format(selectedDate, "MMM d")}</p>
-              <button
-                onClick={() => setShowAddForm(true)}
-                className="text-xs font-bold text-indigo-500 hover:text-indigo-700 flex items-center gap-1 transition-colors"
-              >
-                <Plus size={13} /> Add event
-              </button>
+                <div className="w-12 h-12 rounded-2xl glass flex items-center justify-center border border-primary/5">
+                    <Clock size={20} className="text-primary/30" strokeWidth={2.5} />
+                </div>
+                <div className="space-y-1">
+                    <p className="text-xs font-black uppercase tracking-[0.2em] text-text">Vapor Schedule</p>
+                    <p className="text-[9px] font-bold text-text-variant opacity-60 uppercase tracking-widest">No events logged on {format(selectedDate, "MMM d")}</p>
+                </div>
+                <button
+                    onClick={() => setShowAddForm(true)}
+                    className="text-[10px] font-black text-primary hover:text-primary/80 flex items-center gap-2 transition-all uppercase tracking-[0.3em] bg-primary/5 px-5 py-2.5 rounded-xl border border-primary/10 mt-2"
+                >
+                    <Plus size={14} strokeWidth={3} /> Initial Event
+                </button>
             </motion.div>
           ) : (
-            <motion.div key="events" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-3">
+            <motion.div key="events" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
               {eventsForSelected.map((event, idx) => (
                 <motion.div
                   key={event.id}
-                  initial={{ opacity: 0, x: -8 }}
+                  initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: idx * 0.05 }}
                   onClick={() => navigate(`/events?date=${selectedDate.toISOString().split("T")[0]}`)}
-                  className="flex items-center gap-4 group cursor-pointer"
+                  className="flex items-center gap-5 group cursor-pointer glass p-3.5 rounded-2xl border border-primary/5 hover:border-primary/20 hover:shadow-xl transition-all"
                 >
-                  <div className="w-1.5 h-10 bg-indigo-500 rounded-full group-hover:bg-indigo-600 transition-colors" />
-                  <div className="flex-1">
-                    <p className="text-sm font-bold text-text">{event.title}</p>
-                    <p className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
-                      <Clock size={11} />
+                  <div className="w-1 h-10 bg-primary/20 rounded-full group-hover:bg-primary transition-all duration-500 group-hover:w-1.5" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-bold text-text group-hover:text-primary transition-colors leading-tight line-clamp-1">{event.title}</p>
+                    <p className="text-[9px] text-text-variant flex items-center gap-1.5 mt-1.5 uppercase tracking-[0.2em] font-black opacity-60">
+                      <Clock size={10} strokeWidth={3} className="text-primary" />
                       {format(new Date(event.start_time), "p")}
                     </p>
                   </div>
-                  <button className="opacity-0 group-hover:opacity-100 bg-white/50 px-3 py-1 rounded-full text-xs font-bold text-indigo-600 transition-opacity flex items-center gap-1">
-                    View <ChevronRight size={12} />
-                  </button>
+                  <ChevronRight size={14} className="text-primary opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
                 </motion.div>
               ))}
               <button
                 onClick={() => setShowAddForm(true)}
-                className="text-xs font-bold text-indigo-500 hover:text-indigo-700 flex items-center gap-1 mt-2 transition-colors"
+                className="w-full text-[9px] font-black text-primary/60 hover:text-primary flex items-center justify-center gap-2 mt-4 transition-all uppercase tracking-[0.4em] py-3 border-t border-primary/5"
               >
-                <Plus size={13} /> Add another
+                <Plus size={14} strokeWidth={3} /> Expand Matrix
               </button>
             </motion.div>
           )}
