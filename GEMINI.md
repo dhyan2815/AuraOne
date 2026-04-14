@@ -103,3 +103,21 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
   - `Settings.tsx`: Completely rebuilt spacing and typography. Reduced generic 5xl headers to 2xl, `p-10 text-center rounded-[3rem]` panels to standard `p-6 rounded-2xl` dense grid blocks. Replaced large gap sections with tighter layouts and smaller secondary text scales.
   - `Tasks.tsx`: Fixed the hero container that was set up as `flex-col md:flex-row`. Streamlined it to a permanent single-row flex to prevent breaking alignments and save vertical screen space.
   - `Chat.tsx`: Compacted the input bar `p-6` → `p-3`, input send button down to `w-9 h-9`. Scaled down suggestion cards to `p-4` inside a limited `max-w-md` grid. Reduced message avatars (`w-10 h-10` → `w-8 h-8`).
+
+### April 14, 2026: Desktop Sidebar — Fixed Positioning & Width Normalization
+- **Objective:** Ensure the sidebar remains visible and fixed during page scrolling across all views and normalize its desktop width.
+- **Action:** 
+  - Updated `Sidebar.tsx` to use `fixed` positioning for the desktop sidebar container.
+  - Implemented a placeholder `aside` with `w-56 flex-shrink-0` to maintain layout integrity within the `Layout.tsx` flexbox container, preventing content overlap.
+  - Normalized sidebar width to `w-56` (224px) for both the fixed element and the placeholder to align with Phase 2 scaling objectives.
+- **Outcome:** The sidebar is now perfectly stationary while the main content area scrolls, providing a more stable and premium navigation experience.
+
+### April 14, 2026: UI Simplification — Header Removal & Relocated Theme Toggle
+- **Objective:** Streamline the interface by removing redundant header elements and providing a more accessible theme toggle.
+- **Action:** 
+  - Eliminated the top `header` in `Layout.tsx`, including search, notification icons, and user account details.
+  - Relocated the light/dark mode toggle to the **bottom-right corner** as a floating button.
+  - Enhanced the toggle with `framer-motion` for smooth, spring-based transitions between the Sun and Moon icons.
+  - Applied premium glassmorphism effects (backdrop blur, subtle borders) to the floating toggle for visual consistency with the Aurora Glass design.
+- **Outcome:** A cleaner, more focused workspace that prioritizes content while keeping essential theme controls within easy reach.
+

@@ -50,7 +50,7 @@ const Sidebar = () => {
 
   const SidebarContent = () => (
     <div
-      className="relative flex h-dvh w-64 flex-col overflow-hidden py-4"
+      className="relative flex h-dvh w-56 flex-col overflow-hidden py-4"
       style={{
         background: "rgba(255,255,255,0.20)",
         backdropFilter: "blur(40px)",
@@ -131,8 +131,10 @@ const Sidebar = () => {
         )}
       </AnimatePresence>
 
-      <aside className="sticky top-0 hidden h-dvh flex-shrink-0 self-start md:block md:z-20">
-        <SidebarContent />
+      <aside className="hidden w-56 flex-shrink-0 md:block">
+        <div className="fixed bottom-0 left-0 top-0 z-20 w-56">
+          <SidebarContent />
+        </div>
       </aside>
 
       <AnimatePresence>
