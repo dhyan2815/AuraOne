@@ -11,7 +11,6 @@ import {
   RotateCw,
   X,
   History,
-  FileText
 } from "lucide-react";
 import { format } from "date-fns";
 import TiptapEditor from "../components/editor/TiptapEditor";

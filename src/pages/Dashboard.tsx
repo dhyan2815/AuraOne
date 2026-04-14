@@ -47,7 +47,6 @@ const Dashboard = () => {
           style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
         >
           {greeting}, {userName}{' '}
-          <Logo iconOnly iconClassName="w-6 h-6 inline-block mb-1 opacity-80" />
         </h1>
         <p className="text-sm text-text-variant mt-1 max-w-xl font-medium">
           A quick overview of your goals, upcoming schedule, and latest news.

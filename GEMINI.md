@@ -86,3 +86,31 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
   - **Chat**: Renamed "Neural Pulse" to "Aura Assistant" and updated interaction prompts for clarity.
 - **Outcome**: The application now features a logical, user-friendly interface that maintains its premium aesthetic while being significantly more intuitive.
 
+### April 14, 2026: News Widget Expansion — Enhanced Information Density
+- **Objective**: Increase the number of news updates visible on the dashboard to improve information delivery.
+- **Action**: 
+  - Updated `NewsWidget.tsx` to fetch and render 5 items (1 featured + 4 secondary) instead of 3.
+  - Expanded the categories system to include "Pulse" and "Editorial" for the additional articles.
+  - Optimized transition delays for the newly added secondary items.
+- **Outcome**: The dashboard now provides a more comprehensive overview of global updates while maintaining its sleek, high-fidelity aesthetic.
+
+### April 14, 2026: UI Consistency — Refined Calendar Terminology
+- **Objective**: Replace the abstract "Vapor Schedule" label in the Calendar widget with a more logical and intuitive term.
+- **Action**: Updated `CalendarWidget.tsx` to rename "Vapor Schedule" to "Daily Agenda".
+- **Outcome**: Improved UI clarity and adherence to the standardized professional terminology system.
+
+### April 14, 2026: Authentication UI Refine — Logical Taxonomy
+- **Objective**: Standardize esoteric and abstract labeling in the Login and SignUp pages to improve clarity and user onboarding.
+- **Action**:
+  - **Login.tsx**: Replaced "Universal Identifier" with "Email Address", "Secure Key" with "Password", and "Restore Session" with "Sign In". Standardized decorative headers to "Welcome Back" and "Professional Workspace".
+  - **SignUp.tsx**: Replaced "Guardian Name" with "Full Name", "Digital Identifier" with "Email Address", and "Cryptographic Key" with "Password". Updated "Commence Journey" to "Sign Up".
+- **Outcome**: The authentication flow is now intuitive and professionally labeled while retaining its premium visual identity.
+
+### April 14, 2026: Sidebar Collapsing & Logout Button Refinement
+- **Objective**: Implement collapsible sidebar functionality and resolve confusion between logout and collapse icons.
+- **Action**:
+  - **Collapsible Sidebar**: Introduced `isCollapsed` state with `localStorage` persistence. The sidebar now transitions between `224px` and `80px` width.
+  - **Floating Toggle**: Added a glassmorphic Chevron toggle button positioned on the sidebar's right border, vertically aligned with the "Dashboard" item. Fixed overflow issues to ensure the toggle button remains fully visible in both expanded and collapsed states.
+  - **Logout Clarification**: Replaced the ambiguous `LogOut` (arrow) icon with a `Power` icon in the profile section. Added an explicit "SIGN OUT" label that appears on hover to clearly distinguish the action.
+  - **UI/UX Dynamics**: Leveraged synced `framer-motion` springs for butter-smooth layout shifts. Added rotation animations to the toggle chevron and graceful label showing/hiding with `AnimatePresence`.
+- **Outcome**: Improved workspace flexibility and reduced interface ambiguity.

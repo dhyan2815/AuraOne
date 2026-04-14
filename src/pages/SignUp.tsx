@@ -121,10 +121,10 @@ const SignUp = () => {
               className="space-y-8"
             >
               <div className="space-y-4">
-                <p className="section-header">Initiate Expansion</p>
+                <p className="section-header">Join the Platform</p>
                 <h1 className="display-lg leading-tight bg-gradient-to-br from-primary via-secondary to-tertiary bg-clip-text text-transparent italic">
                   Craft Your<br />
-                  <span className="not-italic text-aurora-on-surface font-extrabold">Next Paradigm.</span>
+                  <span className="not-italic text-aurora-on-surface font-extrabold">Digital Workspace.</span>
                 </h1>
                 <p className="text-xl text-aurora-on-surface-variant font-medium leading-relaxed max-w-xl">
                   Step into the future of productivity. A workspace designed to adapt, illuminate, and empower your every thought.
@@ -137,7 +137,7 @@ const SignUp = () => {
                   { title: "Intelligent Design", desc: "Aesthetic meets function in harmony." },
                   { title: "Universal Sync", desc: "Your data, everywhere, instantly." },
                   { title: "AI Integration", desc: "Augmented cognition by default." },
-                  { title: "Privacy First", desc: "End-to-end encryption for your mind." },
+                  { title: "Privacy First", desc: "Enterprise-grade security for your data." },
                 ].map((item, i) => (
                   <div key={i} className="flex items-start space-x-3">
                     <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2" />
@@ -159,8 +159,8 @@ const SignUp = () => {
               <div className="glass-panel p-10 rounded-[2.5rem] shadow-2xl relative">
                 <form onSubmit={handleSignUp} className="space-y-6" autoComplete="off">
                   <div className="text-center mb-10 space-y-2">
-                    <h2 className="headline-sm text-3xl tracking-tighter">Create Sanctuary</h2>
-                    <p className="text-aurora-on-surface-variant font-medium">Join the frontier of productivity.</p>
+                    <h2 className="headline-sm text-3xl tracking-tighter">Create Account</h2>
+                    <p className="text-aurora-on-surface-variant font-medium">Get started with AuraOne today.</p>
                   </div>
 
                   {error && (
@@ -175,7 +175,7 @@ const SignUp = () => {
 
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <label htmlFor="name" className="section-header mb-0 ml-1">Guardian Name</label>
+                      <label htmlFor="name" className="section-header mb-0 ml-1">Full Name</label>
                       <input
                         id="name"
                         type="text"
@@ -188,7 +188,7 @@ const SignUp = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <label htmlFor="email" className="section-header mb-0 ml-1">Digital Identifier</label>
+                      <label htmlFor="email" className="section-header mb-0 ml-1">Email Address</label>
                       <input
                         id="email"
                         type="email"
@@ -201,7 +201,7 @@ const SignUp = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <label htmlFor="password" className="section-header mb-0 ml-1">Cryptographic Key</label>
+                      <label htmlFor="password" className="section-header mb-0 ml-1">Password</label>
                       <div className="relative group">
                         <input
                           id="password"
@@ -231,19 +231,19 @@ const SignUp = () => {
                     {isSigningUp ? (
                       <div className="flex items-center justify-center gap-3">
                         <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin" />
-                        Establishing Core...
+                        Creating Account...
                       </div>
                     ) : (
                       <div className="flex items-center justify-center">
-                        Commence Journey
+                        Sign Up
                         <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                       </div>
                     )}
                   </button>
 
                   <p className="text-center text-aurora-on-surface-variant font-medium mt-8">
-                    Already a visionary?{" "}
-                    <Link to="/login" className="text-primary font-bold hover:underline">Restore Session</Link>
+                    Already a user?{" "}
+                    <Link to="/login" className="text-primary font-bold hover:underline">Sign In</Link>
                   </p>
                 </form>
 
@@ -259,7 +259,7 @@ const SignUp = () => {
       <footer className="py-20 border-t border-primary/5">
         <div className="max-w-[1440px] mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
           <Logo iconClassName="w-8 h-8" textClassName="text-2xl" />
-          <p className="text-xs font-black uppercase tracking-widest text-primary/40">&copy; 2026 AuraOne Registry. Developed by Dhyan Patel</p>
+          <p className="text-xs font-black uppercase tracking-widest text-primary/40">&copy; 2025 AuraOne. Developed by Dhyan Patel</p>
         </div>
       </footer>
     </div>

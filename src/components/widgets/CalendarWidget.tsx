@@ -142,7 +142,7 @@ const CalendarWidget = () => {
                     <Clock size={20} className="text-primary/30" strokeWidth={2.5} />
                 </div>
                 <div className="space-y-1">
-                    <p className="text-xs font-black uppercase tracking-[0.2em] text-text">Vapor Schedule</p>
+                    <p className="text-xs font-black uppercase tracking-[0.2em] text-text">Daily Agenda</p>
                     <p className="text-[9px] font-bold text-text-variant opacity-60 uppercase tracking-widest">No events logged on {format(selectedDate, "MMM d")}</p>
                 </div>
                 <button

@@ -118,30 +118,14 @@ const Login = () => {
               className="space-y-8"
             >
               <div className="space-y-4">
-                <p className="section-header">Returning to Excellence</p>
+                <p className="section-header">Welcome Back</p>
                 <h1 className="display-lg leading-tight bg-gradient-to-br from-primary via-secondary to-tertiary bg-clip-text text-transparent italic">
                   Enter Your<br />
-                  <span className="not-italic text-aurora-on-surface font-extrabold">Luminous Sanctuary.</span>
+                  <span className="not-italic text-aurora-on-surface font-extrabold">Professional Workspace.</span>
                 </h1>
                 <p className="text-xl text-aurora-on-surface-variant font-medium leading-relaxed max-w-xl">
                   Your workspace is preserved in the light. Seamlessly continue your flow across every device.
                 </p>
-              </div>
-
-              {/* Stats / Proof */}
-              <div className="grid grid-cols-3 gap-8 pt-8">
-                <div className="space-y-1">
-                  <p className="text-3xl font-black text-primary">10k+</p>
-                  <p className="section-header mb-0 text-[0.6rem]">Visionaries</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-3xl font-black text-secondary">Free</p>
-                  <p className="section-header mb-0 text-[0.6rem]">Always</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-3xl font-black text-tertiary">4.9/5</p>
-                  <p className="section-header mb-0 text-[0.6rem]">Rating</p>
-                </div>
               </div>
             </motion.div>
 
@@ -155,7 +139,7 @@ const Login = () => {
                 <form onSubmit={handleLogin} className="space-y-6" autoComplete="off">
                   <div className="text-center mb-10 space-y-2">
                     <h2 className="headline-sm text-3xl tracking-tighter">Welcome Back</h2>
-                    <p className="text-aurora-on-surface-variant font-medium">Authentication for the modern mind.</p>
+                    <p className="text-aurora-on-surface-variant font-medium">Securely access your digital workspace.</p>
                   </div>
 
                   {error && (
@@ -170,11 +154,11 @@ const Login = () => {
 
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <label htmlFor="email" className="section-header mb-0 ml-1">Universal Identifier</label>
+                      <label htmlFor="email" className="section-header mb-0 ml-1">Email Address</label>
                       <input
                         id="email"
                         type="email"
-                        placeholder="your@sanctuary.com"
+                        placeholder="name@company.com"
                         className="input-aurora"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
@@ -184,8 +168,8 @@ const Login = () => {
 
                     <div className="space-y-2">
                       <div className="flex justify-between items-center ml-1">
-                        <label htmlFor="password" className="section-header mb-0">Secure Key</label>
-                        <Link to="/forgot-password" className="text-[0.65rem] font-black uppercase tracking-widest text-primary hover:underline">Secret Forgotten?</Link>
+                        <label htmlFor="password" className="section-header mb-0">Password</label>
+                        <Link to="/forgot-password" className="text-[0.65rem] font-black uppercase tracking-widest text-primary hover:underline">Forgot Password?</Link>
                       </div>
                       <div className="relative group">
                         <input
@@ -216,19 +200,19 @@ const Login = () => {
                     {isLoggingIn ? (
                       <div className="flex items-center justify-center gap-3">
                         <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin" />
-                        Aligning Flows...
+                        Signing In...
                       </div>
                     ) : (
                       <div className="flex items-center justify-center">
-                        Restore Session
+                        Sign In
                         <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                       </div>
                     )}
                   </button>
 
                   <p className="text-center text-aurora-on-surface-variant font-medium mt-8">
-                    New visionary?{" "}
-                    <Link to="/signup" className="text-primary font-bold hover:underline">Initiate Sanctuary</Link>
+                    New user?{" "}
+                    <Link to="/signup" className="text-primary font-bold hover:underline">Create Account</Link>
                   </p>
                 </form>
 
@@ -244,7 +228,7 @@ const Login = () => {
       <footer className="py-20 border-t border-primary/5">
         <div className="max-w-[1440px] mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
           <Logo iconClassName="w-8 h-8" textClassName="text-2xl" />
-          <p className="text-xs font-black uppercase tracking-widest text-primary/40">&copy; 2026 AuraOne Registry. Developed by Dhyan Patel</p>
+          <p className="text-xs font-black uppercase tracking-widest text-primary/40">&copy; 2025 AuraOne. Developed by Dhyan Patel</p>
         </div>
       </footer>
     </div>

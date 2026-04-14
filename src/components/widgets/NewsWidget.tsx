@@ -20,7 +20,7 @@ interface ApiNewsItem {
   image_url?: string;
 }
 
-const CATEGORIES = ["Trends", "Weekly Focus", "Insights"];
+const CATEGORIES = ["Trends", "Weekly Focus", "Insights", "Pulse", "Editorial"];
 
 const NewsWidget = () => {
   const [news, setNews] = useState<NewsItem[]>([]);
@@ -37,7 +37,7 @@ const NewsWidget = () => {
         if (!res.ok) throw new Error("Connection unstable");
         const data = await res.json();
         setNews(
-          data.results.slice(0, 4).map((item: ApiNewsItem, i: number) => ({
+          data.results.slice(0, 5).map((item: ApiNewsItem, i: number) => ({
             id: i.toString(),
             title: item.title,
             source: item.source_id,
@@ -106,7 +106,7 @@ const NewsWidget = () => {
         </motion.a>
 
         {/* Smaller articles */}
-        {rest.slice(0, 2).map((item, idx) => (
+        {rest.map((item, idx) => (
           <motion.a
             key={item.id}
             initial={{ opacity: 0, x: -8 }}
@@ -140,6 +140,7 @@ const NewsWidget = () => {
         ))}
       </div>
     </AnimatePresence>
+
   );
 };
 
