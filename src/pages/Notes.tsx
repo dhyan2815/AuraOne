@@ -217,12 +217,22 @@ const Notes = () => {
         )}
       </AnimatePresence>
 
-      {/* Load More */}
+      {/* Note Stats */}
       {filtered.length > 0 && (
         <div className="mt-16 flex justify-center">
-          <button className="glass px-12 py-4 rounded-full font-black text-[10px] uppercase tracking-[0.3em] text-primary hover:bg-primary hover:text-white transition-all shadow-xl shadow-primary/5 border border-primary/10">
-            Show More Notes ↓
-          </button>
+          <div className="glass px-8 py-4 rounded-2xl border border-primary/10 flex items-center gap-6 shadow-lg shadow-primary/5">
+            <div className="text-center">
+              <span className="block text-2xl font-black text-primary">{filtered.length}</span>
+              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-Text--variant/50">Notes</span>
+            </div>
+            <div className="w-px h-8 bg-primary/20" />
+            <div className="text-center">
+              <span className="block text-2xl font-black text-primary">
+                {notes.reduce((acc, n) => acc + (n.tags?.length || 0), 0)}
+              </span>
+              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-Text-variant/50">Tags</span>
+            </div>
+          </div>
         </div>
       )}
     </div>

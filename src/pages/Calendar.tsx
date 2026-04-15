@@ -233,9 +233,9 @@ const Calendar = () => {
                   />
                   <button
                     type="submit"
-                    className="btn-aurora px-8 shadow-xl shadow-primary/20"
-                  >
-                    <Plus size={18} /> Schedule
+                    className="flex items-center gap-3 px-6 py-3.5 rounded-2xl glass border border-primary/10 text-Primary hover:text-Primary hover:border-Primary/20 transition-all active:scale-95 shadow-lg shadow-primary/10"                  >
+                    <Plus size={18} />
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em]">Schedule</span>
                   </button>
                 </form>
               </motion.div>

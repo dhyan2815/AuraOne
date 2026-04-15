@@ -47,7 +47,7 @@ const TasksWidget = () => {
         </div>
         <button
           onClick={() => navigate("/tasks/new")}
-          className="btn-aurora py-2.5 px-6 text-[10px] shadow-lg shadow-primary/10"
+          className="flex items-center gap-3 px-6 py-3 rounded-2xl glass border border-primary/10 text-primary hover:text-primary hover:border-primary/20 transition-all active:scale-95 shadow-lg shadow-primary/10"
         >
           Create Task
         </button>

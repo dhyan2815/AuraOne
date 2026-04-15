@@ -223,9 +223,9 @@ const NotePage = () => {
             )}
           </div>
 
-          <button onClick={() => handleSave(false)} className="btn-aurora px-8 py-3.5 shadow-xl shadow-primary/20">
+          <button onClick={() => handleSave(false)} className="flex items-center gap-3 px-6 py-3.5 rounded-2xl glass border border-primary/10 text-primary hover:text-primary hover:border-primary/20 transition-all active:scale-95 shadow-lg shadow-primary/10">
             <Save size={18} />
-            Save Note
+            <span className="text-[10px] font-black uppercase tracking-[0.2em]">Save Note</span>
           </button>
 
           <button

@@ -190,10 +190,10 @@ const Tasks = () => {
 
             <button
               onClick={() => navigate("/tasks/new")}
-              className="flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-secondary text-white px-8 py-3 rounded-2xl font-black shadow-2xl shadow-primary/20 text-xs hover:scale-105 active:scale-95 transition-all uppercase tracking-widest"
+              className="flex items-center gap-3 px-6 py-3.5 rounded-2xl glass border border-Primary/10 text-Primary hover:text-Primary hover:border-Primary/20 transition-all active:scale-95 shadow-lg shadow-primary/10"
             >
               <Plus size={16} strokeWidth={4} />
-              ADD TASK
+              <span className="text-[10px] font-black uppercase tracking-[0.2em]">ADD TASK</span>
             </button>
           </motion.div>
         </div>
@@ -213,9 +213,9 @@ const Tasks = () => {
           <p className="text-sm text-text-variant mt-3 max-w-xs text-center leading-relaxed font-medium">Create your first task to start organizing your daily goals.</p>
           <button
             onClick={() => navigate("/tasks/new")}
-            className="mt-10 btn-aurora px-12 py-4"
-          >
-            Create New Task
+            className="mt-10 flex items-center gap-3 px-8 py-4 rounded-2xl glass border border-primary/10 text-Primary hover:text-Primary hover:border-Primary/20 transition-all active:scale-95 shadow-2xl shadow-primary/10"          >
+            <Plus size={18} />
+            <span className="text-[10px] font-black uppercase tracking-[0.2em]">Create New Task</span>
           </button>
         </motion.div>
       ) : (

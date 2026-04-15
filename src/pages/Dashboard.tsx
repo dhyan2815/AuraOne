@@ -84,7 +84,7 @@ const Dashboard = () => {
                 ACTIVE TASKS
             </h3>
             <button
-              className="bg-primary/10 text-primary p-2.5 rounded-2xl hover:bg-primary/20 transition-all hover:rotate-90 active:scale-95 shadow-lg shadow-primary/5"
+              className="p-3 rounded-2xl glass border border-primary/10 text-text-variant hover:text-primary hover:border-primary/20 transition-all active:scale-95 shadow-lg shadow-primary/5"
               title="Add objective"
             >
               <Plus size={18} strokeWidth={3} />
