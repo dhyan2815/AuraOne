@@ -56,18 +56,23 @@ const Settings = () => {
   const handleChangePassword = async () => {
     if (!user || !newPassword || !confirmPassword) { toast.error("Complete all protocols"); return; }
     if (newPassword !== confirmPassword) { toast.error("Encryption mismatch"); return; }
-    if (newPassword.length < 6) { toast.error("Entropy insufficient"); return; }
+    if (newPassword.length < 8) { toast.error("Entropy insufficient (8+ chars)"); return; }
 
     setIsChangingPassword(true);
-    const { error } = await supabase.auth.updateUser({ password: newPassword });
-    if (error) {
-      toast.error(error.message || "Security update failed");
-    } else {
-      setNewPassword("");
-      setConfirmPassword("");
-      toast.success("Security matrix updated");
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) {
+        toast.error(error.message || "Security update failed");
+      } else {
+        setNewPassword("");
+        setConfirmPassword("");
+        toast.success("Security matrix updated");
+      }
+    } catch (err) {
+      toast.error("Security update failed");
+    } finally {
+      setIsChangingPassword(false);
     }
-    setIsChangingPassword(false);
   };
 
   const formatDate = (date: Date) =>
@@ -237,9 +242,9 @@ const Settings = () => {
                 <button
                   onClick={handleChangePassword}
                   disabled={isChangingPassword || !newPassword || !confirmPassword}
-                  className="btn-aurora w-full py-5 text-xs tracking-[0.2em] shadow-xl shadow-secondary/20 bg-gradient-to-r from-secondary to-primary uppercase"
+                  className="btn-aurora w-full py-3 text-[10px] tracking-[0.2em] shadow-xl shadow-secondary/20 bg-gradient-to-r from-secondary to-primary uppercase flex items-center justify-center gap-2 rounded-2xl"
                 >
-                  {isChangingPassword ? <RotateCw className="animate-spin" size={16} /> : <Shield size={16} strokeWidth={3} />}
+                  {isChangingPassword ? <RotateCw className="animate-spin" size={14} /> : <Shield size={14} strokeWidth={3} />}
                   Update Password
                 </button>
               </div>
