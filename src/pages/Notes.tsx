@@ -16,6 +16,13 @@ const TAG_BADGE: Record<string, { bg: string; text: string }> = {
   General:  { bg: "bg-primary/10",   text: "text-primary" },
 };
 
+const stripHtml = (html: string | null) => {
+  if (!html) return '';
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  return tmp.textContent || tmp.innerText || '';
+};
+
 const Notes = () => {
   const [notes, setNotes] = useState<Note[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -183,7 +190,7 @@ const Notes = () => {
                     </h3>
                     {/* Preview */}
                     <p className="text-text-variant font-medium leading-relaxed mb-6 text-sm line-clamp-3 opacity-70">
-                      {note.content || "No content provided..."}
+                      {stripHtml(note.content) || "No content provided..."}
                     </p>
                   </Link>
 
