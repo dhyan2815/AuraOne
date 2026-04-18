@@ -11,7 +11,6 @@ import { supabase } from "../services/supabase";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { format } from "date-fns";
-import Logo from "../components/structure/Logo";
 
 const SUGGESTIONS = [
   { icon: "📋", title: "Summarize", sub: "Analyze recent objectives." },
@@ -184,14 +183,10 @@ const Chat = () => {
         <div className="px-6 h-14 border-b border-primary/5 flex items-center justify-between bg-primary/5 backdrop-blur-md z-10">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white shadow-md shadow-primary/10">
-              <Logo iconOnly iconClassName="w-4.5 h-4.5 filter brightness-0 invert" />
+              <img src="/favicon.svg" alt="Aura" className="w-4.5 h-4.5 filter brightness-0 invert" />
             </div>
             <div>
               <h2 className="text-sm font-bold text-text tracking-wide uppercase">Aura Assistant</h2>
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-tight opacity-80">AI Online</span>
-              </div>
             </div>
           </div>
         </div>
@@ -208,7 +203,7 @@ const Chat = () => {
               >
                 <div className="space-y-4">
                   <div className="w-16 h-16 rounded-2xl bg-primary/5 glass shadow-sm flex items-center justify-center mx-auto mb-6 border border-primary/10">
-                    <Logo iconOnly iconClassName="w-9 h-9" />
+                    <img src="/favicon.svg" alt="Aura" className="w-9 h-9" />
                   </div>
                   <h2 className="text-2xl font-bold tracking-tight text-text" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                     Welcome to <span className="text-primary">Aura Assistant</span>
@@ -251,7 +246,7 @@ const Chat = () => {
                         : "glass border border-primary/20 text-primary"
                     }`}>
                       {msg.role === "ai" ? (
-                        <Logo iconOnly iconClassName="w-4 h-4 filter brightness-0 invert" />
+                        <img src="/favicon.svg" alt="Aura" className="w-4 h-4 filter brightness-0 invert" />
                       ) : (
                         <span className="text-[11px] font-bold uppercase">{displayName[0]}</span>
                       )}
@@ -269,7 +264,7 @@ const Chat = () => {
                 {loading && (
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-4">
                     <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-primary to-secondary flex items-center justify-center shadow-sm">
-                      <Logo iconOnly iconClassName="w-4 h-4 filter brightness-0 invert" />
+                      <img src="/favicon.svg" alt="Aura" className="w-4 h-4 filter brightness-0 invert" />
                     </div>
                     <div className="glass border border-primary/5 rounded-2xl rounded-tl-sm px-5 py-3 flex items-center gap-1 shadow-sm">
                       {[1, 2, 3].map((i) => (

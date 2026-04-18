@@ -4,7 +4,6 @@ import { useAuth } from "../hooks/useAuth";
 import { supabase } from "../services/supabase";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
-import Logo from "../components/structure/Logo";
 
 interface UserProfile {
   name: string;
@@ -83,7 +82,7 @@ const Settings = () => {
       {/* ── Hero ── */}
       <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
         <div className="flex items-center gap-3 mb-2">
-          <Logo iconOnly iconClassName="w-6 h-6" />
+          <img src="/favicon.svg" alt="Aura" className="w-6 h-6" />
           <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Preferences</span>
         </div>
         <h1 className="text-3xl font-extrabold text-text tracking-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Settings</h1>
@@ -261,10 +260,10 @@ const Settings = () => {
 
             <div className="flex items-center gap-5 mb-10 group">
               <div className="w-16 h-16 rounded-[1.5rem] bg-primary/5 glass p-3 border border-primary/10 group-hover:rotate-6 transition-transform">
-                <Logo iconOnly iconClassName="w-full h-full" />
+                <img src="/favicon.svg" alt="Aura" className="w-full h-full" />
               </div>
               <div>
-                <Logo textOnly textClassName="text-sm" />
+                <span className="text-sm font-bold"><span className="text-indigo-500">Aura</span><span className="text-cyan-400 italic font-light">One</span></span>
                 <p className="text-[10px] font-black text-primary uppercase tracking-[0.25em] mt-1">Version 1.2.0</p>
               </div>
             </div>

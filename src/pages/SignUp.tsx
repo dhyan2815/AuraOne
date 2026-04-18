@@ -8,7 +8,6 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
-import Logo from "../components/structure/Logo";
 
 const SignUp = () => {
     const navigate = useNavigate();
@@ -89,7 +88,7 @@ const SignUp = () => {
             to="/"
             className="hover:opacity-80 transition-opacity cursor-pointer inline-block"
           >
-            <Logo iconClassName="w-10 h-10" textClassName="text-2xl" />
+            <img src="/favicon.svg" alt="Aura" className="w-10 h-10" />
           </Link>
 
           <div className="flex items-center space-x-8">
@@ -258,7 +257,7 @@ const SignUp = () => {
       {/* Enhanced Footer */}
       <footer className="py-20 border-t border-primary/5">
         <div className="max-w-[1440px] mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
-          <Logo iconClassName="w-8 h-8" textClassName="text-2xl" />
+          <img src="/favicon.svg" alt="Aura" className="w-8 h-8" />
           <p className="text-xs font-black uppercase tracking-widest text-primary/40">&copy; 2025 AuraOne. Developed by Dhyan Patel</p>
         </div>
       </footer>
