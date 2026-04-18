@@ -123,9 +123,9 @@ const Chat = () => {
   const displayName = user?.email?.split("@")[0] ?? "User";
 
   return (
-    <div className="app-page flex min-h-[calc(100dvh-4rem)] flex-col gap-4 lg:grid lg:grid-cols-[18rem_1fr]">
+    <div className="flex h-[calc(100dvh-4rem)] flex-col gap-4 lg:grid lg:grid-cols-[18rem_1fr] lg:px-6 lg:pt-16">
       {/* ── Left Sidebar: Sessions ── */}
-      <aside className="flex min-h-0 flex-col gap-3 lg:max-h-[calc(100dvh-8rem)]">
+      <aside className="flex min-h-0 flex-col gap-3 lg:h-full lg:max-h-[calc(100dvh-4rem)]">
         <motion.button
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.99 }}
@@ -179,7 +179,7 @@ const Chat = () => {
       </aside>
 
       {/* ── Main Chat ── */}
-      <section className="relative flex min-h-[70dvh] min-w-0 flex-1 flex-col overflow-hidden rounded-2xl border border-primary/10 glass shadow-sm transition-colors duration-500 lg:max-h-[calc(100dvh-8rem)]">
+      <section className="relative flex min-h-[calc(100dvh-8rem)] min-w-0 flex-col overflow-hidden rounded-2xl border border-primary/10 glass shadow-sm transition-colors duration-500">
         {/* Chat Header */}
         <div className="px-6 h-14 border-b border-primary/5 flex items-center justify-between bg-primary/5 backdrop-blur-md z-10">
           <div className="flex items-center gap-3">
