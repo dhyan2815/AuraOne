@@ -96,7 +96,7 @@ const LandingPage = () => {
                             to="/signup"
                             className="bg-primary text-white font-black py-2.5 px-6 rounded-full shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all uppercase tracking-widest text-[10px]"
                         >
-                            Join Aura
+                            Sign Up
                         </Link>
                     </div>
                 </div>
@@ -140,11 +140,7 @@ const LandingPage = () => {
 
                             <div className="flex items-center gap-12 pt-8">
                                 <div className="text-center">
-                                    <p className="text-4xl font-black text-primary">10k+</p>
-                                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-text-variant opacity-60">Dreamers</p>
-                                </div>
-                                <div className="text-center">
-                                    <p className="text-4xl font-black text-tertiary">99%</p>
+                                    <p className="text-4xl font-black text-primary">99%</p>
                                     <p className="text-[10px] font-black uppercase tracking-[0.3em] text-text-variant opacity-60">Consistency</p>
                                 </div>
                                 <div className="text-center">
@@ -262,7 +258,7 @@ const LandingPage = () => {
                     <div className="glass p-12 sm:p-20 rounded-[3rem] shadow-2xl border border-primary/10 relative overflow-hidden group">
                         <div className="absolute -inset-48 bg-gradient-to-tr from-primary/10 to-transparent blur-[100px] pointer-events-none opacity-30 group-hover:opacity-50 transition-opacity"></div>
                         <h2 className="text-5xl font-extrabold mb-8 tracking-tighter text-text relative z-10">
-                            Join the <span className="text-primary italic">Aura</span>.
+                            Join <span className="text-primary bold">Aura</span>.
                         </h2>
                         <p className="text-xl text-text-variant font-medium mb-12 max-w-2xl mx-auto relative z-10">
                             Elevate your digital presence. Start your journey into the Luminous Workspace today.
