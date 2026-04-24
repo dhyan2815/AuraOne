@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Calendar, CheckCircle, FileText, MessageSquare, Shield, ArrowRight, ChevronDown, Star, BarChart3 } from "lucide-react";
+import { Calendar, CheckCircle, MessageSquare, ArrowRight, ChevronDown, Star } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import LandingPicture from "../assets/LandingImage.png";
 // import Card from "../components/ui/Card";
@@ -181,12 +181,9 @@ const LandingPage = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                         {[
-                            { icon: <Calendar className="w-6 h-6" />, title: "Temporal Matrix", description: "A weightless scheduling experience that brings clarity to your temporal flow." },
-                            { icon: <CheckCircle className="w-6 h-6" />, title: "Objective Registry", description: "Prioritize with grace. Manage your output with intuitive focus systems." },
-                            { icon: <MessageSquare className="w-6 h-6" />, title: "Neural Pulse", description: "Advanced AI assistance that converses with you, not just for you." },
-                            { icon: <FileText className="w-6 h-6" />, title: "Insight Archives", description: "Note-taking that feels like editorial design. Every word deserves beauty." },
-                            { icon: <BarChart3 className="w-6 h-6" />, title: "Cognitive Stats", description: "Visualize your cognitive patterns and optimize your peak productivity hours." },
-                            { icon: <Shield className="w-6 h-6" />, title: "Secure Perimeter", description: "Your sanctuary is protected by enterprise-grade encryption and ethical AI." }
+                            { icon: <Calendar className="w-6 h-6" />, title: "Events Calendar", description: "Orchestrate your time with a weightless scheduling experience designed for clarity and temporal flow." },
+                            { icon: <CheckCircle className="w-6 h-6" />, title: "Tasks & Notes Management", description: "Precision management. Organize your objectives with intuitive focus systems and dynamic priority tiers." },
+                            { icon: <MessageSquare className="w-6 h-6" />, title: "Aura Assistant", description: "Your neural companion. Advanced AI intelligence that anticipates your needs and streamlines your workflow." },
                         ].map((feature, index) => (
                             <motion.div
                                 key={index}

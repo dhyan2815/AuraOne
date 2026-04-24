@@ -138,7 +138,7 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
 - **Objective**: Standardize and optimize the codebase by removing all unused files, components, and legacy configurations to reduce technical debt and build size.
 - **Action**:
   - **Asset Pruning**: Permanently deleted 7 unu
-  sed image and video assets from `src/assets/` (`flat-illustration-1.jpg`, `flat-illustration-2.jpg`, `flat-illustration-3.png`, `illustration.jpg`, `LandingVideo.mp4`, `LandingVideo2.mp4`, `project_flow.png`).
+  - **Asset Pruning**: Permanently deleted 7 unused image and video assets from `src/assets/` (`flat-illustration-1.jpg`, `flat-illustration-2.jpg`, `flat-illustration-3.png`, `illustration.jpg`, `LandingVideo.mp4`, `LandingVideo2.mp4`, `project_flow.png`).
   - **Legacy Config Removal**: Deleted `firebase.json` and `logo.html` (legacy playbooks/configs no longer relevant post-Supabase migration).
   - **Dependency Optimization**: Updated `package.json` to remove unused server-side and client-side dependencies including `mongoose`, `express`, `axios`, `@ai-sdk/google`, `@google/generative-ai`, `nodemon`, and `proxyquire`. Cleaned up the `scripts` section to remove obsolete server commands.
   - **Verification**: Verified that all remaining components and assets are actively imported and functional within the application. Corrected the favicon path in `index.html` to follow Vite root-absolute standards. Added `CLAUDE.md` to `.gitignore` and untracked it from git.
@@ -151,3 +151,11 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
   - Standardized logo dimensions (`w-10 h-10` for header, `w-8 h-8` for footer) across both authentication pages.
   - Updated copyright year from 2025 to 2026 in page footers for consistency with the rest of the application.
 - **Outcome**: Resolved broken image issues while enhancing UI consistency and aligning with the premium AuraOne design system.
+
+### April 24, 2026: Landing Page Synchronization — Foundational Modules Refined
+- **Objective**: Align the Landing Page's "Foundational Modules" with the standardized terminology and premium vision established for the rest of the application.
+- **Action**: 
+  - Updated terminology from abstract titles (e.g., "Temporal Matrix", "Neural Pulse") to clear, professional names ("Events Calendar", "Aura Assistant", "Strategic Workboard").
+  - Rewrote feature descriptions to be more descriptive and aligned with the "Aurora Glass" aesthetic and AI-productivity intent.
+  - Standardized all 6 module cards: Events Calendar, Strategic Workboard, Aura Assistant, Infinite Notes, Neural Insights, and Secure Sanctuary.
+- **Outcome**: The Landing Page now accurately reflects the application's actual features and professional tone, ensuring a consistent user experience from first impression to deep interaction.
