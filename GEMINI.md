@@ -168,3 +168,12 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
   - **UI/UX Polish**: Standardized icon sizing and applied appropriate filters (`brightness`, `contrast`) to ensure the logo remains visually premium across different backgrounds (glass, gradients).
 - **Outcome**: Resolved all broken logo issues application-wide, ensuring a seamless and high-fidelity visual experience. Committed changes with reference to Issue #70.
 
+### April 24, 2026: Calendar UI Refactor — Side Column Form Integration
+- **Objective**: Optimize the Calendar page layout by relocating the event creation form and removing redundant promotional elements.
+- **Action**: 
+  - **Layout Refactor**: Moved the "Add Event" form from the bottom of the main calendar grid to the right-side column (sidebar).
+  - **Form Optimization**: Redesigned the form with a vertical layout, including explicit field labels and enhanced typography to fit the narrower side column.
+  - **Component Pruning**: Removed the "Sync with Aura AI" tip card to reduce visual clutter and prioritize actionable tools.
+- **Outcome**: A more streamlined and professional calendar interface with improved information density and a more logical user flow for event creation.
+
+

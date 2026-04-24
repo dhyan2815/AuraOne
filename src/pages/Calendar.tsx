@@ -195,52 +195,6 @@ const Calendar = () => {
             </div>
           </motion.div>
 
-          {/* Add Event Form for Selected Date */}
-          <AnimatePresence>
-            {showForm && (
-              <motion.div
-                initial={{ opacity: 0, y: 12, scale: 0.98 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 12, scale: 0.98 }}
-                className="glass rounded-[2rem] p-6 lg:p-8"
-              >
-                <div className="flex items-center justify-between mb-6">
-                  <div>
-                    <h3 className="font-bold text-text text-xl">
-                      Add Event
-                    </h3>
-                    <p className="text-xs text-text-variant font-bold uppercase tracking-widest mt-1">
-                      {format(selectedDate, "MMMM d, yyyy")}
-                    </p>
-                  </div>
-                  <button onClick={() => setShowForm(false)} className="text-text-variant hover:text-text transition-colors">
-                    <X size={20} />
-                  </button>
-                </div>
-                <form onSubmit={handleAddEvent} className="flex flex-col sm:flex-row gap-4">
-                  <input
-                    type="text"
-                    value={newEventTitle}
-                    onChange={(e) => setNewEventTitle(e.target.value)}
-                    placeholder="Event title…"
-                    className="flex-1 input-aurora"
-                  />
-                  <input
-                    type="time"
-                    value={newEventTime}
-                    onChange={(e) => setNewEventTime(e.target.value)}
-                    className="input-aurora sm:w-40"
-                  />
-                  <button
-                    type="submit"
-                    className="flex items-center gap-3 px-6 py-3.5 rounded-2xl glass border border-primary/10 text-Primary hover:text-Primary hover:border-Primary/20 transition-all active:scale-95 shadow-lg shadow-primary/10"                  >
-                    <Plus size={18} />
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em]">Schedule</span>
-                  </button>
-                </form>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
 
         {/* ── Right: Upcoming Events ── */}
@@ -326,22 +280,59 @@ const Calendar = () => {
               </button>
             </div>
 
-            {/* Promo card */}
-            <div className="mt-4 glass rounded-[2rem] p-6 overflow-hidden relative group">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-tertiary/10 opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="relative z-10">
-                <span className="bg-primary text-[10px] font-black text-white px-3 py-1 rounded-full uppercase tracking-wider">
-                  Tip
-                </span>
-                <h5 className="text-base font-extrabold text-text mt-4">Sync with Aura AI</h5>
-                <p className="text-xs text-text-variant mt-2 leading-relaxed font-medium">
-                  Let Aura AI help you review conflicts and improve your schedule.
-                </p>
-                <button className="mt-5 px-6 py-2 bg-text text-background dark:bg-primary dark:text-white rounded-full text-[10px] font-black hover:scale-105 transition-transform uppercase tracking-widest shadow-lg">
-                  Learn More
-                </button>
-              </div>
-            </div>
+            {/* Add Event Form for Selected Date */}
+            <AnimatePresence>
+              {showForm && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                  animate={{ opacity: 1, height: "auto", marginTop: 16 }}
+                  exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                  className="glass rounded-[2rem] p-6 overflow-hidden border border-primary/10 shadow-xl shadow-primary/5"
+                >
+                  <div className="flex items-center justify-between mb-6">
+                    <div>
+                      <h3 className="font-bold text-text text-lg">
+                        Add Event
+                      </h3>
+                      <p className="text-[10px] text-text-variant font-black uppercase tracking-widest mt-1">
+                        {format(selectedDate, "MMMM d, yyyy")}
+                      </p>
+                    </div>
+                    <button onClick={() => setShowForm(false)} className="p-2 hover:bg-primary/5 rounded-full transition-colors text-text-variant">
+                      <X size={16} />
+                    </button>
+                  </div>
+                  <form onSubmit={handleAddEvent} className="flex flex-col gap-4">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-text-variant ml-1">Event Title</label>
+                      <input
+                        type="text"
+                        value={newEventTitle}
+                        onChange={(e) => setNewEventTitle(e.target.value)}
+                        placeholder="Meeting, Deadline, etc..."
+                        className="w-full input-aurora py-3.5 px-5"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-text-variant ml-1">Start Time</label>
+                      <input
+                        type="time"
+                        value={newEventTime}
+                        onChange={(e) => setNewEventTime(e.target.value)}
+                        className="w-full input-aurora py-3.5 px-5"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      className="mt-2 flex items-center justify-center gap-3 py-4 rounded-2xl bg-primary text-white hover:bg-primary/90 transition-all active:scale-95 shadow-lg shadow-primary/20"
+                    >
+                      <Plus size={18} strokeWidth={3} />
+                      <span className="text-[10px] font-black uppercase tracking-[0.2em]">Synchronize</span>
+                    </button>
+                  </form>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </div>
