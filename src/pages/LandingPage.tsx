@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Calendar, CheckCircle, FileText, MessageSquare, Shield, ArrowRight, ChevronDown, Star, BarChart3 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import LandingPicture from "../assets/LandingImage.png";
-import Card from "../components/ui/Card";
+// import Card from "../components/ui/Card";
 import Logo from "../components/structure/Logo";
 
 const LandingPage = () => {
@@ -272,13 +272,13 @@ const LandingPage = () => {
                                 to="/signup"
                                 className="bg-primary text-white font-black py-4 px-12 rounded-2xl text-sm shadow-xl shadow-primary/20 hover:bg-primary/90 transition-all uppercase tracking-[0.2em]"
                             >
-                                Initiate Profile
+                                Sign Up
                             </Link>
                             <Link
                                 to="/login"
                                 className="glass border border-primary/20 text-text font-black py-4 px-12 rounded-2xl text-sm shadow-xl hover:border-primary/40 transition-all uppercase tracking-[0.2em]"
                             >
-                                Visionary Login
+                                Login
                             </Link>
                         </div>
                     </div>
@@ -301,16 +301,7 @@ const LandingPage = () => {
                             <ul className="space-y-4 font-bold text-sm">
                                 <li><button onClick={scrollToFeatures} className="text-text-variant hover:text-primary transition-colors">Experience</button></li>
                                 <li><Link to="/login" className="text-text-variant hover:text-primary transition-colors">Join Us</Link></li>
-                                <li><a href="https://dhyan-patel.onrender.com" target="_blank" className="text-text-variant hover:text-primary transition-colors">Developer Profile</a></li>
-                            </ul>
-                        </div>
-
-                        <div className="space-y-6">
-                            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary opacity-60">Philosophy</p>
-                            <ul className="space-y-4 font-bold text-sm">
-                                <li><span className="text-primary">Luminous Flow</span></li>
-                                <li><span className="text-tertiary">Ethical AI</span></li>
-                                <li><span className="text-cta">Privacy First</span></li>
+                                <li><a href="https://dhyan-patel.notion.site/about-dhyan" target="_blank" className="text-text-variant hover:text-primary transition-colors">Developer Profile</a></li>
                             </ul>
                         </div>
                     </div>
