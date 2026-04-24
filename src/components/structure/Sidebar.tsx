@@ -15,6 +15,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../../hooks/useAuth";
 import toast from "react-hot-toast";
+import Logo from "./Logo";
 
 const navItems = [
   { path: "/dashboard", icon: <LayoutDashboard size={20} />, label: "Dashboard" },
@@ -88,7 +89,7 @@ const Sidebar = () => {
 
       <div className="flex flex-col h-full w-full overflow-hidden">
         <div className={`mb-6 px-4 transition-all duration-300 ${isCollapsed && !isMobile ? "scale-75 items-center justify-center pl-4" : ""}`}>
-        <img src="/favicon.svg" alt="Aura" className="h-8 w-8 drop-shadow-md" />
+        <Logo iconOnly iconClassName="h-8 w-8 drop-shadow-md" />
         <AnimatePresence>
           {(!isCollapsed || isMobile) && (
             <motion.p 

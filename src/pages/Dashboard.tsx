@@ -6,6 +6,7 @@ import WeatherWidget from '../components/widgets/WeatherWidget';
 import TasksWidget from '../components/widgets/TasksWidget';
 import CalendarWidget from '../components/widgets/CalendarWidget';
 import NewsWidget from '../components/widgets/NewsWidget';
+import Logo from '../components/structure/Logo';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -142,7 +143,7 @@ const Dashboard = () => {
         style={{ background: 'linear-gradient(135deg, var(--color-primary), var(--color-tertiary))' }}
         title="Quick Action"
       >
-        <img src="/favicon.svg" alt="Aura" className="w-7 h-7 filter brightness-200 contrast-125" />
+        <Logo iconOnly iconClassName="w-7 h-7" className="filter brightness-200 contrast-125" />
       </motion.button>
     </div>
   );
