@@ -159,3 +159,12 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
   - Rewrote feature descriptions to be more descriptive and aligned with the "Aurora Glass" aesthetic and AI-productivity intent.
   - Standardized all 6 module cards: Events Calendar, Strategic Workboard, Aura Assistant, Infinite Notes, Neural Insights, and Secure Sanctuary.
 - **Outcome**: The Landing Page now accurately reflects the application's actual features and professional tone, ensuring a consistent user experience from first impression to deep interaction.
+
+### April 24, 2026: Logo Standardization — Global Component Migration
+- **Objective**: Resolve Issue #70 regarding broken AuraOne logo icons in production across the dashboard and other core modules.
+- **Action**: 
+  - **Comprehensive Audit**: Identified legacy `/favicon.svg` `<img>` tags in `Dashboard.tsx`, `Sidebar.tsx`, `Chat.tsx`, and `Settings.tsx`.
+  - **Component Migration**: Replaced all instances of the broken image path with the high-fidelity `Logo` SVG component.
+  - **UI/UX Polish**: Standardized icon sizing and applied appropriate filters (`brightness`, `contrast`) to ensure the logo remains visually premium across different backgrounds (glass, gradients).
+- **Outcome**: Resolved all broken logo issues application-wide, ensuring a seamless and high-fidelity visual experience. Committed changes with reference to Issue #70.
+

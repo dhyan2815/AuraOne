@@ -98,7 +98,7 @@ const Sidebar = () => {
               exit={{ opacity: 0, height: 0 }}
               className="mt-1 pl-0.5 text-[10px] font-medium tracking-wide text-slate-500 dark:text-slate-400 uppercase"
             >
-              The Luminous Workspace
+              AuraOne
             </motion.p>
           )}
         </AnimatePresence>
