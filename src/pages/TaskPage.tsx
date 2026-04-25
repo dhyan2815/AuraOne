@@ -11,7 +11,6 @@ import {
   Flag,
   RotateCw,
   AlertCircle,
-  X
 } from "lucide-react";
 import { format } from "date-fns";
 import {
@@ -193,9 +192,9 @@ const TaskPage = () => {
           <button 
             onClick={handleSave} 
             disabled={isSaving}
-            className="btn-aurora px-10 py-3.5 shadow-xl shadow-primary/20 disabled:opacity-50"
+            className="flex items-center gap-3 px-10 py-4 rounded-2xl bg-gradient-to-r from-primary to-secondary text-white font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 disabled:grayscale"
           >
-            {isSaving ? <RotateCw className="animate-spin" size={18} /> : <Save size={18} />}
+            {isSaving ? <RotateCw className="animate-spin" size={18} strokeWidth={3} /> : <Save size={18} strokeWidth={3} />}
             Save Task
           </button>
 

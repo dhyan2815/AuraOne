@@ -107,7 +107,7 @@ const CalendarWidget = () => {
               className="space-y-3 glass border border-primary/10 rounded-2xl p-5 shadow-2xl shadow-primary/5"
             >
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Temporal Event</span>
+                <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">New Event</span>
                 <button type="button" onClick={() => setShowAddForm(false)} className="p-1.5 rounded-xl hover:bg-primary/10 transition-colors text-text-variant active:scale-90">
                   <X size={14} />
                 </button>
@@ -117,7 +117,7 @@ const CalendarWidget = () => {
                 type="text"
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
-                placeholder="Synchronize identity…"
+                placeholder="Event name…"
                 className="input-aurora w-full py-3 px-4 text-xs font-bold"
               />
               <input
@@ -127,8 +127,11 @@ const CalendarWidget = () => {
                 onChange={(e) => setNewTime(e.target.value)}
                 className="input-aurora w-full py-3 px-4 text-xs font-bold"
               />
-              <button type="submit" className="btn-aurora w-full py-3 text-xs tracking-widest mt-2 uppercase shadow-lg shadow-primary/10">
-                Commit Event
+              <button 
+                type="submit" 
+                className="w-full mt-2 py-3 rounded-2xl bg-gradient-to-r from-primary to-secondary text-white font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
+              >
+                Add
               </button>
             </motion.form>
           ) : eventsForSelected.length === 0 ? (
@@ -176,9 +179,10 @@ const CalendarWidget = () => {
               ))}
               <button
                 onClick={() => setShowAddForm(true)}
-                className="w-full text-[9px] font-black text-primary/60 hover:text-primary flex items-center justify-center gap-2 mt-4 transition-all uppercase tracking-[0.4em] py-3 border-t border-primary/5"
+                className="w-full mt-4 flex items-center justify-center gap-3 py-3.5 rounded-2xl glass border border-primary/10 text-primary hover:text-primary hover:border-primary/20 transition-all active:scale-95 shadow-lg shadow-primary/10"
               >
-                <Plus size={14} strokeWidth={3} /> Expand Matrix
+                <Plus size={16} strokeWidth={4} />
+                <span className="text-[10px] font-black uppercase tracking-[0.2em]">Add Event</span>
               </button>
             </motion.div>
           )}
