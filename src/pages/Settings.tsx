@@ -275,10 +275,11 @@ const Settings = () => {
 
             <div className="space-y-3">
               {[
-                'Neural Pulse AI',
-                'Cloud Archive Sync',
-                'Aurora Glass Interface',
-                'Layer-2 Encryption'
+                'AI Assistant',
+                'Smart Notes',
+                'Task Management',
+                'Calendar & Events',
+                'Cloud Sync'
               ].map(f => (
                 <div key={f} className="flex items-center justify-between glass border-primary/5 px-4 py-3.5 rounded-2xl hover:bg-primary/5 transition-all group">
                   <span className="text-[10px] font-black text-text uppercase tracking-widest">{f}</span>
