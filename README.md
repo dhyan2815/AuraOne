@@ -145,7 +145,7 @@ src/
 - Better natural language parsing for tasks, notes, and events
 - Single `aiService.ts` handles all AI operations
 
-### v1.3 - Aura Assistant & Multi-Model Chat
+### [v1.3 - Aura Assistant & Multi-Model Chat](https://github.com/dhyan2815/AuraOne/releases/tag/v1.3-aura-assistant)
 - Implemented **Brain Mode** for deep reasoning and complex request processing.
 - Switched fallback provider to **Open Router** for enterprise-grade reliability in production.
 - Added **Neural Handshake** animations for transparent AI processing states.
