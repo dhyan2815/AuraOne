@@ -137,6 +137,60 @@ async function callQwenAPI(prompt: string): Promise<string> {
   }
 }
 
+// Open Router API call - Deep reasoning fallback
+async function callOpenRouterAPI(prompt: string): Promise<string> {
+  if (!AI_CONFIG.openRouter.enabled) {
+    throw new Error('Open Router API not configured or disabled');
+  }
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), SERVICE_CONFIG.TIMEOUT_MS);
+
+  try {
+    const response = await fetch(AI_CONFIG.openRouter.apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${AI_CONFIG.openRouter.apiKey}`,
+        'HTTP-Referer': 'http://localhost:5173',
+        'X-Title': 'AuraOne',
+      },
+      body: JSON.stringify({
+        model: AI_CONFIG.openRouter.model,
+        messages: [
+          { 
+            role: 'system', 
+            content: 'You are Aura, a professional and helpful assistant. Provide clear, concise, and helpful responses to user queries.' 
+          },
+          { role: 'user', content: prompt }
+        ],
+      }),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`Open Router API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const text = data.choices?.[0]?.message?.content;
+    
+    if (!text) {
+      throw new Error('No response from Open Router');
+    }
+
+    return text.trim();
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error('Open Router API request timed out');
+    }
+    throw error;
+  }
+}
+
 // Parse AI response and validate
 async function parseAndValidateResponse(response: string): Promise<AICommand> {
   try {
@@ -270,7 +324,7 @@ async function handleRead(type: string, data: Record<string, unknown>, userId: s
 
 // Update operations
 async function handleUpdate(type: string, data: Record<string, unknown>, userId: string): Promise<string> {
-  const { id, ...updateData } = data;
+  const { id } = data;
   
   if (!id || typeof id !== 'string') {
     throw new Error('ID is required for update operations');
@@ -332,10 +386,17 @@ export async function processAIRequest(
   options?: {
     preferModel?: 'gemini' | 'qwen';
     maxRetries?: number;
+    mode?: 'command' | 'brain';
   }
 ): Promise<string> {
   const maxRetries = options?.maxRetries || SERVICE_CONFIG.MAX_RETRIES;
   const preferModel = options?.preferModel || 'gemini';
+  const mode = options?.mode || 'command';
+
+  // Immediate brain mode routing
+  if (mode === 'brain') {
+    return await callOpenRouterAPI(userPrompt);
+  }
   
   let lastError: Error | null = null;
   
@@ -363,6 +424,15 @@ export async function processAIRequest(
       } catch (error) {
         lastError = error as Error;
           
+        // Fallback to Open Router if Gemini fails or parse fails
+        if (model === 'gemini' || (error instanceof Error && error.message.includes('Failed to parse AI response'))) {
+          try {
+            return await callOpenRouterAPI(userPrompt);
+          } catch {
+            // Fallback failed, continue with next attempts
+          }
+        }
+
           // If it's a validation error, try repair
           if (error instanceof Error && error.message.includes('Failed to parse AI response')) {
             try {
@@ -375,7 +445,7 @@ export async function processAIRequest(
               const result = await executeCRUDOperation(command, userId);
               
               return result;
-            } catch (repairError) {
+            } catch {
               // Repair failed, continue to next attempt
             }
           }
