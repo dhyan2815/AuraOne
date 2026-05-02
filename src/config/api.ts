@@ -26,6 +26,10 @@ export const API_CONFIG = {
   // Qwen API - Local development fallback
   QWEN_ENDPOINT: isDevelopment ? "http://localhost:11434/api/generate" : null,
   QWEN_MODEL: "qwen2.5-coder:1.5b",
+
+  // Open Router - Deep reasoning fallback
+  OPENROUTER_API_KEY: import.meta.env.VITE_OPENROUTER_API_KEY,
+  OPENROUTER_API_URL: "https://openrouter.ai/api/v1/chat/completions",
 };
 
 // Enhanced API key validation with detailed reporting
@@ -45,6 +49,10 @@ export const validateApiKeys = () => {
 
   if (!API_CONFIG.NEWS_API_KEY) {
     warnings.push("NewsData (news features disabled)");
+  }
+
+  if (!API_CONFIG.OPENROUTER_API_KEY) {
+    warnings.push("Open Router (deep reasoning fallback disabled)");
   }
 
   // Development-specific checks
@@ -99,6 +107,12 @@ export const getAIConfig = () => {
       enabled: isDevelopment && !!API_CONFIG.QWEN_ENDPOINT,
       endpoint: API_CONFIG.QWEN_ENDPOINT,
       model: API_CONFIG.QWEN_MODEL,
+    },
+    openRouter: {
+      enabled: !!API_CONFIG.OPENROUTER_API_KEY,
+      apiKey: API_CONFIG.OPENROUTER_API_KEY,
+      apiUrl: API_CONFIG.OPENROUTER_API_URL,
+      model: "openrouter/auto",
     },
     environment: API_CONFIG.ENV,
     validation,
