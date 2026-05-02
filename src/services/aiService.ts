@@ -37,6 +37,11 @@ Examples:
 
 For general conversation (greetings, questions, casual chat), respond with: {"action": "chat", "type": "general", "data": {"message": "your helpful response here"}}
 
+CRITICAL FORMATTING RULES FOR CHAT MESSAGES:
+When generating chat messages (especially lists or structured data), you MUST use a professional and minimalist formatting style with comprehensive bold and italic text effects so the overall response signal is high.
+For example, when listing items, use EXACTLY this format:
+- **Category Name:** *e.g., example item 1, example item 2*
+
 Examples of general conversation:
 - "Hello" → {"action": "chat", "type": "general", "data": {"message": "Hello! How can I help you today?"}}
 - "How are you?" → {"action": "chat", "type": "general", "data": {"message": "I'm doing well, thank you! I'm here to help you manage your tasks, notes, and events."}}
@@ -46,8 +51,11 @@ Always use ISO date format (YYYY-MM-DD) for dates and 24-hour time format (HH:mm
 
 // Gemini API call
 async function callGeminiAPI(prompt: string): Promise<string> {
+  const LOCATION = "src/services/aiService.ts:callGeminiAPI";
+  console.log(`--- [${LOCATION}] Initiating ---`);
   if (!AI_CONFIG.gemini.enabled) {
-    throw new Error('Gemini API not configured or disabled');
+    console.error(`[${LOCATION}] Gemini disabled or missing keys`);
+    throw new Error(`[${LOCATION}] Gemini API not configured`);
   }
 
   const controller = new AbortController();
@@ -70,33 +78,41 @@ async function callGeminiAPI(prompt: string): Promise<string> {
       }
     );
 
-        clearTimeout(timeoutId);
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
-      throw new Error(`Gemini API error: ${response.status}`);
+      const errorText = await response.text();
+      console.error(`[${LOCATION}] HTTP ${response.status}:`, errorText);
+      throw new Error(`[${LOCATION}] Gemini API error: ${response.status}`);
     }
 
     const data = await response.json();
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
     
     if (!text) {
-      throw new Error('No response from Gemini');
+      console.error(`[${LOCATION}] Empty candidate array in response`, data);
+      throw new Error(`[${LOCATION}] No response candidate from Gemini`);
     }
 
+    console.log(`[${LOCATION}] Success: Received ${text.length} chars`);
     return text.trim();
   } catch (error) {
     clearTimeout(timeoutId);
     if (error instanceof Error && error.name === 'AbortError') {
-      throw new Error('Gemini API request timed out');
+      console.error(`[${LOCATION}] Request Timed Out (${SERVICE_CONFIG.TIMEOUT_MS}ms)`);
+      throw new Error(`[${LOCATION}] Gemini Hub Timeout`);
     }
+    console.error(`[${LOCATION}] Exception:`, error);
     throw error;
   }
 }
 
 // Qwen API call
 async function callQwenAPI(prompt: string): Promise<string> {
+  const LOCATION = "src/services/aiService.ts:callQwenAPI";
+  console.log(`--- [${LOCATION}] Initiating ---`);
   if (!AI_CONFIG.qwen.enabled || !AI_CONFIG.qwen.endpoint) {
-    throw new Error('Qwen API not available');
+    throw new Error(`[${LOCATION}] Qwen API not available`);
   }
 
   const controller = new AbortController();
@@ -117,36 +133,44 @@ async function callQwenAPI(prompt: string): Promise<string> {
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      throw new Error(`Qwen API error: ${response.status}`);
+      throw new Error(`[${LOCATION}] Qwen API error: ${response.status}`);
     }
 
     const data = await response.json();
     const text = data.response;
     
     if (!text) {
-      throw new Error('No response from Qwen');
+      throw new Error(`[${LOCATION}] No response from Qwen`);
     }
 
+    console.log(`[${LOCATION}] Success: Received ${text.length} chars`);
     return text.trim();
   } catch (error) {
     clearTimeout(timeoutId);
-    if (error instanceof Error && error.name === 'AbortError') {
-      throw new Error('Qwen API request timed out');
-    }
+    console.error(`[${LOCATION}] Exception:`, error);
     throw error;
   }
 }
 
 // Open Router API call - Deep reasoning fallback
-async function callOpenRouterAPI(prompt: string): Promise<string> {
+async function callOpenRouterAPI(prompt: string, systemPrompt?: string): Promise<string> {
+  const LOCATION = "src/services/aiService.ts:callOpenRouterAPI";
+  console.log(`--- [${LOCATION}] Initiating ---`);
+  
   if (!AI_CONFIG.openRouter.enabled) {
-    throw new Error('Open Router API not configured or disabled');
+    console.error(`[${LOCATION}] Open Router disabled or missing keys`);
+    throw new Error(`[${LOCATION}] Open Router API not configured`);
   }
 
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), SERVICE_CONFIG.TIMEOUT_MS);
+  const timeoutId = setTimeout(() => controller.abort(), SERVICE_CONFIG.TIMEOUT_MS * 3); // Extra time for reasoning
 
   try {
+    const activeModel = AI_CONFIG.openRouter.model || 'openrouter/free';
+    const activeSystemPrompt = systemPrompt || 'You are Aura, a professional and helpful assistant. Provide clear, concise, and helpful responses to user queries. CRITICAL FORMATTING RULES: When generating chat messages (especially lists or structured data), you MUST use a professional and minimalist formatting style with comprehensive bold and italic text effects. For example, when listing items, use this format: - **Category Name:** *e.g., example item 1, example item 2*';
+    
+    console.log(`[aiService] Requesting Open Router with model: ${activeModel}`);
+    
     const response = await fetch(AI_CONFIG.openRouter.apiUrl, {
       method: 'POST',
       headers: {
@@ -156,14 +180,12 @@ async function callOpenRouterAPI(prompt: string): Promise<string> {
         'X-Title': 'AuraOne',
       },
       body: JSON.stringify({
-        model: AI_CONFIG.openRouter.model,
+        model: activeModel,
         messages: [
-          { 
-            role: 'system', 
-            content: 'You are Aura, a professional and helpful assistant. Provide clear, concise, and helpful responses to user queries.' 
-          },
+          { role: 'system', content: activeSystemPrompt },
           { role: 'user', content: prompt }
         ],
+        temperature: 0.7,
       }),
       signal: controller.signal,
     });
@@ -171,22 +193,30 @@ async function callOpenRouterAPI(prompt: string): Promise<string> {
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      throw new Error(`Open Router API error: ${response.status}`);
+      const errorData = await response.json().catch(() => ({}));
+      console.error(`[aiService] Open Router Error Data:`, errorData);
+      throw new Error(`[aiService] Open Router HTTP ${response.status}`);
     }
 
     const data = await response.json();
+    console.log(`[aiService] Open Router response data:`, data);
+    
     const text = data.choices?.[0]?.message?.content;
     
     if (!text) {
-      throw new Error('No response from Open Router');
+      console.error(`[aiService] Invalid response structure`, data);
+      throw new Error(`[aiService] Invalid Open Router response format`);
     }
 
+    console.log(`[aiService] Open Router response text:`, text.substring(0, 100) + '...');
     return text.trim();
   } catch (error) {
     clearTimeout(timeoutId);
     if (error instanceof Error && error.name === 'AbortError') {
-      throw new Error('Open Router API request timed out');
+      console.error(`[aiService] Open Router Request Timed Out`);
+      throw new Error(`[aiService] Reasoning Matrix Timeout`);
     }
+    console.error(`[aiService] Open Router Exception:`, error);
     throw error;
   }
 }
@@ -247,46 +277,43 @@ async function executeCRUDOperation(command: AICommand, userId: string): Promise
 async function handleCreate(type: string, data: Record<string, unknown>, userId: string): Promise<string> {
   switch (type) {
     case 'task': {
-      const taskData = data.task as Record<string, unknown>;
+      const taskData = (data.task || data) as Record<string, unknown>;
       const parsedDate = taskData.dueDate ? chrono.parseDate(taskData.dueDate as string) : null;
       
       const taskDataToSave = {
-        title: taskData.title as string,
+        title: (taskData.title || taskData.task) as string,
         description: (taskData.description as string) || '',
-        dueDate: parsedDate ? format(parsedDate, 'yyyy-MM-dd') : '',
-        dueTime: parsedDate ? format(parsedDate, 'HH:mm') : '',
-        completed: 'due' as const,
+        due_date: parsedDate ? parsedDate.toISOString() : undefined,
+        completed: false,
         priority: ((taskData.priority as string) || 'medium') as 'low' | 'medium' | 'high',
-        createdAt: new Date().toISOString(),
       };
       
       await createTask(userId, taskDataToSave);
-      return `Task "${taskData.title as string}" created successfully ✅`;
+      return `Task "${taskDataToSave.title}" created successfully ✅`;
     }
     
     case 'note': {
-      const noteData = data.note as Record<string, unknown>;
+      const noteData = (data.note || data) as Record<string, unknown>;
       await createNote(userId, {
-        title: noteData.title as string,
-        content: noteData.content as string,
-        createdAt: new Date().toISOString(),
+        title: (noteData.title || 'New Note') as string,
+        content: (noteData.content as string) || '',
         tags: (noteData.tags as string[]) || [],
-        starred: (noteData.starred as boolean) || false,
-        pinned: (noteData.pinned as boolean) || false,
+        is_archived: false,
       });
       return `Note "${noteData.title as string}" created successfully ✅`;
     }
     
     case 'event': {
-      const eventData = data.event as Record<string, unknown>;
-      const parsedDate = chrono.parseDate(eventData.date as string);
+      const eventData = (data.event || data) as Record<string, unknown>;
+      const rawDate = (eventData.date || eventData.start_time || eventData.time) as string;
+      const parsedDate = chrono.parseDate(rawDate);
       if (!parsedDate) throw new Error('Invalid event date');
       
       await createEvent(userId, {
-        title: eventData.title as string,
+        title: (eventData.title as string) || 'New Event',
         start_time: parsedDate.toISOString(),
         end_time: null,
-        description: null,
+        description: (eventData.description as string) || null,
       });
       return `Event "${eventData.title as string}" created successfully ✅`;
     }
@@ -297,12 +324,12 @@ async function handleCreate(type: string, data: Record<string, unknown>, userId:
 }
 
 // Read operations
-async function handleRead(type: string, data: Record<string, unknown>, userId: string): Promise<string> {
+async function handleRead(type: string, _data: Record<string, unknown>, userId: string): Promise<string> {
   switch (type) {
     case 'task': {
       const tasks = await getTasks(userId);
       if (tasks.length === 0) return 'No tasks found 📭';
-      return 'Your Tasks:\n' + tasks.map(t => `- ${t.title}${t.dueDate ? ` (${t.dueDate})` : ''}`).join('\n');
+      return 'Your Tasks:\n' + tasks.map(t => `- ${t.title}${t.due_date ? ` (${format(new Date(t.due_date), 'MMM dd')})` : ''}`).join('\n');
     }
     
     case 'note': {
@@ -314,7 +341,7 @@ async function handleRead(type: string, data: Record<string, unknown>, userId: s
     case 'event': {
       const events = await getEvents(userId);
       if (events.length === 0) return 'No events found 🗓️';
-      return 'Your Events:\n' + events.map(e => `- ${e.title} (${format(new Date(e.start_time), 'yyyy-MM-dd HH:mm')})`).join('\n');
+      return 'Your Events:\n' + events.map(e => `- ${e.title} (${format(new Date(e.start_time), 'MMM dd HH:mm')})`).join('\n');
     }
     
     default:
@@ -323,7 +350,7 @@ async function handleRead(type: string, data: Record<string, unknown>, userId: s
 }
 
 // Update operations
-async function handleUpdate(type: string, data: Record<string, unknown>, userId: string): Promise<string> {
+async function handleUpdate(type: string, data: Record<string, unknown>, _userId: string): Promise<string> {
   const { id } = data;
   
   if (!id || typeof id !== 'string') {
@@ -332,14 +359,14 @@ async function handleUpdate(type: string, data: Record<string, unknown>, userId:
   
   switch (type) {
     case 'task': {
-      const taskUpdates = data.task || {};
-      await updateTask(userId, id, taskUpdates as Record<string, unknown>);
+      const taskUpdates = (data.task || data) as Record<string, unknown>;
+      await updateTask(id, taskUpdates);
       return `Task updated successfully ✅`;
     }
     
     case 'note': {
-      const noteUpdates = data.note || {};
-      await updateNote(userId, id, noteUpdates as Record<string, unknown>);
+      const noteUpdates = (data.note || data) as Record<string, unknown>;
+      await updateNote(id, noteUpdates);
       return `Note updated successfully ✅`;
     }
     
@@ -354,7 +381,7 @@ async function handleUpdate(type: string, data: Record<string, unknown>, userId:
 }
 
 // Delete operations
-async function handleDelete(type: string, data: Record<string, unknown>, userId: string): Promise<string> {
+async function handleDelete(type: string, data: Record<string, unknown>, _userId: string): Promise<string> {
   const { id } = data;
   
   if (!id || typeof id !== 'string') {
@@ -363,15 +390,15 @@ async function handleDelete(type: string, data: Record<string, unknown>, userId:
   
   switch (type) {
     case 'task':
-      await deleteTask(userId, id);
+      await deleteTask(id);
       return 'Task deleted successfully 🗑️';
     
     case 'note':
-      await deleteNote(userId, id);
+      await deleteNote(id);
       return 'Note deleted successfully 🗑️';
     
     case 'event':
-      await deleteEvent(userId, id);
+      await deleteEvent(id);
       return 'Event deleted successfully 🗑️';
     
     default:
@@ -393,14 +420,14 @@ export async function processAIRequest(
   const preferModel = options?.preferModel || 'gemini';
   const mode = options?.mode || 'command';
 
-  // Immediate brain mode routing
+  // Immediate brain mode routing (always uses Open Router)
   if (mode === 'brain') {
     return await callOpenRouterAPI(userPrompt);
   }
   
   let lastError: Error | null = null;
   
-  // Try Gemini first (or Qwen if preferred)
+  // Try models in order
   const models = preferModel === 'gemini' 
     ? ['gemini', 'qwen'] 
     : ['qwen', 'gemini'];
@@ -408,47 +435,64 @@ export async function processAIRequest(
   for (const model of models) {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        // Call AI model
-        const response = model === 'gemini' 
+        console.log(`[aiService] Attempt ${attempt} with model ${model}`);
+        
+        // 1. Call primary AI model
+        const rawResponse = model === 'gemini' 
           ? await callGeminiAPI(userPrompt)
           : await callQwenAPI(userPrompt);
         
-        // Parse and validate response
-        const command = await parseAndValidateResponse(response);
+        // 2. Parse and validate response
+        const command = await parseAndValidateResponse(rawResponse);
         
-        // Execute CRUD operation
-        const result = await executeCRUDOperation(command, userId);
-        
-        return result;
+        // 3. Execute CRUD operation
+        return await executeCRUDOperation(command, userId);
         
       } catch (error) {
         lastError = error as Error;
+        console.warn(`[aiService] Attempt ${attempt} failed: ${lastError.message}`);
           
-        // Fallback to Open Router if Gemini fails or parse fails
-        if (model === 'gemini' || (error instanceof Error && error.message.includes('Failed to parse AI response'))) {
+        // Immediate fallback to Open Router if Gemini is failing (likely rate limit)
+        // OR if it's a parsing error (suggests Gemini is hallucinating invalid JSON)
+        const isGeminiFailure = model === 'gemini' && (lastError.message.includes('429') || lastError.message.includes('error: 401') || lastError.message.includes('timeout'));
+        const isParsingFailure = lastError.message.includes('Failed to parse AI response');
+
+        if (isGeminiFailure || isParsingFailure) {
+          console.log(`[aiService] Triggering Open Router Fallback (Reason: ${isGeminiFailure ? 'Model Disruption' : 'Parsing Failure'})`);
           try {
-            return await callOpenRouterAPI(userPrompt);
-          } catch {
-            // Fallback failed, continue with next attempts
+            // Fallback call with the FULL system prompt to maintain command capabilities
+            const fallbackResponse = await callOpenRouterAPI(userPrompt, SYSTEM_PROMPT);
+            
+            try {
+              // Try to parse the fallback as a command
+              const command = await parseAndValidateResponse(fallbackResponse);
+              return await executeCRUDOperation(command, userId);
+            } catch {
+              // If fallback isn't valid JSON, treat it as a direct chat response
+              console.log("[aiService] Fallback returned non-JSON, returning as chat message.");
+              return fallbackResponse;
+            }
+          } catch (fallbackError) {
+            console.error("[aiService] Fallback also failed:", fallbackError);
+            // Continue with next attempts/models
           }
         }
 
-          // If it's a validation error, try repair
-          if (error instanceof Error && error.message.includes('Failed to parse AI response')) {
-            try {
-              const repairPrompt = createRepairPrompt(userPrompt, error.message);
-              const repairResponse = model === 'gemini' 
-                ? await callGeminiAPI(repairPrompt)
-                : await callQwenAPI(repairPrompt);
-              
-              const command = await parseAndValidateResponse(repairResponse);
-              const result = await executeCRUDOperation(command, userId);
-              
-              return result;
-            } catch {
-              // Repair failed, continue to next attempt
-            }
+        // Handle specific repair logic for validation errors (if we haven't returned yet)
+        if (isParsingFailure && attempt < maxRetries) {
+          try {
+            console.log("[aiService] Attempting repair prompt...");
+            const repairPrompt = createRepairPrompt(userPrompt, lastError.message);
+            const repairResponse = model === 'gemini' 
+              ? await callGeminiAPI(repairPrompt)
+              : await callQwenAPI(repairPrompt);
+            
+            const command = await parseAndValidateResponse(repairResponse);
+            return await executeCRUDOperation(command, userId);
+          } catch {
+            // Repair failed, continue to next attempt
           }
+        }
         
         // If this is the last attempt for this model, break to try next model
         if (attempt === maxRetries) break;
@@ -457,7 +501,7 @@ export async function processAIRequest(
   }
   
   // All attempts failed
-  throw new Error(`All AI models failed. Last error: ${lastError?.message || 'Unknown error'}`);
+  throw new Error(`Critical Intelligence Failure: ${lastError?.message || 'Unknown error'}`);
 }
 
 // Export configuration for external use

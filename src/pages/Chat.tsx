@@ -21,9 +21,9 @@ const SUGGESTIONS = [
 ];
 
 const HANDSHAKE_STEPS = [
-  "Handshaking with Neural Matrix...",
-  "Routing to Deep Reasoning Hub...",
-  "Synthesizing Cognitive Response...",
+  "Processing request context...",
+  "Querying workspace modules...",
+  "Drafting strategic response...",
 ];
 
 const Chat = () => {
@@ -67,24 +67,66 @@ const Chat = () => {
   useEffect(() => { fetchSessions(); }, [user, fetchSessions]);
 
   const fetchMessages = useCallback(async () => {
-    if (!selectedSession) { setMessages([]); return; }
+    if (!selectedSession) {
+      console.log('[Chat] No session selected, clearing messages.');
+      setMessages([]);
+      return;
+    }
     try {
+      console.log('[Chat] Fetching historical messages for session:', selectedSession);
       const list = await getMessages(selectedSession);
+      console.log(`[Chat] Received ${list.length} messages.`);
       setMessages(list);
-    } catch { toast.error("Matrix error: Messages"); }
+    } catch (err) {
+      console.error('[Chat] Matrix error: Messages', err);
+      toast.error("Matrix error: Messages");
+    }
   }, [selectedSession]);
 
   useEffect(() => {
+    if (!selectedSession) return;
+    
     fetchMessages();
+    
+    console.log(`[Chat] Initializing Real-time Matrix Sync for session: ${selectedSession}`);
     const channel = supabase
       .channel(`chat-messages-${selectedSession}`)
       .on(
         "postgres_changes",
-        { event: "INSERT", schema: "public", table: "chat_messages", filter: `session_id=eq.${selectedSession}` },
-        (payload) => setMessages((cur) => [...cur, payload.new as Message])
+        { 
+          event: "INSERT", 
+          schema: "public", 
+          table: "chat_messages", 
+          filter: `session_id=eq.${selectedSession}` 
+        },
+        (payload) => {
+          console.log('[Chat] Real-time message detected:', payload.new.id);
+          setMessages((cur) => {
+            // PREVENT DUPLICATES: Only add if message ID doesn't exist
+            const exists = cur.some(m => m.id === payload.new.id);
+            if (exists) return cur;
+
+            // If it's a real user message arriving, remove the corresponding optimistic one
+            if (payload.new.role === 'user') {
+              console.log('[Chat] Real user message confirmed, cleaning up optimistic state.');
+              return [...cur.filter(m => !m.id?.toString().startsWith('temp-')), payload.new as Message];
+            }
+
+            return [...cur, payload.new as Message];
+          });
+        }
       )
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
+      .subscribe((status) => {
+        console.log(`[Chat] Real-time Sync Status: ${status}`);
+        if (status === 'CHANNEL_ERROR') {
+          console.error('[Chat] Real-time subscription failed. Manual sync will handle fallback.');
+        }
+      });
+
+    return () => {
+      console.log(`[Chat] Disconnecting Real-time Sync for session: ${selectedSession}`);
+      supabase.removeChannel(channel);
+    };
   }, [selectedSession, fetchMessages]);
 
   useEffect(scrollToBottom, [messages]);
@@ -92,13 +134,41 @@ const Chat = () => {
   const handleSend = async () => {
     if (!user || !selectedSession || !input.trim()) return;
     const msg = input;
+    
+    // Optimistic UI Update: Add user message to state immediately
+    const tempUserMsg: Message = {
+      role: 'user',
+      content: msg,
+      session_id: selectedSession,
+      user_id: user.id,
+      created_at: new Date().toISOString()
+    };
+    setMessages(prev => [...prev, tempUserMsg]);
+    
     setInput("");
     setLoading(true);
+    console.log('[Chat] handleSend: Initiating transmission...');
+    
     try {
       await handleSendMessage(msg, user, selectedSession, isBrainMode);
-      setSessions(await getSessions(user.id));
-    } catch { toast.error("Transmission failed"); }
-    finally { setLoading(false); }
+      console.log('[Chat] handleSend: Transmission successful, refreshing data...');
+      
+      // Secondary Sync: Refresh messages and sessions manually to ensure UI is current
+      const [updatedSessions, updatedMessages] = await Promise.all([
+        getSessions(user.id),
+        getMessages(selectedSession)
+      ]);
+      
+      setSessions(updatedSessions);
+      setMessages(updatedMessages);
+      console.log('[Chat] handleSend: Data sync complete.');
+      
+    } catch (err) {
+      console.error('[Chat] Transmission failed:', err);
+      toast.error("Transmission failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -359,7 +429,7 @@ const Chat = () => {
               </div>
             </div>
             <div className="flex items-center justify-center gap-1.5 mt-3 opacity-30">
-              <p className="text-[10px] font-bold text-text-variant uppercase tracking-widest text-center">Neural Matrix Protected</p>
+              <p className="text-[10px] font-bold text-text-variant uppercase tracking-widest text-center">Workspace Secured</p>
             </div>
           </div>
         </div>

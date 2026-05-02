@@ -112,7 +112,7 @@ export const getAIConfig = () => {
       enabled: !!API_CONFIG.OPENROUTER_API_KEY,
       apiKey: API_CONFIG.OPENROUTER_API_KEY,
       apiUrl: API_CONFIG.OPENROUTER_API_URL,
-      model: "openrouter/auto",
+      model: "openrouter/free",
     },
     environment: API_CONFIG.ENV,
     validation,
