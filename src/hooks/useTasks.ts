@@ -26,7 +26,6 @@ export const getTasks = async (userId: string): Promise<Task[]> => {
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.error("Error fetching tasks:", error);
     throw error;
   }
   return data || [];
@@ -41,7 +40,6 @@ export const getTaskById = async (taskId: string): Promise<Task | null> => {
     .single();
 
   if (error) {
-    console.error("Error fetching task by id:", error);
     throw error;
   }
   return data;
@@ -59,13 +57,7 @@ export const listenToTasks = (
       { event: "*", schema: "public", table: "tasks", filter: `user_id=eq.${userId}` },
       callback
     )
-    .subscribe((status, err) => {
-      if (status === 'SUBSCRIBED') {
-        console.log('Connected to tasks channel!');
-      }
-      if (err) {
-        console.error('Error subscribing to tasks channel:', err);
-      }
+    .subscribe(() => {
     });
 
   return channel;
@@ -80,7 +72,6 @@ export const createTask = async (userId: string, task: NewTask): Promise<Task> =
     .single();
 
   if (error) {
-    console.error("Error creating task:", error);
     throw error;
   }
   return data;
@@ -99,7 +90,6 @@ export const updateTask = async (
     .single();
 
   if (error) {
-    console.error("Error updating task:", error);
     throw error;
   }
   return data;
@@ -110,7 +100,6 @@ export const deleteTask = async (taskId: string) => {
   const { error } = await supabase.from("tasks").delete().eq("id", taskId);
 
   if (error) {
-    console.error("Error deleting task:", error);
     throw error;
   }
 };

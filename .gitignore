@@ -29,4 +29,6 @@ dist-ssr
 *.sln
 *.sw?
 CLAUDE.md
+.superpowers/
+docs/
 GEMINI.md

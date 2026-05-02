@@ -26,6 +26,10 @@ export const API_CONFIG = {
   // Qwen API - Local development fallback
   QWEN_ENDPOINT: isDevelopment ? "http://localhost:11434/api/generate" : null,
   QWEN_MODEL: "qwen2.5-coder:1.5b",
+
+  // Open Router - Deep reasoning fallback
+  OPENROUTER_API_KEY: import.meta.env.VITE_OPENROUTER_API_KEY,
+  OPENROUTER_API_URL: "https://openrouter.ai/api/v1/chat/completions",
 };
 
 // Enhanced API key validation with detailed reporting
@@ -47,6 +51,10 @@ export const validateApiKeys = () => {
     warnings.push("NewsData (news features disabled)");
   }
 
+  if (!API_CONFIG.OPENROUTER_API_KEY) {
+    warnings.push("Open Router (deep reasoning fallback disabled)");
+  }
+
   // Development-specific checks
   if (isDevelopment) {
     if (!API_CONFIG.QWEN_ENDPOINT) {
@@ -57,7 +65,7 @@ export const validateApiKeys = () => {
   // Production-specific checks
   if (isProduction) {
     if (!API_CONFIG.GEMINI_API_KEY) {
-      console.error("❌ CRITICAL: Gemini API key missing in production!");
+      // Missing critical key in production
     }
   }
 
@@ -67,19 +75,6 @@ export const validateApiKeys = () => {
     warnings,
     environment: API_CONFIG.ENV,
   };
-
-  // Log validation results
-  if (missingKeys.length > 0) {
-    console.error("❌ Missing required API keys:", missingKeys.join(", "));
-  }
-  
-  if (warnings.length > 0) {
-    console.warn("⚠️ API configuration warnings:", warnings.join(", "));
-  }
-
-  if (result.valid) {
-    // API configuration validated successfully
-  }
 
   return result;
 };
@@ -99,6 +94,12 @@ export const getAIConfig = () => {
       enabled: isDevelopment && !!API_CONFIG.QWEN_ENDPOINT,
       endpoint: API_CONFIG.QWEN_ENDPOINT,
       model: API_CONFIG.QWEN_MODEL,
+    },
+    openRouter: {
+      enabled: !!API_CONFIG.OPENROUTER_API_KEY,
+      apiKey: API_CONFIG.OPENROUTER_API_KEY,
+      apiUrl: API_CONFIG.OPENROUTER_API_URL,
+      model: "openrouter/free",
     },
     environment: API_CONFIG.ENV,
     validation,

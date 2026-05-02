@@ -25,7 +25,6 @@ export const getEvents = async (userId: string): Promise<Event[]> => {
     .order("start_time", { ascending: true });
 
   if (error) {
-    console.error("Error fetching events:", error);
     throw error;
   }
   return data || [];
@@ -43,13 +42,7 @@ export const listenToEvents = (
       { event: "*", schema: "public", table: "events", filter: `user_id=eq.${userId}` },
       callback
     )
-    .subscribe((status, err) => {
-      if (status === 'SUBSCRIBED') {
-        console.log('Connected to events channel!');
-      }
-      if (err) {
-        console.error('Error subscribing to events channel:', err);
-      }
+    .subscribe(() => {
     });
 
   return channel;
@@ -64,7 +57,6 @@ export const createEvent = async (userId: string, event: NewEvent): Promise<Even
     .single();
 
   if (error) {
-    console.error("Error creating event:", error);
     throw error;
   }
   return data;
@@ -75,7 +67,6 @@ export const deleteEvent = async (eventId: string): Promise<void> => {
   const { error } = await supabase.from("events").delete().eq("id", eventId);
 
   if (error) {
-    console.error("Error deleting event:", error);
     throw error;
   }
 };
