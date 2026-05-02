@@ -20,11 +20,19 @@ const SUGGESTIONS = [
   { icon: "💡", title: "Ideas",    sub: "List 5 neural features." },
 ];
 
+const HANDSHAKE_STEPS = [
+  "Handshaking with Neural Matrix...",
+  "Routing to Deep Reasoning Hub...",
+  "Synthesizing Cognitive Response...",
+];
+
 const Chat = () => {
   const { user, loading: authLoading } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isBrainMode, setIsBrainMode] = useState(false);
+  const [thinkingStep, setThinkingStep] = useState(0);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [selectedSession, setSelectedSession] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -33,6 +41,19 @@ const Chat = () => {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
+  useEffect(() => {
+    let interval: any;
+    if (loading) {
+      setThinkingStep(0);
+      interval = setInterval(() => {
+        setThinkingStep((prev) => (prev + 1) % 3);
+      }, 1500);
+    } else {
+      setThinkingStep(0);
+    }
+    return () => clearInterval(interval);
+  }, [loading]);
 
   const fetchSessions = useCallback(async () => {
     if (!user) return;
@@ -74,7 +95,7 @@ const Chat = () => {
     setInput("");
     setLoading(true);
     try {
-      await handleSendMessage(msg, user, selectedSession);
+      await handleSendMessage(msg, user, selectedSession, isBrainMode);
       setSessions(await getSessions(user.id));
     } catch { toast.error("Transmission failed"); }
     finally { setLoading(false); }
@@ -267,10 +288,20 @@ const Chat = () => {
                     <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-primary to-secondary flex items-center justify-center shadow-sm">
                       <Logo iconOnly iconClassName="w-4 h-4 filter brightness-0 invert" />
                     </div>
-                    <div className="glass border border-primary/5 rounded-2xl rounded-tl-sm px-5 py-3 flex items-center gap-1 shadow-sm">
-                      {[1, 2, 3].map((i) => (
-                        <div key={i} className="w-1 h-1 bg-primary rounded-full animate-bounce" style={{ animationDelay: `${i * 0.1}s` }} />
-                      ))}
+                    <div className="glass border border-primary/5 rounded-2xl rounded-tl-sm px-5 py-3 flex flex-col gap-2 shadow-sm min-w-[200px]">
+                      <div className="flex items-center gap-1">
+                        {[1, 2, 3].map((i) => (
+                          <div key={i} className="w-1 h-1 bg-primary rounded-full animate-bounce" style={{ animationDelay: `${i * 0.1}s` }} />
+                        ))}
+                      </div>
+                      <motion.p
+                        key={thinkingStep}
+                        initial={{ opacity: 0, y: 5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-[10px] font-bold text-primary uppercase tracking-widest font-mono"
+                      >
+                        {HANDSHAKE_STEPS[thinkingStep]}
+                      </motion.p>
                     </div>
                   </motion.div>
                 )}
@@ -298,7 +329,21 @@ const Chat = () => {
                 className="flex-1 resize-none bg-transparent border-none py-2.5 text-sm font-medium text-text outline-none placeholder:text-text-variant/40 focus:ring-0 scrollbar-none"
                 style={{ maxHeight: "150px" }}
               />
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1.5">
+                {/* BRAIN Toggle */}
+                <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg glass border border-primary/10 transition-all mr-1">
+                  <span className="text-[9px] font-black tracking-[0.1em] text-text-variant uppercase">Brain</span>
+                  <button
+                    onClick={() => setIsBrainMode(!isBrainMode)}
+                    className={`relative w-7 h-3.5 rounded-full transition-all duration-300 ${isBrainMode ? 'bg-primary shadow-[0_0_10px_rgba(var(--color-primary),0.5)]' : 'bg-text-variant/20'}`}
+                  >
+                    <motion.div
+                      animate={{ x: isBrainMode ? 14 : 2 }}
+                      className="absolute top-0.5 w-2.5 h-2.5 rounded-full bg-white shadow-sm"
+                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    />
+                  </button>
+                </div>
                 <button className="p-2.5 text-text-variant hover:text-primary transition-all rounded-lg hover:bg-primary/5">
                   <Mic size={18} strokeWidth={2} />
                 </button>
