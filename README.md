@@ -70,20 +70,19 @@ flowchart TD
 - **Frontend**: React 18.3.1, TypeScript 5.5.3, Vite 5.4.2
 - **Styling**: Tailwind CSS 3.4.1, Framer Motion 11.0.8
 - **Backend**: Firebase (Authentication, Firestore)
-- **AI**: Google Gemini API (Primary), Qwen-Coder (Ollama Fallback)
+- **AI**: Google Gemini API (Primary), Open Router (Fallback)
 - **APIs**: OpenWeatherMap, NewsData.io
 - **UI Components**: Radix UI, Lucide React Icons
 
 ### 🤖 AI Service Architecture
-AuraOne features a unified AI service that intelligently manages both Gemini and Qwen models:
+AuraOne features a robust, multi-model AI infrastructure that ensures high availability and intelligent workspace management:
 
-- **Primary Model**: Google Gemini 2.0 Flash for 24/7 reliability
-- **Fallback Model**: Qwen 2.5 Coder (1.5B) via Ollama for local development
-- **Automatic Fallback**: Seamless switching when primary model is unavailable
-- **Schema Validation**: Strict Zod validation ensures consistent AI responses
-- **Auto-Repair**: Invalid responses automatically retried with repair prompts
-- **Environment-Aware**: Different configurations for development vs production
-- **Unified Logic**: Same parsing, validation, and CRUD mapping for both models
+- **Primary Model**: Google Gemini Hub for ultra-fast, state-of-the-art response generation.
+- **Fallback Model**: Open Router Integration providing seamless continuity if Gemini limits are reached.
+- **Brain Mode**: Deep reasoning capabilities for complex strategic planning and workspace analysis.
+- **Neural Handshake**: Real-time visual feedback during multi-stage processing and module queries.
+- **Workspace Integration**: Direct command mapping for managing tasks, notes, and calendar events.
+- **Automatic Fallback**: Intelligent try/catch logic that transparently routes requests to secondary providers.
 
 ### Project Structure
 ```
@@ -145,6 +144,13 @@ src/
 - Single service handling both Gemini and Qwen with automatic fallback
 - Better natural language parsing for tasks, notes, and events
 - Single `aiService.ts` handles all AI operations
+
+### v1.3 - Aura Assistant & Multi-Model Chat
+- Implemented **Brain Mode** for deep reasoning and complex request processing.
+- Switched fallback provider to **Open Router** for enterprise-grade reliability in production.
+- Added **Neural Handshake** animations for transparent AI processing states.
+- Enhanced Chat UI with a professional, minimalist design and improved information density.
+
 
 
 ## 👨‍💻 Author
