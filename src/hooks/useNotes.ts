@@ -25,7 +25,6 @@ export const getNotes = async (userId: string): Promise<Note[]> => {
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.error("Error fetching notes:", error);
     throw error;
   }
   return data || [];
@@ -40,7 +39,6 @@ export const getNoteById = async (noteId: string): Promise<Note | null> => {
     .single();
 
   if (error) {
-    console.error("Error fetching note by id:", error);
     throw error;
   }
   return data;
@@ -58,13 +56,7 @@ export const listenToNotes = (
       { event: "*", schema: "public", table: "notes", filter: `user_id=eq.${userId}` },
       callback
     )
-    .subscribe((status, err) => {
-      if (status === 'SUBSCRIBED') {
-        console.log('Connected to notes channel!');
-      }
-      if (err) {
-        console.error('Error subscribing to notes channel:', err);
-      }
+    .subscribe(() => {
     });
 
   return channel;
@@ -79,7 +71,6 @@ export const createNote = async (userId: string, note: NewNote): Promise<Note> =
     .single();
 
   if (error) {
-    console.error("Error creating note:", error);
     throw error;
   }
   return data;
@@ -98,7 +89,6 @@ export const updateNote = async (
     .single();
 
   if (error) {
-    console.error("Error updating note:", error);
     throw error;
   }
   return data;
@@ -109,7 +99,6 @@ export const deleteNote = async (noteId: string) => {
   const { error } = await supabase.from("notes").delete().eq("id", noteId);
 
   if (error) {
-    console.error("Error deleting note:", error);
     throw error;
   }
 };

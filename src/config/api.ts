@@ -65,7 +65,7 @@ export const validateApiKeys = () => {
   // Production-specific checks
   if (isProduction) {
     if (!API_CONFIG.GEMINI_API_KEY) {
-      console.error("❌ CRITICAL: Gemini API key missing in production!");
+      // Missing critical key in production
     }
   }
 
@@ -75,19 +75,6 @@ export const validateApiKeys = () => {
     warnings,
     environment: API_CONFIG.ENV,
   };
-
-  // Log validation results
-  if (missingKeys.length > 0) {
-    console.error("❌ Missing required API keys:", missingKeys.join(", "));
-  }
-  
-  if (warnings.length > 0) {
-    console.warn("⚠️ API configuration warnings:", warnings.join(", "));
-  }
-
-  if (result.valid) {
-    // API configuration validated successfully
-  }
 
   return result;
 };

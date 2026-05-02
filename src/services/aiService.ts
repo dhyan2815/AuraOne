@@ -52,9 +52,7 @@ Always use ISO date format (YYYY-MM-DD) for dates and 24-hour time format (HH:mm
 // Gemini API call
 async function callGeminiAPI(prompt: string): Promise<string> {
   const LOCATION = "src/services/aiService.ts:callGeminiAPI";
-  console.log(`--- [${LOCATION}] Initiating ---`);
   if (!AI_CONFIG.gemini.enabled) {
-    console.error(`[${LOCATION}] Gemini disabled or missing keys`);
     throw new Error(`[${LOCATION}] Gemini API not configured`);
   }
 
@@ -81,8 +79,6 @@ async function callGeminiAPI(prompt: string): Promise<string> {
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`[${LOCATION}] HTTP ${response.status}:`, errorText);
       throw new Error(`[${LOCATION}] Gemini API error: ${response.status}`);
     }
 
@@ -90,19 +86,15 @@ async function callGeminiAPI(prompt: string): Promise<string> {
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
     
     if (!text) {
-      console.error(`[${LOCATION}] Empty candidate array in response`, data);
       throw new Error(`[${LOCATION}] No response candidate from Gemini`);
     }
 
-    console.log(`[${LOCATION}] Success: Received ${text.length} chars`);
     return text.trim();
   } catch (error) {
     clearTimeout(timeoutId);
     if (error instanceof Error && error.name === 'AbortError') {
-      console.error(`[${LOCATION}] Request Timed Out (${SERVICE_CONFIG.TIMEOUT_MS}ms)`);
       throw new Error(`[${LOCATION}] Gemini Hub Timeout`);
     }
-    console.error(`[${LOCATION}] Exception:`, error);
     throw error;
   }
 }
@@ -110,7 +102,6 @@ async function callGeminiAPI(prompt: string): Promise<string> {
 // Qwen API call
 async function callQwenAPI(prompt: string): Promise<string> {
   const LOCATION = "src/services/aiService.ts:callQwenAPI";
-  console.log(`--- [${LOCATION}] Initiating ---`);
   if (!AI_CONFIG.qwen.enabled || !AI_CONFIG.qwen.endpoint) {
     throw new Error(`[${LOCATION}] Qwen API not available`);
   }
@@ -143,11 +134,9 @@ async function callQwenAPI(prompt: string): Promise<string> {
       throw new Error(`[${LOCATION}] No response from Qwen`);
     }
 
-    console.log(`[${LOCATION}] Success: Received ${text.length} chars`);
     return text.trim();
   } catch (error) {
     clearTimeout(timeoutId);
-    console.error(`[${LOCATION}] Exception:`, error);
     throw error;
   }
 }
@@ -155,10 +144,8 @@ async function callQwenAPI(prompt: string): Promise<string> {
 // Open Router API call - Deep reasoning fallback
 async function callOpenRouterAPI(prompt: string, systemPrompt?: string): Promise<string> {
   const LOCATION = "src/services/aiService.ts:callOpenRouterAPI";
-  console.log(`--- [${LOCATION}] Initiating ---`);
   
   if (!AI_CONFIG.openRouter.enabled) {
-    console.error(`[${LOCATION}] Open Router disabled or missing keys`);
     throw new Error(`[${LOCATION}] Open Router API not configured`);
   }
 
@@ -168,8 +155,6 @@ async function callOpenRouterAPI(prompt: string, systemPrompt?: string): Promise
   try {
     const activeModel = AI_CONFIG.openRouter.model || 'openrouter/free';
     const activeSystemPrompt = systemPrompt || 'You are Aura, a professional and helpful assistant. Provide clear, concise, and helpful responses to user queries. CRITICAL FORMATTING RULES: When generating chat messages (especially lists or structured data), you MUST use a professional and minimalist formatting style with comprehensive bold and italic text effects. For example, when listing items, use this format: - **Category Name:** *e.g., example item 1, example item 2*';
-    
-    console.log(`[aiService] Requesting Open Router with model: ${activeModel}`);
     
     const response = await fetch(AI_CONFIG.openRouter.apiUrl, {
       method: 'POST',
@@ -193,30 +178,23 @@ async function callOpenRouterAPI(prompt: string, systemPrompt?: string): Promise
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error(`[aiService] Open Router Error Data:`, errorData);
       throw new Error(`[aiService] Open Router HTTP ${response.status}`);
     }
 
     const data = await response.json();
-    console.log(`[aiService] Open Router response data:`, data);
     
     const text = data.choices?.[0]?.message?.content;
     
     if (!text) {
-      console.error(`[aiService] Invalid response structure`, data);
       throw new Error(`[aiService] Invalid Open Router response format`);
     }
 
-    console.log(`[aiService] Open Router response text:`, text.substring(0, 100) + '...');
     return text.trim();
   } catch (error) {
     clearTimeout(timeoutId);
     if (error instanceof Error && error.name === 'AbortError') {
-      console.error(`[aiService] Open Router Request Timed Out`);
       throw new Error(`[aiService] Reasoning Matrix Timeout`);
     }
-    console.error(`[aiService] Open Router Exception:`, error);
     throw error;
   }
 }
@@ -435,8 +413,6 @@ export async function processAIRequest(
   for (const model of models) {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        console.log(`[aiService] Attempt ${attempt} with model ${model}`);
-        
         // 1. Call primary AI model
         const rawResponse = model === 'gemini' 
           ? await callGeminiAPI(userPrompt)
@@ -450,7 +426,6 @@ export async function processAIRequest(
         
       } catch (error) {
         lastError = error as Error;
-        console.warn(`[aiService] Attempt ${attempt} failed: ${lastError.message}`);
           
         // Immediate fallback to Open Router if Gemini is failing (likely rate limit)
         // OR if it's a parsing error (suggests Gemini is hallucinating invalid JSON)
@@ -458,7 +433,6 @@ export async function processAIRequest(
         const isParsingFailure = lastError.message.includes('Failed to parse AI response');
 
         if (isGeminiFailure || isParsingFailure) {
-          console.log(`[aiService] Triggering Open Router Fallback (Reason: ${isGeminiFailure ? 'Model Disruption' : 'Parsing Failure'})`);
           try {
             // Fallback call with the FULL system prompt to maintain command capabilities
             const fallbackResponse = await callOpenRouterAPI(userPrompt, SYSTEM_PROMPT);
@@ -469,11 +443,9 @@ export async function processAIRequest(
               return await executeCRUDOperation(command, userId);
             } catch {
               // If fallback isn't valid JSON, treat it as a direct chat response
-              console.log("[aiService] Fallback returned non-JSON, returning as chat message.");
               return fallbackResponse;
             }
           } catch (fallbackError) {
-            console.error("[aiService] Fallback also failed:", fallbackError);
             // Continue with next attempts/models
           }
         }
@@ -481,7 +453,6 @@ export async function processAIRequest(
         // Handle specific repair logic for validation errors (if we haven't returned yet)
         if (isParsingFailure && attempt < maxRetries) {
           try {
-            console.log("[aiService] Attempting repair prompt...");
             const repairPrompt = createRepairPrompt(userPrompt, lastError.message);
             const repairResponse = model === 'gemini' 
               ? await callGeminiAPI(repairPrompt)

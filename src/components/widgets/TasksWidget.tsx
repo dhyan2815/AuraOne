@@ -15,7 +15,7 @@ const TasksWidget = () => {
     if (user) {
       getTasks(user.id)
         .then(setTasks)
-        .catch((e) => console.error("Failed to fetch tasks", e));
+        .catch(() => {});
     }
   }, [user]);
 

@@ -22,7 +22,6 @@ export const getMessages = async (sessionId: string): Promise<Message[]> => {
     .order('created_at', { ascending: true });
 
   if (error) {
-    console.error('Error fetching messages:', error);
     throw error;
   }
   return data || [];
@@ -37,7 +36,6 @@ export const addMessage = async (message: Omit<Message, 'id' | 'created_at'>): P
     .single();
 
   if (error) {
-    console.error('Error adding message:', error);
     throw error;
   }
   return data;
@@ -60,23 +58,19 @@ export const handleSendMessage = async (
   isBrainMode: boolean,
 ) => {
   if (!input.trim() || !user || !selectedSession) {
-    console.warn('[chatHandler] Missing required fields:', { input, user: !!user, selectedSession });
     return;
   }
 
   const content = input.trim();
-  console.log('[chatHandler] Starting message flow for:', content);
 
   try {
     // 1. Save user message
-    console.log('[chatHandler] Saving user message to Supabase...');
-    const userMsg = await addMessage({
+    await addMessage({
       session_id: selectedSession,
       user_id: user.id,
       role: 'user',
       content,
     });
-    console.log('[chatHandler] User message saved:', userMsg.id);
 
     // 2. Check if it's the first message to name the session
     const { data: messages, error } = await supabase
@@ -84,31 +78,28 @@ export const handleSendMessage = async (
       .select('id')
       .eq('session_id', selectedSession);
 
-    if (error) console.error("[chatHandler] Could not count messages to name session:", error);
+    if (error) {
+      // Silent fail for session naming
+    }
 
     if (messages && messages.length === 1) {
       const sessionName = generateSessionName(content);
-      console.log('[chatHandler] First message detected. Updating session name to:', sessionName);
       await updateSessionName(selectedSession, sessionName);
     }
 
     // 3. Process with AI and save response
-    console.log(`[chatHandler] Processing AI request (Brain Mode: ${isBrainMode})...`);
     const resultText = await processAIRequest(content, user.id, {
       mode: isBrainMode ? 'brain' : 'command'
     });
     
-    console.log('[chatHandler] AI response received. Saving to Supabase...');
     await addMessage({
       session_id: selectedSession,
       user_id: user.id,
       role: 'ai',
       content: resultText,
     });
-    console.log('[chatHandler] AI message flow complete.');
     
   } catch (aiError) {
-    console.error("❌ [chatHandler] Error in message flow:", aiError);
     
     // Determine specific error source for the fallback message
     let source = 'Neural Core';
@@ -130,7 +121,6 @@ export const handleSendMessage = async (
     const errorMessage = `[SYSTEM ERROR @ ${source}]: ${detail}
 
 FALLBACK: I couldn't process your request "${content.substring(0, 20)}${content.length > 20 ? '...' : ''}" at this time. Please try again in a few moments or switch to Brain Mode. ⚠️`;
-
     try {
       await addMessage({
         session_id: selectedSession,
@@ -138,9 +128,8 @@ FALLBACK: I couldn't process your request "${content.substring(0, 20)}${content.
         role: 'ai',
         content: errorMessage,
       });
-      console.log('[chatHandler] Fallback error message saved to Supabase.');
-    } catch (saveError) {
-      console.error('[chatHandler] CRITICAL: Failed to save fallback message:', saveError);
+    } catch {
+      // Critical failure saving error message
     }
   }
 };

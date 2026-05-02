@@ -18,7 +18,6 @@ export const getSessions = async (userId: string): Promise<Session[]> => {
     .order('created_at', { ascending: false });
 
   if (error) {
-    console.error('Error fetching sessions:', error);
     throw error;
   }
   return data || [];
@@ -35,7 +34,6 @@ export const createNewSession = async (user: User): Promise<Session> => {
     .single();
 
   if (error) {
-    console.error('Error creating new session:', error);
     throw error;
   }
   return data;
@@ -49,7 +47,6 @@ export const deleteSession = async (sessionId: string): Promise<void> => {
     .eq('id', sessionId);
 
   if (error) {
-    console.error('Error deleting session:', error);
     throw error;
   }
 };
@@ -64,7 +61,6 @@ export const updateSessionName = async (sessionId: string, name: string): Promis
     .single();
 
   if (error) {
-    console.error('Error updating session name:', error);
     throw error;
   }
   return data;

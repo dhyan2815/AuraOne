@@ -68,17 +68,13 @@ const Chat = () => {
 
   const fetchMessages = useCallback(async () => {
     if (!selectedSession) {
-      console.log('[Chat] No session selected, clearing messages.');
       setMessages([]);
       return;
     }
     try {
-      console.log('[Chat] Fetching historical messages for session:', selectedSession);
       const list = await getMessages(selectedSession);
-      console.log(`[Chat] Received ${list.length} messages.`);
       setMessages(list);
     } catch (err) {
-      console.error('[Chat] Matrix error: Messages', err);
       toast.error("Matrix error: Messages");
     }
   }, [selectedSession]);
@@ -88,7 +84,6 @@ const Chat = () => {
     
     fetchMessages();
     
-    console.log(`[Chat] Initializing Real-time Matrix Sync for session: ${selectedSession}`);
     const channel = supabase
       .channel(`chat-messages-${selectedSession}`)
       .on(
@@ -100,7 +95,6 @@ const Chat = () => {
           filter: `session_id=eq.${selectedSession}` 
         },
         (payload) => {
-          console.log('[Chat] Real-time message detected:', payload.new.id);
           setMessages((cur) => {
             // PREVENT DUPLICATES: Only add if message ID doesn't exist
             const exists = cur.some(m => m.id === payload.new.id);
@@ -108,7 +102,6 @@ const Chat = () => {
 
             // If it's a real user message arriving, remove the corresponding optimistic one
             if (payload.new.role === 'user') {
-              console.log('[Chat] Real user message confirmed, cleaning up optimistic state.');
               return [...cur.filter(m => !m.id?.toString().startsWith('temp-')), payload.new as Message];
             }
 
@@ -117,14 +110,12 @@ const Chat = () => {
         }
       )
       .subscribe((status) => {
-        console.log(`[Chat] Real-time Sync Status: ${status}`);
         if (status === 'CHANNEL_ERROR') {
-          console.error('[Chat] Real-time subscription failed. Manual sync will handle fallback.');
+          // Manual sync will handle fallback.
         }
       });
 
     return () => {
-      console.log(`[Chat] Disconnecting Real-time Sync for session: ${selectedSession}`);
       supabase.removeChannel(channel);
     };
   }, [selectedSession, fetchMessages]);
@@ -147,11 +138,9 @@ const Chat = () => {
     
     setInput("");
     setLoading(true);
-    console.log('[Chat] handleSend: Initiating transmission...');
     
     try {
       await handleSendMessage(msg, user, selectedSession, isBrainMode);
-      console.log('[Chat] handleSend: Transmission successful, refreshing data...');
       
       // Secondary Sync: Refresh messages and sessions manually to ensure UI is current
       const [updatedSessions, updatedMessages] = await Promise.all([
@@ -161,10 +150,8 @@ const Chat = () => {
       
       setSessions(updatedSessions);
       setMessages(updatedMessages);
-      console.log('[Chat] handleSend: Data sync complete.');
       
     } catch (err) {
-      console.error('[Chat] Transmission failed:', err);
       toast.error("Transmission failed");
     } finally {
       setLoading(false);

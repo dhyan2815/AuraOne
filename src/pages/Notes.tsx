@@ -31,8 +31,7 @@ const Notes = () => {
 
   const fetchNotes = useCallback(async () => {
     if (!user) return;
-    const fetched = await getNotes(user.id).catch((e) => {
-      console.error("fetch notes:", e);
+    const fetched = await getNotes(user.id).catch(() => {
       return [] as Note[];
     });
     setNotes(fetched);
