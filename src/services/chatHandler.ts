@@ -57,6 +57,7 @@ export const handleSendMessage = async (
   input: string,
   user: User,
   selectedSession: string,
+  isBrainMode: boolean,
 ) => {
   if (!input.trim() || !user || !selectedSession) return;
 
@@ -85,7 +86,9 @@ export const handleSendMessage = async (
 
   // 3. Process with AI and save response
   try {
-    const resultText = await processAIRequest(content, user.id);
+    const resultText = await processAIRequest(content, user.id, {
+      mode: isBrainMode ? 'brain' : 'command'
+    });
     await addMessage({
       session_id: selectedSession,
       user_id: user.id,
