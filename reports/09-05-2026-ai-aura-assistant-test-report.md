@@ -2,7 +2,7 @@
 
 ## Run Summary
 - Date: 2026-05-09
-- Command: `npx vitest run test/aiCommandSchema.test.ts test/aiService.test.ts`
+- Command: `npx vitest run test/09-05-2026-ai-command-schema/aiCommandSchema.test.ts test/09-05-2026-ai-service/aiService.test.ts`
 - Result: 2 test files passed, 8 tests passed, 0 failed
 
 ## Scenario Results
