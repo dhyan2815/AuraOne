@@ -113,7 +113,7 @@ src/
 ├── pages/             # Route components
 ├── hooks/             # Custom React hooks (useAuth, useTasks, useNotes, useEvents)
 ├── services/          # External service integrations
-│   ├── aiService.ts   # Unified AI service (Gemini + Qwen)
+│   ├── aiService.ts   # Unified AI service (Gemini + OpenRouter)
 │   ├── chatHandler.ts # Chat orchestrator
 │   ├── chatSessionService.ts # Chat session management
 │   └── firebase.ts    # Firebase configuration
@@ -153,12 +153,12 @@ src/
 - Integrated Gemini 2.0 Flash for AI-powered task, event, and note creation via prompt.
 - Enhanced with custom parsing commands.
 
-### [v1.1 - Qwen LLM Integration](https://github.com/dhyan2815/AuraOne/releases/tag/v1.1-qwen)
-- Added Qwen-Coder2.5 (1.5B parameters) for advanced prompt-based automation.
-- Improved custom parsing capabilities.
+### [v1.1 - OpenRouter Integration](https://github.com/dhyan2815/AuraOne/releases/tag/v1.1-openrouter)
+- Added OpenRouter as fallback provider for enhanced reliability.
+- Improved natural language parsing for tasks, notes, and events.
 
 ### [v1.2 - Unified Models Integration](https://github.com/dhyan2815/AuraOne/releases/tag/v1.2-unified)
-- Single service handling both Gemini and Qwen with automatic fallback
+- Single service handling both Gemini and OpenRouter with automatic fallback
 - Better natural language parsing for tasks, notes, and events
 - Single `aiService.ts` handles all AI operations
 
