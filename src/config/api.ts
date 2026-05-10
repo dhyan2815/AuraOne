@@ -21,7 +21,7 @@ export const API_CONFIG = {
   // Gemini API - Enhanced configuration
   GEMINI_API_KEY: import.meta.env.VITE_GEMINI_API_KEY,
   GEMINI_API_URL: "https://generativelanguage.googleapis.com/v1beta",
-  GEMINI_MODEL: "gemini-2.0-flash",
+  GEMINI_MODEL: "gemini-2.5-flash",
   
   // Qwen API - Local development fallback
   QWEN_ENDPOINT: isDevelopment ? "http://localhost:11434/api/generate" : null,

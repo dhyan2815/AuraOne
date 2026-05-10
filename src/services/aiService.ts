@@ -15,6 +15,7 @@ const AI_CONFIG = getAIConfig();
 const SERVICE_CONFIG = {
   MAX_RETRIES: 3,
   TIMEOUT_MS: 15000,
+  BACKOFF_MS: 2000,
 };
 
 // System prompt for consistent AI behavior
@@ -467,6 +468,9 @@ export async function processAIRequest(
         
         // If this is the last attempt for this model, break to try next model
         if (attempt === maxRetries) break;
+
+        // Add backoff delay before next retry (prevents 429)
+        await new Promise(r => setTimeout(r, SERVICE_CONFIG.BACKOFF_MS * attempt));
       }
     }
   }
