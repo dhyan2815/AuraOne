@@ -36,12 +36,8 @@ flowchart TD
     Parse2 -->|yes| RouteCRUD
     Parse2 -->|no| FallbackChat[💬 Plain Chat Response]
 
-    %% OpenRouter failure → Qwen
-    Fallback1 --> |error| Qwen[🐋 Qwen API]
-    Qwen --> Parse3{✅ Valid JSON?}
-
-    Parse3 -->|yes| RouteCRUD
-    Parse3 -->|no| Exhaustion[❌ Retry Exhaustion]
+    %% OpenRouter failure → Retry exhaustion
+    Fallback1 --> |error| Exhaustion[❌ Retry Exhaustion]
 
     %% Repair prompt flow
     Validate -->|validation error| Repair[🔧 Repair Prompt]
@@ -53,6 +49,6 @@ flowchart TD
     classDef error fill:#FFB6C1,stroke:#DC143C,stroke-width:2px,color:black
     classDef api fill:#87CEEB,stroke:#333,stroke-width:2px,color:darkblue
 
-    class Gemini,Qwen,ORBrain api
+    class Gemini,ORBrain api
     class Success1,BrainResult success
     class Exhaustion error
