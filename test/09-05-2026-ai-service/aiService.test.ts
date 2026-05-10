@@ -22,11 +22,6 @@ vi.mock('../src/config/api', () => ({
       apiUrl: 'https://gemini.test',
       model: 'gemini-test',
     },
-    qwen: {
-      enabled: true,
-      endpoint: 'https://qwen.test',
-      model: 'qwen-test',
-    },
     openRouter: {
       enabled: true,
       apiKey: 'openrouter-key',
@@ -79,11 +74,6 @@ const geminiCommandResponse = (text: string) =>
         },
       },
     ],
-  });
-
-const qwenCommandResponse = (text: string) =>
-  jsonResponse({
-    response: text,
   });
 
 const openRouterResponse = (text: string) =>
@@ -372,20 +362,6 @@ describe('AI service behavior', () => {
           )
         )
         .mockResolvedValueOnce(
-          qwenCommandResponse(
-            JSON.stringify({
-              action: 'update',
-              type: 'event',
-              data: {
-                id: 'event-44',
-                event: {
-                  title: 'Shift event',
-                },
-              },
-            })
-          )
-        )
-        .mockResolvedValueOnce(
           geminiCommandResponse(
             JSON.stringify({
               action: 'update',
@@ -399,21 +375,6 @@ describe('AI service behavior', () => {
           )
         )
         .mockResolvedValueOnce(jsonResponse({}, true, 200))
-        .mockResolvedValueOnce(
-          qwenCommandResponse(
-            JSON.stringify({
-              action: 'update',
-              type: 'task',
-              data: {
-                task: {
-                  title: 'No id task',
-                },
-              },
-            })
-          )
-        )
-        .mockResolvedValueOnce(jsonResponse({}, true, 200))
-        .mockResolvedValueOnce(jsonResponse({}, false, 500))
         .mockResolvedValueOnce(jsonResponse({}, false, 500));
 
       const { processAIRequest } = await import('../src/services/aiService');
@@ -427,7 +388,7 @@ describe('AI service behavior', () => {
         'Critical Intelligence Failure: Failed to parse AI response: Invalid AI command structure: data.id: Invalid input: expected string, received undefined'
       );
       await expect(processAIRequest('Make everything fail', 'user-1', { maxRetries: 1 })).rejects.toThrow(
-        'Critical Intelligence Failure: [src/services/aiService.ts:callQwenAPI] Qwen API error: 500'
+        'Critical Intelligence Failure: [aiService] Open Router HTTP 500'
       );
     });
   });
