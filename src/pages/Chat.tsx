@@ -22,9 +22,9 @@ const SUGGESTIONS = [
 ];
 
 const HANDSHAKE_STEPS = [
-  "Processing request context...",
-  "Querying workspace modules...",
-  "Drafting strategic response...",
+  "Analyzing your request...",
+  "Retrieving relevant context...",
+  "Generating response...",
 ];
 
 const Chat = () => {
