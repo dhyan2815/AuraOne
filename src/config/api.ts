@@ -23,10 +23,6 @@ export const API_CONFIG = {
   GEMINI_API_URL: "https://generativelanguage.googleapis.com/v1beta",
   GEMINI_MODEL: "gemini-2.5-flash",
   
-  // Qwen API - Local development fallback
-  QWEN_ENDPOINT: isDevelopment ? "http://localhost:11434/api/generate" : null,
-  QWEN_MODEL: "qwen2.5-coder:1.5b",
-
   // Open Router - Deep reasoning fallback
   OPENROUTER_API_KEY: import.meta.env.VITE_OPENROUTER_API_KEY,
   OPENROUTER_API_URL: "https://openrouter.ai/api/v1/chat/completions",
@@ -53,13 +49,6 @@ export const validateApiKeys = () => {
 
   if (!API_CONFIG.OPENROUTER_API_KEY) {
     warnings.push("Open Router (deep reasoning fallback disabled)");
-  }
-
-  // Development-specific checks
-  if (isDevelopment) {
-    if (!API_CONFIG.QWEN_ENDPOINT) {
-      warnings.push("Qwen endpoint not configured (local fallback disabled)");
-    }
   }
 
   // Production-specific checks
@@ -89,11 +78,6 @@ export const getAIConfig = () => {
       apiKey: API_CONFIG.GEMINI_API_KEY,
       apiUrl: API_CONFIG.GEMINI_API_URL,
       model: API_CONFIG.GEMINI_MODEL,
-    },
-    qwen: {
-      enabled: isDevelopment && !!API_CONFIG.QWEN_ENDPOINT,
-      endpoint: API_CONFIG.QWEN_ENDPOINT,
-      model: API_CONFIG.QWEN_MODEL,
     },
     openRouter: {
       enabled: !!API_CONFIG.OPENROUTER_API_KEY,
