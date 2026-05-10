@@ -28,35 +28,33 @@ An **intelligent personal assistant** designed for comprehensive task management
 ```mermaid
 %%{init: {'theme': 'dark'}}%%
 flowchart TD
-    A[👤 User Arrives] --> B[Landing Page]
-    B --> C[🔐 Auth<br/>Login|SignUp|Reset]
-    C --> D["🏠 Dashboard Hub<br/>Weather|News|Tasks|Calendar"]
-    D --> E["🎯 Explore Features"]
+    A[User Arrives] --> B[Landing Page]
+    B --> C[Auth]
+    C --> D[Dashboard Hub]
+    D --> E[Explore Features]
     
-    E --> F[📝 Notes]
-    E --> G[✅ Tasks]
-    E --> H[📅 Events]
-    E --> I[💬 Aura Assistant]
+    E --> F[Notes]
+    E --> G[Tasks]
+    E --> H[Events]
+    E --> I[Aura Assistant]
     
-    %% Manual CRUD flows
     F --> J[(Supabase)]
     G --> J
     H --> J
     
-    %% AI Chat flow
-    I --> K[📝 Natural Language]
-    K --> L{🤖 AI Processing}
+    I --> K[Natural Language]
+    K --> L{AI Processing}
     
-    L -->|Command Mode| M[🔍 Parse JSON]
-    L -->|Brain Mode| N[🧠 Deep Reasoning]
+    L -->|Command Mode| M[Parse JSON]
+    L -->|Brain Mode| N[Deep Reasoning]
     
-    M --> O{📌 Action Type}
-    N --> P[💬 Plain Response]
+    M --> O{Action Type}
+    N --> P[Plain Response]
     
-    O -->|create| Q[➕ Create]
-    O -->|read| R[📖 Read]
-    O -->|update| S[✏️ Update]
-    O -->|delete| T[🗑️ Delete]
+    O -->|create| Q[Create]
+    O -->|read| R[Read]
+    O -->|update| S[Update]
+    O -->|delete| T[Delete]
     O -->|chat| P
     
     Q --> J
@@ -64,8 +62,8 @@ flowchart TD
     S --> J
     T --> J
     
-    J --> U[🔄 Real-time Sync]
-    P --> V[💾 Save Chat Session]
+    J --> U[Real-time Sync]
+    P --> V[Save Chat Session]
     V --> U
     
     style A fill:#1e3a8a,stroke:#3b82f6,color:#ffffff
