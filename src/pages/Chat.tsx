@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
+import ReactMarkdown from "react-markdown";
 import { Send, Trash2, Plus, Paperclip, Mic } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import {
@@ -335,7 +336,9 @@ const Chat = () => {
                         ? "bg-primary text-white rounded-2xl rounded-tr-sm shadow-md shadow-primary/10"
                         : "glass border border-primary/5 text-text rounded-2xl rounded-tl-sm shadow-sm"
                     }`}>
-                      <div className="whitespace-pre-wrap break-words">{msg.content}</div>
+                      <div className="whitespace-pre-wrap break-words prose prose-sm max-w-none prose-headings:font-bold prose-p:text-inherit prose-strong:text-inherit prose-em:text-inherit prose-ul:list-disc prose-ol:list-decimal prose-li:marker:text-primary/60">
+                        <ReactMarkdown>{msg.content}</ReactMarkdown>
+                      </div>
                     </div>
                   </motion.div>
                 ))}
