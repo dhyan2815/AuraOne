@@ -28,32 +28,51 @@ An **intelligent personal assistant** designed for comprehensive task management
 ```mermaid
 %%{init: {'theme': 'dark'}}%%
 flowchart TD
-    A[👤 User Arrives] --> B[🔐 Authentication]
-    B --> C["🏠 Dashboard Hub<br/>(Weather, News)"]
-    C --> D["🎯 Explore Features"]
+    A[👤 User Arrives] --> B[Landing Page]
+    B --> C[🔐 Auth<br/>Login|SignUp|Reset]
+    C --> D["🏠 Dashboard Hub<br/>Weather|News|Tasks|Calendar"]
+    D --> E["🎯 Explore Features"]
     
-    D --> E[📝 Notes]
-    D --> F[✅ Tasks]
-    D --> G[📅 Events]
-    D --> H[💬 Aura Assistant]
+    E --> F[📝 Notes]
+    E --> G[✅ Tasks]
+    E --> H[📅 Events]
+    E --> I[💬 Aura Assistant]
     
-    H --> I[🤖 Natural Language Input]
-    I --> J[🧠 Model Processing]
-    J --> K[✨ Automate Content]
+    %% Manual CRUD flows
+    F --> J[(Supabase)]
+    G --> J
+    H --> J
     
-    E --> L[💾 Save & Sync]
-    F --> L
-    G --> L
-    K --> L
+    %% AI Chat flow
+    I --> K[📝 Natural Language]
+    K --> L{🤖 AI Processing}
     
-    L --> M[📱 Access Anywhere]
-    M --> N[🔄 Real-time Updates]
+    L -->|Command Mode| M[🔍 Parse JSON]
+    L -->|Brain Mode| N[🧠 Deep Reasoning]
+    
+    M --> O{📌 Action Type}
+    N --> P[💬 Plain Response]
+    
+    O -->|create| Q[➕ Create]
+    O -->|read| R[📖 Read]
+    O -->|update| S[✏️ Update]
+    O -->|delete| T[🗑️ Delete]
+    O -->|chat| P
+    
+    Q --> J
+    R --> J
+    S --> J
+    T --> J
+    
+    J --> U[🔄 Real-time Sync]
+    P --> V[💾 Save Chat Session]
+    V --> U
     
     style A fill:#1e3a8a,stroke:#3b82f6,color:#ffffff
-    style C fill:#059669,stroke:#10b981,color:#ffffff
-    style H fill:#d97706,stroke:#f59e0b,color:#ffffff
-    style M fill:#7c3aed,stroke:#8b5cf6,color:#ffffff
-    style N fill:#059669,stroke:#10b981,color:#ffffff
+    style D fill:#059669,stroke:#10b981,color:#ffffff
+    style I fill:#d97706,stroke:#f59e0b,color:#ffffff
+    style J fill:#7c3aed,stroke:#8b5cf6,color:#ffffff
+    style U fill:#059669,stroke:#10b981,color:#ffffff
 ```
 
 **Professional Workflow:**
