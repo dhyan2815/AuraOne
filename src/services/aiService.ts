@@ -100,48 +100,6 @@ async function callGeminiAPI(prompt: string): Promise<string> {
   }
 }
 
-// Qwen API call
-async function callQwenAPI(prompt: string): Promise<string> {
-  const LOCATION = "src/services/aiService.ts:callQwenAPI";
-  if (!AI_CONFIG.qwen.enabled || !AI_CONFIG.qwen.endpoint) {
-    throw new Error(`[${LOCATION}] Qwen API not available`);
-  }
-
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), SERVICE_CONFIG.TIMEOUT_MS);
-
-  try {
-    const response = await fetch(AI_CONFIG.qwen.endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: AI_CONFIG.qwen.model,
-        stream: false,
-        prompt: SYSTEM_PROMPT + '\n\nUser: ' + prompt + '\n\nAura:',
-      }),
-      signal: controller.signal,
-    });
-
-    clearTimeout(timeoutId);
-
-    if (!response.ok) {
-      throw new Error(`[${LOCATION}] Qwen API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const text = data.response;
-    
-    if (!text) {
-      throw new Error(`[${LOCATION}] No response from Qwen`);
-    }
-
-    return text.trim();
-  } catch (error) {
-    clearTimeout(timeoutId);
-    throw error;
-  }
-}
-
 // Open Router API call - Deep reasoning fallback
 async function callOpenRouterAPI(prompt: string, systemPrompt?: string): Promise<string> {
   const LOCATION = "src/services/aiService.ts:callOpenRouterAPI";
@@ -390,34 +348,28 @@ export async function processAIRequest(
   userPrompt: string, 
   userId: string,
   options?: {
-    preferModel?: 'gemini' | 'qwen';
     maxRetries?: number;
     mode?: 'command' | 'brain';
   }
 ): Promise<string> {
   const maxRetries = options?.maxRetries || SERVICE_CONFIG.MAX_RETRIES;
-  const preferModel = options?.preferModel || 'gemini';
   const mode = options?.mode || 'command';
 
   // Immediate brain mode routing (always uses Open Router)
   if (mode === 'brain') {
     return await callOpenRouterAPI(userPrompt);
   }
-  
+
   let lastError: Error | null = null;
-  
-  // Try models in order
-  const models = preferModel === 'gemini' 
-    ? ['gemini', 'qwen'] 
-    : ['qwen', 'gemini'];
+
+  // Try Gemini first, fall back to OpenRouter on failure
+  const models = ['gemini'];
   
   for (const model of models) {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        // 1. Call primary AI model
-        const rawResponse = model === 'gemini' 
-          ? await callGeminiAPI(userPrompt)
-          : await callQwenAPI(userPrompt);
+        // 1. Call Gemini API
+        const rawResponse = await callGeminiAPI(userPrompt);
         
         // 2. Parse and validate response
         const command = await parseAndValidateResponse(rawResponse);
@@ -455,10 +407,8 @@ export async function processAIRequest(
         if (isParsingFailure && attempt < maxRetries) {
           try {
             const repairPrompt = createRepairPrompt(userPrompt, lastError.message);
-            const repairResponse = model === 'gemini' 
-              ? await callGeminiAPI(repairPrompt)
-              : await callQwenAPI(repairPrompt);
-            
+            const repairResponse = await callGeminiAPI(repairPrompt);
+
             const command = await parseAndValidateResponse(repairResponse);
             return await executeCRUDOperation(command, userId);
           } catch {
