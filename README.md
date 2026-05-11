@@ -83,6 +83,20 @@ flowchart TD
 
 ## 🏗️ Architecture
 
+### System Diagrams
+
+**Activity Diagram** - User workflow and decision points:
+![Activity Diagram](architecture/activity_diagram.png)
+
+**Data Flow Diagram** - System data movement:
+![DFD Diagram](architecture/dfd_diagram.png)
+
+**Entity Relationship Diagram** - Database schema:
+![ER Diagram](architecture/er_diagram.png)
+
+**Sequence Diagram** - API interaction flow:
+![Sequence Diagram](architecture/sequence_diagram.png)
+
 ### Tech Stack
 - **Frontend**: React 18.3.1, TypeScript 5.5.3, Vite 5.4.2
 - **Styling**: Tailwind CSS 3.4.1, Framer Motion 11.0.8
