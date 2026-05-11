@@ -147,29 +147,6 @@ src/
 - **Event Management**: Edit and delete events
 - **Today's Schedule**: Focused view of current day
 
-## 🏷️ Releases
-
-### v1.0 - Gemini LLM Integration
-- Integrated Gemini 2.0 Flash for AI-powered task, event, and note creation via prompt.
-- Enhanced with custom parsing commands.
-
-### [v1.1 - OpenRouter Integration](https://github.com/dhyan2815/AuraOne/releases/tag/v1.1-openrouter)
-- Added OpenRouter as fallback provider for enhanced reliability.
-- Improved natural language parsing for tasks, notes, and events.
-
-### [v1.2 - Unified Models Integration](https://github.com/dhyan2815/AuraOne/releases/tag/v1.2-unified)
-- Single service handling both Gemini and OpenRouter with automatic fallback
-- Better natural language parsing for tasks, notes, and events
-- Single `aiService.ts` handles all AI operations
-
-### [v1.3 - Aura Assistant & Multi-Model Chat](https://github.com/dhyan2815/AuraOne/releases/tag/v1.3-aura-assistant)
-- Implemented **Brain Mode** for deep reasoning and complex request processing.
-- Switched fallback provider to **Open Router** for enterprise-grade reliability in production.
-- Added **Neural Handshake** animations for transparent AI processing states.
-- Enhanced Chat UI with a professional, minimalist design and improved information density.
-
-
-
 ## 👨‍💻 Author
 
 **Dhyan Patel**
