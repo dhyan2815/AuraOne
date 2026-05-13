@@ -1,4 +1,5 @@
 interface PerformanceMetric {
+  id: string;
   operation: string;
   startTime: number;
   endTime?: number;
@@ -13,6 +14,7 @@ class PerformanceMonitor {
   start(operation: string): string {
     const id = `${operation}-${Date.now()}`;
     this.metrics.push({
+      id,
       operation,
       startTime: Date.now(),
       status: 'pending',
@@ -21,7 +23,7 @@ class PerformanceMonitor {
   }
 
   end(id: string, status: 'success' | 'error', error?: string): void {
-    const metric = this.metrics.find(m => m.operation === id.split('-').slice(0, -1).join('-'));
+    const metric = this.metrics.find(m => m.id === id);
     if (metric) {
       metric.endTime = Date.now();
       metric.duration = metric.endTime - metric.startTime;
