@@ -75,6 +75,24 @@ The AI parses user input into structured commands:
 
 ---
 
+## Caching Strategy
+
+### Session Context Caching
+- **Chat History (In-Memory)**: The `chatSessionService.ts` maintains session context in memory during active user sessions. This caches recent conversation history for context-aware AI responses.
+- **Context Retention**: Session data persists across message exchanges within a single browser session but is not persisted to localStorage or database.
+- **Memory Management**: Old messages are retained to provide context window to the AI while avoiding unbounded memory growth.
+
+### Existing Caching Mechanisms
+- **React Context**: Auth and Theme contexts are cached in React's context API for fast re-renders
+- **API Response Caching**: Widget data (weather, news) can be cached locally to reduce API calls
+
+### Future Caching Plans
+- **localStorage**: Persist chat history for session restoration
+- **Redis (Backend)**: Server-side caching for frequently accessed data (future Supabase Edge Functions)
+- **TTLCache**: Implement time-to-live caching for API responses to reduce redundant calls
+
+---
+
 ## Deployment
 
 - **Frontend**: Vercel (React + Vite)
