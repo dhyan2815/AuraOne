@@ -5,7 +5,7 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.5.3-3178C6?logo=typescript)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4.1-06B6D4?logo=tailwindcss)
 ![Vitest](https://img.shields.io/badge/Tests-Vitest-6E9F18?logo=vitest)
-[![Coverage](https://img.shields.io/badge/coverage-TBD-yellow)](#)
+[![Coverage](https://img.shields.io/badge/coverage-29%25-yellow)](#)
 
 **Sick of app overload?** AuraOne puts your tasks, notes, events, and news in one smart, AI-powered hub. **One app, zero chaos—just pure focus.**
 

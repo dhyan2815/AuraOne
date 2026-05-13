@@ -8,6 +8,8 @@ const mockEvents = [
 
 const createdEvent = { id: 'event-1', user_id: 'user-1', title: 'New Event', start_time: '2024-01-01T10:00:00Z', end_time: '2024-01-01T11:00:00Z', description: 'New event description', created_at: '2024-01-01' };
 
+const updatedEvent = { id: 'event-1', user_id: 'user-1', title: 'Updated Event', start_time: '2024-01-01T10:00:00Z', end_time: '2024-01-01T12:00:00Z', description: 'Updated description', created_at: '2024-01-01' };
+
 vi.mock('../../src/services/supabase', () => ({
   supabase: {
     from: vi.fn(() => ({
@@ -19,6 +21,13 @@ vi.mock('../../src/services/supabase', () => ({
       insert: vi.fn(() => ({
         select: vi.fn(() => ({
           single: vi.fn(() => Promise.resolve({ data: createdEvent, error: null })),
+        })),
+      })),
+      update: vi.fn(() => ({
+        eq: vi.fn(() => ({
+          select: vi.fn(() => ({
+            single: vi.fn(() => Promise.resolve({ data: updatedEvent, error: null })),
+          })),
         })),
       })),
       delete: vi.fn(() => ({
@@ -33,7 +42,7 @@ vi.mock('../../src/services/supabase', () => ({
   },
 }));
 
-import { getEvents, createEvent, deleteEvent } from '../../src/hooks/useEvents';
+import { getEvents, createEvent, updateEvent, deleteEvent } from '../../src/hooks/useEvents';
 
 describe('useEvents', () => {
   beforeEach(() => {
@@ -63,6 +72,14 @@ describe('useEvents', () => {
   describe('deleteEvent', () => {
     it('should delete an event successfully', async () => {
       await expect(deleteEvent('event-1')).resolves.toBeUndefined();
+    });
+  });
+
+  describe('updateEvent', () => {
+    it('should update an existing event', async () => {
+      const updates = { title: 'Updated Event', end_time: '2024-01-01T12:00:00Z', description: 'Updated description' };
+      const result = await updateEvent('event-1', updates);
+      expect(result).toEqual(updatedEvent);
     });
   });
 });

@@ -70,3 +70,18 @@ export const deleteEvent = async (eventId: string): Promise<void> => {
     throw error;
   }
 };
+
+// Update an event
+export const updateEvent = async (eventId: string, updates: Partial<NewEvent>): Promise<Event> => {
+  const { data, error } = await supabase
+    .from("events")
+    .update(updates)
+    .eq("id", eventId)
+    .select()
+    .single();
+
+  if (error) {
+    throw error;
+  }
+  return data;
+};
