@@ -77,26 +77,35 @@ describe('Caching Behavior', () => {
 
   describe('Cache Expiration', () => {
     it('should expire cached data after TTL', async () => {
+      vi.useFakeTimers();
       // Use very short TTL for testing (100ms)
       cache.set('key1', 'value1', 100);
 
       // Should be available immediately
       expect(cache.get('key1')).toBe('value1');
 
-      // Wait for expiry
-      await new Promise((resolve) => setTimeout(resolve, 150));
+      // Advance time past expiry
+      vi.advanceTimersByTime(150);
 
       // Should be expired
       expect(cache.get('key1')).toBeNull();
+      vi.useRealTimers();
     });
 
     it('should not return expired data even if key still exists in map', () => {
+      vi.useFakeTimers();
       cache.set('key1', 'value1', 50);
 
-      // Manually expire by advancing time check
-      // The implementation checks Date.now() > expiry on get
+      // Should work before expiry
+      expect(cache.get('key1')).toBe('value1');
+
+      // Advance time past expiry
+      vi.advanceTimersByTime(100);
+
+      // Should be expired
       const item = cache.get('key1');
-      expect(item).toBe('value1');
+      expect(item).toBeNull();
+      vi.useRealTimers();
     });
   });
 

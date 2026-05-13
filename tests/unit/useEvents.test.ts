@@ -10,6 +10,29 @@ const createdEvent = { id: 'event-1', user_id: 'user-1', title: 'New Event', sta
 
 const updatedEvent = { id: 'event-1', user_id: 'user-1', title: 'Updated Event', start_time: '2024-01-01T10:00:00Z', end_time: '2024-01-01T12:00:00Z', description: 'Updated description', created_at: '2024-01-01' };
 
+const createMockWithError = (error: Error) => ({
+  select: vi.fn(() => ({
+    eq: vi.fn(() => ({
+      order: vi.fn(() => Promise.resolve({ data: null, error })),
+    })),
+  })),
+  insert: vi.fn(() => ({
+    select: vi.fn(() => ({
+      single: vi.fn(() => Promise.resolve({ data: null, error })),
+    })),
+  })),
+  update: vi.fn(() => ({
+    eq: vi.fn(() => ({
+      select: vi.fn(() => ({
+        single: vi.fn(() => Promise.resolve({ data: null, error })),
+      })),
+    })),
+  })),
+  delete: vi.fn(() => ({
+    eq: vi.fn(() => Promise.resolve({ error })),
+  })),
+});
+
 vi.mock('../../src/services/supabase', () => ({
   supabase: {
     from: vi.fn(() => ({
@@ -80,6 +103,40 @@ describe('useEvents', () => {
       const updates = { title: 'Updated Event', end_time: '2024-01-01T12:00:00Z', description: 'Updated description' };
       const result = await updateEvent('event-1', updates);
       expect(result).toEqual(updatedEvent);
+    });
+  });
+
+  describe('Error Handling', () => {
+    it('should throw error when getEvents fails due to network failure', async () => {
+      const networkError = new Error('Network request failed');
+      const { supabase } = await import('../../src/services/supabase');
+      (supabase.from as vi.Mock).mockReturnValueOnce(createMockWithError(networkError));
+
+      await expect(getEvents('user-1')).rejects.toThrow('Network request failed');
+    });
+
+    it('should throw error when createEvent fails due to Supabase error', async () => {
+      const supabaseError = new Error('Failed to create event');
+      const { supabase } = await import('../../src/services/supabase');
+      (supabase.from as vi.Mock).mockReturnValueOnce(createMockWithError(supabaseError));
+
+      await expect(createEvent('user-1', { title: 'New Event', start_time: '2024-01-01T10:00:00Z' })).rejects.toThrow('Failed to create event');
+    });
+
+    it('should throw error when updateEvent fails due to network failure', async () => {
+      const networkError = new Error('Connection timeout');
+      const { supabase } = await import('../../src/services/supabase');
+      (supabase.from as vi.Mock).mockReturnValueOnce(createMockWithError(networkError));
+
+      await expect(updateEvent('event-1', { title: 'Updated' })).rejects.toThrow('Connection timeout');
+    });
+
+    it('should throw error when deleteEvent fails due to Supabase error', async () => {
+      const supabaseError = new Error('Delete failed');
+      const { supabase } = await import('../../src/services/supabase');
+      (supabase.from as vi.Mock).mockReturnValueOnce(createMockWithError(supabaseError));
+
+      await expect(deleteEvent('event-1')).rejects.toThrow('Delete failed');
     });
   });
 });

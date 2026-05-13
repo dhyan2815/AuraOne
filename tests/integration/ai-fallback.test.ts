@@ -45,19 +45,25 @@ describe('AI Fallback Chain', () => {
 
     global.fetch = mockFetch;
 
-    // Simulate retry logic
+    // Simulate retry logic - succeeds on 3rd attempt
     let lastError: Error | null = null;
+    let success = false;
     for (let attempt = 1; attempt <= 3; attempt++) {
       try {
-        await fetch('https://api.example.com');
-        break;
+        const response = await fetch('https://api.example.com');
+        if (response.ok) {
+          success = true;
+          break;
+        }
       } catch (error) {
         lastError = error as Error;
       }
     }
 
     expect(callCount).toBe(3);
-    expect(lastError).toBeDefined();
+    expect(success).toBe(true);
+    // After successful retry, there should be no error
+    // Note: lastError may still have value from last failure before success
   });
 
   it('should parse JSON responses correctly', async () => {
