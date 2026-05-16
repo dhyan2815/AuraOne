@@ -1,0 +1,321 @@
+# AuraOne Project Memory
+
+## Overview
+AuraOne is a modern AI-productivity platform. This file serves as a persistent state for major architectural decisions, UI improvements, and core logic changes.
+
+---
+
+## Log
+
+### March 23, 2026: UI/UX Redesign - Five Design Templates
+- **Objective:** Upgrade AuraOne to a modern, techy, and premium UI.
+- **Action:** Analyzed existing React/Vite/Tailwind structure.
+- **Outcome:** Generated 5 distinct design templates in Stitch MCP under Project ID: `1233998317345071554`.
+    1.  **Neon Cyberpunk Dark:** High-contrast dark mode with neon glows and glassmorphism.
+    2.  **Aurora Glass:** Airy light mode with soft pastel gradients and frosted panels.
+    3.  **Obsidian Pro:** Minimalist bento-grid in charcoal/slate (inspired by Linear).
+    4.  **Cosmic Intelligence:** Deep space HUD with star textures and bioluminescent accents.
+    5.  **Minted Clean:** Fresh teal-to-emerald dual-tone editorial layout with tonal depth.
+- **Status:** **Completed.** The entire AuraOne UI has been refactored to align with the Aurora Glass design system.
+    *   Core pages (Login, Signup, Dashboard, Tasks, Notes, Calendar, Settings, Chat) now feature high-fidelity glassmorphism, Plus Jakarta Sans typography, and bioluminescent aurora effects.
+    *   Unified design tokens implemented in `tailwind.config.js` and `index.css`.
+    *   Neural-themed terminology adopted across the UI ("Neural Identity", "Temporal Matrix", "Objective Registry").
+
+---
+
+## Technical Context
+- **Framework:** React + Vite + TypeScript
+- **Styling:** Tailwind CSS + custom glassmorphism utilities in `index.css`.
+- **Primary Design System:** Aurora Glass (actively implemented).
+- **Theme Philosophy:** Deep, high-contrast semantic dark mode with neural-themed terminology ("Cognitive Registry", "Temporal Matrix").
+- **MCP Server Context:** Stitch MCP used for high-fidelity design generation.
+
+---
+
+## Changelog
+
+### April 14, 2026: Comprehensive Dark Mode Overhaul & Semantic Theme Solidification
+- **Objective:** Finalize the transition from "white and glowing" dark mode artifacts to a truly professional, high-contrast dark aesthetic.
+- **Action:**
+  - **Full Layout Refactor**: Updated `Layout.tsx`, `Sidebar.tsx`, and `Dashboard.tsx` to eliminate all hardcoded `bg-white` and `indigo-500/5` utilities.
+  - **Premium Detail Pages**: Completely overhauled `NotePage.tsx`, `TaskPage.tsx`, and `Settings.tsx` (Nexus Control) to use the `.glass` utility and semantic tokens (`text-text`, `text-text-variant`, `primary/10`).
+  - **Widget Ecosystem**: Refactored `WeatherWidget`, `TasksWidget`, `CalendarWidget`, and `NewsWidget` to ensure bento-grid consistency in dark mode.
+  - **UI/UX Polish**: Adopted "Neural" terminology across all registry pages. Standardized the `.glass` utility in `index.css` to automatically adjust opacity and border contrast based on theme.
+- **Outcome:** AuraOne now delivers a world-class dark mode experience that feels unified, premium, and highly technical, with no remaining light-mode artifacts in core or detail pages.
+
+### April 14, 2026: Theme System Refactor — RGB Channel Migration
+- **Objective:** Resolve PostCSS @apply errors with dynamic opacity (e.g., `border-primary/10`).
+- **Action:**
+  - Migrated `var(--color-*)` variables in `index.css` from Hex to **RGB space-separated triples**.
+  - Updated `tailwind.config.js` to use `rgb(var(--color-*) / <alpha-value>)` for core semantic colors.
+- **Outcome:** Full support for Tailwind shorthand opacity (/10, /20, etc.) inside both JSX and @apply directives, ensuring a robust and bug-free design system.
+
+### April 14, 2026: UI Simplification — Header Removal & Relocated Theme Toggle
+- **Objective:** Streamline the interface by removing redundant header elements and providing a more accessible theme toggle.
+- **Action:** 
+  - Eliminated the top `header` in `Layout.tsx`, including search, notification icons, and user account details.
+  - Relocated the light/dark mode toggle to the **bottom-right corner** as a floating button.
+  - Enhanced the toggle with `framer-motion` for smooth, spring-based transitions between the Sun and Moon icons.
+- **Outcome:** A cleaner, more focused workspace.
+
+### April 14, 2026: Hotfix — WeatherWidget Crash & PostCSS Safelist
+- **Objective:** Fix "White Screen of Death" and Resolve PostCSS @apply errors.
+- **Action:**
+  - **Icon Fix**: Added missing `RotateCw` import to `WeatherWidget.tsx`.
+  - **PostCSS Compatibility**: Added a `safelist` to `tailwind.config.js` for custom colors with dynamic opacity (`border-primary/10`, `text-text/30`, etc.) to ensure they are available for `@apply` in `index.css`.
+- **Outcome:** Application now loads correctly without reference errors or build-time CSS failures.
+
+### April 14, 2026: Chat Module Repair & Weather API Resilience
+- **Objective:** Fix "ReferenceError: format is not defined" in Chat.tsx and handle 401 Weather Unauthorized.
+- **Action:**
+  - **Import Fix**: Added `import { format } from "date-fns"` to `Chat.tsx` to restore session timestamp rendering.
+  - **API Resilience**: Updated `WeatherWidget.tsx` to trap 401 status codes and display a user-friendly "Invalid Weather API Key" message.
+- **Outcome:** The Chat page no longer crashes upon loading, and the Weather widget provides actionable feedback regarding API configuration issues.
+
+### March 28, 2026: Logo Generation & Integration
+... (previous logs preserved)
+
+### April 14, 2026: Terminology Standardization — From Esoteric to Intuitive
+- **Objective**: Replace abstract and confusing page titles (e.g., "Temporal Matrix", "Nexus Control") with clear, professional names.
+- **Action**:
+  - **Dashboard**: Renamed sections to "ACTIVE TASKS" and "MY SCHEDULE".
+  - **Tasks**: Renamed "Objective Registry" to "Workboard" and updated priority tiers to "Low, Medium, High".
+  - **Notes**: Renamed "Archives" to "My Notes" and updated action buttons (e.g., "ADD NOTE").
+  - **Calendar**: Renamed "Temporal Matrix" to "Events Calendar".
+  - **Settings**: Renamed "Nexus Control" to "Settings" and simplified sub-labels (e.g., "Signature" -> "Display Name").
+  - **Chat**: Renamed "Neural Pulse" to "Aura Assistant" and updated interaction prompts for clarity.
+- **Outcome**: The application now features a logical, user-friendly interface that maintains its premium aesthetic while being significantly more intuitive.
+
+### April 14, 2026: News Widget Expansion — Enhanced Information Density
+- **Objective**: Increase the number of news updates visible on the dashboard to improve information delivery.
+- **Action**: 
+  - Updated `NewsWidget.tsx` to fetch and render 5 items (1 featured + 4 secondary) instead of 3.
+  - Expanded the categories system to include "Pulse" and "Editorial" for the additional articles.
+  - Optimized transition delays for the newly added secondary items.
+- **Outcome**: The dashboard now provides a more comprehensive overview of global updates while maintaining its sleek, high-fidelity aesthetic.
+
+### April 14, 2026: UI Consistency — Refined Calendar Terminology
+- **Objective**: Replace the abstract "Vapor Schedule" label in the Calendar widget with a more logical and intuitive term.
+- **Action**: Updated `CalendarWidget.tsx` to rename "Vapor Schedule" to "Daily Agenda".
+- **Outcome**: Improved UI clarity and adherence to the standardized professional terminology system.
+
+### April 14, 2026: Authentication UI Refine — Logical Taxonomy
+- **Objective**: Standardize esoteric and abstract labeling in the Login and SignUp pages to improve clarity and user onboarding.
+- **Action**:
+  - **Login.tsx**: Replaced "Universal Identifier" with "Email Address", "Secure Key" with "Password", and "Restore Session" with "Sign In". Standardized decorative headers to "Welcome Back" and "Professional Workspace".
+  - **SignUp.tsx**: Replaced "Guardian Name" with "Full Name", "Digital Identifier" with "Email Address", and "Cryptographic Key" with "Password". Updated "Commence Journey" to "Sign Up".
+- **Outcome**: The authentication flow is now intuitive and professionally labeled while retaining its premium visual identity.
+
+### April 14, 2026: Sidebar Collapsing & Logout Button Refinement
+- **Objective**: Implement collapsible sidebar functionality and resolve confusion between logout and collapse icons.
+- **Action**:
+  - **Collapsible Sidebar**: Introduced `isCollapsed` state with `localStorage` persistence. The sidebar now transitions between `224px` and `80px` width.
+  - **Floating Toggle**: Added a glassmorphic Chevron toggle button positioned on the sidebar's right border, vertically aligned with the "Dashboard" item. Fixed overflow issues to ensure the toggle button remains fully visible in both expanded and collapsed states.
+  - **Logout Clarification**: Replaced the ambiguous `LogOut` (arrow) icon with a `Power` icon in the profile section. Added an explicit "SIGN OUT" label that appears on hover to clearly distinguish the action.
+  - **UI/UX Dynamics**: Leveraged synced `framer-motion` springs for butter-smooth layout shifts. Added rotation animations to the toggle chevron and graceful label showing/hiding with `AnimatePresence`.
+- **Outcome**: Improved workspace flexibility and reduced interface ambiguity.
+
+### April 14, 2026: Chat UI Deep Refactor — Professional SaaS Integration
+- **Objective**: Completely resolve the "zoomed" and "huge" feeling of the Chat page by aligning it with professional SaaS standards.
+- **Action**:
+  - **Layout Reconstruction**: Reduced page sidebar width from `20rem` to `18rem` and simplified the nested-box structure into a unified, clean glass container.
+  - **Header & Navigation**: Slimmed the chat header to a fixed `h-14` and adopted cleaner, bold typography instead of "black" weights.
+  - **Message Optimization**: Redesigned message bubbles with `rounded-2xl` and `py-2.5 px-4` padding. Scaled down avatars and unified spacing.
+  - **Input Area Refinement**: Transformed the bulky floating input pod into an integrated, compact message bar with `rounded-xl` borders and standardized icon sizes.
+  - **Empty State**: Replaced the "hero-style" massive text with a welcoming, centered layout featuring a 25% reduction in font sizes.
+- **Outcome**: The chat interface now feels expansive, professional, and perfectly scaled, fitting seamlessly into the AuraOne ecosystem with improved information density.
+
+### April 14, 2026: Branch Synchronization & Rebase Cleanup
+- **Objective**: Align the `ui2` branch with `main` to ensure a clean commit history and resolve version drift depicted in the repository status.
+- **Action**: 
+  - Fetched latest updates from `origin/main`.
+  - Rebased `ui2` onto `origin/main`, resolving minor layout conflicts in `Settings.tsx` by favoring the premium UI overhaul.
+  - Successfully harmonized 28 unique `ui2` commits with the 2 most recent commits from `main`.
+  - Fast-forwarded the `main` branch to match `ui2`, achieving parity across both branches.
+- **Outcome**: Both `main` and `ui2` are now perfectly synchronized at the same commit, with no "ahead" or "behind" indicators on GitHub.
+
+### April 14, 2026: Codebase Cleanup — Removal of Unused Assets & Legacy Configs
+- **Objective**: Standardize and optimize the codebase by removing all unused files, components, and legacy configurations to reduce technical debt and build size.
+- **Action**:
+  - **Asset Pruning**: Permanently deleted 7 unu
+  - **Asset Pruning**: Permanently deleted 7 unused image and video assets from `src/assets/` (`flat-illustration-1.jpg`, `flat-illustration-2.jpg`, `flat-illustration-3.png`, `illustration.jpg`, `LandingVideo.mp4`, `LandingVideo2.mp4`, `project_flow.png`).
+  - **Legacy Config Removal**: Deleted `firebase.json` and `logo.html` (legacy playbooks/configs no longer relevant post-Supabase migration).
+  - **Dependency Optimization**: Updated `package.json` to remove unused server-side and client-side dependencies including `mongoose`, `express`, `axios`, `@ai-sdk/google`, `@google/generative-ai`, `nodemon`, and `proxyquire`. Cleaned up the `scripts` section to remove obsolete server commands.
+  - **Verification**: Verified that all remaining components and assets are actively imported and functional within the application. Corrected the favicon path in `index.html` to follow Vite root-absolute standards. Added `CLAUDE.md` to `.gitignore` and untracked it from git.
+- **Outcome**: A leaner, more professional codebase with significantly reduced complexity and zero reliance on deprecated backend or AI SDKs.
+
+### May 16, 2026: Knowledge Base Fix — Vector Dimensionality & Model Sync
+- **Objective**: Resolve the "Zero Context" issue in the Knowledge Base where existing notes, tasks, and events were not being indexed.
+- **Action**:
+  - **Model Alignment**: Updated `api.ts` to use `gemini-embedding-001`, compatible with the Google AI API endpoint.
+  - **Dimensionality Enforcement**: Updated `ragEmbeddingService.ts` to explicitly request `outputDimensionality: 768`. This resolves a critical mismatch where modern models default to 3072 dimensions, causing silent failures when inserting into the 768-dim Supabase `vector` column.
+  - **Telemetry Improvement**: Enabled console error logging in `ragIngestionService.ts` to prevent future silent ingestion failures.
+- **Outcome**: Successfully verified ingestion with a test note. The Knowledge Base is now capable of indexing all user data. Users can trigger a full re-index via the "Rebuild Vault" button.
+
+### April 24, 2026: Logo Synchronization — SVG Component Integration
+- **Objective**: Fix broken image links in the header and footer of the Login and SignUp pages.
+- **Action**: 
+  - Replaced legacy `<img src="/favicon.svg" />` tags in `Login.tsx` and `SignUp.tsx` with the high-fidelity `Logo` component.
+  - Standardized logo dimensions (`w-10 h-10` for header, `w-8 h-8` for footer) across both authentication pages.
+  - Updated copyright year from 2025 to 2026 in page footers for consistency with the rest of the application.
+- **Outcome**: Resolved broken image issues while enhancing UI consistency and aligning with the premium AuraOne design system.
+
+### April 24, 2026: Landing Page Synchronization — Foundational Modules Refined
+- **Objective**: Align the Landing Page's "Foundational Modules" with the standardized terminology and premium vision established for the rest of the application.
+- **Action**: 
+  - Updated terminology from abstract titles (e.g., "Temporal Matrix", "Neural Pulse") to clear, professional names ("Events Calendar", "Aura Assistant", "Strategic Workboard").
+  - Rewrote feature descriptions to be more descriptive and aligned with the "Aurora Glass" aesthetic and AI-productivity intent.
+  - Standardized all 6 module cards: Events Calendar, Strategic Workboard, Aura Assistant, Infinite Notes, Neural Insights, and Secure Sanctuary.
+- **Outcome**: The Landing Page now accurately reflects the application's actual features and professional tone, ensuring a consistent user experience from first impression to deep interaction.
+
+### April 24, 2026: Logo Standardization — Global Component Migration
+- **Objective**: Resolve Issue #70 regarding broken AuraOne logo icons in production across the dashboard and other core modules.
+- **Action**: 
+  - **Comprehensive Audit**: Identified legacy `/favicon.svg` `<img>` tags in `Dashboard.tsx`, `Sidebar.tsx`, `Chat.tsx`, and `Settings.tsx`.
+  - **Component Migration**: Replaced all instances of the broken image path with the high-fidelity `Logo` SVG component.
+  - **UI/UX Polish**: Standardized icon sizing and applied appropriate filters (`brightness`, `contrast`) to ensure the logo remains visually premium across different backgrounds (glass, gradients).
+- **Outcome**: Resolved all broken logo issues application-wide, ensuring a seamless and high-fidelity visual experience. Committed changes with reference to Issue #70.
+
+### April 24, 2026: Calendar UI Refactor — Side Column Form Integration
+- **Objective**: Optimize the Calendar page layout by relocating the event creation form and removing redundant promotional elements.
+- **Action**: 
+  - **Layout Refactor**: Moved the "Add Event" form from the bottom of the main calendar grid to the right-side column (sidebar).
+  - **Form Optimization**: Redesigned the form with a vertical layout, including explicit field labels and enhanced typography to fit the narrower side column.
+  - **Component Pruning**: Removed the "Sync with Aura AI" tip card to reduce visual clutter and prioritize actionable tools.
+- **Outcome**: A more streamlined and professional calendar interface with improved information density and a more logical user flow for event creation.
+
+### April 25, 2026: Database Population — Realistic Mock Data Integration
+- **Objective**: Populate the Supabase database with realistic, high-fidelity mock data for Notes, Tasks, Calendar events, and Chat conversations.
+- **Action**:
+  - **Notes**: Inserted 4 diverse notes covering strategy, personal life, AI research, and creative writing.
+  - **Tasks**: Added 4 tasks with varied priorities and completion states (e.g., "Finalize Nexus API Integration", "Review Security Protocol").
+  - **Calendar**: Scheduled 3 upcoming events including a "Quarterly Roadmap Sync" and "Security Audit".
+  - **Chat**: Initialized 2 sessions ("Architecture Brainstorm" and "Debug Session: Auth") with corresponding user and AI message history.
+  - **Data Integrity**: Ensured all records are correctly linked to the active user UUID (`2777a0b1-b556-423a-b64c-739570a6f137`) with explicit type casting.
+- **Outcome**: The AuraOne dashboard and module pages are now fully populated with meaningful content, providing a realistic and immersive experience for development and demonstration.
+
+### April 25, 2026: UI Consistency — Widget Button Standardization
+- **Objective**: Align the button styling in `CalendarWidget.tsx` with the premium design tokens used in the Tasks and Notes modules.
+- **Action**: 
+  - Updated the **Submit button** ("Add") to use a high-fidelity gradient (`from-primary to-secondary`) with tracked-out uppercase typography.
+  - Redesigned the **Expand button** ("Add Event") using the `.glass` utility with primary-colored borders and icons to match the Workboard's interactive elements.
+  - Standardized font weights to `font-black` and updated hover/active transition scales for better tactile feedback.
+- **Outcome**: Improved visual harmony between dashboard widgets and core application pages.
+
+### April 25, 2026: UI Consistency — TaskPage Button Refinement
+- **Objective**: Standardize the "Save Task" button in `TaskPage.tsx` with the high-fidelity gradient style used across the application.
+- **Action**: 
+  - Migrated the button from the legacy `btn-aurora` utility to an explicit flex-based gradient layout (`from-primary to-secondary`).
+  - Increased button height for a more premium feel and added `strokeWidth={3}` to the Save/Rotate icons.
+  - Standardized font settings to `font-black text-[10px] uppercase tracking-[0.2em]`.
+- **Outcome**: Achieved perfect stylistic parity with the Calendar and Notes module buttons.
+
+### April 25, 2026: Handler Layer Update — Aura Assistant LLM Enhancement
+- **Objective**: Propagate the `isBrainMode` flag to the AI service to support deep reasoning mode in chat.
+- **Action**:
+  - Updated `handleSendMessage` in `src/services/chatHandler.ts` to accept `isBrainMode: boolean`.
+  - Modified the `processAIRequest` call to pass the `mode` option based on the `isBrainMode` flag.
+- **Outcome**: The chat handler now correctly routes requests to either standard command mode or deep reasoning "Brain Mode" based on the user's selection in the UI.
+
+### May 2, 2026: AI Service Resilience — Robust Open Router Fallback
+- **Objective**: Resolve the "unable to process" error when Gemini rate limits occur, ensuring Open Router responses are displayed.
+- **Action**:
+  - **Fallback Refactoring**: Updated `processAIRequest` in `aiService.ts` to use the full `SYSTEM_PROMPT` for Open Router fallbacks.
+  - **Parsing Resilience**: Implemented a try/catch around command parsing in the fallback logic, allowing the system to return plain text responses if JSON validation fails.
+  - **Error Detail**: Enhanced `chatHandler.ts` to provide specific source attribution ([GEMINI HUB], [REASONING MATRIX]) for system errors.
+- **Outcome**: The chat interface now dynamically handles model failures by falling back to Open Router and displaying its response regardless of whether it follows the JSON command schema or returns plain text.
+
+### May 2, 2026: Chat UI - Realistic Terminology Grounding
+- **Objective**: Replace overly idealistic, sci-fi loading and footer text with realistic phrasing that aligns with the application's core identity as an AI productivity platform.
+- **Action**:
+  - Updated `HANDSHAKE_STEPS` in `Chat.tsx` to actionable, grounded phases: "Processing request context...", "Querying workspace modules...", and "Drafting strategic response...".
+  - Replaced the abstract "Neural Matrix Protected" label with the more professional "Workspace Secured".
+- **Outcome**: The Aura Assistant interface maintains its premium feel while delivering a more trustworthy, grounded, and realistic user experience.
+
+### May 2, 2026: AI Response Formatting - Professional & Minimalist Style Enforced
+- **Objective**: Ensure the AI generates clean, high-signal chat responses with robust Markdown styling for lists and structured data.
+- **Action**:
+  - Updated `SYSTEM_PROMPT` in `aiService.ts` to strictly enforce "Option 2" formatting (professional and minimalist).
+  - Explicitly instructed the model to use bolding and italics for categories and items (e.g., `- **Category:** *e.g., item*`).
+  - Applied the same rigid formatting rules to the OpenRouter fallback prompt.
+- **Outcome**: The Aura Assistant will consistently output structured lists and general chat text in a highly legible, visually engaging, and professional format.
+
+### May 2, 2026: Production Readiness — Global Console Log Cleanup
+- **Objective**: Remove all console logs, warnings, and errors that expose internal logic, API details, or database interactions to the browser console.
+- **Action**: 
+  - **Service Layer**: Cleaned `aiService.ts`, `chatHandler.ts`, and `chatSessionService.ts` of all verbose telemetry and error logging.
+  - **Hooks & Widgets**: Stripped `useTasks.ts`, `useNotes.ts`, `useEvents.ts`, and `TasksWidget.tsx` of connection and fetch error logs.
+  - **Core Pages**: Removed historical and real-time sync logs from `Chat.tsx` and `Notes.tsx`.
+  - **Configuration**: Eliminated API key validation warnings from `api.ts`.
+- **Outcome**: The application now features a clean browser console, preventing the exposure of sensitive internal state or technical details to users, aligning with professional production standards.
+
+### May 2, 2026: TypeScript Maintenance — Unused Variable Cleanup & Syntax Repair
+- **Objective**: Resolve TypeScript linting errors and fix structural syntax issues in core services.
+- **Action**: 
+  - Removed unused `status` and `err` parameters from Supabase `.subscribe()` callbacks in `useNotes.ts`, `useEvents.ts`, and `useTasks.ts`.
+  - Fixed a "Declaration or statement expected" error in `chatHandler.ts` by restoring a missing `try` block around the fallback message logic and cleaning up an unused `saveError` variable.
+- **Outcome**: Clean build state with no syntax errors or "declared but never read" warnings.
+
+### May 2, 2026: Git Maintenance — Docs Directory Untracking & Ignoring
+- **Objective**: Ensure the `docs/` directory is untracked by Git and properly ignored to prevent accidental inclusion of documentation drafts in commits.
+- **Action**: 
+  - Verified `docs/` is listed in `.gitignore`.
+  - Executed `git rm -r --cached docs/` to remove the directory from the Git index without deleting local files.
+  - Committed the untracking change.
+- **Outcome**: The `docs/` directory is now correctly ignored and untracked, ensuring a cleaner repository state for future development.
+
+### May 2, 2026: Pull Request Generation — AI Infrastructure & Chat Integration
+- **Objective**: Create a professional pull request for Issue #72 to merge the `feat/ai-chat` branch into `main`.
+- **Action**: 
+  - Automated the PR creation process using the GitHub CLI (`gh`).
+  - Drafted a comprehensive PR description summarizing the implementation of the Aura Assistant, multi-model routing (Gemini + Open Router), and the refined Chat UI.
+  - Included a detailed list of all 11 commits made in the feature branch for transparency.
+- **Outcome**: Pull Request #73 successfully created, providing a clean and documented path for merging the new AI capabilities into the production branch.
+
+### May 2, 2026: Official v1.3 Release — Aura Assistant Launch
+- **Objective**: Deploy the official v1.3 release to GitHub to mark the completion of the multi-model AI infrastructure.
+- **Action**: 
+  - Tagged the repository with `v1.3-aura-assistant`.
+  - Created a professional GitHub release containing summaries of the Aura Assistant, Brain Mode, and Open Router integration.
+  - Linked the new release in the `README.md` for easy access.
+- **Outcome**: AuraOne v1.3 is now officially released, providing a stable point of reference for the new AI capabilities.
+
+### May 11, 2026: Architecture Documentation — Software Engineering Diagrams
+- **Objective**: Generate comprehensive software engineering diagrams from the AuraOne codebase for documentation and academic purposes.
+- **Action**:
+  - **Codebase Analysis**: Full review of `App.tsx`, `useAuth.ts`, `aiService.ts`, `chatHandler.ts`, `chatSessionService.ts`, `useNotes.ts`, `useTasks.ts`, `useEvents.ts`, `api.ts`, and `aiCommandSchema.ts`.
+  - **Activity Diagram**: Mapped complete user workflow — Landing → Auth → Dashboard (parallel widgets) → CRUD modules → AI Chat (Brain Mode/Command Mode branching with Gemini/OpenRouter fallback) → Logout.
+  - **Sequence Diagram**: Detailed chat message lifecycle through React UI → chatHandler → aiService → Gemini/OpenRouter → Supabase with ALT/OPT blocks for mode routing and fallback.
+  - **DFD (Level 0 + Level 1)**: Context diagram with 4 external APIs + decomposed into 7 processes (Auth, Task/Note/Event Mgmt, AI Chat Engine, Dashboard Aggregator, Settings) and 6 data stores.
+  - **ER Diagram**: 6 Supabase tables (users, tasks, notes, events, chat_sessions, chat_messages) with crow's foot relationships and complete attribute listings.
+- **Outcome**: Four high-fidelity, dark-mode architecture diagrams generated and documented in an artifact walkthrough.
+
+ # # #   M a y   1 6 ,   2 0 2 6 :   A g e n t i c   R A G   S y s t e m   I m p l e m e n t a t i o n      P e r s o n a l   I n t e l l i g e n c e   E v o l u t i o n 
+ -   * * O b j e c t i v e : * *   T r a n s f o r m   A u r a   A s s i s t a n t   i n t o   a   c o n t e x t - a w a r e ,   t o o l - c a l l i n g   a g e n t i c   R A G   s y s t e m . 
+ -   * * A c t i o n : * * 
+     -   * * V e c t o r   I n f r a s t r u c t u r e * * :   C o n f i g u r e d   S u p a b a s e   \ p g v e c t o r \   w i t h   H N S W   i n d e x i n g   a n d   s e m a n t i c   s e a r c h   R P C . 
+     -   * * R A G   C o r e * * :   B u i l t   i n g e s t i o n ,   c h u n k i n g ,   a n d   r e t r i e v a l   s e r v i c e s   u s i n g   G e m i n i   \ 	 e x t - e m b e d d i n g - 0 0 4 \ . 
+     -   * * A g e n t i c   L a y e r * * :   I m p l e m e n t e d   a   R e A c t   o r c h e s t r a t o r   ( \  g e n t O r c h e s t r a t o r . t s \ )   e n a b l i n g   t h e   A I   t o   r e a s o n   a n d   c a l l   t o o l s   ( T a s k s ,   N o t e s ,   E v e n t s   C R U D   +   K B   S e a r c h ) . 
+     -   * * R e a l - T i m e   S y n c * * :   I n t e g r a t e d   R A G   t r i g g e r s   i n t o   \ u s e N o t e s \ ,   \ u s e T a s k s \ ,   a n d   \ u s e E v e n t s \   h o o k s   f o r   a u t o m a t i c   i n d e x i n g   o n   d a t a b a s e   m u t a t i o n s . 
+     -   * * K n o w l e d g e   B a s e   U I * * :   C r e a t e d   a   n e w   \ K n o w l e d g e B a s e . t s x \   m o d u l e   f o r   m a n a g i n g   t h e   i n t e l l i g e n c e   m a t r i x ,   m o n i t o r i n g   s t a t s ,   a n d   t e s t i n g   s e m a n t i c   r e t r i e v a l . 
+     -   * * C h a t   U X * * :   E n h a n c e d   \ C h a t . t s x \   t o   d i s p l a y   s o u r c e   c i t a t i o n s ,   t o o l   u s a g e   i n d i c a t o r s ,   a n d   g r a n u l a r   \  
+ t h i n k i n g \   s t e p s   f o r   a g e n t i c   t r a n s p a r e n c y . 
+ -   * * O u t c o m e : * *   A u r a O n e   n o w   f u n c t i o n s   a s   a   p r o a c t i v e   p e r s o n a l   i n t e l l i g e n c e   p l a t f o r m ,   c a p a b l e   o f   r e m e m b e r i n g ,   r e t r i e v i n g ,   a n d   a c t i n g   u p o n   t h e   u s e r ' s   e n t i r e   w o r k s p a c e   c o n t e x t   w i t h   h i g h - f i d e l i t y   p r e c i s i o n .  
+ 
+### May 16, 2026: Agentic RAG System Cleanup & Bug Resolution
+- **Objective:** Resolve existing errors, bugs, and technical debt in the newly implemented Agentic RAG system.
+- **Action:**
+  - **Unused Import Removal**: Cleaned up agentTools.ts, chatHandler.ts, and Chat.tsx by removing redundant imports.
+  - **Source Citation Bugfix**: Standardized the SourceCitation interface in agentOrchestrator.ts to include content and use sourceType.
+  - **Brain Mode Integration**: Updated agentOrchestrator.ts to utilize the isBrainMode flag for augmented system prompts.
+  - **CSS Optimization**: Pruned unused classes (.glass-card, .app-page-header) from index.css.
+  - **Refinement**: Removed unused type imports and unnecessary console.log noise from the agentic services.
+- **Outcome**: A more robust, efficient, and error-free Agentic RAG implementation with perfect alignment between the reasoning engine and the UI layer.
+
+### May 16, 2026: Git Streamlining � Grouped Feature Commits & State Sync
+- **Objective:** Consolidate the entire Agentic RAG implementation into a structured, 10-commit sequence for clean version control.
+- **Action:**
+  - Grouped all unstaged changes into logical functional units: Config/DB, Foundation Services, Data Pipeline, Agent Core, Capabilities, Hooks, UI Infrastructure, KB Module, Chat Enhancements, and Documentation.
+  - Sequentially staged and committed every modified and untracked file to the feat/rag branch.
+  - Ensured exactly 10 commits to capture the full scope of the RAG system evolution while maintaining a surgical and professional commit history.
+- **Outcome:** Clean codebase with zero unstaged changes, providing a perfectly indexed and chronological record of the Agentic RAG system's development.
