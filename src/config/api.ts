@@ -22,10 +22,21 @@ export const API_CONFIG = {
   GEMINI_API_KEY: import.meta.env.VITE_GEMINI_API_KEY,
   GEMINI_API_URL: "https://generativelanguage.googleapis.com/v1beta",
   GEMINI_MODEL: "gemini-2.5-flash",
+  GEMINI_EMBEDDING_MODEL: "gemini-embedding-001",
   
   // Open Router - Deep reasoning fallback
   OPENROUTER_API_KEY: import.meta.env.VITE_OPENROUTER_API_KEY,
   OPENROUTER_API_URL: "https://openrouter.ai/api/v1/chat/completions",
+};
+
+// Configuration helper for RAG service
+export const getRAGConfig = () => {
+  return {
+    embeddingModel: API_CONFIG.GEMINI_EMBEDDING_MODEL,
+    dimensions: 768,
+    threshold: 0.5,
+    topK: 10,
+  };
 };
 
 // Enhanced API key validation with detailed reporting
