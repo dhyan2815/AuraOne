@@ -319,3 +319,10 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
   - Sequentially staged and committed every modified and untracked file to the feat/rag branch.
   - Ensured exactly 10 commits to capture the full scope of the RAG system evolution while maintaining a surgical and professional commit history.
 - **Outcome:** Clean codebase with zero unstaged changes, providing a perfectly indexed and chronological record of the Agentic RAG system's development.
+
+### May 16, 2026: Security — Scratch Folder Removal
+- **Objective:** Eliminate potential security risks by removing the scratch folder containing sensitive database credentials.
+- **Action:**
+  - Deleted the entire \scratch/\ directory which contained local testing scripts and hardcoded Supabase credentials.
+  - Committed and pushed the deletion to the \eat/rag\ branch.
+- **Outcome:** Reduced security vulnerability by ensuring sensitive connection details are no longer present in the latest codebase state.
