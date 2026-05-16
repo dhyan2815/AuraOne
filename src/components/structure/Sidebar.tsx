@@ -11,6 +11,7 @@ import {
   Menu,
   X,
   ChevronLeft,
+  Brain,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../../hooks/useAuth";
@@ -23,6 +24,7 @@ const navItems = [
   { path: "/tasks", icon: <CheckSquare size={20} />, label: "Tasks" },
   { path: "/events", icon: <CalendarIcon size={20} />, label: "Events" },
   { path: "/chat", icon: <MessagesSquare size={20} />, label: "Chat" },
+  { path: "/knowledge", icon: <Brain size={20} />, label: "Knowledge" },
 ];
 
 const navLinkClass = (isActive: boolean, isCollapsed: boolean) =>

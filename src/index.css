@@ -137,10 +137,6 @@
     border: 1px solid rgba(255, 255, 255, 0.12);
   }
 
-  .glass-card {
-    @apply bg-white/30 dark:bg-slate-900/40 backdrop-blur-[40px] border border-white/30 dark:border-white/10 shadow-xl shadow-indigo-500/5 dark:shadow-none;
-  }
-
   /* Aurora Input */
   .input-aurora {
     @apply w-full max-w-full bg-white/60 dark:bg-slate-900/60 border border-primary/10 dark:border-white/10 rounded-xl px-4 py-3 text-sm font-medium text-text placeholder:text-text/30 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all;
@@ -190,5 +186,14 @@
 
   .app-page { @apply w-full max-w-7xl mx-auto px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8; }
   .app-page-tight { @apply w-full max-w-5xl mx-auto px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8; }
-  .app-page-header { @apply flex flex-col gap-3 md:flex-row md:items-end md:justify-between; }
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-primary/20 rounded-full hover:bg-primary/40 transition-colors;
+  }
 }

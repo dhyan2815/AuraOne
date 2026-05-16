@@ -12,6 +12,7 @@ import { useAuth } from "./hooks/useAuth";
 import Login from "./pages/Login";
 import Loader from "./components/ui/Loader";
 import Chat from "./pages/Chat";
+import KnowledgeBase from "./pages/KnowledgeBase";
 import SignUp from "./pages/SignUp";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
@@ -45,6 +46,7 @@ function App() {
             <Route path="tasks/:id" element={<TaskPage />} />
             <Route path="events" element={<Calendar />} />
             <Route path="chat" element={<Chat />} />
+            <Route path="knowledge" element={<KnowledgeBase />} />
             <Route path="settings" element={<Settings />} />
           </Route>
         )}
