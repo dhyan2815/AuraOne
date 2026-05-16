@@ -1,8 +1,8 @@
 // src/services/chatHandler.ts
 import { supabase } from './supabase';
-import { processAIRequest } from './aiService';
 import { updateSessionName } from './chatSessionService';
 import { User } from '@supabase/supabase-js';
+import { processAgenticRequest } from './agentOrchestrator';
 
 export type Message = {
   id?: string;
@@ -11,6 +11,7 @@ export type Message = {
   role: 'user' | 'ai';
   content: string;
   created_at?: string;
+  metadata?: any;
 };
 
 // Fetch all messages for a given session
@@ -87,16 +88,20 @@ export const handleSendMessage = async (
       await updateSessionName(selectedSession, sessionName);
     }
 
-    // 3. Process with AI and save response
-    const resultText = await processAIRequest(content, user.id, {
-      mode: isBrainMode ? 'brain' : 'command'
+    // 3. Process with Agentic AI and save response
+    const agentResponse = await processAgenticRequest(content, user.id, {
+      isBrainMode
     });
     
     await addMessage({
       session_id: selectedSession,
       user_id: user.id,
       role: 'ai',
-      content: resultText,
+      content: agentResponse.message,
+      metadata: {
+        sources: agentResponse.sources,
+        toolsUsed: agentResponse.toolsUsed
+      }
     });
     
   } catch (aiError) {

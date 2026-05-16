@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import ReactMarkdown from "react-markdown";
-import { Send, Trash2, Plus, Paperclip, Mic } from "lucide-react";
+import { Send, Plus, Paperclip, ExternalLink, Database, Search, Wrench, ChevronDown, ChevronUp } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import {
-  getSessions, createNewSession, deleteSession, Session,
+  getSessions, createNewSession, Session,
 } from "../services/chatSessionService";
 import {
   getMessages, handleSendMessage, Message,
@@ -11,7 +11,6 @@ import {
 import { supabase } from "../services/supabase";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
-import { format } from "date-fns";
 import Logo from "../components/structure/Logo";
 
 const SUGGESTIONS = [
@@ -22,9 +21,11 @@ const SUGGESTIONS = [
 ];
 
 const HANDSHAKE_STEPS = [
-  "Analyzing your request...",
-  "Retrieving relevant context...",
-  "Generating response...",
+  "Analyzing context...",
+  "Searching knowledge base...",
+  "Thinking through plan...",
+  "Applying tool calls...",
+  "Synthesizing response...",
 ];
 
 const Chat = () => {
@@ -36,19 +37,36 @@ const Chat = () => {
   const [thinkingStep, setThinkingStep] = useState(0);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [selectedSession, setSelectedSession] = useState<string | null>(null);
+  const [expandedMetadata, setExpandedMetadata] = useState<Record<string, boolean>>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Auto-resize textarea
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const adjustHeight = () => {
+      textarea.style.height = 'auto';
+      textarea.style.height = `${Math.min(textarea.scrollHeight, 200)}px`;
+    };
+
+    textarea.addEventListener('input', adjustHeight);
+    adjustHeight();
+
+    return () => textarea.removeEventListener('input', adjustHeight);
+  }, [input]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(() => {
-    let interval: any;
+    let interval: ReturnType<typeof setInterval>;
     if (loading) {
       setThinkingStep(0);
       interval = setInterval(() => {
-        setThinkingStep((prev) => (prev + 1) % 3);
+        setThinkingStep((prev) => (prev + 1) % HANDSHAKE_STEPS.length);
       }, 1500);
     } else {
       setThinkingStep(0);
@@ -75,7 +93,7 @@ const Chat = () => {
     try {
       const list = await getMessages(selectedSession);
       setMessages(list);
-    } catch (err) {
+    } catch {
       toast.error("Matrix error: Messages");
     }
   }, [selectedSession]);
@@ -97,24 +115,18 @@ const Chat = () => {
         },
         (payload) => {
           setMessages((cur) => {
-            // PREVENT DUPLICATES: Only add if message ID doesn't exist
             const exists = cur.some(m => m.id === payload.new.id);
             if (exists) return cur;
 
-            // If it's a real user message arriving, remove the corresponding optimistic one
             if (payload.new.role === 'user') {
-              return [...cur.filter(m => !m.id?.toString().startsWith('temp-')), payload.new as Message];
+              return [...cur.filter(m => !m.id?.startsWith('temp-')), payload.new as Message];
             }
 
             return [...cur, payload.new as Message];
           });
         }
       )
-      .subscribe((status) => {
-        if (status === 'CHANNEL_ERROR') {
-          // Manual sync will handle fallback.
-        }
-      });
+      .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
@@ -127,7 +139,6 @@ const Chat = () => {
     if (!user || !selectedSession || !input.trim()) return;
     const msg = input;
     
-    // Optimistic UI Update: Add user message to state immediately
     const tempUserMsg: Message = {
       role: 'user',
       content: msg,
@@ -142,17 +153,13 @@ const Chat = () => {
     
     try {
       await handleSendMessage(msg, user, selectedSession, isBrainMode);
-      
-      // Secondary Sync: Refresh messages and sessions manually to ensure UI is current
       const [updatedSessions, updatedMessages] = await Promise.all([
         getSessions(user.id),
         getMessages(selectedSession)
       ]);
-      
       setSessions(updatedSessions);
       setMessages(updatedMessages);
-      
-    } catch (err) {
+    } catch {
       toast.error("Transmission failed");
     } finally {
       setLoading(false);
@@ -175,26 +182,15 @@ const Chat = () => {
     } catch { toast.error("Initialization failed"); }
   };
 
-  const handleDeleteSession = async (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!window.confirm("Archive this conversation?")) return;
-    try {
-      await deleteSession(id);
-      toast.success("Archive Successful");
-      const updated = sessions.filter((s) => s.id !== id);
-      setSessions(updated);
-      if (selectedSession === id) {
-        setSelectedSession(updated[0]?.id ?? null);
-        setMessages([]);
-      }
-    } catch { toast.error("Archive failed"); }
+  const toggleMetadata = (id: string) => {
+    setExpandedMetadata(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
   if (authLoading) {
     return (
       <div className="flex flex-col items-center justify-center h-[calc(100vh-4rem)]">
         <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin mb-4" />
-        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary animate-pulse">Connecting to Aura AI Assistant...</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary animate-pulse">Connecting to Aura AI...</p>
       </div>
     );
   }
@@ -202,9 +198,9 @@ const Chat = () => {
   const displayName = user?.email?.split("@")[0] ?? "User";
 
   return (
-    <div className="flex h-[calc(100dvh-4rem)] flex-col gap-4 lg:grid lg:grid-cols-[18rem_1fr] lg:px-6 lg:pt-16">
-      {/* ── Left Sidebar: Sessions ── */}
-      <aside className="flex min-h-0 flex-col gap-3 lg:h-full lg:max-h-[calc(100dvh-4rem)]">
+    <div className="flex h-full lg:h-[calc(100dvh-4rem)] flex-col gap-4 lg:grid lg:grid-cols-[20rem_1fr] lg:px-6 lg:pt-6 overflow-hidden relative z-0">
+      {/* ── Sidebar ── */}
+      <aside className="flex min-h-0 flex-col gap-4 lg:h-full">
         <motion.button
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.99 }}
@@ -215,41 +211,24 @@ const Chat = () => {
           <span className="font-bold text-white text-xs tracking-wide">New Chat</span>
         </motion.button>
 
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-primary/10 glass shadow-sm transition-colors duration-500">
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-primary/10 glass shadow-sm">
           <div className="px-4 py-3 border-b border-primary/5 bg-primary/5">
-            <h3 className="text-[11px] font-bold text-text-variant uppercase tracking-wider opacity-70">Recent Conversations</h3>
+            <h3 className="text-[11px] font-bold text-text-variant uppercase tracking-wider opacity-70">History</h3>
           </div>
-          <div className="flex-1 overflow-y-auto custom-scrollbar p-2">
-            {sessions.length === 0 && (
-              <div className="py-12 text-center px-4">
-                <p className="text-[11px] text-text-variant/40 font-bold uppercase tracking-wider leading-relaxed">No history found</p>
-              </div>
-            )}
-            <div className="space-y-1">
+          <div className="flex-1 overflow-y-auto custom-scrollbar p-3">
+            <div className="space-y-1.5">
               {sessions.map((s) => (
                 <motion.div
                   key={s.id}
+                  whileHover={{ x: 4 }}
                   onClick={() => setSelectedSession(s.id)}
-                  className={`px-3 py-2.5 rounded-lg cursor-pointer group flex items-center justify-between gap-3 transition-all duration-200 border ${
-                    selectedSession === s.id
-                      ? "bg-primary/10 border-primary/20 text-primary shadow-sm"
-                      : "bg-transparent border-transparent hover:bg-primary/5 text-text-variant hover:text-text"
+                  className={`px-3 py-3 rounded-xl cursor-pointer group flex items-center justify-between gap-3 transition-all ${
+                    selectedSession === s.id 
+                      ? "bg-primary/10 border border-primary/20 text-primary" 
+                      : "hover:bg-primary/5 text-text-variant border border-transparent"
                   }`}
                 >
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold truncate">
-                      {s.name || "New Chat"}
-                    </p>
-                    <p className="text-[10px] font-medium opacity-50 mt-0.5">
-                      {s.created_at ? format(new Date(s.created_at), "MMM dd") : ""}
-                    </p>
-                  </div>
-                  <button
-                    onClick={(e) => handleDeleteSession(s.id, e)}
-                    className="p-1 text-text-variant/30 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
-                  >
-                    <Trash2 size={13} />
-                  </button>
+                  <p className="text-xs font-bold truncate">{s.name || "New Chat"}</p>
                 </motion.div>
               ))}
             </div>
@@ -258,169 +237,199 @@ const Chat = () => {
       </aside>
 
       {/* ── Main Chat ── */}
-      <section className="relative flex min-h-[calc(100dvh-8rem)] min-w-0 flex-col overflow-hidden rounded-2xl border border-primary/10 glass shadow-sm transition-colors duration-500">
-        {/* Chat Header */}
-        <div className="px-6 h-14 border-b border-primary/5 flex items-center justify-between bg-primary/5 backdrop-blur-md z-10">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white shadow-md shadow-primary/10">
-              <Logo iconOnly iconClassName="w-[1.125rem] h-[1.125rem] filter brightness-0 invert" />
+      <section className="relative flex flex-col h-full min-h-0 overflow-hidden rounded-3xl border border-primary/10 bg-white dark:glass shadow-2xl shadow-primary/5 isolation-auto">
+        <div className="px-6 h-16 border-b border-primary/5 flex items-center justify-between bg-white/50 dark:bg-primary/5 backdrop-blur-xl z-10 shrink-0">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary to-secondary flex items-center justify-center shadow-lg shadow-primary/20">
+              <Logo iconOnly iconClassName="w-5 h-5 filter brightness-0 invert" />
             </div>
             <div>
-              <h2 className="text-sm font-bold text-text tracking-wide uppercase">Aura Assistant</h2>
+              <h2 className="text-sm font-black text-text tracking-widest uppercase">Aura Assistant</h2>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-tight">Active Pulse</span>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Messages / Canvas */}
-        <div className="custom-scrollbar relative flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
-          <AnimatePresence mode="popLayout">
+        <div className="custom-scrollbar relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 sm:p-6 lg:p-8 overscroll-contain touch-pan-y" style={{ height: '100%' }}>
+          <AnimatePresence>
             {messages.length === 0 && !loading ? (
-              <motion.div
-                key="empty"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="relative z-10 flex h-full flex-col items-center justify-center space-y-8 p-4 text-center pb-20"
-              >
-                <div className="space-y-4">
-                  <div className="w-16 h-16 rounded-2xl bg-primary/5 glass shadow-sm flex items-center justify-center mx-auto mb-6 border border-primary/10">
-                    <Logo iconOnly iconClassName="w-9 h-9" />
-                  </div>
-                  <h2 className="text-2xl font-bold tracking-tight text-text" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                    Welcome to <span className="text-primary">Aura Assistant</span>
-                  </h2>
-                  <p className="text-xs text-text-variant font-medium max-w-[280px] mx-auto leading-relaxed opacity-60">
-                    How can I help you optimize your neural workflow today?
-                  </p>
+              <div className="h-full flex flex-col items-center justify-center text-center pb-20">
+                <div className="w-16 h-16 rounded-2xl glass mb-6 border border-primary/10 flex items-center justify-center">
+                  <Logo iconOnly iconClassName="w-9 h-9" />
                 </div>
-
-                <div className="grid w-full max-w-lg grid-cols-2 gap-3">
+                <h2 className="text-2xl font-bold text-text">How can I assist?</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-12 w-full max-w-2xl">
                   {SUGGESTIONS.map((s, i) => (
                     <motion.button
                       key={i}
-                      whileHover={{ y: -2, scale: 1.01 }}
-                      whileTap={{ scale: 0.99 }}
+                      whileHover={{ scale: 1.02, translateY: -2 }}
+                      whileTap={{ scale: 0.98 }}
                       onClick={() => setInput(s.title)}
-                      className="glass border border-primary/5 p-4 rounded-xl text-left hover:border-primary/20 hover:bg-primary/5 transition-all group"
+                      className="glass border border-primary/10 p-5 rounded-2xl text-left hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all group"
                     >
-                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-base mb-3 group-hover:scale-110 transition-transform">
-                        {s.icon}
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="text-xl group-hover:scale-110 transition-transform">{s.icon}</span>
+                        <p className="text-[11px] font-black text-primary uppercase tracking-[0.15em]">{s.title}</p>
                       </div>
-                      <p className="text-[10px] font-bold text-text uppercase tracking-wider group-hover:text-primary transition-colors">{s.title}</p>
-                      <p className="text-[10px] text-text-variant font-medium mt-1 leading-normal opacity-60">{s.sub}</p>
+                      <p className="text-[11px] font-medium text-text-variant leading-relaxed opacity-80">{s.sub}</p>
                     </motion.button>
                   ))}
                 </div>
-              </motion.div>
+              </div>
             ) : (
-              <div className="relative z-10 mx-auto max-w-3xl space-y-10 pb-6">
+              <div className="mx-auto max-w-3xl space-y-8">
                 {messages.map((msg, idx) => (
                   <motion.div
                     key={msg.id || idx}
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className={`flex items-start gap-5 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}
+                    className={`flex items-start gap-4 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}
                   >
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm ${
-                      msg.role === "ai"
-                        ? "bg-gradient-to-tr from-primary to-secondary border border-white/20"
-                        : "glass border border-primary/20 text-primary"
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                      msg.role === "ai" ? "bg-gradient-to-tr from-primary to-secondary text-white" : "glass border border-primary/20 text-primary"
                     }`}>
-                      {msg.role === "ai" ? (
-                        <Logo iconOnly iconClassName="w-4 h-4 filter brightness-0 invert" />
-                      ) : (
-                        <span className="text-[11px] font-bold uppercase">{displayName[0]}</span>
-                      )}
+                      {msg.role === "ai" ? <Logo iconOnly iconClassName="w-4 h-4 filter brightness-0 invert" /> : <span className="text-[11px] font-bold">{displayName[0]}</span>}
                     </div>
-                    <div className={`max-w-[80%] px-4 py-2.5 text-sm font-medium leading-relaxed transition-all ${
-                      msg.role === "user"
-                        ? "bg-primary text-white rounded-2xl rounded-tr-sm shadow-md shadow-primary/10"
-                        : "glass border border-primary/5 text-text rounded-2xl rounded-tl-sm shadow-sm"
-                    }`}>
-                      <div className="whitespace-pre-wrap break-words prose prose-sm max-w-none prose-headings:font-bold prose-p:text-inherit prose-strong:text-inherit prose-em:text-inherit prose-ul:list-disc prose-ol:list-decimal prose-li:marker:text-primary/60">
-                        <ReactMarkdown>{msg.content}</ReactMarkdown>
+                    
+                    <div className="flex flex-col gap-2 max-w-[85%]">
+                      <div className={`px-4 py-2.5 text-sm leading-relaxed ${
+                        msg.role === "user" 
+                          ? "bg-white dark:bg-primary text-black dark:text-white border border-primary/10 dark:border-transparent rounded-2xl rounded-tr-sm shadow-md" 
+                          : "bg-white dark:glass border border-primary/5 text-black dark:text-white rounded-2xl rounded-tl-sm"
+                      }`}>
+                        <div className="whitespace-pre-wrap break-words prose prose-sm max-w-none dark:prose-invert">
+                          <ReactMarkdown>{msg.content}</ReactMarkdown>
+                        </div>
                       </div>
+
+                      {/* Metadata / Sources UI */}
+                      {msg.role === "ai" && msg.metadata && (
+                        <div className="mt-1">
+                          <button 
+                            onClick={() => toggleMetadata(msg.id || idx.toString())}
+                            className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-primary hover:opacity-80 transition-all mb-2"
+                          >
+                            {msg.metadata.sources?.length ? <Search size={10} /> : <Wrench size={10} />}
+                            {msg.metadata.sources?.length ? `${msg.metadata.sources.length} Context Sources` : 'Agent Insights'}
+                            {expandedMetadata[msg.id || idx.toString()] ? <ChevronUp size={10} /> : <ChevronDown size={10} />}
+                          </button>
+                          
+                          <AnimatePresence>
+                            {expandedMetadata[msg.id || idx.toString()] && (
+                              <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: "auto" }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="space-y-2 overflow-hidden"
+                              >
+                                {msg.metadata.toolsUsed && msg.metadata.toolsUsed.length > 0 && (
+                                  <div className="flex flex-wrap gap-2 mb-3">
+                                    {msg.metadata.toolsUsed.map((tool: string, ti: number) => (
+                                      <div key={ti} className="px-2 py-1 rounded bg-primary/5 border border-primary/10 flex items-center gap-1.5">
+                                        <Wrench size={10} className="text-primary" />
+                                        <span className="text-[9px] font-bold text-text-variant opacity-70">{tool}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                                
+                                {msg.metadata.sources && msg.metadata.sources.map((source: any, si: number) => (
+                                  <div key={si} className="p-3 rounded-xl bg-white/5 border border-white/5 flex gap-3 group">
+                                    <Database size={14} className="text-primary/40 shrink-0 mt-0.5" />
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-[10px] font-bold text-text-variant uppercase mb-1">
+                                        {source.sourceType} • {(source.similarity * 100).toFixed(0)}% Match
+                                      </p>
+                                      <p className="text-xs text-text opacity-70 line-clamp-2 italic">"{source.content}"</p>
+                                    </div>
+                                    <button className="opacity-0 group-hover:opacity-100 transition-all p-1 text-text-variant hover:text-primary">
+                                      <ExternalLink size={12} />
+                                    </button>
+                                  </div>
+                                ))}
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      )}
                     </div>
                   </motion.div>
                 ))}
 
                 {loading && (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-4">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-primary to-secondary flex items-center justify-center shadow-sm">
+                  <div className="flex gap-4">
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-primary to-secondary flex items-center justify-center">
                       <Logo iconOnly iconClassName="w-4 h-4 filter brightness-0 invert" />
                     </div>
-                    <div className="glass border border-primary/5 rounded-2xl rounded-tl-sm px-5 py-3 flex flex-col gap-2 shadow-sm min-w-[200px]">
-                      <div className="flex items-center gap-1">
-                        {[1, 2, 3].map((i) => (
-                          <div key={i} className="w-1 h-1 bg-primary rounded-full animate-bounce" style={{ animationDelay: `${i * 0.1}s` }} />
-                        ))}
+                    <div className="bg-white/50 dark:bg-slate-900/40 backdrop-blur-xl border border-primary/10 rounded-2xl rounded-tl-sm px-6 py-4 flex flex-col gap-3 min-w-[240px] shadow-lg shadow-primary/5">
+                      <div className="flex gap-1.5 items-center">
+                        <div className="w-1.5 h-1.5 bg-primary rounded-full animate-[bounce_1s_infinite_0ms]" />
+                        <div className="w-1.5 h-1.5 bg-primary rounded-full animate-[bounce_1s_infinite_200ms]" />
+                        <div className="w-1.5 h-1.5 bg-primary rounded-full animate-[bounce_1s_infinite_400ms]" />
+                        <span className="ml-2 text-[10px] font-black text-primary uppercase tracking-widest animate-pulse">Neural Processing</span>
                       </div>
-                      <motion.p
-                        key={thinkingStep}
-                        initial={{ opacity: 0, y: 5 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="text-[10px] font-bold text-primary uppercase tracking-widest font-mono"
-                      >
-                        {HANDSHAKE_STEPS[thinkingStep]}
-                      </motion.p>
+                      <div className="h-px w-full bg-gradient-to-r from-primary/20 to-transparent" />
+                      <p className="text-[10px] font-bold text-text-variant uppercase tracking-[0.1em] font-mono flex items-center gap-2">
+                        <span className="text-primary">❯</span> {HANDSHAKE_STEPS[thinkingStep]}
+                      </p>
                     </div>
-                  </motion.div>
+                  </div>
                 )}
-                <div ref={messagesEndRef} />
+                <div ref={messagesEndRef} className="h-4 w-full" />
               </div>
             )}
           </AnimatePresence>
         </div>
 
-        {/* Floating Input Area */}
-        <div className="sticky bottom-0 left-0 z-30 w-full border-t border-primary/5 glass-panel px-4 pb-4 pt-4">
-          <div className="mx-auto max-w-3xl">
-            <div className={`glass border border-primary/15 rounded-xl p-1.5 flex items-end gap-1.5 shadow-xl shadow-primary/5 transition-all`}>
-              <button className="p-2.5 text-text-variant hover:text-primary transition-all rounded-lg hover:bg-primary/5">
-                <Paperclip size={18} strokeWidth={2} />
-              </button>
+        <div className="w-full bg-white/5 dark:bg-transparent backdrop-blur-md p-4 sm:p-6 lg:pb-8 shrink-0 border-t border-primary/5">
+          <div className="mx-auto max-w-4xl">
+            <div className="bg-white dark:bg-slate-900/40 backdrop-blur-2xl border border-primary/20 rounded-2xl p-2 flex items-end gap-2 shadow-2xl shadow-primary/10 transition-all focus-within:border-primary/40 focus-within:ring-4 focus-within:ring-primary/5">
+              <div className="flex items-center self-center pl-1">
+                <button className="p-2 text-text-variant hover:text-primary hover:bg-primary/5 rounded-xl transition-all">
+                  <Paperclip size={20} />
+                </button>
+              </div>
+              
               <textarea
                 ref={textareaRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Message Aura Assistant..."
+                placeholder="Message Aura..."
                 rows={1}
-                disabled={loading || !selectedSession}
-                className="flex-1 resize-none bg-transparent border-none py-2.5 text-sm font-medium text-text outline-none placeholder:text-text-variant/40 focus:ring-0 scrollbar-none"
-                style={{ maxHeight: "150px" }}
+                className="flex-1 bg-transparent border-none py-3 text-sm font-semibold text-text outline-none resize-none min-h-[44px] max-h-[200px] custom-scrollbar"
               />
-              <div className="flex items-center gap-1.5">
-                {/* BRAIN Toggle */}
-                <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg glass border border-primary/10 transition-all mr-1">
-                  <span className="text-[9px] font-black tracking-[0.1em] text-text-variant uppercase">Brain</span>
-                  <button
-                    onClick={() => setIsBrainMode(!isBrainMode)}
-                    className={`relative w-7 h-3.5 rounded-full transition-all duration-300 ${isBrainMode ? 'bg-primary shadow-[0_0_10px_rgba(var(--color-primary),0.5)]' : 'bg-text-variant/20'}`}
-                  >
-                    <motion.div
-                      animate={{ x: isBrainMode ? 14 : 2 }}
-                      className="absolute top-0.5 w-2.5 h-2.5 rounded-full bg-white shadow-sm"
-                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                    />
-                  </button>
-                </div>
-                <button className="p-2.5 text-text-variant hover:text-primary transition-all rounded-lg hover:bg-primary/5">
-                  <Mic size={18} strokeWidth={2} />
-                </button>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={handleSend}
-                  disabled={loading || !input.trim() || !selectedSession}
-                  className="w-10 h-10 rounded-lg bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/20 disabled:opacity-20 disabled:grayscale transition-all"
+              
+              <div className="flex items-center gap-2 pr-1 shrink-0 self-center md:self-end md:pb-1">
+                <button 
+                  onClick={() => setIsBrainMode(!isBrainMode)} 
+                  className={`hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl border transition-all ${
+                    isBrainMode 
+                      ? 'bg-primary/10 border-primary/30 text-primary shadow-inner shadow-primary/5' 
+                      : 'bg-text-variant/5 border-transparent text-text-variant hover:bg-text-variant/10'
+                  }`}
                 >
-                  <Send size={16} strokeWidth={2.5} />
-                </motion.button>
+                  <Database size={14} className={isBrainMode ? 'animate-pulse' : ''} />
+                  <span className="text-[10px] font-black uppercase tracking-wider">Brain Mode</span>
+                  <div className={`relative w-6 h-3 rounded-full transition-all ${isBrainMode ? 'bg-primary/40' : 'bg-text-variant/20'}`}>
+                    <motion.div animate={{ x: isBrainMode ? 14 : 2 }} className="absolute top-0.5 w-2 h-2 rounded-full bg-white shadow-sm" />
+                  </div>
+                </button>
+
+                <button 
+                  onClick={handleSend} 
+                  disabled={loading || !input.trim()} 
+                  className="w-11 h-11 rounded-xl bg-primary text-white flex items-center justify-center disabled:opacity-20 disabled:grayscale transition-all hover:shadow-lg hover:shadow-primary/30 active:scale-95 shrink-0"
+                >
+                  <Send size={18} strokeWidth={3} />
+                </button>
               </div>
             </div>
-            <div className="flex items-center justify-center gap-1.5 mt-3 opacity-30">
-              <p className="text-[10px] font-bold text-text-variant uppercase tracking-widest text-center">Workspace Secured</p>
-            </div>
+            <p className="text-[9px] text-center mt-3 text-text-variant uppercase font-black tracking-[0.2em] opacity-40">
+              Aura Assistant          </p>
           </div>
         </div>
       </section>
