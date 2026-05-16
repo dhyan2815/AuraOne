@@ -1,6 +1,7 @@
 // src/hooks/useNotes.ts
 import { supabase } from "../services/supabase";
 import { RealtimeChannel } from "@supabase/supabase-js";
+import { ingestItem, removeItem } from "../services/ragIngestionService";
 
 // The Note interface now matches the Supabase table schema
 export interface Note {
@@ -73,6 +74,10 @@ export const createNote = async (userId: string, note: NewNote): Promise<Note> =
   if (error) {
     throw error;
   }
+
+  // Trigger RAG ingestion
+  ingestItem(userId, 'note', data.id).catch(err => console.error("RAG Ingestion Error:", err));
+
   return data;
 };
 
@@ -91,6 +96,10 @@ export const updateNote = async (
   if (error) {
     throw error;
   }
+
+  // Trigger RAG ingestion
+  ingestItem(data.user_id, 'note', data.id).catch(err => console.error("RAG Ingestion Error:", err));
+
   return data;
 };
 
@@ -101,4 +110,7 @@ export const deleteNote = async (noteId: string) => {
   if (error) {
     throw error;
   }
+
+  // Remove from RAG index
+  removeItem(noteId).catch(err => console.error("RAG Removal Error:", err));
 };

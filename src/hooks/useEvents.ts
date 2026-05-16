@@ -1,6 +1,7 @@
 // src/hooks/useEvents.ts
 import { supabase } from "../services/supabase";
 import { RealtimeChannel } from "@supabase/supabase-js";
+import { ingestItem, removeItem } from "../services/ragIngestionService";
 
 // The Event interface matches the Supabase 'events' table
 export interface Event {
@@ -59,6 +60,10 @@ export const createEvent = async (userId: string, event: NewEvent): Promise<Even
   if (error) {
     throw error;
   }
+
+  // Trigger RAG ingestion
+  ingestItem(userId, 'event', data.id).catch(err => console.error("RAG Ingestion Error:", err));
+
   return data;
 };
 
@@ -69,6 +74,9 @@ export const deleteEvent = async (eventId: string): Promise<void> => {
   if (error) {
     throw error;
   }
+
+  // Remove from RAG index
+  removeItem(eventId).catch(err => console.error("RAG Removal Error:", err));
 };
 
 // Update an event
@@ -83,5 +91,9 @@ export const updateEvent = async (eventId: string, updates: Partial<NewEvent>): 
   if (error) {
     throw error;
   }
+
+  // Trigger RAG ingestion
+  ingestItem(data.user_id, 'event', data.id).catch(err => console.error("RAG Ingestion Error:", err));
+
   return data;
 };

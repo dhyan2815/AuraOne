@@ -1,6 +1,7 @@
 // src/hooks/useTasks.ts
 import { supabase } from "../services/supabase";
 import { RealtimeChannel } from "@supabase/supabase-js";
+import { ingestItem, removeItem } from "../services/ragIngestionService";
 
 // The Task interface now matches the Supabase table schema
 export interface Task {
@@ -74,6 +75,10 @@ export const createTask = async (userId: string, task: NewTask): Promise<Task> =
   if (error) {
     throw error;
   }
+
+  // Trigger RAG ingestion
+  ingestItem(userId, 'task', data.id).catch(err => console.error("RAG Ingestion Error:", err));
+
   return data;
 };
 
@@ -92,6 +97,10 @@ export const updateTask = async (
   if (error) {
     throw error;
   }
+
+  // Trigger RAG ingestion
+  ingestItem(data.user_id, 'task', data.id).catch(err => console.error("RAG Ingestion Error:", err));
+
   return data;
 };
 
@@ -102,4 +111,7 @@ export const deleteTask = async (taskId: string) => {
   if (error) {
     throw error;
   }
+
+  // Remove from RAG index
+  removeItem(taskId).catch(err => console.error("RAG Removal Error:", err));
 };
