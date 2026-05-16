@@ -1,6 +1,0 @@
-{
-  "model": "models/text-embedding-004",
-  "content": {
-    "parts": [{ "text": "Hello world" }]
-  }
-}
