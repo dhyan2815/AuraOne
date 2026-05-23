@@ -326,3 +326,13 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
   - Deleted the entire \scratch/\ directory which contained local testing scripts and hardcoded Supabase credentials.
   - Committed and pushed the deletion to the \eat/rag\ branch.
 - **Outcome:** Reduced security vulnerability by ensuring sensitive connection details are no longer present in the latest codebase state.
+
+### May 16, 2026: Knowledge Graph Update - Agentic RAG Domain Extraction
+- **Objective:** Synchronize the Understand Anything Knowledge Graph with the newly implemented Agentic RAG system architecture.
+- **Action:**
+  - Analyzed the new agentic services (agentOrchestrator, agentTools, ragRetrieval, etc.) and extracted domain-specific logic clusters.
+  - Regenerated knowledge-graph.json to include 12+ new nodes and multiple high-weight edges representing the ReAct reasoning loop and vector retrieval pipeline.
+  - Introduced new Domain Layers: 'Intelligence Engine' and 'RAG Architecture' for better visual organization.
+  - Created a specialized 'Agentic RAG Flow' Tour Slide to guide users through the query-to-result journey.
+  - Updated the Dashboard Access Guide with a new token: auraone-kg-20260516.
+- **Outcome:** The codebase's structural intelligence is now fully synchronized with its latest agentic capabilities, enabling precise architectural analysis and onboarding.

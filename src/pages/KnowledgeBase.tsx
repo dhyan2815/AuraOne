@@ -1,8 +1,8 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Brain, Search, RefreshCw, FileText, CheckCircle, Calendar, Trash2, ExternalLink, Database, Filter } from 'lucide-react';
-import { ingestAllForUser, removeItem } from '../services/ragIngestionService';
+import { motion } from 'framer-motion';
+import { Brain, Search, RefreshCw, FileText, CheckCircle, Calendar, Trash2, Database, Filter } from 'lucide-react';
+import { ingestAllForUser } from '../services/ragIngestionService';
 import { retrieveContext, RetrievalResult } from '../services/ragRetrievalService';
 import { supabase } from '../services/supabase';
 import toast from 'react-hot-toast';
@@ -136,10 +136,10 @@ const KnowledgeBase = () => {
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-text leading-tight flex items-center gap-3">
             <Brain className="text-primary" size={32} />
-            Knowledge Base
+            Recent Activity
           </h1>
           <p className="text-sm text-text-variant mt-1 font-medium opacity-70">
-            Monitor and manage your personal intelligence matrix.
+            See your recent activities you've done across tasks, notes, events, and calendar.
           </p>
         </div>
 
@@ -153,7 +153,7 @@ const KnowledgeBase = () => {
           }`}
         >
           <RefreshCw size={14} className={isSyncing ? 'animate-spin' : ''} />
-          {isSyncing ? `Indexing ${syncProgress}%` : 'Rebuild Vault'}
+          {isSyncing ? `Indexing ${syncProgress}%` : 'Refresh Activity'}
         </button>
       </motion.div>
 
@@ -212,7 +212,7 @@ const KnowledgeBase = () => {
                 <div className="space-y-6">
                   <div className="flex items-center justify-between gap-4">
                     <p className="text-[10px] font-bold text-text-variant uppercase tracking-widest opacity-60">
-                      Indexed Knowledge Chunks (Limit 50)
+                      Activity List (Limit 50)
                     </p>
                     <div className="flex gap-2">
                       {['all', 'note', 'task', 'event'].map(f => (
