@@ -43,14 +43,14 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
   - **UI/UX Polish**: Adopted "Neural" terminology across all registry pages. Standardized the `.glass` utility in `index.css` to automatically adjust opacity and border contrast based on theme.
 - **Outcome:** AuraOne now delivers a world-class dark mode experience that feels unified, premium, and highly technical, with no remaining light-mode artifacts in core or detail pages.
 
-### April 14, 2026: Theme System Refactor — RGB Channel Migration
+### April 14, 2026: Theme System Refactor â€” RGB Channel Migration
 - **Objective:** Resolve PostCSS @apply errors with dynamic opacity (e.g., `border-primary/10`).
 - **Action:**
   - Migrated `var(--color-*)` variables in `index.css` from Hex to **RGB space-separated triples**.
   - Updated `tailwind.config.js` to use `rgb(var(--color-*) / <alpha-value>)` for core semantic colors.
 - **Outcome:** Full support for Tailwind shorthand opacity (/10, /20, etc.) inside both JSX and @apply directives, ensuring a robust and bug-free design system.
 
-### April 14, 2026: UI Simplification — Header Removal & Relocated Theme Toggle
+### April 14, 2026: UI Simplification â€” Header Removal & Relocated Theme Toggle
 - **Objective:** Streamline the interface by removing redundant header elements and providing a more accessible theme toggle.
 - **Action:** 
   - Eliminated the top `header` in `Layout.tsx`, including search, notification icons, and user account details.
@@ -58,7 +58,7 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
   - Enhanced the toggle with `framer-motion` for smooth, spring-based transitions between the Sun and Moon icons.
 - **Outcome:** A cleaner, more focused workspace.
 
-### April 14, 2026: Hotfix — WeatherWidget Crash & PostCSS Safelist
+### April 14, 2026: Hotfix â€” WeatherWidget Crash & PostCSS Safelist
 - **Objective:** Fix "White Screen of Death" and Resolve PostCSS @apply errors.
 - **Action:**
   - **Icon Fix**: Added missing `RotateCw` import to `WeatherWidget.tsx`.
@@ -75,7 +75,7 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
 ### March 28, 2026: Logo Generation & Integration
 ... (previous logs preserved)
 
-### April 14, 2026: Terminology Standardization — From Esoteric to Intuitive
+### April 14, 2026: Terminology Standardization â€” From Esoteric to Intuitive
 - **Objective**: Replace abstract and confusing page titles (e.g., "Temporal Matrix", "Nexus Control") with clear, professional names.
 - **Action**:
   - **Dashboard**: Renamed sections to "ACTIVE TASKS" and "MY SCHEDULE".
@@ -86,7 +86,7 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
   - **Chat**: Renamed "Neural Pulse" to "Aura Assistant" and updated interaction prompts for clarity.
 - **Outcome**: The application now features a logical, user-friendly interface that maintains its premium aesthetic while being significantly more intuitive.
 
-### April 14, 2026: News Widget Expansion — Enhanced Information Density
+### April 14, 2026: News Widget Expansion â€” Enhanced Information Density
 - **Objective**: Increase the number of news updates visible on the dashboard to improve information delivery.
 - **Action**: 
   - Updated `NewsWidget.tsx` to fetch and render 5 items (1 featured + 4 secondary) instead of 3.
@@ -94,12 +94,12 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
   - Optimized transition delays for the newly added secondary items.
 - **Outcome**: The dashboard now provides a more comprehensive overview of global updates while maintaining its sleek, high-fidelity aesthetic.
 
-### April 14, 2026: UI Consistency — Refined Calendar Terminology
+### April 14, 2026: UI Consistency â€” Refined Calendar Terminology
 - **Objective**: Replace the abstract "Vapor Schedule" label in the Calendar widget with a more logical and intuitive term.
 - **Action**: Updated `CalendarWidget.tsx` to rename "Vapor Schedule" to "Daily Agenda".
 - **Outcome**: Improved UI clarity and adherence to the standardized professional terminology system.
 
-### April 14, 2026: Authentication UI Refine — Logical Taxonomy
+### April 14, 2026: Authentication UI Refine â€” Logical Taxonomy
 - **Objective**: Standardize esoteric and abstract labeling in the Login and SignUp pages to improve clarity and user onboarding.
 - **Action**:
   - **Login.tsx**: Replaced "Universal Identifier" with "Email Address", "Secure Key" with "Password", and "Restore Session" with "Sign In". Standardized decorative headers to "Welcome Back" and "Professional Workspace".
@@ -115,7 +115,7 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
   - **UI/UX Dynamics**: Leveraged synced `framer-motion` springs for butter-smooth layout shifts. Added rotation animations to the toggle chevron and graceful label showing/hiding with `AnimatePresence`.
 - **Outcome**: Improved workspace flexibility and reduced interface ambiguity.
 
-### April 14, 2026: Chat UI Deep Refactor — Professional SaaS Integration
+### April 14, 2026: Chat UI Deep Refactor â€” Professional SaaS Integration
 - **Objective**: Completely resolve the "zoomed" and "huge" feeling of the Chat page by aligning it with professional SaaS standards.
 - **Action**:
   - **Layout Reconstruction**: Reduced page sidebar width from `20rem` to `18rem` and simplified the nested-box structure into a unified, clean glass container.
@@ -134,7 +134,7 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
   - Fast-forwarded the `main` branch to match `ui2`, achieving parity across both branches.
 - **Outcome**: Both `main` and `ui2` are now perfectly synchronized at the same commit, with no "ahead" or "behind" indicators on GitHub.
 
-### April 14, 2026: Codebase Cleanup — Removal of Unused Assets & Legacy Configs
+### April 14, 2026: Codebase Cleanup â€” Removal of Unused Assets & Legacy Configs
 - **Objective**: Standardize and optimize the codebase by removing all unused files, components, and legacy configurations to reduce technical debt and build size.
 - **Action**:
   - **Asset Pruning**: Permanently deleted 7 unu
@@ -144,7 +144,7 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
   - **Verification**: Verified that all remaining components and assets are actively imported and functional within the application. Corrected the favicon path in `index.html` to follow Vite root-absolute standards. Added `CLAUDE.md` to `.gitignore` and untracked it from git.
 - **Outcome**: A leaner, more professional codebase with significantly reduced complexity and zero reliance on deprecated backend or AI SDKs.
 
-### May 16, 2026: Knowledge Base Fix — Vector Dimensionality & Model Sync
+### May 16, 2026: Knowledge Base Fix â€” Vector Dimensionality & Model Sync
 - **Objective**: Resolve the "Zero Context" issue in the Knowledge Base where existing notes, tasks, and events were not being indexed.
 - **Action**:
   - **Model Alignment**: Updated `api.ts` to use `gemini-embedding-001`, compatible with the Google AI API endpoint.
@@ -152,7 +152,7 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
   - **Telemetry Improvement**: Enabled console error logging in `ragIngestionService.ts` to prevent future silent ingestion failures.
 - **Outcome**: Successfully verified ingestion with a test note. The Knowledge Base is now capable of indexing all user data. Users can trigger a full re-index via the "Rebuild Vault" button.
 
-### April 24, 2026: Logo Synchronization — SVG Component Integration
+### April 24, 2026: Logo Synchronization â€” SVG Component Integration
 - **Objective**: Fix broken image links in the header and footer of the Login and SignUp pages.
 - **Action**: 
   - Replaced legacy `<img src="/favicon.svg" />` tags in `Login.tsx` and `SignUp.tsx` with the high-fidelity `Logo` component.
@@ -160,7 +160,7 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
   - Updated copyright year from 2025 to 2026 in page footers for consistency with the rest of the application.
 - **Outcome**: Resolved broken image issues while enhancing UI consistency and aligning with the premium AuraOne design system.
 
-### April 24, 2026: Landing Page Synchronization — Foundational Modules Refined
+### April 24, 2026: Landing Page Synchronization â€” Foundational Modules Refined
 - **Objective**: Align the Landing Page's "Foundational Modules" with the standardized terminology and premium vision established for the rest of the application.
 - **Action**: 
   - Updated terminology from abstract titles (e.g., "Temporal Matrix", "Neural Pulse") to clear, professional names ("Events Calendar", "Aura Assistant", "Strategic Workboard").
@@ -168,7 +168,7 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
   - Standardized all 6 module cards: Events Calendar, Strategic Workboard, Aura Assistant, Infinite Notes, Neural Insights, and Secure Sanctuary.
 - **Outcome**: The Landing Page now accurately reflects the application's actual features and professional tone, ensuring a consistent user experience from first impression to deep interaction.
 
-### April 24, 2026: Logo Standardization — Global Component Migration
+### April 24, 2026: Logo Standardization â€” Global Component Migration
 - **Objective**: Resolve Issue #70 regarding broken AuraOne logo icons in production across the dashboard and other core modules.
 - **Action**: 
   - **Comprehensive Audit**: Identified legacy `/favicon.svg` `<img>` tags in `Dashboard.tsx`, `Sidebar.tsx`, `Chat.tsx`, and `Settings.tsx`.
@@ -176,7 +176,7 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
   - **UI/UX Polish**: Standardized icon sizing and applied appropriate filters (`brightness`, `contrast`) to ensure the logo remains visually premium across different backgrounds (glass, gradients).
 - **Outcome**: Resolved all broken logo issues application-wide, ensuring a seamless and high-fidelity visual experience. Committed changes with reference to Issue #70.
 
-### April 24, 2026: Calendar UI Refactor — Side Column Form Integration
+### April 24, 2026: Calendar UI Refactor â€” Side Column Form Integration
 - **Objective**: Optimize the Calendar page layout by relocating the event creation form and removing redundant promotional elements.
 - **Action**: 
   - **Layout Refactor**: Moved the "Add Event" form from the bottom of the main calendar grid to the right-side column (sidebar).
@@ -184,7 +184,7 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
   - **Component Pruning**: Removed the "Sync with Aura AI" tip card to reduce visual clutter and prioritize actionable tools.
 - **Outcome**: A more streamlined and professional calendar interface with improved information density and a more logical user flow for event creation.
 
-### April 25, 2026: Database Population — Realistic Mock Data Integration
+### April 25, 2026: Database Population â€” Realistic Mock Data Integration
 - **Objective**: Populate the Supabase database with realistic, high-fidelity mock data for Notes, Tasks, Calendar events, and Chat conversations.
 - **Action**:
   - **Notes**: Inserted 4 diverse notes covering strategy, personal life, AI research, and creative writing.
@@ -194,7 +194,7 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
   - **Data Integrity**: Ensured all records are correctly linked to the active user UUID (`2777a0b1-b556-423a-b64c-739570a6f137`) with explicit type casting.
 - **Outcome**: The AuraOne dashboard and module pages are now fully populated with meaningful content, providing a realistic and immersive experience for development and demonstration.
 
-### April 25, 2026: UI Consistency — Widget Button Standardization
+### April 25, 2026: UI Consistency â€” Widget Button Standardization
 - **Objective**: Align the button styling in `CalendarWidget.tsx` with the premium design tokens used in the Tasks and Notes modules.
 - **Action**: 
   - Updated the **Submit button** ("Add") to use a high-fidelity gradient (`from-primary to-secondary`) with tracked-out uppercase typography.
@@ -202,7 +202,7 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
   - Standardized font weights to `font-black` and updated hover/active transition scales for better tactile feedback.
 - **Outcome**: Improved visual harmony between dashboard widgets and core application pages.
 
-### April 25, 2026: UI Consistency — TaskPage Button Refinement
+### April 25, 2026: UI Consistency â€” TaskPage Button Refinement
 - **Objective**: Standardize the "Save Task" button in `TaskPage.tsx` with the high-fidelity gradient style used across the application.
 - **Action**: 
   - Migrated the button from the legacy `btn-aurora` utility to an explicit flex-based gradient layout (`from-primary to-secondary`).
@@ -210,14 +210,14 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
   - Standardized font settings to `font-black text-[10px] uppercase tracking-[0.2em]`.
 - **Outcome**: Achieved perfect stylistic parity with the Calendar and Notes module buttons.
 
-### April 25, 2026: Handler Layer Update — Aura Assistant LLM Enhancement
+### April 25, 2026: Handler Layer Update â€” Aura Assistant LLM Enhancement
 - **Objective**: Propagate the `isBrainMode` flag to the AI service to support deep reasoning mode in chat.
 - **Action**:
   - Updated `handleSendMessage` in `src/services/chatHandler.ts` to accept `isBrainMode: boolean`.
   - Modified the `processAIRequest` call to pass the `mode` option based on the `isBrainMode` flag.
 - **Outcome**: The chat handler now correctly routes requests to either standard command mode or deep reasoning "Brain Mode" based on the user's selection in the UI.
 
-### May 2, 2026: AI Service Resilience — Robust Open Router Fallback
+### May 2, 2026: AI Service Resilience â€” Robust Open Router Fallback
 - **Objective**: Resolve the "unable to process" error when Gemini rate limits occur, ensuring Open Router responses are displayed.
 - **Action**:
   - **Fallback Refactoring**: Updated `processAIRequest` in `aiService.ts` to use the full `SYSTEM_PROMPT` for Open Router fallbacks.
@@ -240,7 +240,7 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
   - Applied the same rigid formatting rules to the OpenRouter fallback prompt.
 - **Outcome**: The Aura Assistant will consistently output structured lists and general chat text in a highly legible, visually engaging, and professional format.
 
-### May 2, 2026: Production Readiness — Global Console Log Cleanup
+### May 2, 2026: Production Readiness â€” Global Console Log Cleanup
 - **Objective**: Remove all console logs, warnings, and errors that expose internal logic, API details, or database interactions to the browser console.
 - **Action**: 
   - **Service Layer**: Cleaned `aiService.ts`, `chatHandler.ts`, and `chatSessionService.ts` of all verbose telemetry and error logging.
@@ -249,14 +249,14 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
   - **Configuration**: Eliminated API key validation warnings from `api.ts`.
 - **Outcome**: The application now features a clean browser console, preventing the exposure of sensitive internal state or technical details to users, aligning with professional production standards.
 
-### May 2, 2026: TypeScript Maintenance — Unused Variable Cleanup & Syntax Repair
+### May 2, 2026: TypeScript Maintenance â€” Unused Variable Cleanup & Syntax Repair
 - **Objective**: Resolve TypeScript linting errors and fix structural syntax issues in core services.
 - **Action**: 
   - Removed unused `status` and `err` parameters from Supabase `.subscribe()` callbacks in `useNotes.ts`, `useEvents.ts`, and `useTasks.ts`.
   - Fixed a "Declaration or statement expected" error in `chatHandler.ts` by restoring a missing `try` block around the fallback message logic and cleaning up an unused `saveError` variable.
 - **Outcome**: Clean build state with no syntax errors or "declared but never read" warnings.
 
-### May 2, 2026: Git Maintenance — Docs Directory Untracking & Ignoring
+### May 2, 2026: Git Maintenance â€” Docs Directory Untracking & Ignoring
 - **Objective**: Ensure the `docs/` directory is untracked by Git and properly ignored to prevent accidental inclusion of documentation drafts in commits.
 - **Action**: 
   - Verified `docs/` is listed in `.gitignore`.
@@ -264,7 +264,7 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
   - Committed the untracking change.
 - **Outcome**: The `docs/` directory is now correctly ignored and untracked, ensuring a cleaner repository state for future development.
 
-### May 2, 2026: Pull Request Generation — AI Infrastructure & Chat Integration
+### May 2, 2026: Pull Request Generation â€” AI Infrastructure & Chat Integration
 - **Objective**: Create a professional pull request for Issue #72 to merge the `feat/ai-chat` branch into `main`.
 - **Action**: 
   - Automated the PR creation process using the GitHub CLI (`gh`).
@@ -272,7 +272,7 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
   - Included a detailed list of all 11 commits made in the feature branch for transparency.
 - **Outcome**: Pull Request #73 successfully created, providing a clean and documented path for merging the new AI capabilities into the production branch.
 
-### May 2, 2026: Official v1.3 Release — Aura Assistant Launch
+### May 2, 2026: Official v1.3 Release â€” Aura Assistant Launch
 - **Objective**: Deploy the official v1.3 release to GitHub to mark the completion of the multi-model AI infrastructure.
 - **Action**: 
   - Tagged the repository with `v1.3-aura-assistant`.
@@ -280,12 +280,12 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
   - Linked the new release in the `README.md` for easy access.
 - **Outcome**: AuraOne v1.3 is now officially released, providing a stable point of reference for the new AI capabilities.
 
-### May 11, 2026: Architecture Documentation — Software Engineering Diagrams
+### May 11, 2026: Architecture Documentation â€” Software Engineering Diagrams
 - **Objective**: Generate comprehensive software engineering diagrams from the AuraOne codebase for documentation and academic purposes.
 - **Action**:
   - **Codebase Analysis**: Full review of `App.tsx`, `useAuth.ts`, `aiService.ts`, `chatHandler.ts`, `chatSessionService.ts`, `useNotes.ts`, `useTasks.ts`, `useEvents.ts`, `api.ts`, and `aiCommandSchema.ts`.
-  - **Activity Diagram**: Mapped complete user workflow — Landing → Auth → Dashboard (parallel widgets) → CRUD modules → AI Chat (Brain Mode/Command Mode branching with Gemini/OpenRouter fallback) → Logout.
-  - **Sequence Diagram**: Detailed chat message lifecycle through React UI → chatHandler → aiService → Gemini/OpenRouter → Supabase with ALT/OPT blocks for mode routing and fallback.
+  - **Activity Diagram**: Mapped complete user workflow â€” Landing â†’ Auth â†’ Dashboard (parallel widgets) â†’ CRUD modules â†’ AI Chat (Brain Mode/Command Mode branching with Gemini/OpenRouter fallback) â†’ Logout.
+  - **Sequence Diagram**: Detailed chat message lifecycle through React UI â†’ chatHandler â†’ aiService â†’ Gemini/OpenRouter â†’ Supabase with ALT/OPT blocks for mode routing and fallback.
   - **DFD (Level 0 + Level 1)**: Context diagram with 4 external APIs + decomposed into 7 processes (Auth, Task/Note/Event Mgmt, AI Chat Engine, Dashboard Aggregator, Settings) and 6 data stores.
   - **ER Diagram**: 6 Supabase tables (users, tasks, notes, events, chat_sessions, chat_messages) with crow's foot relationships and complete attribute listings.
 - **Outcome**: Four high-fidelity, dark-mode architecture diagrams generated and documented in an artifact walkthrough.
@@ -312,7 +312,7 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
   - **Refinement**: Removed unused type imports and unnecessary console.log noise from the agentic services.
 - **Outcome**: A more robust, efficient, and error-free Agentic RAG implementation with perfect alignment between the reasoning engine and the UI layer.
 
-### May 16, 2026: Git Streamlining � Grouped Feature Commits & State Sync
+### May 16, 2026: Git Streamlining — Grouped Feature Commits & State Sync
 - **Objective:** Consolidate the entire Agentic RAG implementation into a structured, 10-commit sequence for clean version control.
 - **Action:**
   - Grouped all unstaged changes into logical functional units: Config/DB, Foundation Services, Data Pipeline, Agent Core, Capabilities, Hooks, UI Infrastructure, KB Module, Chat Enhancements, and Documentation.
@@ -320,7 +320,7 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
   - Ensured exactly 10 commits to capture the full scope of the RAG system evolution while maintaining a surgical and professional commit history.
 - **Outcome:** Clean codebase with zero unstaged changes, providing a perfectly indexed and chronological record of the Agentic RAG system's development.
 
-### May 16, 2026: Security � Scratch Folder Removal
+### May 16, 2026: Security — Scratch Folder Removal
 - **Objective:** Eliminate potential security risks by removing the scratch folder containing sensitive database credentials.
 - **Action:**
   - Deleted the entire \scratch/\ directory which contained local testing scripts and hardcoded Supabase credentials.
@@ -415,6 +415,21 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
 - **Objective:** Synchronize the layout and spacing properties of the main chat and input boxes between light and dark modes.
 - **Action:**
   - Replaced the transparent dark mode backgrounds on the chat input division with solid \dark:bg-slate-800\ and \dark:bg-white/5\ wrappers to perfectly mimic the bounding boxes of light mode.
-  - Removed \dark:glass\ from the main chat wrapper and AI message bubbles, substituting them with solid dark mode colors (\g-slate-900\ and \g-slate-800\) to ensure borders and padding rules are calculated and displayed identically to light mode.
+  - Removed \dark:glass\ from the main chat wrapper and AI message bubbles, substituting them with solid dark mode colors (\ g-slate-900\ and \ g-slate-800\) to ensure borders and padding rules are calculated and displayed identically to light mode.
   - Restored borders on dark mode user messages by removing \dark:border-transparent\ so that box dimensions match light mode exactly.
 - **Outcome:** A consistent, strictly aligned layout across both theme modes without spacing discrepancies.
+
+### May 23, 2026: GitHub Ops — Issue #78 Closed & PR #77 Updated
+- **Objective:** Verify issue #78 fixes, close the issue, and update PR #77 description with recent commit details.
+- **Action:**
+  - Verified all fixes for issue #78 (Suggestion Options Fallback Error + Scroll Lock) are fully implemented in `Chat.tsx`: `forceBrainMode` parameter, auto-toggle on suggestion click, `pb-32` padding, `setTimeout` scroll fix.
+  - Closed issue #78 with a detailed success comment via `gh issue close 78`.
+  - Updated PR #77 description via `gh pr edit 77` to append a 'Recent Commits (May 23, 2026)' section documenting 6 new commits with per-file change summaries.
+- **Outcome:** Issue #78 is closed as completed. PR #77 description now reflects the full scope of work including the latest session management, KB refactor, Notes fixes, Events updates, and chat UI improvements.
+
+### May 23, 2026: Bugfix - Chat messages POST 400 Bad Request error
+- **Objective:** Fix the database insertion error (POST /rest/v1/chat_messages 400 Bad Request) that occurs when saving AI assistant responses.
+- **Action:**
+  - Diagnosed that `chatHandler.ts` inserts `metadata` (containing sources and toolsUsed) for AI role messages, but the `chat_messages` database table lacked a `metadata` column.
+  - Executed a DDL migration `add_metadata_to_chat_messages` on the Supabase database to add a `metadata JSONB DEFAULT '{}'` column to `public.chat_messages`.
+- **Outcome:** AI responses and metadata are now successfully saved in the database, allowing both standard and Brain Mode assistant messaging to function flawlessly.
