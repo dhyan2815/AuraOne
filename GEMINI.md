@@ -336,3 +336,49 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
   - Created a specialized 'Agentic RAG Flow' Tour Slide to guide users through the query-to-result journey.
   - Updated the Dashboard Access Guide with a new token: auraone-kg-20260516.
 - **Outcome:** The codebase's structural intelligence is now fully synchronized with its latest agentic capabilities, enabling precise architectural analysis and onboarding.
+
+### May 23, 2026: UI - Clean Knowledge Base Activity Formatting
+- **Objective:** Improve the visual formatting of the Knowledge Base activity list and search results.
+- **Action:**
+  - Updated \KnowledgeChunk\ interface to include the \metadata\ property in \KnowledgeBase.tsx\.
+  - Overhauled the activity chunk rendering to extract and display structured metadata (titles, start/end times, priorities, statuses) instead of raw text strings.
+  - Applied identical clean rendering logic to the semantic search results list for consistent UI/UX.
+- **Outcome:** The Knowledge Base now beautifully presents events, tasks, and notes with proper titles and cleanly formatted timing/status badges, significantly improving readability.
+
+### May 23, 2026: UI - Removed Redundant Info Cards from Knowledge Base
+- **Objective:** Declutter the Knowledge Base interface by removing non-actionable, static educational content.
+- **Action:**
+  - Removed the 'Pipeline Architecture' and 'Real-Time Status' cards from \src/pages/KnowledgeBase.tsx\.
+  - Expanded the main Explorer and Search columns to occupy the full width of the screen.
+- **Outcome:** A much cleaner, focused, and premium UI where the core features (Activity List and Semantic Playground) have more room to breathe, significantly improving the user experience.
+
+### May 23, 2026: UI - Notes Description and Editor Contrast Styling
+- **Objective:** Fix overlapping and contrast issues with NoteCard descriptions and NotePage TiptapEditor.
+- **Action:**
+  - Removed prose-aurora from NotePage editor wrapper and applied explicit text-text and dark:text-slate-100 for clarity.
+  - Changed TiptapEditor container to be bg-transparent with no borders, eliminating the double card layout overlap.
+  - Adjusted NoteCard and Notes preview to use transparent backgrounds and text-text-variant with correct whitespace rendering to prevent overlapping.
+- **Outcome:** Clean, single-card note editor with properly contrasting, clearly visible text without any background color interference.
+### May 23, 2026: UI - Chat Suggestions Upgraded
+- **Objective:** Make the new chat suggestion options fully functional and capable prompts.
+- **Action:**
+  - Expanded SUGGESTIONS array in Chat.tsx with high-quality, actionable prompt strings.
+  - Refactored handleSend to accept an optional messageOverride parameter.
+  - Connected suggestion buttons to instantly trigger handleSend with their respective detailed prompts.
+- **Outcome:** A one-click, seamless start to new chat sessions with rich, contextual prompts for the neural engine.
+
+### May 23, 2026: UI - Chat Interface Scrolling Fix
+- **Objective:** Fix the layout constraints to ensure previous conversations and main chat areas are perfectly scrollable on all screen sizes.
+- **Action:**
+  - Added shrink-0 and max-h-[30vh] constraints to the sidebar on mobile devices.
+  - Added min-h-0 to the history list container to prevent implicit flex expansion and properly trigger overflow-y-auto.
+  - Added lex-1 to the main chat section to correctly consume remaining vertical height.
+- **Outcome:** The chat history and main chat interface are now fully scrollable without overflowing or pushing elements off-screen.
+### May 23, 2026: GitHub CLI Authentication
+- **Objective:** Authenticate GitHub CLI for all tasks.
+- **Action:** Checked \gh auth status\ and advised the user to run \gh auth login\ manually to re-authenticate the invalid \dhyan219\ account.
+- **Outcome:** User was directed to terminal for interactive authentication.
+### May 23, 2026: GitHub CLI Authentication Update
+- **Objective:** Fix GitHub CLI error regarding default account.
+- **Action:** Removed invalid \dhyan219\ account from gh auth to resolve the token error. Verified that \dhyan2815\ is the active and fully authenticated account.
+- **Outcome:** \gh\ CLI commands are now fully operational for the AuraOne repository.

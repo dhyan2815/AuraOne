@@ -14,10 +14,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import Logo from "../components/structure/Logo";
 
 const SUGGESTIONS = [
-  { icon: "📋", title: "Summarize", sub: "Analyze recent objectives." },
-  { icon: "🗺️", title: "Roadmap",  sub: "Structure Q4 rollout." },
-  { icon: "✉️", title: "Draft",    sub: "Write follow-up sync." },
-  { icon: "💡", title: "Ideas",    sub: "List 5 neural features." },
+  { icon: "📋", title: "Summarize", sub: "Analyze recent objectives.", prompt: "Summarize my recent objectives and highlight the key strategic takeaways." },
+  { icon: "🗺️", title: "Roadmap",  sub: "Structure Q4 rollout.", prompt: "Create a detailed, structured roadmap for our Q4 product rollout." },
+  { icon: "✉️", title: "Draft",    sub: "Write follow-up sync.", prompt: "Draft a professional follow-up communication for our recent synchronization meeting." },
+  { icon: "💡", title: "Ideas",    sub: "List 5 neural features.", prompt: "List 5 innovative neural features and capabilities we could implement in the platform." },
 ];
 
 const HANDSHAKE_STEPS = [
@@ -135,9 +135,10 @@ const Chat = () => {
 
   useEffect(scrollToBottom, [messages]);
 
-  const handleSend = async () => {
-    if (!user || !selectedSession || !input.trim()) return;
-    const msg = input;
+  const handleSend = async (messageOverride?: string | unknown) => {
+    const textToProcess = typeof messageOverride === 'string' ? messageOverride : input;
+    if (!user || !selectedSession || !textToProcess.trim()) return;
+    const msg = textToProcess;
     
     const tempUserMsg: Message = {
       role: 'user',
@@ -200,7 +201,7 @@ const Chat = () => {
   return (
     <div className="flex h-full lg:h-[calc(100dvh-4rem)] flex-col gap-4 lg:grid lg:grid-cols-[20rem_1fr] lg:px-6 lg:pt-6 overflow-hidden relative z-0">
       {/* ── Sidebar ── */}
-      <aside className="flex min-h-0 flex-col gap-4 lg:h-full">
+      <aside className="flex min-h-0 shrink-0 max-h-[30vh] lg:max-h-none lg:h-full flex-col gap-4">
         <motion.button
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.99 }}
@@ -215,7 +216,7 @@ const Chat = () => {
           <div className="px-4 py-3 border-b border-primary/5 bg-primary/5">
             <h3 className="text-[11px] font-bold text-text-variant uppercase tracking-wider opacity-70">History</h3>
           </div>
-          <div className="flex-1 overflow-y-auto custom-scrollbar p-3">
+          <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-3">
             <div className="space-y-1.5">
               {sessions.map((s) => (
                 <motion.div
@@ -237,17 +238,15 @@ const Chat = () => {
       </aside>
 
       {/* ── Main Chat ── */}
-      <section className="relative flex flex-col h-full min-h-0 overflow-hidden rounded-3xl border border-primary/10 bg-white dark:glass shadow-2xl shadow-primary/5 isolation-auto">
+      <section className="relative flex flex-1 flex-col h-full min-h-0 overflow-hidden rounded-3xl border border-primary/10 bg-white dark:glass shadow-2xl shadow-primary/5 isolation-auto">
         <div className="px-6 h-16 border-b border-primary/5 flex items-center justify-between bg-white/50 dark:bg-primary/5 backdrop-blur-xl z-10 shrink-0">
           <div className="flex items-center gap-4">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary to-secondary flex items-center justify-center shadow-lg shadow-primary/20">
               <Logo iconOnly iconClassName="w-5 h-5 filter brightness-0 invert" />
             </div>
             <div>
-              <h2 className="text-sm font-black text-text tracking-widest uppercase">Aura Assistant</h2>
+              <h2 className="text-md font-black text-text tracking-widest">Aura Assistant</h2>
               <div className="flex items-center gap-1.5 mt-0.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-tight">Active Pulse</span>
               </div>
             </div>
           </div>
@@ -267,7 +266,7 @@ const Chat = () => {
                       key={i}
                       whileHover={{ scale: 1.02, translateY: -2 }}
                       whileTap={{ scale: 0.98 }}
-                      onClick={() => setInput(s.title)}
+                      onClick={() => handleSend(s.prompt)}
                       className="glass border border-primary/10 p-5 rounded-2xl text-left hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all group"
                     >
                       <div className="flex items-center gap-3 mb-2">
