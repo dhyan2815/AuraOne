@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { motion } from 'framer-motion';
-import { Brain, Search, RefreshCw, FileText, CheckCircle, Calendar, Trash2, Database, Filter } from 'lucide-react';
+import { Brain, Search, RefreshCw, FileText, CheckCircle, Calendar, Trash2, Database } from 'lucide-react';
 import { ingestAllForUser } from '../services/ragIngestionService';
 import { retrieveContext, RetrievalResult } from '../services/ragRetrievalService';
 import { supabase } from '../services/supabase';
@@ -13,6 +13,7 @@ interface KnowledgeChunk {
   source_type: 'note' | 'task' | 'event';
   source_id: string;
   created_at: string;
+  metadata?: Record<string, any>;
 }
 
 const KnowledgeBase = () => {
@@ -165,7 +166,7 @@ const KnowledgeBase = () => {
         className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
       >
         {[
-          { label: 'Intelligence Matrix', value: stats.total, icon: Database, color: 'text-primary' },
+          { label: 'Total Records', value: stats.total, icon: Database, color: 'text-primary' },
           { label: 'Note Contexts', value: stats.notes, icon: FileText, color: 'text-blue-400' },
           { label: 'Task Contexts', value: stats.tasks, icon: CheckCircle, color: 'text-emerald-400' },
           { label: 'Event Contexts', value: stats.events, icon: Calendar, color: 'text-amber-400' },
@@ -184,8 +185,8 @@ const KnowledgeBase = () => {
 
       {/* ── Main Content ────────────────────────────────── */}
       <div className="grid grid-cols-12 gap-6">
-        {/* Left Column: Explorer/Search */}
-        <div className="col-span-12 lg:col-span-8 flex flex-col gap-6">
+        {/* Main Full-Width Column: Explorer/Search */}
+        <div className="col-span-12 flex flex-col gap-6">
           <div className="glass rounded-[2.5rem] border border-primary/5 overflow-hidden flex flex-col h-[650px] shadow-2xl shadow-primary/5">
             {/* Tabs */}
             <div className="flex border-b border-white/5 p-2 gap-2 bg-primary/5">
@@ -236,38 +237,108 @@ const KnowledgeBase = () => {
                     </div>
                   ) : chunks.length > 0 ? (
                     <div className="space-y-3">
-                      {chunks.map((chunk) => (
-                        <motion.div
-                          key={chunk.id}
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          className="p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-primary/10 transition-all group relative"
-                        >
-                          <div className="flex justify-between items-start mb-2">
-                            <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest ${
-                              chunk.source_type === 'note' ? 'bg-blue-500/10 text-blue-400' :
-                              chunk.source_type === 'task' ? 'bg-emerald-500/10 text-emerald-400' :
-                              'bg-amber-500/10 text-amber-400'
-                            }`}>
-                              {chunk.source_type}
-                            </span>
-                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
-                              <button 
-                                onClick={() => handleDeleteChunk(chunk.id)}
-                                className="p-1.5 rounded-lg hover:bg-red-500/20 text-red-400 transition-colors"
-                              >
-                                <Trash2 size={12} />
-                              </button>
+                      {chunks.map((chunk) => {
+                        const meta = chunk.metadata || {};
+                        return (
+                          <motion.div
+                            key={chunk.id}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="p-5 rounded-2xl bg-white/5 border border-white/5 hover:border-primary/20 transition-all group relative flex flex-col gap-3"
+                          >
+                            <div className="flex justify-between items-start">
+                              <div className="flex items-center gap-3">
+                                <span className={`px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-widest ${
+                                  chunk.source_type === 'note' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' :
+                                  chunk.source_type === 'task' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
+                                  'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                                }`}>
+                                  {chunk.source_type}
+                                </span>
+                                <h4 className="text-sm font-bold text-text truncate max-w-[200px] md:max-w-[400px]">
+                                  {meta.title || (chunk.source_type === 'note' ? 'Note Fragment' : 'Untitled')}
+                                </h4>
+                              </div>
+                              <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                                <button 
+                                  onClick={() => handleDeleteChunk(chunk.id)}
+                                  className="p-1.5 rounded-lg hover:bg-red-500/20 text-red-400 transition-colors"
+                                  title="Delete Chunk"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              </div>
                             </div>
-                          </div>
-                          <p className="text-xs text-text/80 leading-relaxed italic">
-                            "{chunk.content}"
-                          </p>
-                          <p className="text-[8px] text-text-variant mt-2 font-mono opacity-30">
-                            ID: {chunk.id} • {new Date(chunk.created_at).toLocaleDateString()}
-                          </p>
-                        </motion.div>
-                      ))}
+                            
+                            {/* Display Timing/Status metadata if available */}
+                            {chunk.source_type === 'event' && (meta.start_time || meta.end_time) && (
+                              <div className="flex items-center gap-4 text-[10px] text-text-variant font-medium bg-black/20 p-2 rounded-lg w-fit">
+                                <div className="flex items-center gap-1.5">
+                                  <Calendar size={12} className="text-amber-400/70" />
+                                  <span>
+                                    {meta.start_time ? new Date(meta.start_time).toLocaleString(undefined, {
+                                      month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'
+                                    }) : 'N/A'}
+                                  </span>
+                                </div>
+                                {meta.end_time && (
+                                  <>
+                                    <span className="opacity-40">→</span>
+                                    <span>
+                                      {new Date(meta.end_time).toLocaleString(undefined, {
+                                        hour: 'numeric', minute: '2-digit'
+                                      })}
+                                    </span>
+                                  </>
+                                )}
+                              </div>
+                            )}
+
+                            {chunk.source_type === 'task' && (meta.priority || meta.due_date) && (
+                              <div className="flex items-center gap-4 text-[10px] text-text-variant font-medium bg-black/20 p-2 rounded-lg w-fit">
+                                {meta.priority && (
+                                  <div className="flex items-center gap-1.5 capitalize">
+                                    <CheckCircle size={12} className={meta.priority === 'high' ? 'text-red-400' : meta.priority === 'medium' ? 'text-amber-400' : 'text-emerald-400'} />
+                                    {meta.priority} Priority
+                                  </div>
+                                )}
+                                {meta.due_date && (
+                                  <div className="flex items-center gap-1.5">
+                                    <Calendar size={12} className="text-emerald-400/70" />
+                                    Due: {new Date(meta.due_date).toLocaleDateString()}
+                                  </div>
+                                )}
+                                {meta.completed !== undefined && (
+                                  <div className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ${meta.completed ? 'bg-emerald-500/20 text-emerald-400' : 'bg-white/10 text-text-variant'}`}>
+                                    {meta.completed ? 'Completed' : 'Pending'}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+
+                            <div className="text-xs text-text/80 leading-relaxed bg-white/[0.02] p-3 rounded-xl border border-white/5 whitespace-pre-wrap">
+                              {/* If event or task, and we displayed a nice header, maybe we just show the description from content or metadata? */}
+                              {/* Actually, it's safer to just show the content, or we can try to extract just the description for cleaner UI */}
+                              {(() => {
+                                if (chunk.source_type === 'event' || chunk.source_type === 'task') {
+                                  const descMatch = chunk.content.match(/Description:\s*([\s\S]*)$/);
+                                  if (descMatch && descMatch[1].trim()) {
+                                    return descMatch[1].trim();
+                                  }
+                                }
+                                // Fallback or note
+                                return chunk.content.length > 200 && chunk.source_type === 'note' 
+                                  ? chunk.content.substring(0, 200) + '...' 
+                                  : chunk.content;
+                              })()}
+                            </div>
+                            
+                            <p className="text-[9px] text-text-variant font-mono opacity-40 flex justify-between items-center mt-1">
+                              <span>Created on {new Date(chunk.created_at).toLocaleDateString()}</span>
+                            </p>
+                          </motion.div>
+                        );
+                      })}
                     </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center py-20 opacity-20">
@@ -299,31 +370,96 @@ const KnowledgeBase = () => {
 
                   <div className="space-y-4">
                     {searchResults.length > 0 ? (
-                      searchResults.map((result, i) => (
-                        <motion.div
-                          key={i}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: i * 0.05 }}
-                          className="p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-primary/20 transition-all group"
-                        >
-                          <div className="flex justify-between items-start mb-2">
-                            <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest ${
-                              result.sourceType === 'note' ? 'bg-blue-500/10 text-blue-400' :
-                              result.sourceType === 'task' ? 'bg-emerald-500/10 text-emerald-400' :
-                              'bg-amber-500/10 text-amber-400'
-                            }`}>
-                              {result.sourceType}
-                            </span>
-                            <span className="text-[9px] font-black text-primary/60">
-                              {(result.similarity * 100).toFixed(1)}% Match
-                            </span>
-                          </div>
-                          <p className="text-sm text-text leading-relaxed">
-                            {result.content}
-                          </p>
-                        </motion.div>
-                      ))
+                      searchResults.map((result, i) => {
+                        const meta = result.metadata || {};
+                        return (
+                          <motion.div
+                            key={i}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: i * 0.05 }}
+                            className="p-5 rounded-2xl bg-white/5 border border-white/5 hover:border-primary/20 transition-all group flex flex-col gap-3"
+                          >
+                            <div className="flex justify-between items-start">
+                              <div className="flex items-center gap-3">
+                                <span className={`px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-widest ${
+                                  result.sourceType === 'note' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' :
+                                  result.sourceType === 'task' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
+                                  'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                                }`}>
+                                  {result.sourceType}
+                                </span>
+                                <h4 className="text-sm font-bold text-text truncate max-w-[200px] md:max-w-[400px]">
+                                  {meta.title || (result.sourceType === 'note' ? 'Note Fragment' : 'Untitled')}
+                                </h4>
+                              </div>
+                              <span className="text-[9px] font-black text-primary/60 bg-primary/5 px-2 py-1 rounded-md border border-primary/10">
+                                {(result.similarity * 100).toFixed(1)}% Match
+                              </span>
+                            </div>
+
+                            {/* Display Timing/Status metadata if available */}
+                            {result.sourceType === 'event' && (meta.start_time || meta.end_time) && (
+                              <div className="flex items-center gap-4 text-[10px] text-text-variant font-medium bg-black/20 p-2 rounded-lg w-fit">
+                                <div className="flex items-center gap-1.5">
+                                  <Calendar size={12} className="text-amber-400/70" />
+                                  <span>
+                                    {meta.start_time ? new Date(meta.start_time).toLocaleString(undefined, {
+                                      month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'
+                                    }) : 'N/A'}
+                                  </span>
+                                </div>
+                                {meta.end_time && (
+                                  <>
+                                    <span className="opacity-40">→</span>
+                                    <span>
+                                      {new Date(meta.end_time).toLocaleString(undefined, {
+                                        hour: 'numeric', minute: '2-digit'
+                                      })}
+                                    </span>
+                                  </>
+                                )}
+                              </div>
+                            )}
+
+                            {result.sourceType === 'task' && (meta.priority || meta.due_date) && (
+                              <div className="flex items-center gap-4 text-[10px] text-text-variant font-medium bg-black/20 p-2 rounded-lg w-fit">
+                                {meta.priority && (
+                                  <div className="flex items-center gap-1.5 capitalize">
+                                    <CheckCircle size={12} className={meta.priority === 'high' ? 'text-red-400' : meta.priority === 'medium' ? 'text-amber-400' : 'text-emerald-400'} />
+                                    {meta.priority} Priority
+                                  </div>
+                                )}
+                                {meta.due_date && (
+                                  <div className="flex items-center gap-1.5">
+                                    <Calendar size={12} className="text-emerald-400/70" />
+                                    Due: {new Date(meta.due_date).toLocaleDateString()}
+                                  </div>
+                                )}
+                                {meta.completed !== undefined && (
+                                  <div className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ${meta.completed ? 'bg-emerald-500/20 text-emerald-400' : 'bg-white/10 text-text-variant'}`}>
+                                    {meta.completed ? 'Completed' : 'Pending'}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+
+                            <div className="text-xs text-text/80 leading-relaxed bg-white/[0.02] p-3 rounded-xl border border-white/5 whitespace-pre-wrap">
+                              {(() => {
+                                if (result.sourceType === 'event' || result.sourceType === 'task') {
+                                  const descMatch = result.content.match(/Description:\s*([\s\S]*)$/);
+                                  if (descMatch && descMatch[1].trim()) {
+                                    return descMatch[1].trim();
+                                  }
+                                }
+                                return result.content.length > 200 && result.sourceType === 'note' 
+                                  ? result.content.substring(0, 200) + '...' 
+                                  : result.content;
+                              })()}
+                            </div>
+                          </motion.div>
+                        );
+                      })
                     ) : searchQuery && !isSearching ? (
                       <div className="text-center py-20 text-text-variant opacity-60 italic text-sm">
                         No semantic matches for "{searchQuery}"
@@ -338,48 +474,6 @@ const KnowledgeBase = () => {
               )}
             </div>
           </div>
-        </div>
-
-        {/* Right Column: Tips & Status */}
-        <div className="col-span-12 lg:col-span-4 flex flex-col gap-6">
-          <motion.div variants={item} initial="hidden" animate="show" className="glass p-6 lg:p-8 rounded-[2.5rem] border border-primary/5 bg-primary/5">
-            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-text mb-6 opacity-60 flex items-center gap-2">
-              <Filter size={14} /> Pipeline Architecture
-            </h3>
-            <div className="space-y-5">
-              {[
-                { step: 1, title: 'Chunking', desc: 'Content is split into context-aware snippets.', color: 'bg-primary/20 text-primary' },
-                { step: 2, title: 'Embedding', desc: 'Gemini creates 768-dimensional neural vectors.', color: 'bg-blue-500/20 text-blue-400' },
-                { step: 3, title: 'Vectorization', desc: 'Stored in pgvector with HNSW indexing.', color: 'bg-purple-500/20 text-purple-400' },
-              ].map((s, idx) => (
-                <div key={idx} className="flex gap-4">
-                  <div className={`w-7 h-7 rounded-lg ${s.color} flex items-center justify-center font-black text-[10px] shrink-0`}>
-                    {s.step}
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-text">{s.title}</p>
-                    <p className="text-[10px] text-text-variant mt-1 leading-relaxed opacity-70">{s.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-
-          <motion.div variants={item} initial="hidden" animate="show" transition={{ delay: 0.2 }} className="glass p-6 lg:p-8 rounded-[2.5rem] border border-primary/5 overflow-hidden relative">
-            <div className="absolute top-0 right-0 p-4 opacity-5">
-              <Brain size={120} />
-            </div>
-            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-text mb-4 opacity-60">
-              REAL-TIME STATUS
-            </h3>
-            <div className="flex items-center gap-3">
-              <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.8)] animate-pulse" />
-              <p className="text-[10px] font-black text-text uppercase tracking-widest">Active Indexing</p>
-            </div>
-            <p className="text-[10px] text-text-variant mt-4 leading-relaxed opacity-60">
-              The neural index is automatically updated when you interact with notes, tasks, or events.
-            </p>
-          </motion.div>
         </div>
       </div>
     </div>
