@@ -382,3 +382,39 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
 - **Objective:** Fix GitHub CLI error regarding default account.
 - **Action:** Removed invalid \dhyan219\ account from gh auth to resolve the token error. Verified that \dhyan2815\ is the active and fully authenticated account.
 - **Outcome:** \gh\ CLI commands are now fully operational for the AuraOne repository.
+
+### May 23, 2026: Bugfix - Chat Suggestion Options and Scroll Lock
+- **Objective:** Fix issue #78 regarding Fallback Error on Suggestion Options and Message Scroll Lock.
+- **Action:**
+  - Modified `handleSend` in Chat.tsx to accept an optional `forceBrainMode` parameter.
+  - Updated Suggestion cards to pass `true` to `handleSend`.
+  - Added `pb-32` to the main chat scroll container to prevent cut-off messages.
+  - Wrapped `scrollToBottom` in a `setTimeout` to allow the DOM to paint before scrolling, fixing the scroll lock.
+- **Outcome:** Suggestion options now automatically toggle Brain Mode and successfully process. Fallback/chat messages are fully scrollable and not cut off by the input area.
+
+### May 23, 2026: UI - Chat Session Management and Layout Adjustments
+- **Objective:** Enable session deletion and renaming directly from the chat sidebar, and fix the uneven top/bottom layout margins of the main chat container.
+- **Action:**
+  - Implemented `Trash2` and `Pencil` icons with corresponding rename/delete handlers inside `Chat.tsx`.
+  - Changed the outer layout container from `lg:h-[calc(100dvh-4rem)] lg:pt-6` to `lg:h-[100dvh] lg:p-6` to evenly distribute top and bottom spacing.
+- **Outcome:** A balanced, full-height chat interface with robust, interactive history management.
+
+### May 23, 2026: UI - Chat Loader Optimization
+- **Objective:** Remove redundant loader text during AI generation.
+- **Action:** Consolidated the loader in `Chat.tsx` by removing the generic 'Neural Processing' text and keeping only the dynamic, agentic `HANDSHAKE_STEPS` (e.g., 'Analyzing context...'), aligning it with the bouncing dots.
+- **Outcome:** A cleaner, singular loading state that intelligently communicates the ReAct agent's progress without clutter.
+
+### May 23, 2026: UI - Chat Interface Scroll Cut-off Fix
+- **Objective:** Fix the layout constraint and programmatic scrolling bug where chat messages would be cut off at the top and become unscrollable.
+- **Action:**
+  - Replaced scrollIntoView() with explicit container.scrollTo() to prevent the overflow: hidden parent section from being forcefully shifted.
+  - Removed the inline style={{ height: '100%' }} from the .custom-scrollbar flex container to ensure exact layout bounds.
+- **Outcome:** Chat messages are no longer pushed out of bounds, and both current and new chat sessions are perfectly scrollable without getting stuck.
+
+### May 23, 2026: UI - Chat Layout Sync (Light vs Dark)
+- **Objective:** Synchronize the layout and spacing properties of the main chat and input boxes between light and dark modes.
+- **Action:**
+  - Replaced the transparent dark mode backgrounds on the chat input division with solid \dark:bg-slate-800\ and \dark:bg-white/5\ wrappers to perfectly mimic the bounding boxes of light mode.
+  - Removed \dark:glass\ from the main chat wrapper and AI message bubbles, substituting them with solid dark mode colors (\g-slate-900\ and \g-slate-800\) to ensure borders and padding rules are calculated and displayed identically to light mode.
+  - Restored borders on dark mode user messages by removing \dark:border-transparent\ so that box dimensions match light mode exactly.
+- **Outcome:** A consistent, strictly aligned layout across both theme modes without spacing discrepancies.

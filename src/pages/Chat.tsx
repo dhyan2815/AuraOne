@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import ReactMarkdown from "react-markdown";
-import { Send, Plus, Paperclip, ExternalLink, Database, Search, Wrench, ChevronDown, ChevronUp } from "lucide-react";
+import { Send, Plus, Paperclip, ExternalLink, Database, Search, Wrench, ChevronDown, ChevronUp, Trash2, Pencil, Check, X } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import {
-  getSessions, createNewSession, Session,
+  getSessions, createNewSession, Session, deleteSession, updateSessionName
 } from "../services/chatSessionService";
 import {
   getMessages, handleSendMessage, Message,
@@ -38,7 +38,9 @@ const Chat = () => {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [selectedSession, setSelectedSession] = useState<string | null>(null);
   const [expandedMetadata, setExpandedMetadata] = useState<Record<string, boolean>>({});
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
+  const [editSessionName, setEditSessionName] = useState("");
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Auto-resize textarea
@@ -58,7 +60,14 @@ const Chat = () => {
   }, [input]);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    setTimeout(() => {
+      if (scrollContainerRef.current) {
+        scrollContainerRef.current.scrollTo({
+          top: scrollContainerRef.current.scrollHeight,
+          behavior: "smooth"
+        });
+      }
+    }, 50);
   };
 
   useEffect(() => {
@@ -135,11 +144,16 @@ const Chat = () => {
 
   useEffect(scrollToBottom, [messages]);
 
-  const handleSend = async (messageOverride?: string | unknown) => {
+  const handleSend = async (messageOverride?: string | unknown, forceBrainMode?: boolean) => {
     const textToProcess = typeof messageOverride === 'string' ? messageOverride : input;
     if (!user || !selectedSession || !textToProcess.trim()) return;
     const msg = textToProcess;
     
+    if (forceBrainMode) {
+      setIsBrainMode(true);
+    }
+    const currentBrainMode = forceBrainMode || isBrainMode;
+
     const tempUserMsg: Message = {
       role: 'user',
       content: msg,
@@ -153,7 +167,7 @@ const Chat = () => {
     setLoading(true);
     
     try {
-      await handleSendMessage(msg, user, selectedSession, isBrainMode);
+      await handleSendMessage(msg, user, selectedSession, currentBrainMode);
       const [updatedSessions, updatedMessages] = await Promise.all([
         getSessions(user.id),
         getMessages(selectedSession)
@@ -187,6 +201,46 @@ const Chat = () => {
     setExpandedMetadata(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
+  const handleDeleteSession = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    try {
+      await deleteSession(id);
+      setSessions(prev => prev.filter(s => s.id !== id));
+      if (selectedSession === id) {
+        const nextSession = sessions.find(s => s.id !== id)?.id || null;
+        setSelectedSession(nextSession);
+      }
+      toast.success("Session deleted");
+    } catch {
+      toast.error("Failed to delete session");
+    }
+  };
+
+  const handleStartEdit = (e: React.MouseEvent, s: Session) => {
+    e.stopPropagation();
+    setEditingSessionId(s.id);
+    setEditSessionName(s.name || "New Chat");
+  };
+
+  const handleSaveEdit = async (e: React.MouseEvent | React.KeyboardEvent) => {
+    e.stopPropagation();
+    if (!editingSessionId || !editSessionName.trim()) return;
+    try {
+      await updateSessionName(editingSessionId, editSessionName);
+      setSessions(prev => prev.map(s => s.id === editingSessionId ? { ...s, name: editSessionName } : s));
+      setEditingSessionId(null);
+      toast.success("Session renamed");
+    } catch {
+      toast.error("Failed to rename session");
+    }
+  };
+
+  const handleCancelEdit = (e: React.MouseEvent | React.KeyboardEvent) => {
+    e.stopPropagation();
+    setEditingSessionId(null);
+    setEditSessionName("");
+  };
+
   if (authLoading) {
     return (
       <div className="flex flex-col items-center justify-center h-[calc(100vh-4rem)]">
@@ -199,7 +253,7 @@ const Chat = () => {
   const displayName = user?.email?.split("@")[0] ?? "User";
 
   return (
-    <div className="flex h-full lg:h-[calc(100dvh-4rem)] flex-col gap-4 lg:grid lg:grid-cols-[20rem_1fr] lg:px-6 lg:pt-6 overflow-hidden relative z-0">
+    <div className="flex h-full lg:h-[100dvh] flex-col gap-4 lg:grid lg:grid-cols-[20rem_1fr] lg:p-6 overflow-hidden relative z-0">
       {/* ── Sidebar ── */}
       <aside className="flex min-h-0 shrink-0 max-h-[30vh] lg:max-h-none lg:h-full flex-col gap-4">
         <motion.button
@@ -222,14 +276,47 @@ const Chat = () => {
                 <motion.div
                   key={s.id}
                   whileHover={{ x: 4 }}
-                  onClick={() => setSelectedSession(s.id)}
+                  onClick={() => {
+                    if (editingSessionId !== s.id) setSelectedSession(s.id);
+                  }}
                   className={`px-3 py-3 rounded-xl cursor-pointer group flex items-center justify-between gap-3 transition-all ${
                     selectedSession === s.id 
                       ? "bg-primary/10 border border-primary/20 text-primary" 
                       : "hover:bg-primary/5 text-text-variant border border-transparent"
                   }`}
                 >
-                  <p className="text-xs font-bold truncate">{s.name || "New Chat"}</p>
+                  {editingSessionId === s.id ? (
+                    <div className="flex items-center gap-2 w-full" onClick={(e) => e.stopPropagation()}>
+                      <input
+                        autoFocus
+                        value={editSessionName}
+                        onChange={(e) => setEditSessionName(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') handleSaveEdit(e);
+                          if (e.key === 'Escape') handleCancelEdit(e);
+                        }}
+                        className="bg-transparent border-b border-primary text-xs font-bold outline-none flex-1 w-full text-text"
+                      />
+                      <button onClick={handleSaveEdit} className="text-green-500 hover:text-green-600 transition-colors">
+                        <Check size={14} />
+                      </button>
+                      <button onClick={handleCancelEdit} className="text-red-500 hover:text-red-600 transition-colors">
+                        <X size={14} />
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="text-xs font-bold truncate flex-1">{s.name || "New Chat"}</p>
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onClick={(e) => handleStartEdit(e, s)} className="p-1 hover:text-primary transition-colors">
+                          <Pencil size={12} />
+                        </button>
+                        <button onClick={(e) => handleDeleteSession(e, s.id)} className="p-1 hover:text-red-500 transition-colors">
+                          <Trash2 size={12} />
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </motion.div>
               ))}
             </div>
@@ -238,8 +325,8 @@ const Chat = () => {
       </aside>
 
       {/* ── Main Chat ── */}
-      <section className="relative flex flex-1 flex-col h-full min-h-0 overflow-hidden rounded-3xl border border-primary/10 bg-white dark:glass shadow-2xl shadow-primary/5 isolation-auto">
-        <div className="px-6 h-16 border-b border-primary/5 flex items-center justify-between bg-white/50 dark:bg-primary/5 backdrop-blur-xl z-10 shrink-0">
+      <section className="relative flex flex-1 flex-col h-full min-h-0 overflow-hidden rounded-3xl border border-primary/10 bg-white dark:bg-slate-900 shadow-2xl shadow-primary/5 isolation-auto">
+        <div className="px-6 h-16 border-b border-primary/5 flex items-center justify-between bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl z-10 shrink-0">
           <div className="flex items-center gap-4">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary to-secondary flex items-center justify-center shadow-lg shadow-primary/20">
               <Logo iconOnly iconClassName="w-5 h-5 filter brightness-0 invert" />
@@ -252,7 +339,7 @@ const Chat = () => {
           </div>
         </div>
 
-        <div className="custom-scrollbar relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 sm:p-6 lg:p-8 overscroll-contain touch-pan-y" style={{ height: '100%' }}>
+        <div ref={scrollContainerRef} className="custom-scrollbar relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 sm:p-6 lg:p-8 pb-32 overscroll-contain touch-pan-y">
           <AnimatePresence>
             {messages.length === 0 && !loading ? (
               <div className="h-full flex flex-col items-center justify-center text-center pb-20">
@@ -266,7 +353,7 @@ const Chat = () => {
                       key={i}
                       whileHover={{ scale: 1.02, translateY: -2 }}
                       whileTap={{ scale: 0.98 }}
-                      onClick={() => handleSend(s.prompt)}
+                      onClick={() => handleSend(s.prompt, true)}
                       className="glass border border-primary/10 p-5 rounded-2xl text-left hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all group"
                     >
                       <div className="flex items-center gap-3 mb-2">
@@ -296,8 +383,8 @@ const Chat = () => {
                     <div className="flex flex-col gap-2 max-w-[85%]">
                       <div className={`px-4 py-2.5 text-sm leading-relaxed ${
                         msg.role === "user" 
-                          ? "bg-white dark:bg-primary text-black dark:text-white border border-primary/10 dark:border-transparent rounded-2xl rounded-tr-sm shadow-md" 
-                          : "bg-white dark:glass border border-primary/5 text-black dark:text-white rounded-2xl rounded-tl-sm"
+                          ? "bg-white dark:bg-primary text-black dark:text-white border border-primary/10 rounded-2xl rounded-tr-sm shadow-md" 
+                          : "bg-white dark:bg-slate-800 border border-primary/5 text-black dark:text-white rounded-2xl rounded-tl-sm"
                       }`}>
                         <div className="whitespace-pre-wrap break-words prose prose-sm max-w-none dark:prose-invert">
                           <ReactMarkdown>{msg.content}</ReactMarkdown>
@@ -363,29 +450,27 @@ const Chat = () => {
                     <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-primary to-secondary flex items-center justify-center">
                       <Logo iconOnly iconClassName="w-4 h-4 filter brightness-0 invert" />
                     </div>
-                    <div className="bg-white/50 dark:bg-slate-900/40 backdrop-blur-xl border border-primary/10 rounded-2xl rounded-tl-sm px-6 py-4 flex flex-col gap-3 min-w-[240px] shadow-lg shadow-primary/5">
+                    <div className="bg-white/50 dark:bg-slate-900/40 backdrop-blur-xl border border-primary/10 rounded-2xl rounded-tl-sm px-6 py-4 flex flex-col min-w-[240px] shadow-lg shadow-primary/5">
                       <div className="flex gap-1.5 items-center">
                         <div className="w-1.5 h-1.5 bg-primary rounded-full animate-[bounce_1s_infinite_0ms]" />
                         <div className="w-1.5 h-1.5 bg-primary rounded-full animate-[bounce_1s_infinite_200ms]" />
                         <div className="w-1.5 h-1.5 bg-primary rounded-full animate-[bounce_1s_infinite_400ms]" />
-                        <span className="ml-2 text-[10px] font-black text-primary uppercase tracking-widest animate-pulse">Neural Processing</span>
+                        <span className="ml-2 text-[10px] font-bold text-primary uppercase tracking-[0.1em] font-mono">
+                          {HANDSHAKE_STEPS[thinkingStep]}
+                        </span>
                       </div>
-                      <div className="h-px w-full bg-gradient-to-r from-primary/20 to-transparent" />
-                      <p className="text-[10px] font-bold text-text-variant uppercase tracking-[0.1em] font-mono flex items-center gap-2">
-                        <span className="text-primary">❯</span> {HANDSHAKE_STEPS[thinkingStep]}
-                      </p>
                     </div>
                   </div>
                 )}
-                <div ref={messagesEndRef} className="h-4 w-full" />
+                <div className="h-4 w-full" />
               </div>
             )}
           </AnimatePresence>
         </div>
 
-        <div className="w-full bg-white/5 dark:bg-transparent backdrop-blur-md p-4 sm:p-6 lg:pb-8 shrink-0 border-t border-primary/5">
+        <div className="w-full bg-white/5 dark:bg-white/5 backdrop-blur-md p-4 sm:p-6 lg:pb-8 shrink-0 border-t border-primary/5">
           <div className="mx-auto max-w-4xl">
-            <div className="bg-white dark:bg-slate-900/40 backdrop-blur-2xl border border-primary/20 rounded-2xl p-2 flex items-end gap-2 shadow-2xl shadow-primary/10 transition-all focus-within:border-primary/40 focus-within:ring-4 focus-within:ring-primary/5">
+            <div className="bg-white dark:bg-slate-800 backdrop-blur-2xl border border-primary/20 rounded-2xl p-2 flex items-end gap-2 shadow-2xl shadow-primary/10 transition-all focus-within:border-primary/40 focus-within:ring-4 focus-within:ring-primary/5">
               <div className="flex items-center self-center pl-1">
                 <button className="p-2 text-text-variant hover:text-primary hover:bg-primary/5 rounded-xl transition-all">
                   <Paperclip size={20} />
