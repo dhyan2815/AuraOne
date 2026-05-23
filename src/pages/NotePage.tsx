@@ -223,11 +223,11 @@ const NotePage = () => {
             )}
           </div>
 
-          <button onClick={() => handleSave(false)} className="flex items-center gap-3 px-6 py-3.5 rounded-2xl glass border border-primary/10 text-primary hover:text-primary hover:border-primary/20 transition-all active:scale-95 shadow-lg shadow-primary/10">
+          <motion.button onClick={() => handleSave(false)} whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }} className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-primary to-secondary px-6 py-2.5 text-xs font-black text-white shadow-xl shadow-primary/20 sm:w-auto uppercase tracking-widest">
             <Save size={18} />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em]">Save Note</span>
-          </button>
-
+            Save Note
+          </motion.button>
           <button
             onClick={handleDelete}
             className="p-3.5 rounded-2xl glass border border-primary/5 text-text-variant hover:text-red-500 hover:border-red-500/20 transition-all active:scale-95 shadow-lg shadow-red-500/5"
@@ -286,12 +286,12 @@ const NotePage = () => {
             <motion.div 
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                className="glass rounded-[3.5rem] border border-primary/5 p-6 shadow-2xl transition-colors duration-500 sm:p-8 lg:p-12 relative overflow-hidden"
+                className="glass rounded-[3.5rem] border border-primary/5 p-6 shadow-2xl transition-colors duration-500 sm:p-8 lg:p-12 relative overflow-hidden bg-transparent"
             >
                 {/* Background aura effect inside terminal */}
                 <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/2" />
                 
-                <div className="prose prose-aurora max-w-none relative z-10 min-h-[600px]">
+                <div className="prose max-w-none relative z-10 min-h-[600px] text-text dark:text-slate-100 bg-transparent">
                     <TiptapEditor content={content} onChange={setContent} />
                 </div>
             </motion.div>

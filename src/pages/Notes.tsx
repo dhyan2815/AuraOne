@@ -188,9 +188,11 @@ const Notes = () => {
                       {note.title}
                     </h3>
                     {/* Preview */}
-                    <p className="text-text-variant font-medium leading-relaxed mb-6 text-sm line-clamp-3 opacity-70">
-                      {stripHtml(note.content) || "No content provided..."}
-                    </p>
+                    <div className="bg-transparent text-text-variant dark:text-slate-300 mb-6 opacity-80">
+                      <p className="font-medium leading-relaxed text-sm line-clamp-3 whitespace-pre-wrap">
+                        {stripHtml(note.content) || "No content provided..."}
+                      </p>
+                    </div>
                   </Link>
 
                   {/* Footer */}

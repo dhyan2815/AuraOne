@@ -77,13 +77,15 @@ const NoteCard = ({ note, viewMode }: NoteCardProps) => {
                     </button>
                 </div>
 
-                <div className="flex-1 mb-8">
+                <div className="flex-1 mb-8 bg-transparent">
                     <h3 className="text-xl font-bold leading-tight text-text mb-3 group-hover:text-primary transition-colors">
                         {note.title || 'Untitled Note'}
                     </h3>
-                    <p className="text-sm text-slate-500 line-clamp-4 leading-relaxed">
-                        {cleanContent || "No additional content to display..."}
-                    </p>
+                    <div className="bg-transparent text-text-variant dark:text-slate-300">
+                        <p className="text-sm line-clamp-4 leading-relaxed whitespace-pre-wrap">
+                            {cleanContent || "No additional content to display..."}
+                        </p>
+                    </div>
                 </div>
 
                 <div className="flex items-center justify-between pt-5 border-t border-slate-200 dark:border-gray-700">
