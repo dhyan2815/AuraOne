@@ -200,7 +200,7 @@ const Calendar = () => {
         {/* ── Right: Upcoming Events ── */}
         <div className="col-span-12 flex flex-col gap-6 pt-2 lg:col-span-4">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-base font-bold text-text tracking-tight uppercase tracking-[0.2em] text-[10px]">Upcoming Events</h3>
+            <h3 className="text-base font-bold text-text uppercase tracking-[0.2em] text-[10px]">Upcoming Events</h3>
             <button className="text-primary text-xs font-black uppercase hover:underline">View All</button>
           </div>
 
@@ -327,7 +327,7 @@ const Calendar = () => {
                       className="mt-2 flex items-center justify-center gap-3 py-4 rounded-2xl bg-primary text-white hover:bg-primary/90 transition-all active:scale-95 shadow-lg shadow-primary/20"
                     >
                       <Plus size={18} strokeWidth={3} />
-                      <span className="text-[10px] font-black uppercase tracking-[0.2em]">Synchronize</span>
+                      <span className="text-[10px] font-black uppercase tracking-[0.2em]">Add</span>
                     </button>
                   </form>
                 </motion.div>

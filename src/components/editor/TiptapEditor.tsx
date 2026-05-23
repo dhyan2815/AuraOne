@@ -17,7 +17,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
     },
     editorProps: {
       attributes: {
-        class: 'ProseMirror prose prose-slate dark:prose-invert max-w-none focus:outline-none',
+        class: 'ProseMirror prose max-w-none focus:outline-none text-text dark:text-gray-100',
       },
     }
   });
@@ -31,8 +31,8 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
   }, [content, editor]);
 
   return (
-    <div className="h-full w-full overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-gray-700 dark:bg-gray-800">
-      <EditorContent editor={editor} />
+    <div className="h-full w-full overflow-hidden bg-transparent">
+      <EditorContent editor={editor} className="min-h-[600px] outline-none" />
     </div>
   );
 };
