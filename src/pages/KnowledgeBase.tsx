@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
+import { format } from 'date-fns';
 import { useAuth } from '../hooks/useAuth';
 import { motion } from 'framer-motion';
 import { Brain, Search, RefreshCw, FileText, CheckCircle, Calendar, Trash2, Database } from 'lucide-react';
@@ -130,16 +131,16 @@ const KnowledgeBase = () => {
     <div className="app-page">
       {/* ── Header ────────────────────────────────────── */}
       <motion.div
-        className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4"
+        className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-text leading-tight flex items-center gap-3">
-            <Brain className="text-primary" size={32} />
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-text leading-tight flex items-center gap-2 sm:gap-3">
+            <Brain size={26} className="text-primary sm:w-[32px] sm:h-[32px]" />
             Recent Activity
           </h1>
-          <p className="text-sm text-text-variant mt-1 font-medium opacity-70">
+          <p className="text-xs sm:text-sm text-text-variant mt-1 font-medium opacity-70">
             See your recent activities you've done across tasks, notes, events, and calendar.
           </p>
         </div>
@@ -147,13 +148,13 @@ const KnowledgeBase = () => {
         <button
           onClick={handleSync}
           disabled={isSyncing}
-          className={`px-5 py-2.5 rounded-2xl flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-xl ${
+          className={`px-4 py-2.5 sm:px-5 sm:py-2.5 rounded-xl sm:rounded-2xl flex items-center justify-center gap-2 text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-xl w-full sm:w-auto ${
             isSyncing 
               ? 'bg-primary/20 text-primary cursor-not-allowed' 
               : 'bg-gradient-to-r from-primary to-secondary text-white shadow-primary/20 hover:shadow-primary/40'
           }`}
         >
-          <RefreshCw size={14} className={isSyncing ? 'animate-spin' : ''} />
+          <RefreshCw size={12} className={`sm:w-[14px] sm:h-[14px] ${isSyncing ? 'animate-spin' : ''}`} />
           {isSyncing ? `Indexing ${syncProgress}%` : 'Refresh Activity'}
         </button>
       </motion.div>
@@ -163,7 +164,7 @@ const KnowledgeBase = () => {
         variants={container}
         initial="hidden"
         animate="show"
-        className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
+        className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8"
       >
         {[
           { label: 'Total Records', value: stats.total, icon: Database, color: 'text-primary' },
@@ -171,13 +172,13 @@ const KnowledgeBase = () => {
           { label: 'Task Contexts', value: stats.tasks, icon: CheckCircle, color: 'text-emerald-400' },
           { label: 'Event Contexts', value: stats.events, icon: Calendar, color: 'text-amber-400' },
         ].map((stat, i) => (
-          <motion.div key={i} variants={item} className="glass p-5 rounded-3xl border border-primary/5 flex items-center gap-4">
-            <div className={`p-3 rounded-2xl bg-primary/5 ${stat.color}`}>
-              <stat.icon size={20} />
+          <motion.div key={i} variants={item} className="glass p-3 sm:p-5 rounded-2xl sm:rounded-3xl border border-primary/5 flex items-center gap-2.5 sm:gap-4">
+            <div className={`p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-primary/5 ${stat.color} flex-shrink-0`}>
+              <stat.icon size={16} className="sm:w-[20px] sm:h-[20px]" />
             </div>
-            <div>
-              <p className="text-[9px] font-black uppercase tracking-wider text-text-variant opacity-50">{stat.label}</p>
-              <p className="text-xl font-black text-text">{stat.value}</p>
+            <div className="min-w-0">
+              <p className="text-[8px] sm:text-[9px] font-black uppercase tracking-wider text-text-variant opacity-50 truncate">{stat.label}</p>
+              <p className="text-base sm:text-xl font-black text-text">{stat.value}</p>
             </div>
           </motion.div>
         ))}
@@ -187,12 +188,12 @@ const KnowledgeBase = () => {
       <div className="grid grid-cols-12 gap-6">
         {/* Main Full-Width Column: Explorer/Search */}
         <div className="col-span-12 flex flex-col gap-6">
-          <div className="glass rounded-[2.5rem] border border-primary/5 overflow-hidden flex flex-col h-[650px] shadow-2xl shadow-primary/5">
+          <div className="glass rounded-2xl sm:rounded-3xl lg:rounded-[2.5rem] border border-primary/5 overflow-hidden flex flex-col h-[550px] sm:h-[650px] shadow-2xl shadow-primary/5">
             {/* Tabs */}
-            <div className="flex border-b border-white/5 p-2 gap-2 bg-primary/5">
+            <div className="flex border-b border-white/5 p-1.5 sm:p-2 gap-1.5 sm:gap-2 bg-primary/5">
               <button
                 onClick={() => setActiveTab('explorer')}
-                className={`flex-1 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                className={`flex-1 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all ${
                   activeTab === 'explorer' ? 'bg-primary/10 text-primary shadow-inner' : 'text-text-variant hover:bg-white/5'
                 }`}
               >
@@ -200,7 +201,7 @@ const KnowledgeBase = () => {
               </button>
               <button
                 onClick={() => setActiveTab('search')}
-                className={`flex-1 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                className={`flex-1 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all ${
                   activeTab === 'search' ? 'bg-primary/10 text-primary shadow-inner' : 'text-text-variant hover:bg-white/5'
                 }`}
               >
@@ -208,14 +209,14 @@ const KnowledgeBase = () => {
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar">
               {activeTab === 'explorer' ? (
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between gap-4">
-                    <p className="text-[10px] font-bold text-text-variant uppercase tracking-widest opacity-60">
+                <div className="space-y-4 sm:space-y-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+                    <p className="text-[9px] sm:text-[10px] font-bold text-text-variant uppercase tracking-widest opacity-60">
                       Activity List (Limit 50)
                     </p>
-                    <div className="flex gap-2">
+                    <div className="flex gap-1.5 flex-wrap">
                       {['all', 'note', 'task', 'event'].map(f => (
                         <button
                           key={f}
@@ -320,16 +321,24 @@ const KnowledgeBase = () => {
                               {/* If event or task, and we displayed a nice header, maybe we just show the description from content or metadata? */}
                               {/* Actually, it's safer to just show the content, or we can try to extract just the description for cleaner UI */}
                               {(() => {
+                                let text = chunk.content;
                                 if (chunk.source_type === 'event' || chunk.source_type === 'task') {
                                   const descMatch = chunk.content.match(/Description:\s*([\s\S]*)$/);
                                   if (descMatch && descMatch[1].trim()) {
-                                    return descMatch[1].trim();
+                                    text = descMatch[1].trim();
                                   }
+                                } else if (chunk.content.length > 200 && chunk.source_type === 'note') {
+                                  text = chunk.content.substring(0, 200) + '...';
                                 }
-                                // Fallback or note
-                                return chunk.content.length > 200 && chunk.source_type === 'note' 
-                                  ? chunk.content.substring(0, 200) + '...' 
-                                  : chunk.content;
+                                return text.replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})/g, (match) => {
+                                  try {
+                                    const parsed = new Date(match);
+                                    if (!isNaN(parsed.getTime())) {
+                                      return format(parsed, 'MMM d, yyyy h:mm a');
+                                    }
+                                  } catch {}
+                                  return match;
+                                });
                               })()}
                             </div>
                             
@@ -446,15 +455,24 @@ const KnowledgeBase = () => {
 
                             <div className="text-xs text-text/80 leading-relaxed bg-white/[0.02] p-3 rounded-xl border border-white/5 whitespace-pre-wrap">
                               {(() => {
+                                let text = result.content;
                                 if (result.sourceType === 'event' || result.sourceType === 'task') {
                                   const descMatch = result.content.match(/Description:\s*([\s\S]*)$/);
                                   if (descMatch && descMatch[1].trim()) {
-                                    return descMatch[1].trim();
+                                    text = descMatch[1].trim();
                                   }
+                                } else if (result.content.length > 200 && result.sourceType === 'note') {
+                                  text = result.content.substring(0, 200) + '...';
                                 }
-                                return result.content.length > 200 && result.sourceType === 'note' 
-                                  ? result.content.substring(0, 200) + '...' 
-                                  : result.content;
+                                return text.replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})/g, (match) => {
+                                  try {
+                                    const parsed = new Date(match);
+                                    if (!isNaN(parsed.getTime())) {
+                                      return format(parsed, 'MMM d, yyyy h:mm a');
+                                    }
+                                  } catch {}
+                                  return match;
+                                });
                               })()}
                             </div>
                           </motion.div>

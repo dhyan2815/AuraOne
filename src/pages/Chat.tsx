@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import ReactMarkdown from "react-markdown";
-import { Send, Plus, Paperclip, ExternalLink, Database, Search, Wrench, ChevronDown, ChevronUp, Trash2, Pencil, Check, X } from "lucide-react";
+import { Send, Plus, Paperclip, ExternalLink, Database, Search, Wrench, ChevronDown, ChevronUp, Trash2, Pencil, Check, X, Menu } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import {
   getSessions, createNewSession, Session, deleteSession, updateSessionName
@@ -40,6 +40,7 @@ const Chat = () => {
   const [expandedMetadata, setExpandedMetadata] = useState<Record<string, boolean>>({});
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
   const [editSessionName, setEditSessionName] = useState("");
+  const [showSessionsMobile, setShowSessionsMobile] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -48,15 +49,8 @@ const Chat = () => {
     const textarea = textareaRef.current;
     if (!textarea) return;
 
-    const adjustHeight = () => {
-      textarea.style.height = 'auto';
-      textarea.style.height = `${Math.min(textarea.scrollHeight, 200)}px`;
-    };
-
-    textarea.addEventListener('input', adjustHeight);
-    adjustHeight();
-
-    return () => textarea.removeEventListener('input', adjustHeight);
+    textarea.style.height = 'auto';
+    textarea.style.height = `${Math.min(textarea.scrollHeight, 200)}px`;
   }, [input]);
 
   const scrollToBottom = () => {
@@ -253,14 +247,44 @@ const Chat = () => {
   const displayName = user?.email?.split("@")[0] ?? "User";
 
   return (
-    <div className="flex h-full lg:h-[100dvh] flex-col gap-4 lg:grid lg:grid-cols-[20rem_1fr] lg:p-6 overflow-hidden relative z-0">
+    <div className="fixed inset-0 bottom-[55px] z-10 flex flex-col gap-4 overflow-hidden md:relative md:inset-auto md:bottom-auto md:z-0 md:h-[100dvh] lg:grid lg:grid-cols-[18rem_1fr] lg:p-6">
+      {/* Mobile Sidebar backdrop */}
+      <AnimatePresence>
+        {showSessionsMobile && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowSessionsMobile(false)}
+            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
+          />
+        )}
+      </AnimatePresence>
+
       {/* ── Sidebar ── */}
-      <aside className="flex min-h-0 shrink-0 max-h-[30vh] lg:max-h-none lg:h-full flex-col gap-4">
+      <aside 
+        className={`flex min-h-0 shrink-0 flex-col gap-4 z-50 fixed inset-y-0 left-0 w-[85vw] max-w-[320px] p-5 bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl border-r border-primary/10 shadow-2xl transition-transform duration-300 ease-in-out lg:relative lg:flex lg:w-full lg:translate-x-0 lg:p-0 lg:bg-transparent lg:border-none lg:shadow-none ${
+          showSessionsMobile ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="flex items-center justify-between lg:hidden mb-4">
+          <span className="text-xs font-black uppercase tracking-widest text-primary">Chat History</span>
+          <button 
+            onClick={() => setShowSessionsMobile(false)} 
+            className="p-2 rounded-xl hover:bg-primary/10 text-text-variant active:scale-95 transition-colors bg-primary/5"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
         <motion.button
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.99 }}
-          onClick={handleNewSession}
-          className="bg-primary shadow-lg shadow-primary/10 w-full py-3 px-4 rounded-xl flex items-center justify-center gap-2 group transition-all duration-300"
+          onClick={() => {
+            handleNewSession();
+            setShowSessionsMobile(false);
+          }}
+          className="bg-primary shadow-lg shadow-primary/10 w-full py-3 px-4 rounded-xl flex items-center justify-center gap-2 group transition-all duration-300 flex-shrink-0"
         >
           <Plus size={16} className="text-white" strokeWidth={2.5} />
           <span className="font-bold text-white text-xs tracking-wide">New Chat</span>
@@ -277,7 +301,10 @@ const Chat = () => {
                   key={s.id}
                   whileHover={{ x: 4 }}
                   onClick={() => {
-                    if (editingSessionId !== s.id) setSelectedSession(s.id);
+                    if (editingSessionId !== s.id) {
+                      setSelectedSession(s.id);
+                      setShowSessionsMobile(false);
+                    }
                   }}
                   className={`px-3 py-3 rounded-xl cursor-pointer group flex items-center justify-between gap-3 transition-all ${
                     selectedSession === s.id 
@@ -326,15 +353,20 @@ const Chat = () => {
 
       {/* ── Main Chat ── */}
       <section className="relative flex flex-1 flex-col h-full min-h-0 overflow-hidden rounded-3xl border border-primary/10 bg-white dark:bg-slate-900 shadow-2xl shadow-primary/5 isolation-auto">
-        <div className="px-6 h-16 border-b border-primary/5 flex items-center justify-between bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl z-10 shrink-0">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary to-secondary flex items-center justify-center shadow-lg shadow-primary/20">
-              <Logo iconOnly iconClassName="w-5 h-5 filter brightness-0 invert" />
+        <div className="px-4 sm:px-6 h-14 sm:h-16 border-b border-primary/5 flex items-center justify-between bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl z-10 shrink-0">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <button 
+              onClick={() => setShowSessionsMobile(true)}
+              className="lg:hidden p-2.5 rounded-xl border border-primary/10 text-text-variant hover:bg-primary/5 hover:text-primary transition-all flex items-center justify-center active:scale-95 bg-white/50 dark:bg-slate-800/50 shadow-sm"
+              title="Menu"
+            >
+              <Menu size={18} />
+            </button>
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-primary to-secondary flex items-center justify-center shadow-lg shadow-primary/20">
+              <Logo iconOnly iconClassName="w-4.5 h-4.5 sm:w-5 sm:h-5 filter brightness-0 invert" />
             </div>
             <div>
-              <h2 className="text-md font-black text-text tracking-widest">Aura Assistant</h2>
-              <div className="flex items-center gap-1.5 mt-0.5">
-              </div>
+              <h2 className="text-sm sm:text-md font-black text-text tracking-widest leading-none">Aura Assistant</h2>
             </div>
           </div>
         </div>
@@ -468,7 +500,7 @@ const Chat = () => {
           </AnimatePresence>
         </div>
 
-        <div className="w-full bg-white/5 dark:bg-white/5 backdrop-blur-md p-4 sm:p-6 lg:pb-8 shrink-0 border-t border-primary/5">
+        <div className="w-full bg-white/5 dark:bg-white/5 backdrop-blur-md p-4 pb-20 md:p-6 lg:pb-8 shrink-0 border-t border-primary/5">
           <div className="mx-auto max-w-4xl">
             <div className="bg-white dark:bg-slate-800 backdrop-blur-2xl border border-primary/20 rounded-2xl p-2 flex items-end gap-2 shadow-2xl shadow-primary/10 transition-all focus-within:border-primary/40 focus-within:ring-4 focus-within:ring-primary/5">
               <div className="flex items-center self-center pl-1">

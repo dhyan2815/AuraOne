@@ -98,56 +98,56 @@ const Calendar = () => {
 
           {/* Hero + Month Nav */}
           <motion.div
-            className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between"
+            className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"
             initial={{ opacity: 0, x: -24 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
           >
             <div>
-              <h1 className="text-3xl font-extrabold tracking-tight leading-none text-text" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight leading-none text-text" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 Events Calendar
               </h1>
-              <p className="text-sm text-text-variant mt-2 font-medium">
+              <p className="text-xs sm:text-sm text-text-variant mt-2 font-medium">
                 Manage your appointments, deadlines, and upcoming events.
               </p>
             </div>
-            <div className="flex items-center justify-between gap-2 rounded-2xl border border-primary/10 glass px-4 py-3 shadow-xl shadow-primary/5 sm:gap-4 sm:px-6 transition-colors duration-500">
+            <div className="flex items-center justify-between gap-2 rounded-xl sm:rounded-2xl border border-primary/10 glass px-3 py-2 sm:px-6 sm:py-3 shadow-xl shadow-primary/5 sm:gap-4 transition-colors duration-500">
               <button
                 onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-                className="p-2 hover:bg-primary/10 rounded-full transition-colors text-primary"
+                className="p-1.5 sm:p-2 hover:bg-primary/10 rounded-full transition-colors text-primary"
               >
-                <ChevronLeft size={20} />
+                <ChevronLeft size={16} className="sm:w-[20px] sm:h-[20px]" />
               </button>
-              <span className="text-xl font-bold text-text min-w-[140px] text-center">
+              <span className="text-sm sm:text-xl font-bold text-text min-w-[100px] sm:min-w-[140px] text-center">
                 {format(currentMonth, "MMMM yyyy")}
               </span>
               <button
                 onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-                className="p-2 hover:bg-primary/10 rounded-full transition-colors text-primary"
+                className="p-1.5 sm:p-2 hover:bg-primary/10 rounded-full transition-colors text-primary"
               >
-                <ChevronRight size={20} />
+                <ChevronRight size={16} className="sm:w-[20px] sm:h-[20px]" />
               </button>
             </div>
           </motion.div>
 
           {/* Calendar Grid */}
           <motion.div
-            className="glass shadow-2xl shadow-primary/5 rounded-[2.5rem] p-6 lg:p-8 overflow-hidden transition-colors duration-500"
+            className="glass shadow-2xl shadow-primary/5 rounded-2xl sm:rounded-[2.5rem] p-4 sm:p-6 lg:p-8 overflow-hidden transition-colors duration-500"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
           >
             {/* Day Headers */}
-            <div className="grid grid-cols-7 gap-4 mb-6">
+            <div className="grid grid-cols-7 gap-1 sm:gap-4 mb-4 sm:mb-6">
               {DAY_HEADERS.map((d) => (
-                <div key={d} className="text-center text-[0.6875rem] font-bold uppercase tracking-[0.2em] text-primary/60">
+                <div key={d} className="text-center text-[9px] sm:text-[11px] font-bold uppercase tracking-[0.2em] text-primary/60">
                   {d}
                 </div>
               ))}
             </div>
 
             {/* Day Cells */}
-            <div className="grid grid-cols-7 gap-3 sm:gap-4">
+            <div className="grid grid-cols-7 gap-1.5 sm:gap-4">
               {calendarDays.map((day) => {
                 const dayEvents = eventsForDay(day);
                 const isCurrentMonth = isSameMonth(day, currentMonth);
@@ -157,19 +157,19 @@ const Calendar = () => {
                   <div
                     key={day.toString()}
                     onClick={() => { setSelectedDate(day); setShowForm(true); }}
-                    className={`aspect-square relative flex flex-col items-center justify-center group cursor-pointer rounded-2xl transition-all duration-300 ${
+                    className={`aspect-square relative flex flex-col items-center justify-center group cursor-pointer rounded-lg sm:rounded-2xl transition-all duration-300 ${
                       isTodayDay
                         ? ""
                         : isSelected
-                        ? "bg-primary/10 ring-2 ring-primary/40 shadow-lg shadow-primary/10 scale-[1.05] z-10"
+                        ? "bg-primary/10 ring-1 sm:ring-2 ring-primary/40 shadow-lg shadow-primary/10 scale-[1.03] sm:scale-[1.05] z-10"
                         : "hover:bg-primary/5"
                     }`}
                   >
                     {isTodayDay && (
-                      <div className="absolute inset-1 sm:inset-2 bg-primary rounded-2xl shadow-lg shadow-primary/30" />
+                      <div className="absolute inset-0.5 sm:inset-2 bg-primary rounded-lg sm:rounded-2xl shadow-lg shadow-primary/30" />
                     )}
                     <span
-                      className={`z-10 font-bold text-sm transition-colors ${
+                      className={`z-10 font-bold text-xs sm:text-sm transition-colors ${
                         isTodayDay
                           ? "text-white"
                           : isCurrentMonth
@@ -180,11 +180,11 @@ const Calendar = () => {
                       {format(day, "d")}
                     </span>
                     {dayEvents.length > 0 && (
-                      <div className="absolute bottom-3 flex gap-0.5 z-10">
+                      <div className="absolute bottom-1 sm:bottom-3 flex gap-0.5 z-10">
                         {dayEvents.slice(0, 3).map((_, i) => (
                           <span
                             key={i}
-                            className={`w-1 h-1 rounded-full ${isTodayDay ? "bg-white" : "bg-tertiary"}`}
+                            className={`w-0.5 h-0.5 sm:w-1 sm:h-1 rounded-full ${isTodayDay ? "bg-white" : "bg-tertiary"}`}
                           />
                         ))}
                       </div>

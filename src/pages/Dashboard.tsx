@@ -43,12 +43,12 @@ const Dashboard = () => {
         transition={{ duration: 0.7, ease: 'easeOut' }}
       >
         <h1
-          className="text-3xl font-extrabold tracking-tight text-text leading-tight"
+          className="text-2xl md:text-3xl lg:text-4xl font-extrabold tracking-tight text-text leading-tight"
           style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
         >
           {greeting}, {userName}{' '}
         </h1>
-        <p className="text-sm text-text-variant mt-1 max-w-xl font-medium">
+        <p className="text-xs md:text-sm text-text-variant mt-1 max-w-xl font-medium">
           A quick overview of your goals, upcoming schedule, and latest news.
         </p>
       </motion.div>
@@ -58,12 +58,12 @@ const Dashboard = () => {
         variants={container}
         initial="hidden"
         animate="show"
-        className="grid grid-cols-12 gap-5 lg:gap-6"
+        className="grid grid-cols-12 gap-4 md:gap-5 lg:gap-6"
       >
-        {/* ── Widget 1: Weather (8/12 cols) ── */}
+        {/* ── Widget 1: Weather (8/12 cols desktop, 12/12 tablet/mobile) ── */}
         <motion.div
           variants={item}
-          className="col-span-12 lg:col-span-8 glass p-6 lg:p-8 rounded-[2.5rem] border border-primary/5 shadow-2xl shadow-primary/5 transition-all duration-500 overflow-hidden relative"
+          className="col-span-12 lg:col-span-8 glass p-4 md:p-6 lg:p-8 rounded-2xl md:rounded-[2rem] lg:rounded-[2.5rem] border border-primary/5 shadow-2xl shadow-primary/5 transition-all duration-500 overflow-hidden relative"
         >
           {/* decorative blur orbs */}
           <div className="absolute -right-20 -top-20 w-80 h-80 bg-primary/10 blur-[100px] rounded-full pointer-events-none opacity-50" />
@@ -74,20 +74,20 @@ const Dashboard = () => {
           </div>
         </motion.div>
 
-        {/* ── Widget 2: Tasks Panel (4/12 cols) ── */}
+        {/* ── Widget 2: Tasks Panel (4/12 cols desktop, 6/12 tablet, 12/12 mobile) ── */}
         <motion.div
           variants={item}
-          className="col-span-12 lg:col-span-4 glass p-6 lg:p-8 rounded-[2.5rem] border border-primary/5 shadow-2xl shadow-primary/5 flex flex-col transition-all duration-500"
+          className="col-span-12 md:col-span-6 lg:col-span-4 glass p-4 md:p-6 lg:p-8 rounded-2xl md:rounded-[2rem] lg:rounded-[2.5rem] border border-primary/5 shadow-2xl shadow-primary/5 flex flex-col transition-all duration-500"
         >
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex justify-between items-center mb-4 md:mb-6">
             <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-text opacity-60">
                 ACTIVE TASKS
             </h3>
             <button
-              className="p-3 rounded-2xl glass border border-primary/10 text-text-variant hover:text-primary hover:border-primary/20 transition-all active:scale-95 shadow-lg shadow-primary/5"
+              className="p-2 md:p-3 rounded-xl md:rounded-2xl glass border border-primary/10 text-text-variant hover:text-primary hover:border-primary/20 transition-all active:scale-95 shadow-lg shadow-primary/5"
               title="Add objective"
             >
-              <Plus size={18} strokeWidth={3} />
+              <Plus size={16} strokeWidth={3} className="md:w-[18px] md:h-[18px]" />
             </button>
           </div>
           <div className="flex-1">
@@ -95,37 +95,37 @@ const Dashboard = () => {
           </div>
         </motion.div>
 
-        {/* ── Widget 3: News (5/12 cols) ── */}
+        {/* ── Widget 3: News (5/12 cols desktop, 6/12 tablet, 12/12 mobile) ── */}
         <motion.div
           variants={item}
-          className="col-span-12 lg:col-span-5 glass p-6 lg:p-8 rounded-[2.5rem] border border-primary/5 shadow-2xl shadow-primary/5 transition-all duration-500"
+          className="col-span-12 md:col-span-6 lg:col-span-5 glass p-4 md:p-6 lg:p-8 rounded-2xl md:rounded-[2rem] lg:rounded-[2.5rem] border border-primary/5 shadow-2xl shadow-primary/5 transition-all duration-500"
         >
-          <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-text mb-6 opacity-60">
+          <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-text mb-4 md:mb-6 opacity-60">
             LATEST NEWS
           </h3>
           <NewsWidget />
         </motion.div>
 
-        {/* ── Widget 4: Calendar (7/12 cols) ── */}
+        {/* ── Widget 4: Calendar (7/12 cols desktop, 12/12 tablet/mobile) ── */}
         <motion.div
           variants={item}
-          className="col-span-12 lg:col-span-7 glass p-6 lg:p-8 rounded-[2.5rem] border border-primary/5 shadow-2xl shadow-primary/5 flex flex-col transition-all duration-500"
+          className="col-span-12 md:col-span-12 lg:col-span-7 glass p-4 md:p-6 lg:p-8 rounded-2xl md:rounded-[2rem] lg:rounded-[2.5rem] border border-primary/5 shadow-2xl shadow-primary/5 flex flex-col transition-all duration-500"
         >
-          <div className="flex justify-between items-center mb-5">
+          <div className="flex justify-between items-center mb-4 md:mb-5">
             <div>
               <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-text opacity-60">
                 MY SCHEDULE
               </h3>
-              <p className="text-xl font-extrabold text-text mt-2 tracking-tight">
+              <p className="text-lg md:text-xl font-extrabold text-text mt-1 md:mt-2 tracking-tight">
                 {new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}
               </p>
             </div>
-            <div className="flex gap-3">
-              <button className="w-10 h-10 rounded-xl glass border border-primary/10 flex items-center justify-center hover:bg-primary/10 transition-all active:scale-90 text-text-variant">
-                <ChevronLeft size={18} strokeWidth={2.5} />
+            <div className="flex gap-2 md:gap-3">
+              <button className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl glass border border-primary/10 flex items-center justify-center hover:bg-primary/10 transition-all active:scale-90 text-text-variant">
+                <ChevronLeft size={16} strokeWidth={2.5} className="md:w-[18px] md:h-[18px]" />
               </button>
-              <button className="w-10 h-10 rounded-xl glass border border-primary/10 flex items-center justify-center hover:bg-primary/10 transition-all active:scale-90 text-text-variant">
-                <ChevronRight size={18} strokeWidth={2.5} />
+              <button className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl glass border border-primary/10 flex items-center justify-center hover:bg-primary/10 transition-all active:scale-90 text-text-variant">
+                <ChevronRight size={16} strokeWidth={2.5} className="md:w-[18px] md:h-[18px]" />
               </button>
             </div>
           </div>
