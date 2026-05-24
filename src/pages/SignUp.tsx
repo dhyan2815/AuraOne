@@ -84,24 +84,24 @@ const SignUp = () => {
 
       {/* Navigation */}
       <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${isScrolled ? 'glass py-3 border-b border-primary/5' : 'bg-transparent py-6'}`}>
-        <div className="max-w-[1440px] mx-auto px-6 flex items-center justify-between">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 flex items-center justify-between">
           <Link
             to="/"
             className="hover:opacity-80 transition-opacity cursor-pointer inline-block"
           >
-            <Logo iconClassName="w-10 h-10" iconOnly />
+            <Logo iconClassName="w-8 h-8 sm:w-10 sm:h-10" iconOnly />
           </Link>
 
-          <div className="flex items-center space-x-8">
+          <div className="flex items-center space-x-4 sm:space-x-8">
             <Link
               to="/login"
-              className="text-sm font-bold text-aurora-on-surface-variant hover:text-primary transition-colors uppercase tracking-widest"
+              className="text-xs sm:text-sm font-bold text-aurora-on-surface-variant hover:text-primary transition-colors uppercase tracking-widest"
             >
               Sign In
             </Link>
             <Link
               to="/"
-              className="btn-aurora-secondary px-8 py-3"
+              className="btn-aurora-secondary px-4 sm:px-8 py-2 sm:py-3 text-xs sm:text-sm"
             >
               Back to Home
             </Link>
@@ -110,29 +110,29 @@ const SignUp = () => {
       </nav>
 
       {/* Main Content */}
-      <section className="pt-40 pb-32">
-        <div className="max-w-[1440px] mx-auto px-6">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+      <section className="pt-28 pb-16 sm:pt-40 sm:pb-32">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
             {/* Left Content */}
             <motion.div 
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
-              className="space-y-8"
+              className="space-y-6 sm:space-y-8 text-center lg:text-left"
             >
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 <p className="section-header">Join the Platform</p>
-                <h1 className="display-lg leading-tight bg-gradient-to-br from-primary via-secondary to-tertiary bg-clip-text text-transparent italic">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight bg-gradient-to-br from-primary via-secondary to-tertiary bg-clip-text text-transparent italic">
                   Craft Your<br />
                   <span className="not-italic text-aurora-on-surface font-extrabold">Digital Workspace.</span>
                 </h1>
-                <p className="text-xl text-aurora-on-surface-variant font-medium leading-relaxed max-w-xl">
+                <p className="text-base sm:text-lg lg:text-xl text-aurora-on-surface-variant font-medium leading-relaxed max-w-xl mx-auto lg:mx-0">
                   Step into the future of productivity. A workspace designed to adapt, illuminate, and empower your every thought.
                 </p>
               </div>
 
               {/* Benefits */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 pt-4 text-left max-w-lg mx-auto lg:mx-0">
                 {[
                   { title: "Intelligent Design", desc: "Aesthetic meets function in harmony." },
                   { title: "Universal Sync", desc: "Your data, everywhere, instantly." },
@@ -143,7 +143,7 @@ const SignUp = () => {
                     <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2" />
                     <div>
                       <p className="font-bold text-aurora-on-surface">{item.title}</p>
-                      <p className="text-sm text-aurora-on-surface-variant">{item.desc}</p>
+                      <p className="text-xs sm:text-sm text-aurora-on-surface-variant">{item.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -156,11 +156,11 @@ const SignUp = () => {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
-              <div className="glass-panel p-10 rounded-[2.5rem] shadow-2xl relative">
+              <div className="glass-panel p-6 sm:p-10 rounded-2xl sm:rounded-[2.5rem] shadow-2xl relative">
                 <form onSubmit={handleSignUp} className="space-y-6" autoComplete="off">
-                  <div className="text-center mb-10 space-y-2">
-                    <h2 className="headline-sm text-3xl tracking-tighter">Create Account</h2>
-                    <p className="text-aurora-on-surface-variant font-medium">Get started with AuraOne today.</p>
+                  <div className="text-center mb-6 sm:mb-10 space-y-2">
+                    <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tighter">Create Account</h2>
+                    <p className="text-sm sm:text-base text-aurora-on-surface-variant font-medium">Get started with AuraOne today.</p>
                   </div>
 
                   {error && (
@@ -226,7 +226,7 @@ const SignUp = () => {
                   <button
                     type="submit"
                     disabled={isSigningUp}
-                    className="btn-aurora-primary w-full py-4 text-lg shadow-xl shadow-primary/20 mt-4 group"
+                    className="btn-aurora-primary w-full py-3.5 sm:py-4 text-base sm:text-lg shadow-xl shadow-primary/20 mt-4 group"
                   >
                     {isSigningUp ? (
                       <div className="flex items-center justify-center gap-3">
@@ -256,10 +256,10 @@ const SignUp = () => {
       </section>
 
       {/* Enhanced Footer */}
-      <footer className="py-20 border-t border-primary/5">
-        <div className="max-w-[1440px] mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
+      <footer className="py-10 sm:py-20 border-t border-primary/5">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 flex flex-col sm:flex-row justify-between items-center gap-6 sm:gap-8">
           <Logo iconClassName="w-8 h-8" iconOnly />
-          <p className="text-xs font-black uppercase tracking-widest text-primary/40">&copy; 2026 AuraOne. Developed by Dhyan Patel</p>
+          <p className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-primary/40 text-center sm:text-left">&copy; 2026 AuraOne. Developed by Dhyan Patel</p>
         </div>
       </footer>
     </div>
