@@ -7,7 +7,7 @@ import {
   Clock,
   Save,
   Trash2,
-  CheckCircle,
+  Check,
   Flag,
   RotateCw,
   AlertCircle,
@@ -157,61 +157,61 @@ const TaskPage = () => {
   }
 
   return (
-    <div className="app-page-tight space-y-10 px-4 sm:px-0">
-      <div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
-        <div className="flex items-start gap-8 group flex-1">
+    <div className="app-page-tight space-y-6 sm:space-y-10 px-4 sm:px-0">
+      <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
+        <div className="flex items-start gap-4 sm:gap-8 group flex-1">
           <button
             onClick={() => navigate("/tasks")}
-            className="mt-1 p-4 rounded-2xl glass border border-primary/5 text-text-variant hover:text-primary hover:border-primary/20 transition-all active:scale-95 shadow-xl"
+            className="mt-1 p-3 sm:p-4 rounded-xl sm:rounded-2xl glass border border-primary/5 text-text-variant hover:text-primary hover:border-primary/20 transition-all active:scale-95 shadow-xl flex-shrink-0"
           >
-            <ArrowLeft size={20} />
+            <ArrowLeft size={18} className="sm:w-[20px] sm:h-[20px]" />
           </button>
-          <div className="flex-1 space-y-4">
-            <div className="flex items-center gap-2 text-primary">
-              <Logo iconOnly iconClassName="w-4 h-4" />
-              <span className="text-[10px] font-black uppercase tracking-[0.3em] ml-1">Task Details</span>
+          <div className="flex-1 space-y-2 sm:space-y-4 min-w-0">
+            <div className="flex items-center gap-1.5 text-primary">
+              <Logo iconOnly iconClassName="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] ml-1">Task Details</span>
             </div>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="text-4xl lg:text-5xl font-extrabold bg-transparent border-0 outline-none w-full text-text placeholder:text-text-variant/10 tracking-tighter leading-none"
+              className="text-2xl sm:text-3xl lg:text-5xl font-extrabold bg-transparent border-0 outline-none w-full text-text placeholder:text-text-variant/10 tracking-tighter leading-none truncate"
               placeholder="Enter Task Title..."
               style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
             />
             {createdAt && (
-              <div className="flex items-center text-[10px] font-black text-text-variant uppercase tracking-[0.2em] opacity-60">
-                <Calendar size={12} className="mr-2 text-primary" />
+              <div className="flex items-center text-[9px] sm:text-[10px] font-black text-text-variant uppercase tracking-[0.2em] opacity-60">
+                <Calendar size={10} className="mr-1.5 text-primary sm:w-[12px] sm:h-[12px]" />
                 Created On: {format(new Date(createdAt), "MMMM d, yyyy")}
               </div>
             )}
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-4 lg:self-end">
+        <div className="flex flex-wrap items-center gap-3 sm:gap-4 lg:self-end">
           <button 
             onClick={handleSave} 
             disabled={isSaving}
-            className="flex items-center gap-3 px-10 py-4 rounded-2xl bg-gradient-to-r from-primary to-secondary text-white font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 disabled:grayscale"
+            className="flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-10 py-3 sm:py-4 rounded-xl sm:rounded-2xl bg-gradient-to-r from-primary to-secondary text-white font-black text-[9px] sm:text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 disabled:grayscale flex-1 sm:flex-initial whitespace-nowrap"
           >
-            {isSaving ? <RotateCw className="animate-spin" size={18} strokeWidth={3} /> : <Save size={18} strokeWidth={3} />}
+            {isSaving ? <RotateCw className="animate-spin" size={14} strokeWidth={3} className="sm:w-[18px] sm:h-[18px]" /> : <Save size={14} strokeWidth={3} className="sm:w-[18px] sm:h-[18px]" />}
             Save Task
           </button>
 
           <button
             onClick={handleDelete}
-            className="p-4 rounded-2xl glass border border-primary/5 text-text-variant hover:text-red-500 hover:border-red-500/20 transition-all active:scale-95 shadow-lg shadow-red-500/5"
+            className="p-3 sm:p-4 rounded-xl sm:rounded-2xl glass border border-primary/5 text-text-variant hover:text-red-500 hover:border-red-500/20 transition-all active:scale-95 shadow-lg shadow-red-500/5 flex-shrink-0"
             aria-label="Delete task"
           >
-            <Trash2 size={20} />
+            <Trash2 size={18} className="sm:w-[20px] sm:h-[20px]" />
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12">
-        <div className="lg:col-span-8 space-y-12">
-          <div className="space-y-4">
-            <label className="text-[10px] font-black uppercase tracking-[0.3em] text-text-variant flex items-center gap-3 ml-1 opacity-60">
+      <div className="grid grid-cols-1 gap-6 sm:gap-10 lg:grid-cols-12 lg:gap-12">
+        <div className="lg:col-span-8 space-y-6 sm:space-y-12">
+          <div className="space-y-3 sm:space-y-4">
+            <label className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] text-text-variant flex items-center gap-3 ml-1 opacity-60">
               Description
               <div className="h-px flex-1 bg-primary/10" />
             </label>
@@ -219,51 +219,51 @@ const TaskPage = () => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Add a detailed description for this task..."
-              className="input-aurora w-full h-64 resize-none p-8 text-base font-medium leading-relaxed"
+              className="input-aurora w-full h-48 sm:h-64 resize-none p-4 sm:p-8 text-sm sm:text-base font-medium leading-relaxed"
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="space-y-4">
-              <label className="text-[10px] font-black uppercase tracking-[0.3em] text-text-variant opacity-60 ml-1">Due Date</label>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-8">
+            <div className="space-y-2 sm:space-y-4">
+              <label className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] text-text-variant opacity-60 ml-1">Due Date</label>
               <div className="relative group">
-                <Calendar className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={18} />
+                <Calendar className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={16} className="sm:w-[18px] sm:h-[18px]" />
                 <input
                   type="date"
                   value={dueDate}
                   onChange={(e) => setDueDate(e.target.value)}
-                  className="input-aurora pl-14 w-full py-4 text-sm font-bold appearance-none"
+                  className="input-aurora pl-12 sm:pl-14 w-full py-3 sm:py-4 text-xs sm:text-sm font-bold appearance-none"
                 />
               </div>
             </div>
 
-            <div className="space-y-4">
-              <label className="text-[10px] font-black uppercase tracking-[0.3em] text-text-variant opacity-60 ml-1">Time</label>
+            <div className="space-y-2 sm:space-y-4">
+              <label className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] text-text-variant opacity-60 ml-1">Time</label>
               <div className="relative group">
-                <Clock className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={18} />
+                <Clock className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={16} className="sm:w-[18px] sm:h-[18px]" />
                 <input
                   type="time"
                   value={dueTime}
                   onChange={(e) => setDueTime(e.target.value)}
-                  className="input-aurora pl-14 w-full py-4 text-sm font-bold appearance-none"
+                  className="input-aurora pl-12 sm:pl-14 w-full py-3 sm:py-4 text-xs sm:text-sm font-bold appearance-none"
                 />
               </div>
             </div>
 
-            <div className="space-y-4">
-              <label className="text-[10px] font-black uppercase tracking-[0.3em] text-text-variant opacity-60 ml-1">Priority Level</label>
+            <div className="space-y-2 sm:space-y-4">
+              <label className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] text-text-variant opacity-60 ml-1">Priority Level</label>
               <div className="relative">
                 <select
                     value={priority}
                     onChange={(e) => setPriority(e.target.value as any)}
-                    className="input-aurora w-full py-4 px-8 text-[10px] font-black uppercase tracking-widest appearance-none cursor-pointer"
+                    className="input-aurora w-full py-3 px-6 sm:py-4 sm:px-8 text-[9px] sm:text-[10px] font-black uppercase tracking-widest appearance-none cursor-pointer"
                 >
                     <option value="low" className="bg-background">Low Priority</option>
                     <option value="medium" className="bg-background">Medium Priority</option>
                     <option value="high" className="bg-background">High Priority</option>
                 </select>
-                <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-primary/40">
-                    <Flag size={14} />
+                <div className="absolute right-5 sm:right-6 top-1/2 -translate-y-1/2 pointer-events-none text-primary/40">
+                    <Flag size={12} className="sm:w-[14px] sm:h-[14px]" />
                 </div>
               </div>
             </div>
@@ -275,43 +275,40 @@ const TaskPage = () => {
                 initial={{ opacity: 0, scale: 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.98 }}
-                className="p-8 rounded-[2.5rem] glass border border-red-500/20 bg-red-500/5 flex items-center gap-6 text-red-500 shadow-2xl shadow-red-500/5"
+                className="p-5 sm:p-8 rounded-2xl sm:rounded-[2.5rem] glass border border-red-500/20 bg-red-500/5 flex items-center gap-4 sm:gap-6 text-red-500 shadow-2xl shadow-red-500/5"
               >
-                <AlertCircle className="shrink-0" size={32} strokeWidth={2.5} />
-                <div className="space-y-1.5">
-                  <h4 className="text-xs font-black uppercase tracking-[0.2em]">Task Overdue</h4>
-                  <p className="text-[10px] font-bold opacity-70 leading-relaxed uppercase tracking-widest">This task is past its due date and needs to be completed.</p>
+                <AlertCircle className="shrink-0 sm:w-[32px] sm:h-[32px]" size={24} strokeWidth={2.5} />
+                <div className="space-y-1 sm:space-y-1.5">
+                  <h4 className="text-[10px] sm:text-xs font-black uppercase tracking-[0.2em]">Task Overdue</h4>
+                  <p className="text-[9px] sm:text-[10px] font-bold opacity-70 leading-relaxed uppercase tracking-widest">This task is past its due date and needs to be completed.</p>
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
 
-        <div className="lg:col-span-4 space-y-8">
-          <div className="space-y-6 lg:sticky lg:top-8">
-            <label className="text-[10px] font-black uppercase tracking-[0.3em] text-text-variant opacity-60 ml-1">Task Preview</label>
-            <div className="glass-panel p-10 rounded-[3rem] border border-primary/5 shadow-2xl transition-colors duration-500 relative overflow-hidden group">
+        <div className="lg:col-span-4 space-y-6 sm:space-y-8">
+          <div className="space-y-4 sm:space-y-6 lg:sticky lg:top-8">
+            <label className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] text-text-variant opacity-60 ml-1">Task Preview</label>
+            <div className="glass-panel p-6 sm:p-10 rounded-2xl sm:rounded-[3rem] border border-primary/5 shadow-2xl transition-colors duration-500 relative overflow-hidden group">
               {/* Background accent */}
-              <div className={`absolute top-0 right-0 w-32 h-32 blur-[60px] opacity-20 transition-all duration-700 ${
+              <div className={`absolute top-0 right-0 w-24 h-24 sm:w-32 sm:h-32 blur-[50px] sm:blur-[60px] opacity-20 transition-all duration-700 ${
                 priority === 'high' ? "bg-red-500" :
                 priority === 'medium' ? "bg-secondary" :
                 "bg-emerald-500"
               }`} />
 
-              <div className="absolute top-0 right-0 p-10">
-                <Flag size={20} className={`transition-colors duration-500 ${
+              <div className="absolute top-0 right-0 p-6 sm:p-10">
+                <Flag size={16} className={`sm:w-[20px] sm:h-[20px] transition-colors duration-500 ${
                     priority === 'high' ? "text-red-500 animate-pulse" :
                     priority === 'medium' ? "text-secondary" :
                     "text-emerald-500"
                 }`} strokeWidth={3} />
               </div>
 
-              <div className="space-y-8 relative z-10">
-                <div className="flex items-center gap-5 pointer-events-none">
-                  <div className={`w-10 h-10 rounded-2xl border-2 flex items-center justify-center transition-all duration-500 shadow-xl ${completed ? "bg-primary border-primary text-white shadow-primary/30" : "border-primary/20 text-transparent"}`}>
-                    <CheckCircle size={24} strokeWidth={3} />
-                  </div>
-                  <h3 className={`text-2xl font-black text-text tracking-tighter leading-tight ${completed ? "line-through opacity-40 grayscale" : ""}`}>
+              <div className="space-y-6 sm:space-y-8 relative z-10">
+                <div className="flex items-center gap-4 sm:gap-5 pointer-events-none pr-6">
+                  <h3 className={`text-xl sm:text-2xl font-black text-text tracking-tighter leading-tight ${completed ? "line-through opacity-40 grayscale" : ""}`}>
                     {title || "Untitled Task"}
                   </h3>
                 </div>
@@ -320,17 +317,17 @@ const TaskPage = () => {
                   {description || "No description provided."}
                 </p>
 
-                <div className="pt-8 border-t border-primary/5 space-y-6">
-                  <div className="flex flex-col gap-3">
-                    <div className={`flex items-center text-[10px] font-black uppercase tracking-[0.2em] ${isOverdue ? "text-red-500" : "text-text-variant opacity-80"}`}>
-                      <Clock size={12} className="mr-2.5 text-primary" strokeWidth={3} />
+                <div className="pt-6 sm:pt-8 border-t border-primary/5 space-y-4 sm:space-y-6">
+                  <div className="flex flex-col gap-2.5 sm:gap-3">
+                    <div className={`flex items-center text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] ${isOverdue ? "text-red-500" : "text-text-variant opacity-80"} flex-wrap gap-1`}>
+                      <Clock size={10} className="mr-1.5 text-primary sm:w-[12px] sm:h-[12px]" strokeWidth={3} />
                       {dueTime || "00:00"}
-                      <span className="mx-3 opacity-20">|</span>
+                      <span className="mx-2 opacity-20">|</span>
                       {dueDate ? format(new Date(dueDate), "MMM dd, yyyy") : "No Date"}
                     </div>
                   </div>
                   
-                  <div className={`inline-flex px-5 py-2 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] border shadow-lg ${
+                  <div className={`inline-flex px-4 sm:px-5 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] border shadow-lg ${
                     priority === 'high' ? "bg-red-500/10 text-red-500 border-red-500/20 shadow-red-500/10" :
                     priority === 'medium' ? "bg-secondary/10 text-secondary border-secondary/20 shadow-secondary/10" :
                     "bg-emerald-500/10 text-emerald-500 border-emerald-500/20 shadow-emerald-500/10"
@@ -343,14 +340,15 @@ const TaskPage = () => {
             
             <button 
               onClick={() => setCompleted(!completed)}
-              className={`w-full py-5 rounded-[2.5rem] text-[10px] font-black uppercase tracking-[0.4em] transition-all border shadow-2xl ${
+              className={`w-full flex items-center justify-center gap-3 py-3 sm:py-4 rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] transition-all shadow-xl active:scale-95 border ${
                 completed 
-                  ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500 shadow-emerald-500/10" 
-                  : "glass border-primary/10 text-text-variant hover:text-primary hover:border-primary/20 shadow-primary/5"
+                  ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500 hover:bg-emerald-500/20 shadow-emerald-500/10" 
+                  : "bg-gradient-to-r from-primary to-secondary text-white border-transparent shadow-primary/20 hover:scale-[1.02]"
               }`}
             >
-            {completed ? "Completed" : "Mark as Finished"}
-          </button>
+              {completed ? <RotateCw size={16} strokeWidth={3} className="sm:w-[18px] sm:h-[18px]" /> : <Check size={16} strokeWidth={3} className="sm:w-[18px] sm:h-[18px]" />}
+              <span>{completed ? "Reactivate Task" : "Mark as Finished"}</span>
+            </button>
           </div>
         </div>
       </div>

@@ -67,35 +67,35 @@ const Notes = () => {
     <div className="app-page">
       {/* ── Hero ── */}
       <motion.section
-        className="mb-8"
+        className="mb-6 sm:mb-8"
         initial={{ opacity: 0, x: -24 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.6 }}
       >
-      <h1 className="text-3xl font-extrabold text-text tracking-tight mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+      <h1 className="text-2xl sm:text-3xl font-extrabold text-text tracking-tight mb-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
           My Notes
         </h1>
-        <p className="text-sm text-text-variant max-w-xl font-medium leading-relaxed">
+        <p className="text-xs sm:text-sm text-text-variant max-w-xl font-medium leading-relaxed">
           A digital space for your thoughts, ideas, and documentation.
         </p>
       </motion.section>
 
       {/* ── Controls Bar ── */}
       <motion.section
-        className="mb-8 flex flex-col items-stretch justify-between gap-4 lg:flex-row lg:items-center"
+        className="mb-6 sm:mb-8 flex flex-col items-stretch justify-between gap-4 lg:flex-row lg:items-center"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15 }}
       >
         {/* Filter Tabs */}
-        <div className="flex flex-wrap items-center gap-1 rounded-2xl border border-primary/10 glass p-1 shadow-sm transition-colors duration-500">
+        <div className="flex items-center gap-1 rounded-xl sm:rounded-2xl border border-primary/10 glass p-1 shadow-sm transition-colors duration-500 overflow-x-auto no-scrollbar max-w-full whitespace-nowrap flex-nowrap">
           {FILTERS.map((f) => (
             <button
               key={f}
               onClick={() => setActiveFilter(f)}
-              className={`px-5 py-2 rounded-xl text-[10px] uppercase tracking-widest font-black transition-all ${
+              className={`px-4 sm:px-5 py-2 rounded-lg sm:rounded-xl text-[9px] sm:text-[10px] uppercase tracking-widest font-black transition-all ${
                 activeFilter === f
-                  ? "bg-primary text-white shadow-lg shadow-primary/20"
+                  ? "bg-primary text-white shadow-lg shadow-primary/20 scale-[1.03]"
                   : "text-text-variant hover:text-primary"
               }`}
             >
@@ -113,14 +113,14 @@ const Notes = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search notes…"
-              className="bg-transparent border-none text-xs text-text outline-none placeholder-text-variant/40 focus:ring-0 sm:w-48"
+              className="bg-transparent border-none text-xs text-text outline-none placeholder-text-variant/40 focus:ring-0 sm:w-48 w-full"
             />
           </div>
           <Link to="/notes/new">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-primary to-secondary px-6 py-2.5 text-xs font-black text-white shadow-xl shadow-primary/20 sm:w-auto uppercase tracking-widest"
+              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-primary to-secondary px-6 py-2.5 text-[10px] sm:text-xs font-black text-white shadow-xl shadow-primary/20 sm:w-auto uppercase tracking-widest"
             >
               <PlusIcon size={14} />
               ADD NOTE
@@ -137,17 +137,17 @@ const Notes = () => {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="flex flex-col items-center justify-center py-24 gap-4 text-center glass rounded-[2rem] border-dashed border-primary/20"
+            className="flex flex-col items-center justify-center py-20 sm:py-24 gap-4 text-center glass rounded-2xl sm:rounded-[2rem] border-dashed border-primary/20 p-6"
           >
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-primary/40 mb-2">
-              <FileText size={32} />
+            <div className="w-14 h-14 sm:w-16 sm:h-16 bg-primary/10 rounded-full flex items-center justify-center text-primary/40 mb-2">
+              <FileText size={28} className="sm:w-[32px] sm:h-[32px]" />
             </div>
-            <p className="text-xl font-bold text-text">Notebook Empty</p>
-            <p className="text-sm text-text-variant max-w-xs mx-auto">
+            <p className="text-lg sm:text-xl font-bold text-text">Notebook Empty</p>
+            <p className="text-xs sm:text-sm text-text-variant max-w-xs mx-auto">
               Create your first note to start building your knowledge base.
             </p>
-            <Link to="/notes/new" className="mt-4">
-              <button className="btn-aurora px-10 py-3">
+            <Link to="/notes/new" className="mt-2 sm:mt-4">
+              <button className="btn-aurora px-8 sm:px-10 py-2.5 sm:py-3 text-xs">
                 + Create New Note
               </button>
             </Link>
@@ -158,7 +158,7 @@ const Notes = () => {
             variants={container}
             initial="hidden"
             animate="show"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8"
           >
             {filtered.map((note) => {
               const tag = note.tags?.[0] ?? "General";
@@ -172,14 +172,14 @@ const Notes = () => {
                   key={note.id} 
                   variants={cardVariant} 
                   whileHover={{ y: -8 }}
-                  className="glass flex flex-col rounded-[2rem] p-6 group transition-all duration-300 border border-primary/5 hover:border-primary/20 hover:shadow-2xl hover:shadow-primary/5"
+                  className="glass flex flex-col rounded-2xl sm:rounded-[2rem] p-4 sm:p-6 group transition-all duration-300 border border-primary/5 hover:border-primary/20 hover:shadow-2xl hover:shadow-primary/5"
                 >
                   {/* Tag + Date */}
-                  <div className="flex justify-between items-start mb-5">
-                    <span className={`px-4 py-1.5 rounded-full text-[10px] font-black tracking-[0.15em] uppercase ${badge.bg} ${badge.text}`}>
+                  <div className="flex justify-between items-start mb-4 sm:mb-5">
+                    <span className={`px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-[9px] sm:text-[10px] font-black tracking-[0.15em] uppercase ${badge.bg} ${badge.text}`}>
                       {tag}
                     </span>
-                    <span className="text-[10px] font-black uppercase tracking-widest text-text-variant opacity-60">{dateStr}</span>
+                    <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-text-variant opacity-60">{dateStr}</span>
                   </div>
 
                   {/* Title */}
