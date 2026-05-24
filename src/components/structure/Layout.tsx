@@ -36,10 +36,10 @@ const Layout = () => {
 
       <Sidebar />
 
-      <main className="relative z-10 flex min-h-screen min-w-0 flex-1 flex-col overflow-x-hidden">
+      <main className="relative z-10 flex min-h-screen min-w-0 flex-1 flex-col overflow-x-hidden pb-20 md:pb-0">
         <motion.button
           onClick={toggleTheme}
-          className="fixed bottom-6 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-full shadow-2xl transition-all glass hover:scale-110 active:scale-95"
+          className="fixed bottom-20 md:bottom-6 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-full shadow-2xl transition-all glass hover:scale-110 active:scale-95"
           style={{
             borderColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.05)',
             color: theme === 'dark' ? '#fbbf24' : '#6366f1',
