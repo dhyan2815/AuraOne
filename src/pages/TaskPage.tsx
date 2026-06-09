@@ -194,7 +194,7 @@ const TaskPage = () => {
             disabled={isSaving}
             className="flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-10 py-3 sm:py-4 rounded-xl sm:rounded-2xl bg-gradient-to-r from-primary to-secondary text-white font-black text-[9px] sm:text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 disabled:grayscale flex-1 sm:flex-initial whitespace-nowrap"
           >
-            {isSaving ? <RotateCw className="animate-spin" size={14} strokeWidth={3} className="sm:w-[18px] sm:h-[18px]" /> : <Save size={14} strokeWidth={3} className="sm:w-[18px] sm:h-[18px]" />}
+            {isSaving ? <RotateCw className="animate-spin sm:w-[18px] sm:h-[18px]" size={14} strokeWidth={3} /> : <Save size={14} strokeWidth={3} className="sm:w-[18px] sm:h-[18px]" />}
             Save Task
           </button>
 
@@ -227,7 +227,7 @@ const TaskPage = () => {
             <div className="space-y-2 sm:space-y-4">
               <label className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] text-text-variant opacity-60 ml-1">Due Date</label>
               <div className="relative group">
-                <Calendar className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={16} className="sm:w-[18px] sm:h-[18px]" />
+                <Calendar className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors sm:w-[18px] sm:h-[18px]" size={16} />
                 <input
                   type="date"
                   value={dueDate}
@@ -240,7 +240,7 @@ const TaskPage = () => {
             <div className="space-y-2 sm:space-y-4">
               <label className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] text-text-variant opacity-60 ml-1">Time</label>
               <div className="relative group">
-                <Clock className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={16} className="sm:w-[18px] sm:h-[18px]" />
+                <Clock className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors sm:w-[18px] sm:h-[18px]" size={16} />
                 <input
                   type="time"
                   value={dueTime}

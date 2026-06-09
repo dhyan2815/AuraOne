@@ -504,3 +504,11 @@ AuraOne is a modern AI-productivity platform. This file serves as a persistent s
   - Modified `KnowledgeBase.tsx` to regex match ISO date strings within the plain text `chunk.content` and `result.content`.
   - Imported and utilized `format` from `date-fns` to reliably parse and format matched dates as `MMM d, yyyy h:mm a`.
 - **Outcome:** Due dates, creation times, and other raw ISO dates embedded within task/event contents are now displayed in a highly readable, user-friendly format in both the Explorer and Search tabs.
+
+### June 9, 2026: Package Alignment & TaskPage Build Fix
+- **Objective:** Fix the GitHub Actions preflight error (mismatched package lockfile) and clean up duplicate JSX attributes causing esbuild compilation warnings.
+- **Action:**
+  - **Dependency Compatibility**: Aligned `vitest` and `@vitest/coverage-v8` in `package.json` to version `^2.1.8` to match the project's `vite` version (`^5.4.2`).
+  - **Lockfile Regeneration**: Recreated `package-lock.json` from scratch with `npm install` to establish a synchronized, error-free dependency lockfile (eliminating the nested `vite@8.x` and conflicting `esbuild@0.28.0` peer dependencies).
+  - **JSX Quality**: Cleaned up three duplicate `className` attributes in `src/pages/TaskPage.tsx` (RotateCw, Calendar, and Clock components).
+- **Outcome:** Resolves preflight `npm ci` failures. Verified a warning-free production build (`npm run build`) and passed all 111 tests locally.
