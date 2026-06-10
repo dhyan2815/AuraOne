@@ -58,9 +58,9 @@ const SignUp = () => {
             setTimeout(() => {
                 navigate("/dashboard", { replace: true });
             }, 1500);
-        } catch (err: any) {
-            setError(err.message);
-            toast.error(`Registration Failed: ${err.message}`);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Registration failed');
+            toast.error(`Registration Failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
         } finally {
             setIsSigningUp(false);
         }
