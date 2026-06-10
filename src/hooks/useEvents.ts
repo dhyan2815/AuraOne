@@ -1,6 +1,6 @@
 // src/hooks/useEvents.ts
 import { supabase } from "../services/supabase";
-import { RealtimeChannel } from "@supabase/supabase-js";
+import { RealtimeChannel, RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import { ingestItem, removeItem } from "../services/ragIngestionService";
 
 // The Event interface matches the Supabase 'events' table
@@ -34,7 +34,7 @@ export const getEvents = async (userId: string): Promise<Event[]> => {
 // Listen for real-time changes to events
 export const listenToEvents = (
   userId: string,
-  callback: (payload: any) => void
+  callback: (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => void
 ): RealtimeChannel => {
   const channel = supabase
     .channel(`public:events:user_id=eq.${userId}`)
