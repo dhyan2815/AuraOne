@@ -91,10 +91,10 @@ export const AGENT_TOOLS = [
 /**
  * Executes a tool by name and parameters.
  */
-export async function executeTool(name: string, params: any, userId: string): Promise<any> {
+export async function executeTool(name: string, params: Record<string, unknown> = {}, userId: string): Promise<Record<string, unknown>> {
   switch (name) {
     case 'search_knowledge_base': {
-      const results = await retrieveContext(userId, params.query);
+      const results = await retrieveContext(userId, String(params.query || ''));
       return {
         results: results.map(r => ({
           content: r.content,
@@ -106,12 +106,12 @@ export async function executeTool(name: string, params: any, userId: string): Pr
     }
 
     case 'create_task': {
-      const parsedDate = params.dueDate ? chrono.parseDate(params.dueDate) : null;
+      const parsedDate = params.dueDate ? chrono.parseDate(String(params.dueDate)) : null;
       const task = await createTask(userId, {
-        title: params.title,
-        description: params.description || '',
+        title: String(params.title || ''),
+        description: params.description ? String(params.description) : '',
         due_date: parsedDate ? parsedDate.toISOString() : undefined,
-        priority: params.priority || 'medium',
+        priority: (params.priority as 'low' | 'medium' | 'high') || 'medium',
         completed: false
       });
       return { message: `Task "${task.title}" created successfully.`, task_id: task.id };
@@ -119,34 +119,34 @@ export async function executeTool(name: string, params: any, userId: string): Pr
 
     case 'create_note': {
       const note = await createNote(userId, {
-        title: params.title,
-        content: params.content,
-        tags: params.tags || [],
+        title: String(params.title || ''),
+        content: String(params.content || ''),
+        tags: Array.isArray(params.tags) ? params.tags.map(String) : [],
         is_archived: false
       });
       return { message: `Note "${note.title}" created successfully.`, note_id: note.id };
     }
 
     case 'schedule_event': {
-      const start = chrono.parseDate(params.start_time);
-      const end = params.end_time ? chrono.parseDate(params.end_time) : null;
+      const start = chrono.parseDate(String(params.start_time || ''));
+      const end = params.end_time ? chrono.parseDate(String(params.end_time)) : null;
       if (!start) throw new Error('Invalid start time');
       
       const event = await createEvent(userId, {
-        title: params.title,
+        title: String(params.title || ''),
         start_time: start.toISOString(),
         end_time: end ? end.toISOString() : null,
-        description: params.description || null
+        description: params.description ? String(params.description) : null
       });
       return { message: `Event "${event.title}" scheduled successfully.`, event_id: event.id };
     }
 
     case 'update_task_status': {
-      const updates: any = {};
-      if (params.completed !== undefined) updates.completed = params.completed;
-      if (params.priority) updates.priority = params.priority;
+      const updates: Partial<import('../hooks/useTasks').NewTask> = {};
+      if (params.completed !== undefined) updates.completed = Boolean(params.completed);
+      if (params.priority) updates.priority = params.priority as 'low' | 'medium' | 'high';
       
-      await updateTask(params.task_id, updates);
+      await updateTask(String(params.task_id), updates);
       return { message: `Task ${params.task_id} updated.` };
     }
 
