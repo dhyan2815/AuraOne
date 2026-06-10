@@ -1,6 +1,6 @@
 // src/hooks/useTasks.ts
 import { supabase } from "../services/supabase";
-import { RealtimeChannel } from "@supabase/supabase-js";
+import { RealtimeChannel, RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import { ingestItem, removeItem } from "../services/ragIngestionService";
 
 // The Task interface now matches the Supabase table schema
@@ -49,7 +49,7 @@ export const getTaskById = async (taskId: string): Promise<Task | null> => {
 // Listen for real-time changes to tasks
 export const listenToTasks = (
   userId: string,
-  callback: (payload: any) => void
+  callback: (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => void
 ): RealtimeChannel => {
   const channel = supabase
     .channel(`public:tasks:user_id=eq.${userId}`)
