@@ -7,7 +7,7 @@ export interface ChunkData {
   sourceType: 'note' | 'task' | 'event';
   sourceId: string;
   chunkIndex: number;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
 }
 
 /**
