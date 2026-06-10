@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, Check, Flag, Calendar, Clock, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -20,11 +20,11 @@ const Tasks = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const loadTasks = () => {
+  const loadTasks = useCallback(() => {
     if (user) getTasks(user.id).then(setTasks);
-  };
+  }, [user]);
 
-  useEffect(() => { loadTasks(); }, [user]);
+  useEffect(() => { loadTasks(); }, [user, loadTasks]);
 
   const handleToggle = async (id: string, completed: boolean | undefined, e: React.MouseEvent) => {
     e.stopPropagation();
