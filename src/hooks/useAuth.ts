@@ -37,7 +37,7 @@ export const useAuth = () => {
     }
   };
 
-  const signup = async (email: string, password: string, options?: { data: { [key: string]: any } }) => {
+  const signup = async (email: string, password: string, options?: { data: { [key: string]: unknown } }) => {
     setError(null);
     const { error } = await supabase.auth.signUp({ email, password, options });
     if (error) {
