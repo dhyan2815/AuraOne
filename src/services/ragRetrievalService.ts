@@ -8,7 +8,7 @@ export interface RetrievalResult {
   sourceType: 'note' | 'task' | 'event';
   sourceId: string;
   similarity: number;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
 }
 
 /**
@@ -41,7 +41,7 @@ export const retrieveContext = async (
     }
 
     // 3. Format and return results
-    return (data || []).map((row: any) => ({
+    return (data || []).map((row: { id: string; content: string; source_type: 'note' | 'task' | 'event'; source_id: string; similarity: number; metadata: Record<string, unknown> }) => ({
       id: row.id,
       content: row.content,
       sourceType: row.source_type,
