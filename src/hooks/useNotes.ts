@@ -1,6 +1,6 @@
 // src/hooks/useNotes.ts
 import { supabase } from "../services/supabase";
-import { RealtimeChannel } from "@supabase/supabase-js";
+import { RealtimeChannel, RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import { ingestItem, removeItem } from "../services/ragIngestionService";
 
 // The Note interface now matches the Supabase table schema
@@ -48,7 +48,7 @@ export const getNoteById = async (noteId: string): Promise<Note | null> => {
 // Listen for real-time changes to notes
 export const listenToNotes = (
   userId: string,
-  callback: (payload: any) => void
+  callback: (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => void
 ): RealtimeChannel => {
   const channel = supabase
     .channel(`public:notes:user_id=eq.${userId}`)
