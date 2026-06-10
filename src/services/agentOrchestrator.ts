@@ -60,24 +60,24 @@ export async function processAgenticRequest(
       const response = await callGeminiWithTools(currentPrompt, AGENT_TOOLS, systemPrompt);
 
       // 3. Handle Tool Calls or Direct Text
-      const part = response.parts[0];
+      const part = response.parts?.[0];
 
-      if (part.functionCall) {
+      if (part?.functionCall) {
         const { name, args } = part.functionCall;
         toolsUsed.push(name);
 
         // Execute the tool
-        const result = await executeTool(name, args, userId);
+        const result = await executeTool(name, args || {}, userId);
 
         // If it was a search, update citations
-        if (name === 'search_knowledge_base' && result.results) {
-          result.results.forEach((r: any) => {
+        if (name === 'search_knowledge_base' && result.results && Array.isArray(result.results)) {
+          result.results.forEach((r: { id: string; source: 'note' | 'task' | 'event'; content?: string; similarity: number }) => {
             if (!citations.find(c => c.id === r.id)) {
               citations.push({
                 id: r.id,
                 sourceType: r.source,
-                title: r.content.split('\n')[0].replace('Title: ', '').replace('Task: ', '').replace('Event: ', ''),
-                content: r.content,
+                title: r.content ? r.content.split('\n')[0].replace('Title: ', '').replace('Task: ', '').replace('Event: ', '') : 'Untitled',
+                content: r.content || '',
                 similarity: r.similarity
               });
             }
@@ -89,7 +89,7 @@ export async function processAgenticRequest(
         continue;
       }
 
-      if (part.text) {
+      if (part?.text) {
         return {
           message: part.text,
           sources: citations,
@@ -106,7 +106,7 @@ export async function processAgenticRequest(
       toolsUsed
     };
 
-  } catch (error) {
+  } catch {
     // Fallback to OpenRouter (non-agentic but resilient)
     const systemPromptFallback = options?.isBrainMode 
       ? `${AGENT_SYSTEM_PROMPT}\n\n[BRAIN MODE ENABLED]: Use deep reasoning.` 
