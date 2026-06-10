@@ -69,7 +69,7 @@ const Settings = () => {
         setConfirmPassword("");
         toast.success("Security matrix updated");
       }
-    } catch (err) {
+    } catch {
       toast.error("Security update failed");
     } finally {
       setIsChangingPassword(false);
