@@ -454,7 +454,7 @@ const Chat = () => {
                                   </div>
                                 )}
                                 
-                                {msg.metadata.sources && msg.metadata.sources.map((source: any, si: number) => (
+                                {msg.metadata.sources && msg.metadata.sources.map((source: { id: string; sourceType: string; title: string; content: string; similarity: number }, si: number) => (
                                   <div key={si} className="p-3 rounded-xl bg-white/5 border border-white/5 flex gap-3 group">
                                     <Database size={14} className="text-primary/40 shrink-0 mt-0.5" />
                                     <div className="flex-1 min-w-0">
