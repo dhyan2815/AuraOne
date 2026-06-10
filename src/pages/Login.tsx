@@ -67,8 +67,8 @@ const Login = () => {
         navigate("/dashboard", { replace: true });
       }, 1500);
 
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Login failed');
     } finally {
       setIsLoggingIn(false);
     }
