@@ -11,7 +11,10 @@ export type Message = {
   role: 'user' | 'ai';
   content: string;
   created_at?: string;
-  metadata?: any;
+  metadata?: {
+    sources?: Array<{ id: string; sourceType: string; title: string; content: string; similarity: number }>;
+    toolsUsed?: string[];
+  };
 };
 
 // Fetch all messages for a given session
