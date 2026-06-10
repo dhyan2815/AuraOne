@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, Mock } from 'vitest';
 
 // Store original fetch
 let originalFetch: typeof fetch;
@@ -16,7 +16,7 @@ describe('AI Fallback Chain', () => {
   });
 
   it('should handle successful API responses', async () => {
-    (global.fetch as vi.Mock).mockResolvedValue({
+    (global.fetch as Mock).mockResolvedValue({
       ok: true,
       json: async () => ({
         choices: [{ message: { content: 'Success response' } }],
@@ -43,10 +43,9 @@ describe('AI Fallback Chain', () => {
       });
     });
 
-    global.fetch = mockFetch;
+    global.fetch = mockFetch as unknown as typeof fetch;
 
     // Simulate retry logic - succeeds on 3rd attempt
-    let lastError: Error | null = null;
     let success = false;
     for (let attempt = 1; attempt <= 3; attempt++) {
       try {
@@ -55,8 +54,8 @@ describe('AI Fallback Chain', () => {
           success = true;
           break;
         }
-      } catch (error) {
-        lastError = error as Error;
+      } catch {
+        // Error is expected on first 2 attempts; retry continues
       }
     }
 
@@ -67,7 +66,7 @@ describe('AI Fallback Chain', () => {
   });
 
   it('should parse JSON responses correctly', async () => {
-    (global.fetch as vi.Mock).mockResolvedValue({
+    (global.fetch as Mock).mockResolvedValue({
       ok: true,
       json: async () => ({
         model: 'gemini-2.0-flash',
