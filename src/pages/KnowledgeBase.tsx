@@ -14,7 +14,7 @@ interface KnowledgeChunk {
   source_type: 'note' | 'task' | 'event';
   source_id: string;
   created_at: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 const KnowledgeBase = () => {
@@ -40,9 +40,9 @@ const KnowledgeBase = () => {
       .eq('user_id', user.id);
 
     if (!error && data) {
-      const counts = data.reduce((acc: any, curr: any) => {
+      const counts = data.reduce((acc: { total: number; notes: number; tasks: number; events: number }, curr: { source_type: string }) => {
         const type = curr.source_type + 's';
-        acc[type] = (acc[type] || 0) + 1;
+        acc[type as keyof typeof acc] = (acc[type as keyof typeof acc] || 0) + 1;
         return acc;
       }, { total: 0, notes: 0, tasks: 0, events: 0 });
       setStats({ ...counts, total: data.length });
@@ -116,7 +116,7 @@ const KnowledgeBase = () => {
       toast.success('Chunk purged');
       setChunks(chunks.filter(c => c.id !== id));
       fetchStats();
-    } catch (err) {
+    } catch {
       toast.error('Purge failed');
     }
   };
@@ -257,7 +257,7 @@ const KnowledgeBase = () => {
                                   {chunk.source_type}
                                 </span>
                                 <h4 className="text-sm font-bold text-text truncate max-w-[200px] md:max-w-[400px]">
-                                  {meta.title || (chunk.source_type === 'note' ? 'Note Fragment' : 'Untitled')}
+                                  {typeof meta.title === 'string' && meta.title.trim() !== '' ? meta.title : (chunk.source_type === 'note' ? 'Note Fragment' : 'Untitled')}
                                 </h4>
                               </div>
                               <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
@@ -272,41 +272,41 @@ const KnowledgeBase = () => {
                             </div>
                             
                             {/* Display Timing/Status metadata if available */}
-                            {chunk.source_type === 'event' && (meta.start_time || meta.end_time) && (
+                            {chunk.source_type === 'event' && (Boolean(meta.start_time) || Boolean(meta.end_time)) && (
                               <div className="flex items-center gap-4 text-[10px] text-text-variant font-medium bg-black/20 p-2 rounded-lg w-fit">
                                 <div className="flex items-center gap-1.5">
                                   <Calendar size={12} className="text-amber-400/70" />
                                   <span>
-                                    {meta.start_time ? new Date(meta.start_time).toLocaleString(undefined, {
+                                    {meta.start_time ? (!isNaN(new Date(meta.start_time as string | number).getTime()) ? new Date(meta.start_time as string | number).toLocaleString(undefined, {
                                       month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'
-                                    }) : 'N/A'}
+                                    }) : 'Invalid Date') : 'N/A'}
                                   </span>
                                 </div>
-                                {meta.end_time && (
+                                {Boolean(meta.end_time) && (
                                   <>
                                     <span className="opacity-40">→</span>
                                     <span>
-                                      {new Date(meta.end_time).toLocaleString(undefined, {
+                                      {!isNaN(new Date(meta.end_time as string | number).getTime()) ? new Date(meta.end_time as string | number).toLocaleString(undefined, {
                                         hour: 'numeric', minute: '2-digit'
-                                      })}
+                                      }) : 'Invalid Date'}
                                     </span>
                                   </>
                                 )}
                               </div>
                             )}
 
-                            {chunk.source_type === 'task' && (meta.priority || meta.due_date) && (
+                            {chunk.source_type === 'task' && (Boolean(meta.priority) || Boolean(meta.due_date)) && (
                               <div className="flex items-center gap-4 text-[10px] text-text-variant font-medium bg-black/20 p-2 rounded-lg w-fit">
-                                {meta.priority && (
+                                {Boolean(meta.priority) && (
                                   <div className="flex items-center gap-1.5 capitalize">
                                     <CheckCircle size={12} className={meta.priority === 'high' ? 'text-red-400' : meta.priority === 'medium' ? 'text-amber-400' : 'text-emerald-400'} />
-                                    {meta.priority} Priority
+                                    {String(meta.priority)} Priority
                                   </div>
                                 )}
-                                {meta.due_date && (
+                                {Boolean(meta.due_date) && (
                                   <div className="flex items-center gap-1.5">
                                     <Calendar size={12} className="text-emerald-400/70" />
-                                    Due: {new Date(meta.due_date).toLocaleDateString()}
+                                    Due: {!isNaN(new Date(meta.due_date as string | number).getTime()) ? new Date(meta.due_date as string | number).toLocaleDateString() : 'Invalid Date'}
                                   </div>
                                 )}
                                 {meta.completed !== undefined && (
@@ -321,14 +321,14 @@ const KnowledgeBase = () => {
                               {/* If event or task, and we displayed a nice header, maybe we just show the description from content or metadata? */}
                               {/* Actually, it's safer to just show the content, or we can try to extract just the description for cleaner UI */}
                               {(() => {
-                                let text = chunk.content;
+                                let text = chunk.content || '';
                                 if (chunk.source_type === 'event' || chunk.source_type === 'task') {
-                                  const descMatch = chunk.content.match(/Description:\s*([\s\S]*)$/);
+                                  const descMatch = text.match(/Description:\s*([\s\S]*)$/);
                                   if (descMatch && descMatch[1].trim()) {
                                     text = descMatch[1].trim();
                                   }
-                                } else if (chunk.content.length > 200 && chunk.source_type === 'note') {
-                                  text = chunk.content.substring(0, 200) + '...';
+                                } else if (text.length > 200 && chunk.source_type === 'note') {
+                                  text = text.substring(0, 200) + '...';
                                 }
                                 return text.replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})/g, (match) => {
                                   try {
@@ -336,7 +336,7 @@ const KnowledgeBase = () => {
                                     if (!isNaN(parsed.getTime())) {
                                       return format(parsed, 'MMM d, yyyy h:mm a');
                                     }
-                                  } catch {}
+                                  } catch { /* Return original match if date parsing fails */ }
                                   return match;
                                 });
                               })()}
@@ -399,7 +399,7 @@ const KnowledgeBase = () => {
                                   {result.sourceType}
                                 </span>
                                 <h4 className="text-sm font-bold text-text truncate max-w-[200px] md:max-w-[400px]">
-                                  {meta.title || (result.sourceType === 'note' ? 'Note Fragment' : 'Untitled')}
+                                  {typeof meta.title === 'string' && meta.title.trim() !== '' ? meta.title : (result.sourceType === 'note' ? 'Note Fragment' : 'Untitled')}
                                 </h4>
                               </div>
                               <span className="text-[9px] font-black text-primary/60 bg-primary/5 px-2 py-1 rounded-md border border-primary/10">
@@ -408,41 +408,41 @@ const KnowledgeBase = () => {
                             </div>
 
                             {/* Display Timing/Status metadata if available */}
-                            {result.sourceType === 'event' && (meta.start_time || meta.end_time) && (
+                            {result.sourceType === 'event' && (Boolean(meta.start_time) || Boolean(meta.end_time)) && (
                               <div className="flex items-center gap-4 text-[10px] text-text-variant font-medium bg-black/20 p-2 rounded-lg w-fit">
                                 <div className="flex items-center gap-1.5">
                                   <Calendar size={12} className="text-amber-400/70" />
                                   <span>
-                                    {meta.start_time ? new Date(meta.start_time).toLocaleString(undefined, {
+                                    {meta.start_time ? (!isNaN(new Date(meta.start_time as string | number).getTime()) ? new Date(meta.start_time as string | number).toLocaleString(undefined, {
                                       month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'
-                                    }) : 'N/A'}
+                                    }) : 'Invalid Date') : 'N/A'}
                                   </span>
                                 </div>
-                                {meta.end_time && (
+                                {Boolean(meta.end_time) && (
                                   <>
                                     <span className="opacity-40">→</span>
                                     <span>
-                                      {new Date(meta.end_time).toLocaleString(undefined, {
+                                      {!isNaN(new Date(meta.end_time as string | number).getTime()) ? new Date(meta.end_time as string | number).toLocaleString(undefined, {
                                         hour: 'numeric', minute: '2-digit'
-                                      })}
+                                      }) : 'Invalid Date'}
                                     </span>
                                   </>
                                 )}
                               </div>
                             )}
 
-                            {result.sourceType === 'task' && (meta.priority || meta.due_date) && (
+                            {result.sourceType === 'task' && (Boolean(meta.priority) || Boolean(meta.due_date)) && (
                               <div className="flex items-center gap-4 text-[10px] text-text-variant font-medium bg-black/20 p-2 rounded-lg w-fit">
-                                {meta.priority && (
+                                {Boolean(meta.priority) && (
                                   <div className="flex items-center gap-1.5 capitalize">
                                     <CheckCircle size={12} className={meta.priority === 'high' ? 'text-red-400' : meta.priority === 'medium' ? 'text-amber-400' : 'text-emerald-400'} />
-                                    {meta.priority} Priority
+                                    {String(meta.priority)} Priority
                                   </div>
                                 )}
-                                {meta.due_date && (
+                                {Boolean(meta.due_date) && (
                                   <div className="flex items-center gap-1.5">
                                     <Calendar size={12} className="text-emerald-400/70" />
-                                    Due: {new Date(meta.due_date).toLocaleDateString()}
+                                    Due: {!isNaN(new Date(meta.due_date as string | number).getTime()) ? new Date(meta.due_date as string | number).toLocaleDateString() : 'Invalid Date'}
                                   </div>
                                 )}
                                 {meta.completed !== undefined && (
@@ -455,14 +455,14 @@ const KnowledgeBase = () => {
 
                             <div className="text-xs text-text/80 leading-relaxed bg-white/[0.02] p-3 rounded-xl border border-white/5 whitespace-pre-wrap">
                               {(() => {
-                                let text = result.content;
+                                let text = result.content || '';
                                 if (result.sourceType === 'event' || result.sourceType === 'task') {
-                                  const descMatch = result.content.match(/Description:\s*([\s\S]*)$/);
+                                  const descMatch = text.match(/Description:\s*([\s\S]*)$/);
                                   if (descMatch && descMatch[1].trim()) {
                                     text = descMatch[1].trim();
                                   }
-                                } else if (result.content.length > 200 && result.sourceType === 'note') {
-                                  text = result.content.substring(0, 200) + '...';
+                                } else if (text.length > 200 && result.sourceType === 'note') {
+                                  text = text.substring(0, 200) + '...';
                                 }
                                 return text.replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})/g, (match) => {
                                   try {
@@ -470,7 +470,7 @@ const KnowledgeBase = () => {
                                     if (!isNaN(parsed.getTime())) {
                                       return format(parsed, 'MMM d, yyyy h:mm a');
                                     }
-                                  } catch {}
+                                  } catch { /* Return original match if date parsing fails */ }
                                   return match;
                                 });
                               })()}
