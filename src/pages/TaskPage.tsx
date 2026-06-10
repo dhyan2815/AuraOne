@@ -73,7 +73,7 @@ const TaskPage = () => {
             navigate("/tasks");
           }
         }
-      } catch (err) {
+      } catch {
         toast.error("Uplink failed");
         navigate("/tasks");
       } finally {
@@ -114,7 +114,7 @@ const TaskPage = () => {
         toast.success("Task Updated");
       }
       navigate("/tasks");
-    } catch (err) {
+    } catch {
       toast.error("Transmission interruption");
     } finally {
       setIsSaving(false);
@@ -131,7 +131,7 @@ const TaskPage = () => {
       await deleteTask(id);
       toast.success("Task Deleted");
       navigate("/tasks");
-    } catch (error) {
+    } catch {
       toast.error("Purge system error");
     }
   };
@@ -255,7 +255,7 @@ const TaskPage = () => {
               <div className="relative">
                 <select
                     value={priority}
-                    onChange={(e) => setPriority(e.target.value as any)}
+                    onChange={(e) => setPriority(e.target.value as 'low' | 'medium' | 'high')}
                     className="input-aurora w-full py-3 px-6 sm:py-4 sm:px-8 text-[9px] sm:text-[10px] font-black uppercase tracking-widest appearance-none cursor-pointer"
                 >
                     <option value="low" className="bg-background">Low Priority</option>
