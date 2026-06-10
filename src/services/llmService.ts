@@ -66,9 +66,9 @@ export async function callGeminiAPI(prompt: string, systemPrompt?: string): Prom
 
 export async function callGeminiWithTools(
   prompt: string, 
-  tools: any[], 
+  tools: Array<{ name: string; description: string; parameters: Record<string, unknown> }>, 
   systemPrompt?: string
-): Promise<any> {
+): Promise<{ parts: Array<{ text?: string; functionCall?: { name: string; args: Record<string, unknown> } }> }> {
   const LOCATION = "src/services/llmService.ts:callGeminiWithTools";
   if (!AI_CONFIG.gemini.enabled) {
     throw new Error(`[${LOCATION}] Gemini API not configured`);
