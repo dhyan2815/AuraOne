@@ -64,7 +64,7 @@ const NotePage = () => {
             navigate("/notes");
           }
         }
-      } catch (error) {
+      } catch {
         toast.error("Failed to load note");
         navigate("/notes");
       } finally {
@@ -101,7 +101,7 @@ const NotePage = () => {
         }
         setLastSaved(new Date());
       }
-    } catch (err) {
+    } catch {
       if (!isAutoSave) {
         toast.error("Failed to save note");
       }
@@ -139,7 +139,7 @@ const NotePage = () => {
       await deleteNote(note.id);
       toast.success("Note Deleted");
       navigate("/notes");
-    } catch (error) {
+    } catch {
       toast.error("Failed to delete note");
     }
   };
