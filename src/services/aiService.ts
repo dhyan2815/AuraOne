@@ -71,9 +71,9 @@ async function executeCRUDOperation(command: AICommand, userId: string): Promise
       case 'read':
         return await handleRead(type, data, userId);
       case 'update':
-        return await handleUpdate(type, data, userId);
+        return await handleUpdate(type, data);
       case 'delete':
-        return await handleDelete(type, data, userId);
+        return await handleDelete(type, data);
       case 'chat': {
         // Handle different possible data structures
         let message = '';
@@ -172,7 +172,7 @@ async function handleRead(type: string, _data: Record<string, unknown>, userId: 
 }
 
 // Update operations
-async function handleUpdate(type: string, data: Record<string, unknown>, _userId: string): Promise<string> {
+async function handleUpdate(type: string, data: Record<string, unknown>): Promise<string> {
   const { id } = data;
   
   if (!id || typeof id !== 'string') {
@@ -203,7 +203,7 @@ async function handleUpdate(type: string, data: Record<string, unknown>, _userId
 }
 
 // Delete operations
-async function handleDelete(type: string, data: Record<string, unknown>, _userId: string): Promise<string> {
+async function handleDelete(type: string, data: Record<string, unknown>): Promise<string> {
   const { id } = data;
   
   if (!id || typeof id !== 'string') {
@@ -281,9 +281,9 @@ export async function processAIRequest(
             } catch {
               return fallbackResponse;
             }
-          } catch (fallbackError) {
-            // Continue
-          }
+          } catch {
+              // Continue
+            }
         }
 
         if (isParsingFailure && attempt < maxRetries) {
