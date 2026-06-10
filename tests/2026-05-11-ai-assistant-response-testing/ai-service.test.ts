@@ -9,12 +9,18 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 // TEST HELPERS
 // ============================================
 
-const createMockFetch = (responses: Record<string, any>) => {
-  return vi.fn((url: string, options?: any) => {
-    const key = Object.keys(responses).find(k => url.includes(k)) || 'default';
+const createMockFetch = (responses: Record<string, { ok?: boolean; status?: number; json?: () => Promise<unknown> }>) => {
+  return vi.fn((input: RequestInfo | URL) => {
+    const urlString = typeof input === 'string' ? input : input instanceof URL ? input.toString() : (input as Request).url;
+    const key = Object.keys(responses).find(k => urlString.includes(k)) || 'default';
     const response = responses[key];
-    return Promise.resolve(response);
-  });
+    return Promise.resolve({
+      ok: response?.ok !== undefined ? response?.ok : true,
+      status: response?.status || 200,
+      json: response?.json || (async () => ({})),
+      headers: new Headers(),
+    } as unknown as Response);
+  }) as unknown as typeof fetch;
 };
 
 // ============================================
@@ -456,7 +462,8 @@ describe('Common: Fallback Chain', () => {
     });
 
     try {
-      await fetch('https://gemini.test');
+      const res = await fetch('https://gemini.test');
+      await res.json();
     } catch {
       const fallback = await fetch('https://openrouter.test');
       expect(fallback.ok).toBe(true);
@@ -482,15 +489,6 @@ describe('Common: Fallback Chain', () => {
       'test2': { ok: false, status: 500 },
     });
 
-    let errorHandled = false;
-    try {
-      await fetch('https://test1');
-      await fetch('https://test2');
-    } catch (e) {
-      errorHandled = true;
-    }
-    // The mocked responses don't throw, they return error objects
-    // So we need to check response status instead
     const resp1 = await fetch('https://test1');
     const resp2 = await fetch('https://test2');
     expect(!resp1.ok && !resp2.ok).toBe(true);
