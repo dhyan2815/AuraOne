@@ -1,6 +1,8 @@
+// Verify the behavior and database sync integrations inside the useTasks hook module.
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Mock data
+// Define mock tasks list and status variables representing database records.
 const mockTasks = [
   { id: '1', user_id: 'user-1', title: 'Task 1', completed: false, priority: 'high' },
   { id: '2', user_id: 'user-1', title: 'Task 2', completed: true, priority: 'low' },
@@ -10,6 +12,7 @@ const mockTask = { id: 'task-1', user_id: 'user-1', title: 'Test Task' };
 const createdTask = { id: 'task-1', user_id: 'user-1', title: 'New Task', priority: 'medium' };
 const updatedTask = { id: 'task-1', user_id: 'user-1', title: 'Updated Task', completed: true };
 
+// Construct a mock builder that resolves database requests with predefined error signals.
 const createMockWithError = (error: Error) => ({
   select: vi.fn(() => ({
     eq: vi.fn(() => ({
@@ -34,6 +37,7 @@ const createMockWithError = (error: Error) => ({
   })),
 });
 
+// Mock Supabase endpoints to verify successful task queries.
 vi.mock('../../src/services/supabase', () => ({
   supabase: {
     from: vi.fn(() => ({
