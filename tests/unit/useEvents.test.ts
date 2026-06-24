@@ -1,6 +1,8 @@
+// Verify the behavior and database sync integrations inside the useEvents hook module.
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Mock data
+// Define mock event objects and payloads representing database records.
 const mockEvents = [
   { id: '1', user_id: 'user-1', title: 'Event 1', start_time: '2024-01-01T10:00:00Z', end_time: '2024-01-01T11:00:00Z', description: 'Description 1', created_at: '2024-01-01' },
   { id: '2', user_id: 'user-1', title: 'Event 2', start_time: '2024-01-02T14:00:00Z', end_time: null, description: null, created_at: '2024-01-02' },
@@ -10,6 +12,7 @@ const createdEvent = { id: 'event-1', user_id: 'user-1', title: 'New Event', sta
 
 const updatedEvent = { id: 'event-1', user_id: 'user-1', title: 'Updated Event', start_time: '2024-01-01T10:00:00Z', end_time: '2024-01-01T12:00:00Z', description: 'Updated description', created_at: '2024-01-01' };
 
+// Construct a mock builder that resolves database requests with predefined error signals.
 const createMockWithError = (error: Error) => ({
   select: vi.fn(() => ({
     eq: vi.fn(() => ({
@@ -33,6 +36,7 @@ const createMockWithError = (error: Error) => ({
   })),
 });
 
+// Mock Supabase database endpoints to return successful event mock logs.
 vi.mock('../../src/services/supabase', () => ({
   supabase: {
     from: vi.fn(() => ({
