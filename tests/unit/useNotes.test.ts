@@ -1,6 +1,8 @@
+// Verify the behavior and database sync integrations inside the useNotes hook module.
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Mock data
+// Define mock notes list and status variables representing database records.
 const mockNotes = [
   { id: '1', user_id: 'user-1', title: 'Note 1', content: 'Content 1', tags: ['tag1'], created_at: '2024-01-01', is_archived: false },
   { id: '2', user_id: 'user-1', title: 'Note 2', content: 'Content 2', tags: ['tag2'], created_at: '2024-01-02', is_archived: false },
@@ -10,6 +12,7 @@ const mockNote = { id: 'note-1', user_id: 'user-1', title: 'Test Note', content:
 const createdNote = { id: 'note-1', user_id: 'user-1', title: 'New Note', content: 'New content', tags: ['work'], is_archived: false, created_at: '2024-01-01' };
 const updatedNote = { id: 'note-1', user_id: 'user-1', title: 'Updated Note', content: 'Content', tags: null, created_at: '2024-01-01', is_archived: true };
 
+// Construct a mock builder that resolves database requests with predefined error signals.
 const createMockWithError = (error: Error) => ({
   select: vi.fn(() => ({
     eq: vi.fn(() => ({
@@ -34,6 +37,7 @@ const createMockWithError = (error: Error) => ({
   })),
 });
 
+// Mock Supabase endpoints to verify successful note queries.
 vi.mock('../../src/services/supabase', () => ({
   supabase: {
     from: vi.fn(() => ({
