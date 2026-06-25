@@ -1,3 +1,5 @@
+// Render the KnowledgeBase management console, allowing users to synchronize database content into vectors, search documents semantically, and manage activity chunks.
+
 import { useEffect, useState, useCallback } from 'react';
 import { format } from 'date-fns';
 import { useAuth } from '../hooks/useAuth';
@@ -8,6 +10,7 @@ import { retrieveContext, RetrievalResult } from '../services/ragRetrievalServic
 import { supabase } from '../services/supabase';
 import toast from 'react-hot-toast';
 
+// Define layout data structure for indexed knowledge data chunks.
 interface KnowledgeChunk {
   id: string;
   content: string;
@@ -18,7 +21,10 @@ interface KnowledgeChunk {
 }
 
 const KnowledgeBase = () => {
+  // Retrieve credentials of the current authenticated user context.
   const { user } = useAuth();
+  
+  // Track indices count stats, synchronization states, and semantic queries.
   const [stats, setStats] = useState({ total: 0, notes: 0, tasks: 0, events: 0 });
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncProgress, setSyncProgress] = useState(0);
@@ -27,11 +33,12 @@ const KnowledgeBase = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [activeTab, setActiveTab] = useState<'explorer' | 'search'>('explorer');
   
-  // Explorer State
+  // Manage list of loaded chunks, explorer filter tabs, and page loaders.
   const [chunks, setChunks] = useState<KnowledgeChunk[]>([]);
   const [isFetchingChunks, setIsFetchingChunks] = useState(false);
   const [explorerFilter, setExplorerFilter] = useState<string>('all');
 
+  // Query database chunk counts classified by source types.
   const fetchStats = useCallback(async () => {
     if (!user) return;
     const { data, error } = await supabase
@@ -49,6 +56,7 @@ const KnowledgeBase = () => {
     }
   }, [user]);
 
+  // Load a paginated list of knowledge chunks matching the current explorer tab filter.
   const fetchChunks = useCallback(async () => {
     if (!user) return;
     setIsFetchingChunks(true);
@@ -70,6 +78,7 @@ const KnowledgeBase = () => {
     setIsFetchingChunks(false);
   }, [user, explorerFilter]);
 
+  // Re-fetch database stats and chunk details when the user changes or the active filter updates.
   useEffect(() => {
     if (user) {
       fetchStats();
@@ -77,6 +86,7 @@ const KnowledgeBase = () => {
     }
   }, [user, fetchStats, fetchChunks]);
 
+  // Trigger full context indexing pipeline to regenerate vector embeddings for user content.
   const handleSync = async () => {
     if (!user || isSyncing) return;
     setIsSyncing(true);
@@ -94,6 +104,7 @@ const KnowledgeBase = () => {
     }
   };
 
+  // Perform semantic retrieval over the indexed database using local/remote embeddings.
   const handleSearch = async () => {
     if (!user || !searchQuery.trim()) return;
     setIsSearching(true);
@@ -108,6 +119,7 @@ const KnowledgeBase = () => {
     }
   };
 
+  // Purge a specific chunk from the vector store while leaving original entity records intact.
   const handleDeleteChunk = async (id: string) => {
     if (!window.confirm('Delete this knowledge chunk? This will not delete the original source.')) return;
     try {
