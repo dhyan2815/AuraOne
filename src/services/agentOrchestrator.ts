@@ -1,25 +1,27 @@
+// ReAct Agentic Orchestrator — Core agent reasoning loop that executes tool calls, manages context, and handles fallbacks.
+
 import { callGeminiWithTools, callOpenRouterAPI } from './llmService';
 import { AGENT_TOOLS, executeTool } from './agentTools';
 import { AGENT_SYSTEM_PROMPT, buildAugmentedPrompt } from './agentPrompts';
 import { retrieveContext } from './ragRetrievalService';
 
+// Structure of the agent's finalized reply including source citations and executed tools.
 export interface AgentResponse {
-  message: string;
-  sources: SourceCitation[];
-  toolsUsed: string[];
+  message: string; // The text content of the agent's response.
+  sources: SourceCitation[]; // Documents and chunks used to formulate the response.
+  toolsUsed: string[]; // Names of the functions executed during processing.
 }
 
+// Representation of a context citation shown in the chat UI.
 export interface SourceCitation {
-  id: string;
+  id: string; // Parent entity UUID.
   sourceType: 'note' | 'task' | 'event';
   title: string;
   content: string;
   similarity: number;
 }
 
-/**
- * The ReAct (Reason + Act) loop - the brain of the agentic system.
- */
+// Process user queries using a multi-step Reason + Act loop with parallel tool executions.
 export async function processAgenticRequest(
   userQuery: string,
   userId: string,
@@ -29,10 +31,10 @@ export async function processAgenticRequest(
   const citations: SourceCitation[] = [];
 
   try {
-    // 1. Initial Retrieval (Pre-fetch context to enrich the first prompt)
+    // Retrieve semantic context matching the prompt to prime the agent.
     const initialContext = await retrieveContext(userId, userQuery, 5);
     
-    // Add initial context to citations if highly relevant
+    // Catalog context chunks as citations if similarity is highly relevant.
     initialContext.forEach(ctx => {
       if (ctx.similarity > 0.7) {
         citations.push({
@@ -45,6 +47,7 @@ export async function processAgenticRequest(
       }
     });
 
+    // Augment the system prompt if deep-reasoning Brain Mode is toggled.
     const systemPrompt = options?.isBrainMode 
       ? `${AGENT_SYSTEM_PROMPT}\n\n[BRAIN MODE ENABLED]: Use deep reasoning and analyze context thoroughly.` 
       : AGENT_SYSTEM_PROMPT;
@@ -53,23 +56,23 @@ export async function processAgenticRequest(
     let iterations = 0;
     const maxIterations = 5;
 
+    // Loop until final answer is generated or iteration threshold is reached.
     while (iterations < maxIterations) {
       iterations++;
 
-      // 2. Call Gemini with Tool support
+      // Request next action (text response or tool call) from Gemini.
       const response = await callGeminiWithTools(currentPrompt, AGENT_TOOLS, systemPrompt);
 
-      // 3. Handle Tool Calls or Direct Text
       const part = response.parts?.[0];
 
+      // Execute tool if function-call parameters are returned by the model.
       if (part?.functionCall) {
         const { name, args } = part.functionCall;
         toolsUsed.push(name);
 
-        // Execute the tool
         const result = await executeTool(name, args || {}, userId);
 
-        // If it was a search, update citations
+        // Parse search results to dynamically add new citations.
         if (name === 'search_knowledge_base' && result.results && Array.isArray(result.results)) {
           result.results.forEach((r: { id: string; source: 'note' | 'task' | 'event'; content?: string; similarity: number }) => {
             if (!citations.find(c => c.id === r.id)) {
@@ -84,11 +87,12 @@ export async function processAgenticRequest(
           });
         }
 
-        // Feed result back to the model
+        // Append tool execution logs back into the conversation context for the next decision.
         currentPrompt += `\n[Tool Output for ${name}]: ${JSON.stringify(result)}\n\nBased on this, what is the next step?`;
         continue;
       }
 
+      // Return text answer immediately once agent determines task is resolved.
       if (part?.text) {
         return {
           message: part.text,
@@ -107,7 +111,7 @@ export async function processAgenticRequest(
     };
 
   } catch {
-    // Fallback to OpenRouter (non-agentic but resilient)
+    // Fall back to OpenRouter reasoning models on API rate limit or context failure.
     const systemPromptFallback = options?.isBrainMode 
       ? `${AGENT_SYSTEM_PROMPT}\n\n[BRAIN MODE ENABLED]: Use deep reasoning.` 
       : AGENT_SYSTEM_PROMPT;
@@ -115,7 +119,7 @@ export async function processAgenticRequest(
     return {
       message: fallbackResponse,
       sources: [],
-      toolsUsed: ['fallback_openrouter']
+      toolsUsed: ['fallback_openrouter'] // Log fallback status.
     };
   }
 }
