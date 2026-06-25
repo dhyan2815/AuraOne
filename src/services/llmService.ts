@@ -1,23 +1,24 @@
+// LLM API client service — Interfaces with Gemini and OpenRouter APIs to handle generation, function calling, and timeouts.
+
 import { getAIConfig } from '../config/api';
 
 const AI_CONFIG = getAIConfig();
 
+// Define execution constraints, retries, and timing limits for API calls.
 export const SERVICE_CONFIG = {
   MAX_RETRIES: 3,
-  TIMEOUT_MS: 15000,
+  TIMEOUT_MS: 15000, // 15-second timeout for primary API calls.
   BACKOFF_MS: 2000,
 };
 
-/**
- * Shared service for low-level LLM API calls (Gemini and OpenRouter).
- */
-
+// Dispatch a plaintext content generation request to the Gemini API.
 export async function callGeminiAPI(prompt: string, systemPrompt?: string): Promise<string> {
   const LOCATION = "src/services/llmService.ts:callGeminiAPI";
   if (!AI_CONFIG.gemini.enabled) {
     throw new Error(`[${LOCATION}] Gemini API not configured`);
   }
 
+  // Set up an abort controller to prevent hanging request.
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), SERVICE_CONFIG.TIMEOUT_MS);
 
@@ -32,7 +33,7 @@ export async function callGeminiAPI(prompt: string, systemPrompt?: string): Prom
         body: JSON.stringify({
           contents: [{ parts: [{ text: fullPrompt }] }],
           generationConfig: {
-            temperature: 0.1,
+            temperature: 0.1, // Use low temperature for high determinism.
             maxOutputTokens: 2000,
           },
         }),
@@ -64,6 +65,7 @@ export async function callGeminiAPI(prompt: string, systemPrompt?: string): Prom
   }
 }
 
+// Call Gemini API with tool definitions to perform function calling.
 export async function callGeminiWithTools(
   prompt: string, 
   tools: Array<{ name: string; description: string; parameters: Record<string, unknown> }>, 
@@ -80,9 +82,7 @@ export async function callGeminiWithTools(
   try {
     const contents = [];
     if (systemPrompt) {
-      // Gemini 1.5+ supports system instructions separately, but for compatibility 
-      // we can prepend it or use the system_instruction field if using the right endpoint.
-      // Here we'll use the common contents structure.
+      // Prepend system instructions to user prompt for backward compatibility.
       contents.push({ role: 'user', parts: [{ text: `SYSTEM INSTRUCTION: ${systemPrompt}` }] });
     }
     contents.push({ role: 'user', parts: [{ text: prompt }] });
@@ -97,7 +97,7 @@ export async function callGeminiWithTools(
           tools: [{ function_declarations: tools }],
           tool_config: {
             function_calling_config: {
-              mode: "AUTO",
+              mode: "AUTO", // Allow model to choose when to invoke tools.
             },
           },
           generationConfig: {
@@ -123,6 +123,7 @@ export async function callGeminiWithTools(
   }
 }
 
+// Call OpenRouter API as a fallback when Gemini is unavailable or rate-limited.
 export async function callOpenRouterAPI(prompt: string, systemPrompt?: string): Promise<string> {
   const LOCATION = "src/services/llmService.ts:callOpenRouterAPI";
   
@@ -130,6 +131,7 @@ export async function callOpenRouterAPI(prompt: string, systemPrompt?: string): 
     throw new Error(`[${LOCATION}] Open Router API not configured`);
   }
 
+  // Extend fallback timeout limit as reasoning models might take longer.
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), SERVICE_CONFIG.TIMEOUT_MS * 3);
 
