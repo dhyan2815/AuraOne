@@ -1,23 +1,24 @@
+// RAG embedding service — Generates 768-dimensional vector embeddings using the Gemini API.
+
 import { API_CONFIG } from '../config/api';
 
-/**
- * Service to handle calling the Gemini embedding API.
- * Converts text into 768-dimensional vectors using text-embedding-004.
- */
-
+// Structure of the response returned by the single-text Gemini embedding endpoint.
 interface EmbeddingResponse {
   embedding: {
-    values: number[];
+    values: number[]; // Array of 768 float values.
   };
 }
 
+// Structure of the response returned by the batched Gemini embedding endpoint.
 interface BatchEmbeddingResponse {
   embeddings: Array<{
-    values: number[];
+    values: number[]; // Set of vector float arrays matching request count.
   }>;
 }
 
+// Convert a single block of text into a vector representation.
 export const embedText = async (text: string): Promise<number[]> => {
+  // Ensure we have access to the API key before calling.
   if (!API_CONFIG.GEMINI_API_KEY) {
     throw new Error('Gemini API key is missing');
   }
@@ -25,6 +26,7 @@ export const embedText = async (text: string): Promise<number[]> => {
   const url = `${API_CONFIG.GEMINI_API_URL}/models/${API_CONFIG.GEMINI_EMBEDDING_MODEL}:embedContent?key=${API_CONFIG.GEMINI_API_KEY}`;
 
   try {
+    // Send single text segment to Gemini embedding model.
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -35,10 +37,11 @@ export const embedText = async (text: string): Promise<number[]> => {
         content: {
           parts: [{ text }],
         },
-        outputDimensionality: 768,
+        outputDimensionality: 768, // Hardcode output dimensionality to match pgvector.
       }),
     });
 
+    // Check for HTTP errors and parse response message.
     if (!response.ok) {
       const error = await response.json();
       throw new Error(`Embedding API error: ${error.error?.message || response.statusText}`);
@@ -52,12 +55,13 @@ export const embedText = async (text: string): Promise<number[]> => {
   }
 };
 
+// Convert a list of text segments into vectors, matching Gemini's 100-item batch limit.
 export const embedBatch = async (texts: string[]): Promise<number[][]> => {
   if (!API_CONFIG.GEMINI_API_KEY) {
     throw new Error('Gemini API key is missing');
   }
 
-  // Gemini batch limit is 100 per request
+  // Split target list into chunks of 100 to stay within API rate constraints.
   const chunks = [];
   for (let i = 0; i < texts.length; i += 100) {
     chunks.push(texts.slice(i, i + 100));
@@ -65,6 +69,7 @@ export const embedBatch = async (texts: string[]): Promise<number[][]> => {
 
   const allEmbeddings: number[][] = [];
 
+  // Call the API sequentially for each chunk list.
   for (const chunk of chunks) {
     const url = `${API_CONFIG.GEMINI_API_URL}/models/${API_CONFIG.GEMINI_EMBEDDING_MODEL}:batchEmbedContents?key=${API_CONFIG.GEMINI_API_KEY}`;
 
