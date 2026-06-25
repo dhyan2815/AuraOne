@@ -1,13 +1,18 @@
+// Verify caching configurations, validation thresholds, TTL expiration logic, and dynamic key partitions.
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Simple in-memory cache implementation for testing
+// Mock in-memory caching helper class to validate temporal storage properties during unit runs.
 class SimpleCache<T> {
+  // Store cached data arrays and matching expiration times inside standard Maps.
   private cache: Map<string, { data: T; expiry: number }> = new Map();
 
+  // Bind a value and matching time-to-live threshold to the cache key store.
   set(key: string, data: T, ttl: number = 5 * 60 * 1000): void {
     this.cache.set(key, { data, expiry: Date.now() + ttl });
   }
 
+  // Load cache content by key, automatically purging expired items if threshold is breached.
   get(key: string): T | null {
     const item = this.cache.get(key);
     if (!item) return null;
@@ -18,14 +23,17 @@ class SimpleCache<T> {
     return item.data;
   }
 
+  // Purge a specific cache index key.
   delete(key: string): void {
     this.cache.delete(key);
   }
 
+  // Reset and purge all indices within the cache map.
   clear(): void {
     this.cache.clear();
   }
 
+  // Assert if a key is currently cached without exceeding TTL.
   has(key: string): boolean {
     const item = this.cache.get(key);
     if (!item) return false;
