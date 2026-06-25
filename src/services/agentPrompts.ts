@@ -1,5 +1,8 @@
+// Agent prompt configurations — Defines system instructions, RAG context builders, and ReAct loop directives.
+
 import { RetrievalResult } from './ragRetrievalService';
 
+// Operating instructions defining the personality, capabilities, and constraints of the Aura AI agent.
 export const AGENT_SYSTEM_PROMPT = `You are Aura, the advanced agentic intelligence for AuraOne. Your primary mission is to empower the user by managing their personal knowledge base (notes, tasks, events) with extreme precision and proactive reasoning.
 
 CORE OPERATING PROTOCOLS:
@@ -23,9 +26,11 @@ TOOL USAGE GUIDELINES:
 
 You must handle the retrieved context provided to you in the prompt. Use it to provide grounded, accurate answers.`;
 
+// Prepend retrieved semantic vector results as context above the user's query.
 export const buildAugmentedPrompt = (context: RetrievalResult[], userQuery: string): string => {
   let contextBlock = '';
   
+  // Format each search result with source indexing for referencing.
   if (context.length > 0) {
     contextBlock = '### RETRIEVED CONTEXT FROM KNOWLEDGE BASE\n\n';
     context.forEach((res, i) => {
@@ -37,6 +42,7 @@ export const buildAugmentedPrompt = (context: RetrievalResult[], userQuery: stri
   return `${contextBlock}User Query: ${userQuery}\n\nAura:`;
 };
 
+// Directives for the model on executing multi-step tool calls within the chat pipeline.
 export const TOOL_USAGE_INSTRUCTIONS = `
 When you need to use a tool, provide the function call. You can use multiple tools in sequence if needed (ReAct loop).
 After receiving the tool output, synthesize the final answer for the user.
