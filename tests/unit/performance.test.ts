@@ -1,7 +1,10 @@
+// Verify the metrics recording logic, average duration aggregators, and exception logging in the performance monitor utility.
+
 import { describe, it, expect } from 'vitest';
 import { perfMonitor } from '../../src/utils/performance';
 
 describe('performance monitor', () => {
+  // Assert that a start-end sequence correctly captures the operation identifier and logs a successful execution time.
   it('records and completes a metric by id', async () => {
     const id = perfMonitor.start('ai-service.processAIRequest');
     await new Promise(resolve => setTimeout(resolve, 5));
