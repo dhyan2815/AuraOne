@@ -1,19 +1,20 @@
+// Legacy AI command pipeline (deprecated) — Coordinates legacy JSON-based CRUD request validation and execution.
+
 import { getAIConfig } from '../config/api';
 import { validateAICommand, createRepairPrompt, type AICommand } from '../utils/aiCommandSchema';
 import { format } from 'date-fns';
 import * as chrono from 'chrono-node';
 
-// CRUD function imports
+// Import relational database hook helpers.
 import { createNote, deleteNote, updateNote, getNotes } from '../hooks/useNotes';
 import { createTask, deleteTask, updateTask, getTasks } from '../hooks/useTasks';
 import { createEvent, deleteEvent, getEvents } from '../hooks/useEvents';
 
 import { callGeminiAPI, callOpenRouterAPI, SERVICE_CONFIG } from './llmService';
 
-// Get AI configuration
 const AI_CONFIG = getAIConfig();
 
-// System prompt for consistent AI behavior
+// Legacy system prompt enforcing structured JSON outputs for all commands.
 const SYSTEM_PROMPT = `You are Aura, a helpful AI assistant that manages tasks, notes, and events. 
 
 IMPORTANT: You must respond with ONLY valid JSON. No explanations, markdown, or text outside the JSON object.
@@ -42,17 +43,15 @@ Always use ISO date format (YYYY-MM-DD) for dates and 24-hour time format (HH:mm
 
 /**
  * @deprecated Use agentOrchestrator.processAgenticRequest instead.
- * Parse AI response and validate
+ * Extract and validate the AI JSON response against the Zod command schema.
  */
 async function parseAndValidateResponse(response: string): Promise<AICommand> {
   try {
-    // Clean response
+    // Strip markdown formatting boundaries to isolate raw JSON content.
     const cleaned = response.replace(/```json|```/g, '').trim();
     
-    // Try to parse JSON
     const parsed = JSON.parse(cleaned);
     
-    // Validate with Zod schema
     const validated = validateAICommand(parsed);
     return validated;
   } catch (error) {
@@ -60,7 +59,7 @@ async function parseAndValidateResponse(response: string): Promise<AICommand> {
   }
 }
 
-// Execute CRUD operations
+// Map parsed command actions to their corresponding execution helper functions.
 async function executeCRUDOperation(command: AICommand, userId: string): Promise<string> {
   const { action, type, data } = command;
 
@@ -75,7 +74,6 @@ async function executeCRUDOperation(command: AICommand, userId: string): Promise
       case 'delete':
         return await handleDelete(type, data);
       case 'chat': {
-        // Handle different possible data structures
         let message = '';
         if (typeof data === 'object' && data !== null) {
           if ('message' in data && typeof data.message === 'string') {
@@ -95,7 +93,7 @@ async function executeCRUDOperation(command: AICommand, userId: string): Promise
   }
 }
 
-// Create operations
+// Parse input arguments and write new records to the database.
 async function handleCreate(type: string, data: Record<string, unknown>, userId: string): Promise<string> {
   switch (type) {
     case 'task': {
@@ -145,7 +143,7 @@ async function handleCreate(type: string, data: Record<string, unknown>, userId:
   }
 }
 
-// Read operations
+// Fetch summaries of user events, tasks, or notes to construct a reply.
 async function handleRead(type: string, _data: Record<string, unknown>, userId: string): Promise<string> {
   switch (type) {
     case 'task': {
@@ -171,7 +169,7 @@ async function handleRead(type: string, _data: Record<string, unknown>, userId: 
   }
 }
 
-// Update operations
+// Apply modifications to note and task fields.
 async function handleUpdate(type: string, data: Record<string, unknown>): Promise<string> {
   const { id } = data;
   
@@ -193,7 +191,6 @@ async function handleUpdate(type: string, data: Record<string, unknown>): Promis
     }
     
     case 'event': {
-      // Note: Events don't have update functionality in current hooks
       throw new Error('Event updates not yet implemented');
     }
     
@@ -202,7 +199,7 @@ async function handleUpdate(type: string, data: Record<string, unknown>): Promis
   }
 }
 
-// Delete operations
+// Remove records from notes, tasks, or events databases.
 async function handleDelete(type: string, data: Record<string, unknown>): Promise<string> {
   const { id } = data;
   
@@ -230,7 +227,7 @@ async function handleDelete(type: string, data: Record<string, unknown>): Promis
 
 /**
  * @deprecated Use agentOrchestrator.processAgenticRequest instead.
- * Main AI service function (Legacy path)
+ * Main AI command processor that coordinates LLM responses and fallbacks.
  */
 export async function processAIRequest(
   userPrompt: string, 
@@ -243,26 +240,21 @@ export async function processAIRequest(
   const maxRetries = options?.maxRetries || SERVICE_CONFIG.MAX_RETRIES;
   const mode = options?.mode || 'command';
 
-  // Immediate brain mode routing (always uses Open Router)
+  // Divert prompt immediately to fallback reasoning matrices.
   if (mode === 'brain') {
     return await callOpenRouterAPI(userPrompt);
   }
 
   let lastError: Error | null = null;
-
-  // Try Gemini first, fall back to OpenRouter on failure
   const models = ['gemini'];
   
   for (const model of models) {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        // 1. Call Gemini API
         const rawResponse = await callGeminiAPI(userPrompt, SYSTEM_PROMPT);
         
-        // 2. Parse and validate response
         const command = await parseAndValidateResponse(rawResponse);
         
-        // 3. Execute CRUD operation
         return await executeCRUDOperation(command, userId);
         
       } catch (error) {
@@ -271,6 +263,7 @@ export async function processAIRequest(
         const isGeminiFailure = model === 'gemini' && (lastError.message.includes('429') || lastError.message.includes('401') || lastError.message.includes('timeout'));
         const isParsingFailure = lastError.message.includes('Failed to parse AI response');
 
+        // Trigger OpenRouter fallback if Gemini fails or output fails validation checks.
         if (isGeminiFailure || isParsingFailure) {
           try {
             const fallbackResponse = await callOpenRouterAPI(userPrompt, SYSTEM_PROMPT);
@@ -286,6 +279,7 @@ export async function processAIRequest(
             }
         }
 
+        // Generate self-healing repair prompt and retry on validation failure.
         if (isParsingFailure && attempt < maxRetries) {
           try {
             const repairPrompt = createRepairPrompt(userPrompt, lastError.message);
