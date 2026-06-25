@@ -1,6 +1,8 @@
+// Verify the behavior and configuration presets of the primary aiService module under testing environments.
+
 import { describe, it, expect, vi } from 'vitest';
 
-// Mock dependencies before importing the service
+// Stub environment dependencies (API URLs, keys, notes, tasks, events, and validation schemas) before loading services.
 vi.mock('../../src/config/api', () => ({
   getAIConfig: () => ({
     gemini: {
