@@ -1,13 +1,14 @@
+// Gemini Function-Calling Tool Definitions — Declares and dispatches executable actions for note, task, and event management.
+
 import { createNote, getNotes } from '../hooks/useNotes';
 import { createTask, updateTask, getTasks } from '../hooks/useTasks';
 import { createEvent, getEvents } from '../hooks/useEvents';
 import { retrieveContext } from './ragRetrievalService';
 import * as chrono from 'chrono-node';
 
-/**
- * Tool definitions following Gemini function-calling schema.
- */
+// JSON schema declarations for tools exposed to the Gemini model in function-calling mode.
 export const AGENT_TOOLS = [
+  // Semantic search tool for context retrieval.
   {
     name: 'search_knowledge_base',
     description: 'Search the user\'s personal knowledge base (notes, tasks, events) for relevant information.',
@@ -20,6 +21,7 @@ export const AGENT_TOOLS = [
       required: ['query']
     }
   },
+  // Task creation schema.
   {
     name: 'create_task',
     description: 'Create a new task in the user\'s workboard.',
@@ -34,6 +36,7 @@ export const AGENT_TOOLS = [
       required: ['title']
     }
   },
+  // Note creation schema.
   {
     name: 'create_note',
     description: 'Create a new note.',
@@ -47,6 +50,7 @@ export const AGENT_TOOLS = [
       required: ['title', 'content']
     }
   },
+  // Calendar event schedule schema.
   {
     name: 'schedule_event',
     description: 'Schedule a new calendar event.',
@@ -61,6 +65,7 @@ export const AGENT_TOOLS = [
       required: ['title', 'start_time']
     }
   },
+  // Task status and priority modifier schema.
   {
     name: 'update_task_status',
     description: 'Mark a task as completed or update its priority.',
@@ -74,6 +79,7 @@ export const AGENT_TOOLS = [
       required: ['task_id']
     }
   },
+  // Listing/retrieval schema.
   {
     name: 'list_items',
     description: 'List tasks, notes, or events with optional filters.',
@@ -88,11 +94,10 @@ export const AGENT_TOOLS = [
   }
 ];
 
-/**
- * Executes a tool by name and parameters.
- */
+// Execute functions matched by name and process parameters using the active user context.
 export async function executeTool(name: string, params: Record<string, unknown> = {}, userId: string): Promise<Record<string, unknown>> {
   switch (name) {
+    // Perform vector-similarity query search.
     case 'search_knowledge_base': {
       const results = await retrieveContext(userId, String(params.query || ''));
       return {
@@ -105,6 +110,7 @@ export async function executeTool(name: string, params: Record<string, unknown> 
       };
     }
 
+    // Insert task with natural-language date parsing.
     case 'create_task': {
       const parsedDate = params.dueDate ? chrono.parseDate(String(params.dueDate)) : null;
       const task = await createTask(userId, {
@@ -117,6 +123,7 @@ export async function executeTool(name: string, params: Record<string, unknown> 
       return { message: `Task "${task.title}" created successfully.`, task_id: task.id };
     }
 
+    // Insert note with optional string tag array.
     case 'create_note': {
       const note = await createNote(userId, {
         title: String(params.title || ''),
@@ -127,6 +134,7 @@ export async function executeTool(name: string, params: Record<string, unknown> 
       return { message: `Note "${note.title}" created successfully.`, note_id: note.id };
     }
 
+    // Schedule calendar event with start/end time text processing.
     case 'schedule_event': {
       const start = chrono.parseDate(String(params.start_time || ''));
       const end = params.end_time ? chrono.parseDate(String(params.end_time)) : null;
@@ -141,6 +149,7 @@ export async function executeTool(name: string, params: Record<string, unknown> 
       return { message: `Event "${event.title}" scheduled successfully.`, event_id: event.id };
     }
 
+    // Update target task's completion check or level of urgency.
     case 'update_task_status': {
       const updates: Partial<import('../hooks/useTasks').NewTask> = {};
       if (params.completed !== undefined) updates.completed = Boolean(params.completed);
@@ -150,6 +159,7 @@ export async function executeTool(name: string, params: Record<string, unknown> 
       return { message: `Task ${params.task_id} updated.` };
     }
 
+    // Retrieve list summaries, capped at 10 items for visual efficiency.
     case 'list_items': {
       if (params.type === 'task') {
         const tasks = await getTasks(userId);
