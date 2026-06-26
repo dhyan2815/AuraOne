@@ -1,3 +1,5 @@
+// Tasks Mini-Widget — Renders a dashboard utility panel displaying a summary list of active and recently completed tasks.
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getTasks, updateTask, Task } from "../../hooks/useTasks";
@@ -11,6 +13,7 @@ const TasksWidget = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
+  // Load the complete task list on widget initialization.
   useEffect(() => {
     if (user) {
       getTasks(user.id)
@@ -19,22 +22,25 @@ const TasksWidget = () => {
     }
   }, [user]);
 
+  // Handle task status changes, display a success toast, and refresh task listings.
   const handleToggle = async (id: string, completed: boolean | undefined) => {
     if (!user) return;
     try {
       await updateTask(id, { completed: !completed });
       toast.success(!completed ? "Task Completed" : "Task Reactivated");
       const updated = await getTasks(user.id);
-      setTasks(updated);
+      setTasks(updated); // Sync local state values.
     } catch {
       toast.error("Operation failed");
     }
   };
 
+  // Compile layout slices: 3 active tasks and 1 completed task.
   const incomplete = tasks.filter((t) => !t.completed).slice(0, 3);
   const completedTasks = tasks.filter((t) => t.completed).slice(0, 1);
-  const display = [...incomplete, ...completedTasks].slice(0, 3);
+  const display = [...incomplete, ...completedTasks].slice(0, 3); // Restrict to a maximum of 3 items.
 
+  // Render empty state placeholder if no tasks are available.
   if (display.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-8 text-center gap-4">
@@ -57,6 +63,7 @@ const TasksWidget = () => {
 
   return (
     <div className="space-y-4">
+      {/* Animated list container supporting layout shifts on item completion. */}
       <AnimatePresence mode="popLayout">
         {display.map((task, idx) => {
           const isCompleted = !!task.completed;
@@ -75,7 +82,7 @@ const TasksWidget = () => {
                   : "glass border-primary/10 hover:border-primary/30 hover:shadow-2xl hover:shadow-primary/5"
               }`}
             >
-              {/* Checkbox */}
+              {/* Checkbox completing task status. */}
               <button
                 onClick={(e) => { e.stopPropagation(); handleToggle(task.id, task.completed); }}
                 className={`w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 border-2 transition-all duration-500 ${
@@ -87,7 +94,7 @@ const TasksWidget = () => {
                 {isCompleted && <Check size={14} strokeWidth={4} className="text-white" />}
               </button>
 
-              {/* Info */}
+              {/* Task title and priority/deadline metadata details. */}
               <div className="flex-1 min-w-0">
                 <p className={`text-sm font-bold tracking-tight transition-all duration-500 ${isCompleted ? "line-through text-text-variant italic" : "text-text"}`}>
                   {task.title}
@@ -112,6 +119,7 @@ const TasksWidget = () => {
         })}
       </AnimatePresence>
 
+      {/* Button linking to full workboard. */}
       <button
         onClick={() => navigate("/tasks")}
         className="w-full text-[9px] font-black text-primary/60 hover:text-primary text-center py-3 transition-all uppercase tracking-[0.4em] border-t border-primary/5 mt-2"
