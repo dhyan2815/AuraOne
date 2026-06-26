@@ -1,3 +1,5 @@
+// Note Card UI Component — Renders a summary block of a note in either grid or list layouts with text stripping.
+
 import { Calendar, Tag, MoreVertical, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
@@ -5,14 +7,17 @@ import { Note } from "../../hooks/useNotes";
 import { motion } from "framer-motion";
 import Card from "../ui/Card";
 
+// Expected properties passed to the Note summary display card.
 interface NoteCardProps {
   note: Note;
   viewMode: "grid" | "list";
 }
 
 const NoteCard = ({ note, viewMode }: NoteCardProps) => {
+  // Format creation timestamp into user-friendly string.
   const formattedDate = format(new Date(note.created_at), "MMM d, yyyy");
 
+  // Remove HTML tag blocks from Tiptap editor string to compile plain text previews.
   const stripHtml = (html: string | null) => {
     if (!html) return '';
     const tmp = document.createElement('div');
@@ -22,6 +27,7 @@ const NoteCard = ({ note, viewMode }: NoteCardProps) => {
 
   const cleanContent = stripHtml(note.content);
 
+  // Render list layout variant if viewMode is set to 'list'.
   if (viewMode === "list") {
     return (
       <Link to={`/notes/${note.id}`} className="block group">
@@ -46,6 +52,7 @@ const NoteCard = ({ note, viewMode }: NoteCardProps) => {
                             <Calendar size={12} className="mr-1.5" />
                             {formattedDate}
                         </div>
+                        {/* Display only the first tag in list view mode to preserve width. */}
                         {note.tags && note.tags.length > 0 && (
                             <div className="flex items-center gap-1.5">
                             <Tag size={12} className="text-primary/40" />
@@ -63,6 +70,7 @@ const NoteCard = ({ note, viewMode }: NoteCardProps) => {
     );
   }
 
+  // Fallback to standard grid card layout rendering.
   return (
     <Link to={`/notes/${note.id}`} className="block h-full group">
       <motion.div whileHover={{ y: -5 }} className="h-full">
@@ -72,6 +80,7 @@ const NoteCard = ({ note, viewMode }: NoteCardProps) => {
                     <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-gray-800 border border-slate-200 dark:border-gray-700 flex items-center justify-center text-primary/60 group-hover:text-primary group-hover:scale-105 transition-all">
                         <Sparkles size={24} />
                     </div>
+                    {/* Prevent routing link click when interacting with the actions menu. */}
                     <button onClick={(e) => e.preventDefault()} className="p-2 rounded-xl bg-slate-100 dark:bg-gray-800 border border-slate-200 dark:border-gray-700 text-slate-400 opacity-0 group-hover:opacity-100 transition-all hover:text-primary hover:border-primary/20">
                         <MoreVertical size={16} />
                     </button>
@@ -88,6 +97,7 @@ const NoteCard = ({ note, viewMode }: NoteCardProps) => {
                     </div>
                 </div>
 
+                {/* Footer panel with creation date and tags list. */}
                 <div className="flex items-center justify-between pt-5 border-t border-slate-200 dark:border-gray-700">
                     <div className="flex items-center text-xs font-medium text-slate-400">
                         <Calendar size={12} className="mr-2" />
@@ -95,6 +105,7 @@ const NoteCard = ({ note, viewMode }: NoteCardProps) => {
                     </div>
 
                     <div className="flex gap-2">
+                        {/* Display up to two tags to prevent grid line overflow. */}
                         {note.tags?.slice(0, 2).map(tag => (
                             <span key={tag} className="px-2 py-1 rounded-md bg-primary/10 text-[10px] font-bold uppercase text-primary">
                                 {tag}
