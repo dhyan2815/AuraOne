@@ -1,3 +1,5 @@
+// Render the Calendar workspace interface, displaying monthly grid cells, upcoming schedules, and event scheduler dialog forms.
+
 import { useState, useMemo, useEffect, useCallback } from "react";
 import {
   format, addMonths, subMonths,
@@ -13,16 +15,18 @@ import toast from "react-hot-toast";
 import { RealtimeChannel } from "@supabase/supabase-js";
 import { motion, AnimatePresence } from "framer-motion";
 
-// Event accent colors cycling
+// Configuration offsets to cycle through unique visual accent themes for calendar events.
 const EVENT_ACCENTS = [
   { bar: "bg-primary", dateBg: "bg-primary/10", dateNum: "text-primary", dateMon: "text-primary/60", title: "group-hover:text-primary" },
   { bar: "bg-secondary", dateBg: "bg-secondary/10", dateNum: "text-secondary", dateMon: "text-secondary/60", title: "group-hover:text-secondary" },
   { bar: "bg-tertiary",   dateBg: "bg-tertiary/10",   dateNum: "text-tertiary",   dateMon: "text-tertiary/60",   title: "group-hover:text-tertiary" },
 ];
 
+// Array of headers representing days of the week starting from Monday.
 const DAY_HEADERS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 const Calendar = () => {
+  // Track selected calendar views, schedule details state, and popover overlays.
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [newEventTitle, setNewEventTitle] = useState("");
@@ -31,6 +35,7 @@ const Calendar = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const { user } = useAuth();
 
+  // Retrieve user events list from Supabase storage mapping event schemas.
   const fetchEvents = useCallback(async () => {
     if (!user) return;
     try {
@@ -39,22 +44,28 @@ const Calendar = () => {
     } catch { toast.error("Schedule sync failed"); }
   }, [user]);
 
+  // Sync scheduled calendar items and bind a Supabase Postgres changes subscription to live events.
   useEffect(() => {
     if (!user) return;
     fetchEvents();
     const channel: RealtimeChannel = listenToEvents(user.id, fetchEvents);
+    
+    // Clean up Supabase channels on unmount or user swap.
     return () => { channel.unsubscribe(); };
   }, [user, fetchEvents]);
 
+  // Construct dates range structures for rendering the standard 7-column monthly grid.
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
   const calStart = startOfWeek(monthStart, { weekStartsOn: 1 });
   const calEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
   const calendarDays = eachDayOfInterval({ start: calStart, end: calEnd });
 
+  // Filter events belonging to a specific day cell.
   const eventsForDay = (day: Date) =>
     events.filter((e) => isSameDay(new Date(e.start_time), day));
 
+  // Compute a list of up to 6 upcoming events using useMemo optimizations.
   const upcomingEvents = useMemo(
     () => events
       .filter((e) => new Date(e.start_time) >= new Date())
@@ -63,6 +74,7 @@ const Calendar = () => {
     [events]
   );
 
+  // Submit and save a new event record to Supabase, parsing the date-time values.
   const handleAddEvent = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || !newEventTitle || !newEventTime) return;
@@ -82,6 +94,7 @@ const Calendar = () => {
     } catch { toast.error("Sync failed"); }
   };
 
+  // Terminate and delete an event record from the database.
   const handleDeleteEvent = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     await deleteEvent(id);
