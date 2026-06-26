@@ -1,10 +1,13 @@
+// News Mini-Widget — Renders a dashboard sidebar news feed utilizing the NewsData API.
+
 import { useState, useEffect } from "react";
 import { ExternalLink, Globe } from "lucide-react";
 import { API_CONFIG } from "../../config/api";
 import { motion, AnimatePresence } from "framer-motion";
 
+// Interface representing structured news records displayed in the UI.
 interface NewsItem {
-  id: string;
+  id: string; // Internal unique card identifier.
   title: string;
   source: string;
   url: string;
@@ -12,6 +15,7 @@ interface NewsItem {
   publishedAt: string;
 }
 
+// Interface matching the incoming JSON schema fields from the NewsData API.
 interface ApiNewsItem {
   title: string;
   source_id: string;
@@ -27,15 +31,19 @@ const NewsWidget = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Load news articles on component mount.
   useEffect(() => {
     const fetch_ = async () => {
       try {
         setLoading(true);
+        // Call NewsData API using active developer key.
         const res = await fetch(
           `${API_CONFIG.NEWS_API_URL}/news?apikey=${API_CONFIG.NEWS_API_KEY}&country=in&language=en`
         );
         if (!res.ok) throw new Error("Connection unstable");
         const data = await res.json();
+        
+        // Extract first 5 articles and map response fields to UI parameters.
         setNews(
           data.results.slice(0, 5).map((item: ApiNewsItem, i: number) => ({
             id: i.toString(),
@@ -55,6 +63,7 @@ const NewsWidget = () => {
     fetch_();
   }, []);
 
+  // Display loading feedback spinning indicator.
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center h-48 gap-3">
@@ -64,6 +73,7 @@ const NewsWidget = () => {
     );
   }
 
+  // Display error message fallback panel.
   if (error || news.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-48 gap-2">
@@ -72,12 +82,13 @@ const NewsWidget = () => {
     );
   }
 
+  // Destructure list to separate the primary headline from secondary articles.
   const [featured, ...rest] = news;
 
   return (
     <AnimatePresence>
       <div className="space-y-4">
-        {/* Featured article with image */}
+        {/* Featured headline article rendering. */}
         <motion.a
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -105,7 +116,7 @@ const NewsWidget = () => {
           </h4>
         </motion.a>
 
-        {/* Smaller articles */}
+        {/* Secondary headline list mapping. */}
         {rest.map((item, idx) => (
           <motion.a
             key={item.id}
@@ -140,7 +151,6 @@ const NewsWidget = () => {
         ))}
       </div>
     </AnimatePresence>
-
   );
 };
 
