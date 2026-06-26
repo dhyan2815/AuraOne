@@ -1,3 +1,5 @@
+// Calendar Mini-Widget — Displays a dashboard calendar grid, selected date agenda list, and inline event creators.
+
 import { useState, useMemo, useEffect } from "react";
 import { format, isSameDay, startOfMonth, endOfMonth, eachDayOfInterval, getDay, parse } from "date-fns";
 import { getEvents, createEvent, Event } from "../../hooks/useEvents";
@@ -17,32 +19,37 @@ const CalendarWidget = () => {
   const [newTitle, setNewTitle] = useState("");
   const [newTime, setNewTime] = useState("");
 
+  // Retrieve calendar events once user authentication is resolved.
   useEffect(() => {
     if (user) getEvents(user.id).then(setEvents);
   }, [user]);
 
-  // Build mini calendar grid for current month
+  // Compile dates array to render the current month's visual calendar grid.
   const calendarDays = useMemo(() => {
     const start = startOfMonth(selectedDate);
     const end = endOfMonth(selectedDate);
     const days = eachDayOfInterval({ start, end });
-    // pad start: Monday=0 ... Sunday=6
-    const startDow = (getDay(start) + 6) % 7; // convert Sun=0 to Mon=0
+    // Calculate leading blanks to offset starting day of the week (Monday-based).
+    const startDow = (getDay(start) + 6) % 7;
     const blanks = Array(startDow).fill(null);
-    return [...blanks, ...days].slice(0, 35);
+    return [...blanks, ...days].slice(0, 35); // Cap grid cells to 35 to prevent overflows.
   }, [selectedDate]);
 
+  // Filter events belonging to the selected date.
   const eventsForSelected = useMemo(
     () => events.filter((e) => isSameDay(new Date(e.start_time), selectedDate)),
     [events, selectedDate]
   );
 
+  // Check if a day has any scheduled events.
   const hasEvent = (day: Date | null) =>
     day ? events.some((e) => isSameDay(new Date(e.start_time), day)) : false;
 
+  // Compare if target date is the current calendar day.
   const isToday = (day: Date | null) => day ? isSameDay(day, new Date()) : false;
   const isSelected = (day: Date | null) => day ? isSameDay(day, selectedDate) : false;
 
+  // Validate form details and write new calendar event row into Supabase.
   const handleAddEvent = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTitle || !newTime || !user) return;
@@ -56,12 +63,12 @@ const CalendarWidget = () => {
     setNewTitle("");
     setNewTime("");
     setShowAddForm(false);
-    getEvents(user.id).then(setEvents);
+    getEvents(user.id).then(setEvents); // Re-sync local state values.
   };
 
   return (
     <div className="h-full flex flex-col">
-      {/* Mini calendar grid */}
+      {/* Monthly days grid. */}
       <div className="grid grid-cols-7 gap-y-2 text-center mb-6">
         {DAYS_OF_WEEK.map((d) => (
           <span key={d} className="text-[9px] font-black text-text-variant uppercase tracking-[0.2em] py-1 opacity-50">
@@ -86,6 +93,7 @@ const CalendarWidget = () => {
               }`}
             >
               {format(day, "d")}
+              {/* Render small dot indicator if date has scheduled events. */}
               {marked && !selected && !today && (
                 <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-tertiary rounded-full shadow-[0_0_5px_rgba(139,92,246,0.6)]" />
               )}
@@ -94,10 +102,11 @@ const CalendarWidget = () => {
         })}
       </div>
 
-      {/* Divider */}
+      {/* Selected day agenda section. */}
       <div className="border-t border-primary/10 pt-6 flex-1">
         <AnimatePresence mode="wait">
           {showAddForm ? (
+            // Render inline create event form.
             <motion.form
               key="form"
               initial={{ opacity: 0, scale: 0.95 }}
@@ -135,6 +144,7 @@ const CalendarWidget = () => {
               </button>
             </motion.form>
           ) : eventsForSelected.length === 0 ? (
+            // Render empty daily agenda placeholder.
             <motion.div
               key="empty"
               initial={{ opacity: 0 }}
@@ -156,6 +166,7 @@ const CalendarWidget = () => {
                 </button>
             </motion.div>
           ) : (
+            // Render list of active events for the selected day.
             <motion.div key="events" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
               {eventsForSelected.map((event, idx) => (
                 <motion.div
