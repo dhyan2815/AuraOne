@@ -1,3 +1,5 @@
+// Render the user's main dashboard layout, organizing weather, task management, calendar schedule, and news updates in a premium Bento grid structure.
+
 import { useEffect, useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { motion } from 'framer-motion';
@@ -9,10 +11,14 @@ import NewsWidget from '../components/widgets/NewsWidget';
 import Logo from '../components/structure/Logo';
 
 const Dashboard = () => {
+  // Access global user context to personalize the greeting.
   const { user } = useAuth();
+  
+  // Track personalized greeting messages and user display names.
   const [greeting, setGreeting] = useState('Good morning');
   const [userName, setUserName] = useState('');
 
+  // Dynamically set the time-of-day greeting (Morning, Afternoon, Evening).
   useEffect(() => {
     const h = new Date().getHours();
     if (h < 12) setGreeting('Good morning');
@@ -20,13 +26,14 @@ const Dashboard = () => {
     else setGreeting('Good evening');
   }, []);
 
+  // Update name representation when the authenticated user profile loads or changes.
   useEffect(() => {
     if (user) {
       setUserName(user.user_metadata?.name?.split(' ')[0] || user.email?.split('@')[0] || '');
     }
   }, [user]);
 
-  // animation variants
+  // Define layout animation variants to stagger widget entry timings.
   const container = {
     hidden: { opacity: 0 },
     show: { opacity: 1, transition: { staggerChildren: 0.08 } },
