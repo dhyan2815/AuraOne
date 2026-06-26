@@ -1,3 +1,5 @@
+// Root Layout Shell — Mounts navigation panels, theme controllers, ambient aurora mesh, and page entry animators.
+
 import { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
@@ -5,23 +7,27 @@ import { motion } from 'framer-motion';
 import { Moon, Sun } from 'lucide-react';
 
 const Layout = () => {
+  // Read existing theme state from localStorage, falling back to system preference.
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     const saved = localStorage.getItem('theme');
     if (saved === 'dark' || saved === 'light') return saved;
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   });
 
+  // Sync DOM document class configuration and persist choice inside local storage on theme updates.
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark');
     localStorage.setItem('theme', theme);
   }, [theme]);
 
+  // Toggle active theme status between light and dark options.
   const toggleTheme = () => {
     setTheme((current) => (current === 'light' ? 'dark' : 'light'));
   };
 
   return (
     <div className="flex min-h-screen overflow-x-hidden bg-background text-text transition-colors duration-300">
+      {/* Decorative ambient aurora mesh gradient background. */}
       <div
         aria-hidden="true"
         className="pointer-events-none fixed inset-0 z-0"
@@ -34,9 +40,12 @@ const Layout = () => {
         }}
       />
 
+      {/* Render sidebar navigation. */}
       <Sidebar />
 
+      {/* Main page content area with mobile safety padding at the bottom. */}
       <main className="relative z-10 flex min-h-screen min-w-0 flex-1 flex-col overflow-x-hidden pb-20 md:pb-0">
+        {/* Floating action button for theme switching with custom spring micro-animations. */}
         <motion.button
           onClick={toggleTheme}
           className="fixed bottom-20 md:bottom-6 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-full shadow-2xl transition-all glass hover:scale-110 active:scale-95"
@@ -46,6 +55,7 @@ const Layout = () => {
           }}
           aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
         >
+          {/* Animate symbol swap transition when theme is changed. */}
           <motion.div
             key={theme}
             initial={{ scale: 0.5, opacity: 0, rotate: -90 }}
@@ -58,6 +68,7 @@ const Layout = () => {
         </motion.button>
 
 
+        {/* Slide-up transition wrapper for outlet pages. */}
         <motion.div
           className="flex-1 min-w-0"
           initial={{ opacity: 0, y: 16 }}
