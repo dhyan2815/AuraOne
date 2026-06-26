@@ -1,3 +1,5 @@
+// Render the primary AI Chat interface, managing live conversation threads, real-time database updates, session configuration, and deep agent tool insights.
+
 import { useEffect, useRef, useState, useCallback } from "react";
 import ReactMarkdown from "react-markdown";
 import { Send, Plus, Paperclip, ExternalLink, Database, Search, Wrench, ChevronDown, ChevronUp, Trash2, Pencil, Check, X, Menu } from "lucide-react";
@@ -13,6 +15,7 @@ import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import Logo from "../components/structure/Logo";
 
+// Prompt suggestions displayed in empty state.
 const SUGGESTIONS = [
   { icon: "📋", title: "Summarize", sub: "Analyze recent objectives.", prompt: "Summarize my recent objectives and highlight the key strategic takeaways." },
   { icon: "🗺️", title: "Roadmap",  sub: "Structure Q4 rollout.", prompt: "Create a detailed, structured roadmap for our Q4 product rollout." },
@@ -20,6 +23,7 @@ const SUGGESTIONS = [
   { icon: "💡", title: "Ideas",    sub: "List 5 neural features.", prompt: "List 5 innovative neural features and capabilities we could implement in the platform." },
 ];
 
+// Steps for loading sequence animations.
 const HANDSHAKE_STEPS = [
   "Analyzing context...",
   "Searching knowledge base...",
@@ -29,22 +33,29 @@ const HANDSHAKE_STEPS = [
 ];
 
 const Chat = () => {
+  // Access global authenticated user information and page loading state.
   const { user, loading: authLoading } = useAuth();
+  
+  // Manage conversation logs, dynamic user input state, and active process loaders.
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [isBrainMode, setIsBrainMode] = useState(false);
   const [thinkingStep, setThinkingStep] = useState(0);
+  
+  // Track lists of historical chat sessions and metadata expansion states.
   const [sessions, setSessions] = useState<Session[]>([]);
   const [selectedSession, setSelectedSession] = useState<string | null>(null);
   const [expandedMetadata, setExpandedMetadata] = useState<Record<string, boolean>>({});
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
   const [editSessionName, setEditSessionName] = useState("");
   const [showSessionsMobile, setShowSessionsMobile] = useState(false);
+  
+  // Store DOM references to auto-scroll message logs and auto-resize text inputs.
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Auto-resize textarea
+  // Auto-resize textarea elements to accommodate larger multi-line prompt messages dynamically.
   useEffect(() => {
     const textarea = textareaRef.current;
     if (!textarea) return;
@@ -53,6 +64,7 @@ const Chat = () => {
     textarea.style.height = `${Math.min(textarea.scrollHeight, 200)}px`;
   }, [input]);
 
+  // Smoothly scroll the message container down to show the latest response block.
   const scrollToBottom = () => {
     setTimeout(() => {
       if (scrollContainerRef.current) {
@@ -64,6 +76,7 @@ const Chat = () => {
     }, 50);
   };
 
+  // Cycle through handshake loader steps periodically while waiting for the AI backend.
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
     if (loading) {
@@ -77,6 +90,7 @@ const Chat = () => {
     return () => clearInterval(interval);
   }, [loading]);
 
+  // Retrieve user-owned chat sessions from database storage.
   const fetchSessions = useCallback(async () => {
     if (!user) return;
     try {
@@ -86,8 +100,10 @@ const Chat = () => {
     } catch { toast.error("Historical sync failed"); }
   }, [user, selectedSession]);
 
+  // Synchronize chat histories when the authenticated user context is updated.
   useEffect(() => { fetchSessions(); }, [user, fetchSessions]);
 
+  // Load message logs for the active selected chat session.
   const fetchMessages = useCallback(async () => {
     if (!selectedSession) {
       setMessages([]);
@@ -101,6 +117,7 @@ const Chat = () => {
     }
   }, [selectedSession]);
 
+  // Initialize a real-time Postgres subscription to append new messages automatically.
   useEffect(() => {
     if (!selectedSession) return;
     
@@ -131,13 +148,16 @@ const Chat = () => {
       )
       .subscribe();
 
+    // Tear down Postgres channel listener on component unmount or session swap.
     return () => {
       supabase.removeChannel(channel);
     };
   }, [selectedSession, fetchMessages]);
 
+  // Trigger auto-scroll on change in the messages log array.
   useEffect(scrollToBottom, [messages]);
 
+  // Dispatch a new user message, trigger loading state, and invoke agent orchestrator handler.
   const handleSend = async (messageOverride?: string | unknown, forceBrainMode?: boolean) => {
     const textToProcess = typeof messageOverride === 'string' ? messageOverride : input;
     if (!user || !selectedSession || !textToProcess.trim()) return;
@@ -175,6 +195,7 @@ const Chat = () => {
     }
   };
 
+  // Capture Enter press inside textareas to submit requests without using Shift+Enter.
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
   };
