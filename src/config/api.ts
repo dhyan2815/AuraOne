@@ -1,74 +1,77 @@
-// api.ts
+// Centralized API configuration — Manages API keys, environment endpoints, and AI/RAG settings.
 
-// Environment detection
+// Detect current environment to configure API behaviors and safety checks.
 const isDevelopment = import.meta.env.DEV;
 const isProduction = import.meta.env.PROD;
 
-// API Configuration with enhanced security and environment handling
+// Centralized API configuration object containing environment, weather, news, and AI client settings.
 export const API_CONFIG = {
-  // Environment info
+  // Store the active environment string.
   ENV: isDevelopment ? 'development' : 'production',
   
-  // Weather API
+  // OpenWeatherMap API credentials and endpoints.
   WEATHER_API_KEY: import.meta.env.VITE_WEATHER_API_KEY,
   WEATHER_CURRENT_API_URL: "https://api.openweathermap.org/data/2.5/weather",
   WEATHER_FORECAST_API_URL: "https://api.openweathermap.org/data/2.5/forecast",
 
-  // News API
+  // NewsData.io API credentials and endpoint.
   NEWS_API_KEY: import.meta.env.VITE_NEWS_API_KEY,
   NEWS_API_URL: "https://newsdata.io/api/1", 
 
-  // Gemini API - Enhanced configuration
+  // Gemini AI configuration for chat generation and text embeddings.
   GEMINI_API_KEY: import.meta.env.VITE_GEMINI_API_KEY,
   GEMINI_API_URL: "https://generativelanguage.googleapis.com/v1beta",
   GEMINI_MODEL: "gemini-2.5-flash",
   GEMINI_EMBEDDING_MODEL: "gemini-embedding-001",
   
-  // Open Router - Deep reasoning fallback
+  // OpenRouter API fallback configuration for deep reasoning models.
   OPENROUTER_API_KEY: import.meta.env.VITE_OPENROUTER_API_KEY,
   OPENROUTER_API_URL: "https://openrouter.ai/api/v1/chat/completions",
 };
 
-// Configuration helper for RAG service
+// Retrieve configuration parameters for the RAG service.
 export const getRAGConfig = () => {
   return {
     embeddingModel: API_CONFIG.GEMINI_EMBEDDING_MODEL,
-    dimensions: 768,
-    threshold: 0.5,
-    topK: 10,
+    dimensions: 768, // Dimensions required by gemini-embedding-001.
+    threshold: 0.5, // Similarity score threshold for relevance.
+    topK: 10, // Maximum number of context chunks to retrieve.
   };
 };
 
-// Enhanced API key validation with detailed reporting
+// Validate presence of required API keys and compile warnings for missing optional services.
 export const validateApiKeys = () => {
   const missingKeys: string[] = [];
   const warnings: string[] = [];
 
-  // Required for production
+  // Enforce Gemini API key as a critical dependency.
   if (!API_CONFIG.GEMINI_API_KEY) {
     missingKeys.push("Gemini");
   }
 
-  // Optional but recommended
+  // Warn about missing weather features if weather key is absent.
   if (!API_CONFIG.WEATHER_API_KEY) {
     warnings.push("OpenWeatherMap (weather features disabled)");
   }
 
+  // Warn about missing news features if news key is absent.
   if (!API_CONFIG.NEWS_API_KEY) {
     warnings.push("NewsData (news features disabled)");
   }
 
+  // Warn about missing fallback model support if OpenRouter key is absent.
   if (!API_CONFIG.OPENROUTER_API_KEY) {
     warnings.push("Open Router (deep reasoning fallback disabled)");
   }
 
-  // Production-specific checks
+  // Log strict warning if Gemini key is missing in production environment.
   if (isProduction) {
     if (!API_CONFIG.GEMINI_API_KEY) {
       // Missing critical key in production
     }
   }
 
+  // Structure and return validation outcome with environmental context.
   const result = {
     valid: missingKeys.length === 0,
     missing: missingKeys,
@@ -79,17 +82,19 @@ export const validateApiKeys = () => {
   return result;
 };
 
-// Configuration helper for AI service
+// Compile and retrieve configuration settings for AI model providers.
 export const getAIConfig = () => {
   const validation = validateApiKeys();
   
   return {
+    // Primary Gemini configuration.
     gemini: {
       enabled: !!API_CONFIG.GEMINI_API_KEY,
       apiKey: API_CONFIG.GEMINI_API_KEY,
       apiUrl: API_CONFIG.GEMINI_API_URL,
       model: API_CONFIG.GEMINI_MODEL,
     },
+    // Fallback OpenRouter configuration.
     openRouter: {
       enabled: !!API_CONFIG.OPENROUTER_API_KEY,
       apiKey: API_CONFIG.OPENROUTER_API_KEY,
@@ -101,5 +106,5 @@ export const getAIConfig = () => {
   };
 };
 
-// Export configuration for external use
+// Export configuration object as default.
 export { API_CONFIG as default };
