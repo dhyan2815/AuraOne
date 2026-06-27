@@ -1,24 +1,25 @@
-// src/hooks/useTasks.ts
+// Tasks data actions hook — Handles CRUD operations on tasks with real-time sync and async RAG ingestion triggers.
+
 import { supabase } from "../services/supabase";
 import { RealtimeChannel, RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import { ingestItem, removeItem } from "../services/ragIngestionService";
 
-// The Task interface now matches the Supabase table schema
+// Interface representing the Task entity schema stored in the Postgres database.
 export interface Task {
-  id: string; // uuid
-  user_id: string; // uuid
+  id: string; // Unique task UUID.
+  user_id: string; // Owner user UUID.
   title: string;
   description?: string;
-  due_date?: string; // TIMESTAMPTZ
+  due_date?: string; // TIMESTAMPTZ formatting for task deadline.
   priority?: "low" | "medium" | "high";
   completed?: boolean;
-  created_at?: string; // TIMESTAMPTZ
+  created_at?: string; // TIMESTAMPTZ formatting for database entry timestamp.
 }
 
-// Type for creating a new task, `id`, `user_id` and `created_at` are optional
+// Data shape required to create a new Task (excludes system-generated fields).
 export type NewTask = Omit<Task, "id" | "user_id" | "created_at">;
 
-// Fetch all tasks for the current user
+// Fetch all tasks owned by the specified user, sorted newest first.
 export const getTasks = async (userId: string): Promise<Task[]> => {
   const { data, error } = await supabase
     .from("tasks")
@@ -32,7 +33,7 @@ export const getTasks = async (userId: string): Promise<Task[]> => {
   return data || [];
 };
 
-// Fetch a single task by its ID
+// Retrieve a single task row by its primary key ID.
 export const getTaskById = async (taskId: string): Promise<Task | null> => {
   const { data, error } = await supabase
     .from("tasks")
@@ -46,7 +47,7 @@ export const getTaskById = async (taskId: string): Promise<Task | null> => {
   return data;
 };
 
-// Listen for real-time changes to tasks
+// Subscribe to real-time additions, updates, or deletions of tasks for the active user.
 export const listenToTasks = (
   userId: string,
   callback: (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => void
@@ -64,7 +65,7 @@ export const listenToTasks = (
   return channel;
 };
 
-// Create a new task
+// Insert a new task row and queue a background RAG embedding ingestion job.
 export const createTask = async (userId: string, task: NewTask): Promise<Task> => {
   const { data, error } = await supabase
     .from("tasks")
@@ -76,13 +77,13 @@ export const createTask = async (userId: string, task: NewTask): Promise<Task> =
     throw error;
   }
 
-  // Trigger RAG ingestion
+  // Trigger non-blocking RAG vector index updates.
   ingestItem(userId, 'task', data.id).catch(err => console.error("RAG Ingestion Error:", err));
 
   return data;
 };
 
-// Update an existing task
+// Update task fields by ID and trigger a background RAG re-embedding ingestion job.
 export const updateTask = async (
   taskId: string,
   updates: Partial<NewTask>
@@ -98,13 +99,13 @@ export const updateTask = async (
     throw error;
   }
 
-  // Trigger RAG ingestion
+  // Trigger non-blocking RAG vector index updates.
   ingestItem(data.user_id, 'task', data.id).catch(err => console.error("RAG Ingestion Error:", err));
 
   return data;
 };
 
-// Delete a task
+// Remove a task row by ID and purge its associated vector chunks from pgvector.
 export const deleteTask = async (taskId: string) => {
   const { error } = await supabase.from("tasks").delete().eq("id", taskId);
 
@@ -112,6 +113,6 @@ export const deleteTask = async (taskId: string) => {
     throw error;
   }
 
-  // Remove from RAG index
+  // Purge deprecated vector records from search indices.
   removeItem(taskId).catch(err => console.error("RAG Removal Error:", err));
 };
