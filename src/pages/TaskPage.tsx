@@ -1,3 +1,5 @@
+// Render the task creation and editor form, managing priorities, due dates, completion toggles, and overdue flags.
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import toast from 'react-hot-toast';
@@ -25,10 +27,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import Logo from "../components/structure/Logo";
 
 const TaskPage = () => {
+  // Access dynamic routing context parameters and user authentication values.
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
 
+  // Track task property fields (title, priority level, due dates, description details).
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [dueDate, setDueDate] = useState<string>("");
@@ -39,6 +43,7 @@ const TaskPage = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [createdAt, setCreatedAt] = useState<string | undefined>(undefined);
 
+  // Fetch the selected task checklist fields from database storage or initialize default values.
   useEffect(() => {
     const fetchTask = async () => {
       if (!user) {
@@ -84,6 +89,7 @@ const TaskPage = () => {
     fetchTask();
   }, [id, user, navigate]);
 
+  // Dispatch task modifications to Supabase database tables (inserts for new tasks, updates for existing tasks).
   const handleSave = async () => {
     if (!user) return;
 
@@ -121,6 +127,7 @@ const TaskPage = () => {
     }
   };
 
+  // Remove a task checklist record permanently and redirect the router back to the main list.
   const handleDelete = async () => {
     if (!user || !id || id === "new") {
       navigate("/tasks");
@@ -136,6 +143,7 @@ const TaskPage = () => {
     }
   };
 
+  // Check if the current date is past the task's configured due date and time.
   const isOverdue = dueDate && !completed && (() => {
     try {
       const targetDate = dueTime ? new Date(`${dueDate}T${dueTime}`) : new Date(`${dueDate}T23:59:59`);

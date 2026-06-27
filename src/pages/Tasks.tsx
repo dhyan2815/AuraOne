@@ -1,3 +1,5 @@
+// Render the Tasks listing workspace, allowing users to organize todo items, toggle completion states, and filter tasks by due date or urgency levels.
+
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, Check, Flag, Calendar, Clock, Trash2 } from "lucide-react";
@@ -6,8 +8,10 @@ import { getTasks, updateTask, deleteTask, Task } from "../hooks/useTasks";
 import { useAuth } from "../hooks/useAuth";
 import toast from "react-hot-toast";
 
+// Filter headers displayed on the task management control bar.
 const FILTERS = ["All", "Today", "Upcoming", "Completed"];
 
+// Color styling badges mapped according to task priority flags.
 const PRIORITY_STYLE: Record<string, string> = {
   high:   "bg-red-500/10 text-red-500 border-red-500/20",
   medium: "bg-amber-500/10 text-amber-500 border-amber-500/20",
@@ -15,17 +19,21 @@ const PRIORITY_STYLE: Record<string, string> = {
 };
 
 const Tasks = () => {
+  // Track checklist arrays, filter configurations, and page router navigation.
   const [tasks, setTasks] = useState<Task[]>([]);
   const [activeFilter, setActiveFilter] = useState("All");
   const navigate = useNavigate();
   const { user } = useAuth();
 
+  // Load user tasks from DB storage using the active profile user ID.
   const loadTasks = useCallback(() => {
     if (user) getTasks(user.id).then(setTasks);
   }, [user]);
 
+  // Sync the loaded task checklists when the authenticated user session changes.
   useEffect(() => { loadTasks(); }, [user, loadTasks]);
 
+  // Toggle task completion flag in database storage and show success notifications.
   const handleToggle = async (id: string, completed: boolean | undefined, e: React.MouseEvent) => {
     e.stopPropagation();
     if (!user) return;
@@ -34,6 +42,7 @@ const Tasks = () => {
     loadTasks();
   };
 
+  // Remove a task checklist record permanently from the database.
   const handleDelete = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (!user) return;
@@ -42,6 +51,7 @@ const Tasks = () => {
     loadTasks();
   };
 
+  // Filter task checklist items based on due dates, deadlines, and current dates.
   const today = new Date().toDateString();
   const filtered = useMemo(() => {
     return tasks.filter((t) => {
@@ -52,10 +62,12 @@ const Tasks = () => {
     });
   }, [tasks, activeFilter, today]);
 
+  // Group active tasks into sub-lists depending on priority parameters.
   const highPriority = filtered.filter((t) => t.priority === "high" && !t.completed);
   const activeFlow   = filtered.filter((t) => t.priority !== "high" && !t.completed);
   const achieved     = filtered.filter((t) => !!t.completed);
 
+  // Setup motion properties to stagger entry animations of the task rows.
   const stagger = {
     hidden: { opacity: 0 },
     show: { opacity: 1, transition: { staggerChildren: 0.05 } },

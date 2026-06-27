@@ -1,3 +1,5 @@
+// Render the main Notes panel, enabling users to organize note entries with keyword searches, tag categorization, and real-time database listener feeds.
+
 import { useState, useEffect, useCallback } from "react";
 import { PlusIcon, Search, FileText, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -6,9 +8,10 @@ import { listenToNotes, getNotes, Note } from "../hooks/useNotes";
 import { useAuth } from "../hooks/useAuth";
 import { RealtimeChannel } from "@supabase/supabase-js";
 
+// Filter configuration options available for cataloguing note tags.
 const FILTERS = ["All", "Personal", "Work", "Ideas"];
 
-// Map tag → exact Stitch badge class with dark mode support
+// Map tag categories to corresponding styling theme badges.
 const TAG_BADGE: Record<string, { bg: string; text: string }> = {
   Ideas:    { bg: "bg-indigo-500/10",  text: "text-indigo-500" },
   Work:     { bg: "bg-pink-500/10",    text: "text-pink-500" },
@@ -16,6 +19,7 @@ const TAG_BADGE: Record<string, { bg: string; text: string }> = {
   General:  { bg: "bg-primary/10",   text: "text-primary" },
 };
 
+// Strip HTML tags from a text string to extract pure content for card descriptions.
 const stripHtml = (html: string | null) => {
   if (!html) return '';
   const tmp = document.createElement('div');
@@ -24,11 +28,13 @@ const stripHtml = (html: string | null) => {
 };
 
 const Notes = () => {
+  // Track lists of user notes, current query strings, and active tag filters.
   const [notes, setNotes] = useState<Note[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("All");
   const { user } = useAuth();
 
+  // Retrieve user-owned notes from storage using the authentication context ID.
   const fetchNotes = useCallback(async () => {
     if (!user) return;
     const fetched = await getNotes(user.id).catch(() => {
@@ -37,10 +43,13 @@ const Notes = () => {
     setNotes(fetched);
   }, [user]);
 
+  // Synchronize notes list and bind a Supabase Postgres changes subscription to live updates.
   useEffect(() => {
     if (!user) return;
     fetchNotes();
     const channel: RealtimeChannel = listenToNotes(user.id, fetchNotes);
+    
+    // Clean up Supabase listener channels when unmounting or switching users.
     return () => { channel.unsubscribe(); };
   }, [user, fetchNotes]);
 

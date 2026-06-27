@@ -1,3 +1,5 @@
+// Render the individual NotePage editor, featuring rich Tiptap editor blocks, custom category tag listings, automatic save triggers, and manual Ctrl+S hotkeys.
+
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import toast from 'react-hot-toast';
@@ -26,6 +28,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Logo from "../components/structure/Logo";
 
 const NotePage = () => {
+  // Track loaded note configuration, title headings, categorizing tags, and auto-save timers.
   const [note, setNote] = useState<Note | null>(null);
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -39,6 +42,7 @@ const NotePage = () => {
 
   const { user } = useAuth();
 
+  // Load the note content by URL ID parameter or initialize new note properties.
   useEffect(() => {
     const fetchNote = async () => {
       if (!user) {
@@ -75,6 +79,7 @@ const NotePage = () => {
     fetchNote();
   }, [id, user, navigate]);
 
+  // Save modified note fields to the database table, handling insertions or updates.
   const handleSave = useCallback(async (isAutoSave = false) => {
     if (!user) return;
 
@@ -110,6 +115,7 @@ const NotePage = () => {
     }
   }, [user, title, tags, content, note, id, navigate]);
 
+  // Set up an auto-save timer to capture editor changes automatically after 5 idle seconds.
   useEffect(() => {
     if (loading || id === 'new') return;
     const autoSaveTimeout = setTimeout(() => {
@@ -118,6 +124,7 @@ const NotePage = () => {
     return () => clearTimeout(autoSaveTimeout);
   }, [content, title, tags, id, loading, handleSave]);
 
+  // Register window event listeners for Cmd+S or Ctrl+S manual save keyboard shortcuts.
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if ((event.ctrlKey || event.metaKey) && event.key === 's') {
