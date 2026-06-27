@@ -1,3 +1,5 @@
+// Render the ForgotPassword recovery interface, allowing users to enter email addresses and trigger reset links via Supabase.
+
 import { useState } from "react";
 import { supabase } from "../services/supabase";
 import { Link } from "react-router-dom";
@@ -7,10 +9,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import Logo from "../components/structure/Logo";
 
 const ForgotPassword = () => {
+  // Track recovery email inputs, active loader flags, and delivery verification toggles.
   const [email, setEmail] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
 
+  // Dispatch a password reset link to the configured email and specify redirect parameters.
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSending(true);

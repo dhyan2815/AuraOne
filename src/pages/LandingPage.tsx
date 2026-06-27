@@ -1,3 +1,5 @@
+// Render the public LandingPage marketing interface, presenting platform feature modules, customer testimonials, and subscription CTAs.
+
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Calendar, CheckCircle, MessageSquare, ArrowRight, ChevronDown, Star } from "lucide-react";
@@ -7,9 +9,11 @@ import LandingPicture from "../assets/LandingImage.png";
 import Logo from "../components/structure/Logo";
 
 const LandingPage = () => {
+    // Track page scrolling offsets for navigation styling and active testimonial ratings display.
     const [isScrolled, setIsScrolled] = useState(false);
     const [currentTestimonial, setCurrentTestimonial] = useState(0);
 
+    // List of client testimonials displayed dynamically.
     const testimonials = [
         {
             name: "Rajesh Verma",
@@ -37,14 +41,18 @@ const LandingPage = () => {
         }
     ];
 
+    // Bind scroll event listeners to style navigation headers based on offsets.
     useEffect(() => {
         const handleScroll = () => {
             setIsScrolled(window.scrollY > 50);
         };
         window.addEventListener('scroll', handleScroll);
+        
+        // Clean up window scrolling listeners on component unmount.
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    // Spin up an interval timer to cycle testimonials automatically every 4 seconds.
     useEffect(() => {
         const interval = setInterval(() => {
             setCurrentTestimonial((prevIndex) =>
@@ -52,9 +60,11 @@ const LandingPage = () => {
             );
         }, 4000);
 
+        // Terminate active timer intervals on unmount.
         return () => clearInterval(interval);
     }, [testimonials.length]);
 
+    // Smoothly scroll the window context down to the Features block element.
     const scrollToFeatures = () => {
         const featuresElement = document.getElementById('features');
         if (featuresElement) {
@@ -62,6 +72,7 @@ const LandingPage = () => {
         }
     };
 
+    // Smoothly scroll the viewport back to the top of the page.
     const scrollToTop = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };

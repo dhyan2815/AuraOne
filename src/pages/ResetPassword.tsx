@@ -1,3 +1,5 @@
+// Render the ResetPassword interface, allowing verified recovery users to re-encrypt and update their password credentials.
+
 import { useState, useEffect } from "react";
 import { supabase } from "../services/supabase";
 import { useNavigate } from "react-router-dom";
@@ -7,6 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Logo from "../components/structure/Logo";
 
 const ResetPassword = () => {
+  // Track routing navigation functions and credential property forms.
   const navigate = useNavigate();
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -15,17 +18,21 @@ const ResetPassword = () => {
   const [isResetting, setIsResetting] = useState(false);
   const [resetSuccess, setResetSuccess] = useState(false);
 
+  // Monitor authorization state events on mounting to confirm password recovery session triggers.
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'PASSWORD_RECOVERY') {
-        // Recovery state acknowledged
+        // Recovery event context acknowledged by Supabase auth.
       }
     });
+    
+    // Tear down authentication state changes subscription channel on unmount.
     return () => {
       subscription?.unsubscribe();
     };
   }, []);
 
+  // Validate passwords equality metrics and submit the update query to Supabase.
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newPassword !== confirmPassword) {

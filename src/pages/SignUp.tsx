@@ -1,3 +1,5 @@
+// Render the account registration interface, capturing user names and credentials to provision new user database workspaces.
+
 import { useState, useEffect } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate, Link, useLocation } from "react-router-dom";
@@ -11,9 +13,12 @@ import { motion } from "framer-motion";
 import Logo from "../components/structure/Logo";
 
 const SignUp = () => {
+    // Access navigation utilities, current path location parameters, and auth signup dispatch methods.
     const navigate = useNavigate();
     const location = useLocation();
     const { signup } = useAuth();
+    
+    // Track form registration inputs, password visibility toggles, loading state indicators, and scroll positions.
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -22,16 +27,29 @@ const SignUp = () => {
     const [isSigningUp, setIsSigningUp] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
 
-    // Handle scroll effect for navbar
+    // Bind scroll listener events to dynamically adjust navigation backdrop layouts.
     useEffect(() => {
         const handleScroll = () => {
             setIsScrolled(window.scrollY > 50);
         };
         window.addEventListener("scroll", handleScroll);
+        
+        // Remove scroll event listeners on unmounting.
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
-    // Handle smooth scrolling when coming from other pages or with hash
+    // Scroll viewport context down to auto-align on the signup form container.
+    const scrollToSignUpForm = () => {
+        const formElement = document.querySelector("form");
+        if (formElement) {
+            formElement.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+            });
+        }
+    };
+
+    // Inspect URL parameters or hashes on page load to focus viewport context on sign-up panels.
     useEffect(() => {
         if (
             location.hash === "#signup" ||
@@ -43,10 +61,11 @@ const SignUp = () => {
         }
     }, [location]);
 
+    // Dispatch profile credentials to auth registration API, displaying success toasts and routing to dashboard.
     const handleSignUp = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSigningUp(true);
-        setError(""); // Clear any previous errors
+        setError("");
 
         try {
             await signup(email, password, { data: { name } });
@@ -54,7 +73,7 @@ const SignUp = () => {
             toast.success("Registration Successful! Welcome to AuraOne");
             toast("Redirecting to your dashboard...", { icon: "🚀" });
 
-            // Small delay to show the success message before navigation
+            // Small delay to present confirmation alerts prior to router redirection.
             setTimeout(() => {
                 navigate("/dashboard", { replace: true });
             }, 1500);
@@ -63,17 +82,6 @@ const SignUp = () => {
             toast.error(`Registration Failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
         } finally {
             setIsSigningUp(false);
-        }
-    };
-
-    // Function to scroll to the signup form
-    const scrollToSignUpForm = () => {
-        const formElement = document.querySelector("form");
-        if (formElement) {
-            formElement.scrollIntoView({
-                behavior: "smooth",
-                block: "center",
-            });
         }
     };
 

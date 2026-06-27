@@ -1,3 +1,5 @@
+// Render the Login credentials form, authorizing registered users, and managing navigation flows into dashboard panels.
+
 import { useState, useEffect } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate, Link, useLocation } from "react-router-dom";
@@ -12,9 +14,12 @@ import Logo from "../components/structure/Logo";
 
 
 const Login = () => {
+  // Access router navigation context, dynamic paths, and auth login action utilities.
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
+  
+  // Track credentials input values, visibility toggles, loading state indicators, and scrolling offsets.
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -22,16 +27,18 @@ const Login = () => {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
-  // Handle scroll effect for navbar
+  // Bind a scrolling event handler to toggle custom navigation styling classes on scroll.
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
     };
     window.addEventListener("scroll", handleScroll);
+    
+    // Tear down scrolling event listeners on unmount.
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Function to scroll to the login form
+  // Scroll the page viewport down to center on the credential login form elements.
   const scrollToLoginForm = () => {
     const formElement = document.querySelector('form');
     if (formElement) {
@@ -42,7 +49,7 @@ const Login = () => {
     }
   };
 
-  // Handle smooth scrolling when coming from other pages or with hash
+  // Inspect the current location query strings or hashes to automatically focus on the login panel.
   useEffect(() => {
     if (location.hash === '#login' || location.search.includes('scroll=form')) {
       setTimeout(() => {
@@ -51,18 +58,18 @@ const Login = () => {
     }
   }, [location]);
 
-  // Login logic
+  // Submit credentials to the auth logic, trigger progress indicators, and route to dashboard.
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoggingIn(true);
-    setError(""); // Clear any previous errors
+    setError("");
 
     try {
       await login(email, password);
       toast.success("Logged In Successfully!");
       toast('Welcome back to AuraOne', { icon: '👋' });
 
-      // Small delay to show the success message before navigation
+      // Route the authenticated user to dashboard after a brief delay for alerts.
       setTimeout(() => {
         navigate("/dashboard", { replace: true });
       }, 1500);

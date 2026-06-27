@@ -1,3 +1,5 @@
+// Render the Preferences and Settings page, allowing users to modify account details, update passwords, and track metadata properties.
+
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { User, Info, Eye, EyeOff, ShieldCheck, Zap, History, RotateCw, Key, Shield, ChevronRight } from "lucide-react";
@@ -7,6 +9,7 @@ import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import Logo from "../components/structure/Logo";
 
+// Define structured properties for displaying account metadata information.
 interface UserProfile {
   name: string;
   email: string;
@@ -15,7 +18,10 @@ interface UserProfile {
 }
 
 const Settings = () => {
+  // Access credentials of the current authenticated user context.
   const { user } = useAuth();
+  
+  // Track profile data, inline name editing flags, new passwords, and loader statuses.
   const [profile, setProfile] = useState<UserProfile>({
     name: "",
     email: "",
@@ -30,6 +36,7 @@ const Settings = () => {
   const [showPasswords, setShowPasswords] = useState({ new: false, confirm: false });
   const [isChangingPassword, setIsChangingPassword] = useState(false);
 
+  // Synchronize component profile state when authenticated user data changes.
   useEffect(() => {
     if (user) {
       setProfile({
@@ -42,6 +49,7 @@ const Settings = () => {
     }
   }, [user]);
 
+  // Submit and update the user's name metadata in Supabase authentication stores.
   const handleUpdateName = async () => {
     if (!user || !newName.trim()) return;
     const { error } = await supabase.auth.updateUser({ data: { name: newName.trim() } });
@@ -54,6 +62,7 @@ const Settings = () => {
     }
   };
 
+  // Perform client validation check and submit new user password values to auth settings.
   const handleChangePassword = async () => {
     if (!user || !newPassword || !confirmPassword) { toast.error("Complete all protocols"); return; }
     if (newPassword !== confirmPassword) { toast.error("Encryption mismatch"); return; }
@@ -76,6 +85,7 @@ const Settings = () => {
     }
   };
 
+  // Format dates into readable month-day-year formats with 12-hour clock representations.
   const formatDate = (date: Date) =>
     new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" }).format(date);
 
