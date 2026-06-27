@@ -1,10 +1,18 @@
+// AuraOne design system configuration — Integrates custom variables for themes, glassmorphism, and ambient animations.
+
+// Tailwind plugin imports.
 import animate from 'tailwindcss-animate'
 import typography from '@tailwindcss/typography'
 
 /** @type {import('tailwindcss').Config} */
 export default {
+  // Define source files to scan for Tailwind CSS utility classes.
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  
+  // Enable class-based dark mode toggling.
   darkMode: 'class',
+  
+  // Safelist dynamic classes that might not be statically analyzed in components.
   safelist: [
     'border-primary/10',
     'focus:ring-primary/20',
@@ -13,8 +21,11 @@ export default {
     'bg-primary/20',
     'bg-primary/40',
   ],
+  
+  // Extend default Tailwind theme tokens.
   theme: {
     extend: {
+      // Map theme colors to CSS variables for dynamic runtime theme switching.
       colors: {
         primary: 'rgb(var(--color-primary) / <alpha-value>)',
         secondary: 'rgb(var(--color-secondary) / <alpha-value>)',
@@ -30,6 +41,7 @@ export default {
         'aurora-on-surface': 'rgb(var(--color-text) / <alpha-value>)',
         'aurora-on-surface-variant': 'rgb(var(--color-text-variant) / <alpha-value>)',
 
+        // Semantic alert states (error, success, warning) with container variants.
         error: {
           DEFAULT: '#ba1a1a',
           container: '#ffdad6',
@@ -43,20 +55,21 @@ export default {
           container: '#fef3c7',
         },
       },
+      
+      // Select Outfit or Inter as the primary sans-serif font family.
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
       },
-      // FIXED: Use Tailwind's default spacing scale - don't override entirely
-      // This prevents unexpected sizing cascades
+      
+      // Supplement spacing scale with intermediate sizes without deleting defaults.
       spacing: {
-        // Keep standard Tailwind scale (px, 0.5, 1, 1.5, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 72, 80, 96)
-        // Add custom if needed, but don't override defaults
         '7': '28px',
         '9': '36px',
         '11': '44px',
       },
+      
+      // Design tokens for border-radii used in glassmorphism cards and modal panels.
       borderRadius: {
-        // FIXED: Proper border radius scale with sensible defaults
         none: '0',
         xs: '0.25rem',      // 4px - very subtle
         sm: '0.375rem',     // 6px - small
@@ -68,15 +81,21 @@ export default {
         '3xl': '3rem',      // 48px
         full: '9999px',     // Pill-shaped
       },
+      
+      // Custom drop shadows for ambient glowing effects under interactive elements.
       boxShadow: {
         'aurora-glow': '0 0 30px rgba(73, 83, 188, 0.08)',
         'aurora-glow-lg': '0 0 50px rgba(73, 83, 188, 0.12)',
       },
+      
+      // UI entry and floating background animations.
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',
         'slide-up': 'slideUp 0.4s ease-out',
         'aurora-float': 'auroraFloat 10s ease-in-out infinite',
       },
+      
+      // Define keyframes for opacity, translation, and floating background shapes.
       keyframes: {
         fadeIn: {
           '0%': { opacity: '0' },
@@ -94,5 +113,7 @@ export default {
       },
     },
   },
+  
+  // Register animations and rich text styling typography plugins.
   plugins: [animate, typography],
 };
