@@ -1,15 +1,18 @@
+/* Global styles and CSS custom properties — Configures baseline resets, theme tokens, and custom UI components. */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-  /* FIXED: Critical box-sizing reset */
+  /* Enforce standard box-sizing rules across all elements. */
   *,
   *::before,
   *::after {
     box-sizing: border-box;
   }
 
+  /* Define CSS custom properties for Light Theme (RGB format for opacity manipulation). */
   :root {
     --color-primary: 37 99 235;
     --color-secondary: 59 130 246;
@@ -19,6 +22,7 @@
     --color-text-variant: 100 116 139;
   }
 
+  /* Define CSS custom properties for Dark Theme. */
   .dark {
     --color-primary: 129 140 248;
     --color-secondary: 167 139 250;
@@ -28,6 +32,7 @@
     --color-text-variant: 148 163 184;
   }
 
+  /* Set baseline HTML layout, antialiasing, and default color-schemes. */
   html {
     font-family: "Inter", system-ui, -apple-system, sans-serif;
     @apply antialiased;
@@ -37,10 +42,12 @@
     color-scheme: light;
   }
 
+  /* Sync HTML color-scheme with dark mode status. */
   html.dark {
     color-scheme: dark;
   }
 
+  /* Configure standard body text, background transitions, and scroll behavior. */
   body {
     @apply text-text bg-background;
     background-attachment: fixed;
@@ -52,22 +59,25 @@
     transition: background-color 0.3s ease, color 0.3s ease;
   }
 
+  /* Define viewport boundary for the React application container. */
   #root {
     min-height: 100vh;
   }
 
+  /* Reset heading typography margins and apply font sizing styles. */
   h1, h2, h3, h4, h5, h6 {
     @apply font-bold tracking-tight text-text;
     margin: 0;
   }
 
+  /* Reset default block spacing. */
   p, ul, ol, blockquote, figure {
     margin: 0;
     padding: 0;
   }
 }
 
-/* Global scrollbar */
+/* Custom scrollbars for WebKit browsers. */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -81,13 +91,14 @@
   @apply bg-primary/20 rounded-full hover:bg-primary/40 transition-colors;
 }
 
+/* Custom scrollbar fallback configuration for Firefox. */
 * {
   scrollbar-color: rgba(37, 99, 235, 0.2) transparent;
   scrollbar-width: thin;
 }
 
 @layer components {
-  /* ProseMirror */
+  /* Style the Tiptap ProseMirror editor text container. */
   .ProseMirror {
     @apply min-h-[300px] w-full max-w-full p-4 outline-none text-base;
     word-wrap: break-word;
@@ -95,6 +106,7 @@
     color: var(--color-text);
   }
 
+  /* Define paragraph, header, list, and blockquote spacing styles inside ProseMirror. */
   .ProseMirror p { @apply mb-3 leading-relaxed; }
   .ProseMirror h1 { @apply text-3xl mb-3 font-bold mt-4; }
   .ProseMirror h2 { @apply text-2xl mb-3 font-bold mt-4; }
@@ -106,11 +118,11 @@
     @apply pl-4 border-l-4 border-slate-300 dark:border-slate-700 text-slate-500 dark:text-slate-400 italic my-3;
   }
 
-  /* Typography */
+  /* Typography utilities. */
   .display-lg { @apply text-5xl font-extrabold tracking-tighter leading-tight; }
   .headline-sm { @apply text-2xl font-bold; }
 
-  /* Premium Glass Morphism - Responsive to Dark Mode */
+  /* Premium Glass Morphism components with light/dark adaptive backdrops. */
   .glass {
     background: rgba(255, 255, 255, 0.4);
     backdrop-filter: blur(20px);
@@ -137,14 +149,14 @@
     border: 1px solid rgba(255, 255, 255, 0.12);
   }
 
-  /* Aurora Input */
+  /* Styling for Aurora text and input fields. */
   .input-aurora {
     @apply w-full max-w-full bg-white/60 dark:bg-slate-900/60 border border-primary/10 dark:border-white/10 rounded-xl px-4 py-3 text-sm font-medium text-text placeholder:text-text/30 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all;
     box-sizing: border-box;
     display: block;
   }
 
-  /* Buttons */
+  /* Primary call-to-action button styled with gradients and micro-interactions. */
   .btn-aurora-primary {
     @apply inline-flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-500 text-white font-bold py-3 px-6 rounded-2xl shadow-lg hover:opacity-90 transition-all active:scale-[0.98];
     white-space: nowrap;
@@ -152,21 +164,25 @@
     cursor: pointer;
   }
 
+  /* Secondary button styled with subtle glass-morphism borders. */
   .btn-aurora-secondary {
     @apply inline-flex items-center justify-center gap-2 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm border border-primary/10 dark:border-white/10 text-text font-bold py-3 px-6 rounded-2xl hover:bg-white/80 dark:hover:bg-slate-700/80 transition-all;
     white-space: nowrap;
     cursor: pointer;
   }
 
+  /* Compact section headers for sidebars and settings categorizations. */
   .section-header {
     @apply text-[10px] font-black uppercase tracking-[0.2em] text-primary/50;
     margin: 0;
   }
 
+  /* Glowing ambient shadow wrapper. */
   .aurora-glow {
     @apply shadow-[0_0_20px_rgba(99,102,241,0.3)] dark:shadow-[0_0_30px_rgba(99,102,241,0.5)];
   }
 
+  /* Mesh gradient background representing light and dark ambient orbits. */
   .aurora-mesh {
     background: 
       radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
@@ -184,8 +200,11 @@
       linear-gradient(135deg, rgba(2, 6, 23, 1) 0%, rgba(15, 23, 42, 1) 100%);
   }
 
+  /* Layout wrappers for core app pages. */
   .app-page { @apply w-full max-w-7xl mx-auto px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8; }
   .app-page-tight { @apply w-full max-w-5xl mx-auto px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8; }
+  
+  /* Compact custom-scrollbar rules for sidebar elements. */
   .custom-scrollbar::-webkit-scrollbar {
     width: 4px;
     height: 4px;

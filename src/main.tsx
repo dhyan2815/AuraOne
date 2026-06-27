@@ -1,3 +1,5 @@
+// Initialize the application's React rendering root, mount HTML container hooks, and bind Router providers.
+
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
@@ -5,6 +7,7 @@ import App from './App';
 import { Toaster } from 'react-hot-toast';
 import './index.css';
 
+// Render the strict-mode React application component tree inside the root DOM element.
 createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>

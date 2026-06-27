@@ -1,4 +1,5 @@
-//App.tsx
+// Configure the global routing tree structure, handling user authentication gates, layout templates, and wildcard route redirects.
+
 import { Routes, Route, Navigate } from "react-router-dom";
 import Layout from "./components/structure/Layout";
 import Dashboard from "./pages/Dashboard";
@@ -19,9 +20,10 @@ import ResetPassword from "./pages/ResetPassword";
 import LandingPage from "./pages/LandingPage";
 
 function App() {
-
-  // Loader is displayed when logging..
+  // Check the global user authentication context status.
   const { user, loading } = useAuth();
+  
+  // Render a full-screen loading spinner while the auth session loads.
   if (loading) return <Loader />;
 
   return (
