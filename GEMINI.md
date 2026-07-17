@@ -70,3 +70,12 @@ pm audit step in .github/workflows/preflights.yml to prevent breaking updates (l
   - Confirmed `PerformanceMonitor` and `perfMonitor` were unused and deleted `src/utils/performance.ts` and its test `tests/unit/performance.test.ts` as dormant/dead infrastructure.
   - Verified stability using the validation suite (`npm run lint`, `npx tsc`, `npm run test:run`).
 - **Outcome:** Removed dead utility code and types. The validation suite passes without errors.
+
+### July 17, 2026: Codebase Refactoring — Category 3 (Data Layer Hooks)
+- **Objective:** Execute Category 3 of the full codebase refactoring plan to clean up data layer hooks (`useNotes`, `useTasks`, `useEvents`).
+- **Action:**
+  - Extracted shared `silentIngest` and `silentRemove` helpers in `ragIngestionService.ts` to reduce duplicated `.catch(...)` error-handling blocks across the CRUD hooks.
+  - Removed empty `.subscribe(() => {})` callbacks from realtime subscriptions, replacing them with `.subscribe()`.
+  - Reduced over-commenting to high-signal only across the three hook files, improving code density and readability while preserving function signatures.
+  - Verified stability using the validation suite (`npm run lint`, `npx tsc`, `npm run test:run`).
+- **Outcome:** Data hooks are leaner and DRY-er. The validation suite passes without errors.

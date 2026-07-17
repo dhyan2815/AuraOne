@@ -2,9 +2,8 @@
 
 import { supabase } from "../services/supabase";
 import { RealtimeChannel, RealtimePostgresChangesPayload } from "@supabase/supabase-js";
-import { ingestItem, removeItem } from "../services/ragIngestionService";
+import { silentIngest, silentRemove } from "../services/ragIngestionService";
 
-// Interface representing the Task entity schema stored in the Postgres database.
 export interface Task {
   id: string; // Unique task UUID.
   user_id: string; // Owner user UUID.
@@ -16,10 +15,8 @@ export interface Task {
   created_at?: string; // TIMESTAMPTZ formatting for database entry timestamp.
 }
 
-// Data shape required to create a new Task (excludes system-generated fields).
 export type NewTask = Omit<Task, "id" | "user_id" | "created_at">;
 
-// Fetch all tasks owned by the specified user, sorted newest first.
 export const getTasks = async (userId: string): Promise<Task[]> => {
   const { data, error } = await supabase
     .from("tasks")
@@ -33,7 +30,6 @@ export const getTasks = async (userId: string): Promise<Task[]> => {
   return data || [];
 };
 
-// Retrieve a single task row by its primary key ID.
 export const getTaskById = async (taskId: string): Promise<Task | null> => {
   const { data, error } = await supabase
     .from("tasks")
@@ -47,7 +43,6 @@ export const getTaskById = async (taskId: string): Promise<Task | null> => {
   return data;
 };
 
-// Subscribe to real-time additions, updates, or deletions of tasks for the active user.
 export const listenToTasks = (
   userId: string,
   callback: (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => void
@@ -59,13 +54,11 @@ export const listenToTasks = (
       { event: "*", schema: "public", table: "tasks", filter: `user_id=eq.${userId}` },
       callback
     )
-    .subscribe(() => {
-    });
+    .subscribe();
 
   return channel;
 };
 
-// Insert a new task row and queue a background RAG embedding ingestion job.
 export const createTask = async (userId: string, task: NewTask): Promise<Task> => {
   const { data, error } = await supabase
     .from("tasks")
@@ -77,13 +70,11 @@ export const createTask = async (userId: string, task: NewTask): Promise<Task> =
     throw error;
   }
 
-  // Trigger non-blocking RAG vector index updates.
-  ingestItem(userId, 'task', data.id).catch(err => console.error("RAG Ingestion Error:", err));
+  silentIngest(userId, 'task', data.id);
 
   return data;
 };
 
-// Update task fields by ID and trigger a background RAG re-embedding ingestion job.
 export const updateTask = async (
   taskId: string,
   updates: Partial<NewTask>
@@ -99,13 +90,11 @@ export const updateTask = async (
     throw error;
   }
 
-  // Trigger non-blocking RAG vector index updates.
-  ingestItem(data.user_id, 'task', data.id).catch(err => console.error("RAG Ingestion Error:", err));
+  silentIngest(data.user_id, 'task', data.id);
 
   return data;
 };
 
-// Remove a task row by ID and purge its associated vector chunks from pgvector.
 export const deleteTask = async (taskId: string) => {
   const { error } = await supabase.from("tasks").delete().eq("id", taskId);
 
@@ -113,6 +102,5 @@ export const deleteTask = async (taskId: string) => {
     throw error;
   }
 
-  // Purge deprecated vector records from search indices.
-  removeItem(taskId).catch(err => console.error("RAG Removal Error:", err));
+  silentRemove(taskId);
 };

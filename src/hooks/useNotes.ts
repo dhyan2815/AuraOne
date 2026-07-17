@@ -2,9 +2,8 @@
 
 import { supabase } from "../services/supabase";
 import { RealtimeChannel, RealtimePostgresChangesPayload } from "@supabase/supabase-js";
-import { ingestItem, removeItem } from "../services/ragIngestionService";
+import { silentIngest, silentRemove } from "../services/ragIngestionService";
 
-// Interface representing the Note entity schema stored in the Postgres database.
 export interface Note {
   id: string; // Unique note UUID.
   user_id: string; // Owner user UUID.
@@ -15,10 +14,8 @@ export interface Note {
   is_archived: boolean;
 }
 
-// Data shape required to create a new Note (excludes system-generated fields).
 export type NewNote = Omit<Note, "id" | "user_id" | "created_at">;
 
-// Fetch all notes owned by the specified user, sorted newest first.
 export const getNotes = async (userId: string): Promise<Note[]> => {
   const { data, error } = await supabase
     .from("notes")
@@ -32,7 +29,6 @@ export const getNotes = async (userId: string): Promise<Note[]> => {
   return data || [];
 };
 
-// Retrieve a single note row by its primary key ID.
 export const getNoteById = async (noteId: string): Promise<Note | null> => {
   const { data, error } = await supabase
     .from("notes")
@@ -46,7 +42,6 @@ export const getNoteById = async (noteId: string): Promise<Note | null> => {
   return data;
 };
 
-// Subscribe to real-time additions, updates, or deletions of notes for the active user.
 export const listenToNotes = (
   userId: string,
   callback: (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => void
@@ -58,13 +53,11 @@ export const listenToNotes = (
       { event: "*", schema: "public", table: "notes", filter: `user_id=eq.${userId}` },
       callback
     )
-    .subscribe(() => {
-    });
+    .subscribe();
 
   return channel;
 };
 
-// Insert a new note row and queue a background RAG embedding ingestion job.
 export const createNote = async (userId: string, note: NewNote): Promise<Note> => {
   const { data, error } = await supabase
     .from("notes")
@@ -76,13 +69,11 @@ export const createNote = async (userId: string, note: NewNote): Promise<Note> =
     throw error;
   }
 
-  // Trigger non-blocking RAG vector index updates.
-  ingestItem(userId, 'note', data.id).catch(err => console.error("RAG Ingestion Error:", err));
+  silentIngest(userId, 'note', data.id);
 
   return data;
 };
 
-// Update note fields by ID and trigger a background RAG re-embedding ingestion job.
 export const updateNote = async (
   noteId: string,
   updates: Partial<NewNote>
@@ -98,13 +89,11 @@ export const updateNote = async (
     throw error;
   }
 
-  // Trigger non-blocking RAG vector index updates.
-  ingestItem(data.user_id, 'note', data.id).catch(err => console.error("RAG Ingestion Error:", err));
+  silentIngest(data.user_id, 'note', data.id);
 
   return data;
 };
 
-// Remove a note row by ID and purge its associated vector chunks from pgvector.
 export const deleteNote = async (noteId: string) => {
   const { error } = await supabase.from("notes").delete().eq("id", noteId);
 
@@ -112,6 +101,5 @@ export const deleteNote = async (noteId: string) => {
     throw error;
   }
 
-  // Purge deprecated vector records from search indices.
-  removeItem(noteId).catch(err => console.error("RAG Removal Error:", err));
+  silentRemove(noteId);
 };

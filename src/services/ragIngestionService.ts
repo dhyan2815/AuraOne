@@ -66,6 +66,16 @@ export const removeItem = async (sourceId: string) => {
     .eq('source_id', sourceId);
 };
 
+// Non-blocking wrapper to trigger RAG vector index updates
+export const silentIngest = (userId: string, type: 'note' | 'task' | 'event', id: string) => {
+  ingestItem(userId, type, id).catch(err => console.error("RAG Ingestion Error:", err));
+};
+
+// Non-blocking wrapper to purge deprecated vector records
+export const silentRemove = (id: string) => {
+  removeItem(id).catch(err => console.error("RAG Removal Error:", err));
+};
+
 // Orchestrate a full RAG synchronization for all of a user's database records.
 export const ingestAllForUser = async (
   userId: string,

@@ -2,9 +2,8 @@
 
 import { supabase } from "../services/supabase";
 import { RealtimeChannel, RealtimePostgresChangesPayload } from "@supabase/supabase-js";
-import { ingestItem, removeItem } from "../services/ragIngestionService";
+import { silentIngest, silentRemove } from "../services/ragIngestionService";
 
-// Interface representing the Event entity schema stored in the Postgres database.
 export interface Event {
   id: string; // Unique event UUID.
   user_id: string; // Owner user UUID.
@@ -15,10 +14,8 @@ export interface Event {
   created_at: string; // TIMESTAMPTZ formatting for database entry timestamp.
 }
 
-// Data shape required to create a new Event (excludes system-generated fields).
 export type NewEvent = Omit<Event, "id" | "user_id" | "created_at">;
 
-// Fetch all events owned by the specified user, sorted chronological start time.
 export const getEvents = async (userId: string): Promise<Event[]> => {
   const { data, error } = await supabase
     .from("events")
@@ -32,7 +29,6 @@ export const getEvents = async (userId: string): Promise<Event[]> => {
   return data || [];
 };
 
-// Subscribe to real-time additions, updates, or deletions of events for the active user.
 export const listenToEvents = (
   userId: string,
   callback: (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => void
@@ -44,13 +40,11 @@ export const listenToEvents = (
       { event: "*", schema: "public", table: "events", filter: `user_id=eq.${userId}` },
       callback
     )
-    .subscribe(() => {
-    });
+    .subscribe();
 
   return channel;
 };
 
-// Insert a new event row and queue a background RAG embedding ingestion job.
 export const createEvent = async (userId: string, event: NewEvent): Promise<Event> => {
   const { data, error } = await supabase
     .from("events")
@@ -62,13 +56,11 @@ export const createEvent = async (userId: string, event: NewEvent): Promise<Even
     throw error;
   }
 
-  // Trigger non-blocking RAG vector index updates.
-  ingestItem(userId, 'event', data.id).catch(err => console.error("RAG Ingestion Error:", err));
+  silentIngest(userId, 'event', data.id);
 
   return data;
 };
 
-// Remove an event row by ID and purge its associated vector chunks from pgvector.
 export const deleteEvent = async (eventId: string): Promise<void> => {
   const { error } = await supabase.from("events").delete().eq("id", eventId);
 
@@ -76,11 +68,9 @@ export const deleteEvent = async (eventId: string): Promise<void> => {
     throw error;
   }
 
-  // Purge deprecated vector records from search indices.
-  removeItem(eventId).catch(err => console.error("RAG Removal Error:", err));
+  silentRemove(eventId);
 };
 
-// Update event fields by ID and trigger a background RAG re-embedding ingestion job.
 export const updateEvent = async (eventId: string, updates: Partial<NewEvent>): Promise<Event> => {
   const { data, error } = await supabase
     .from("events")
@@ -93,8 +83,7 @@ export const updateEvent = async (eventId: string, updates: Partial<NewEvent>): 
     throw error;
   }
 
-  // Trigger non-blocking RAG vector index updates.
-  ingestItem(data.user_id, 'event', data.id).catch(err => console.error("RAG Ingestion Error:", err));
+  silentIngest(data.user_id, 'event', data.id);
 
   return data;
 };
