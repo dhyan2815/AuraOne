@@ -34,29 +34,22 @@ const priorityConfig = {
 };
 
 const TaskCard = ({ task, viewMode, onToggleComplete }: TaskCardProps) => {
-  // Format task deadline into a readable date string.
   const formattedDueDate = task.due_date ? format(new Date(task.due_date), 'MMM d, yyyy') : '';
-  
-  // Calculate if task deadline has passed without completion.
   const isOverdue = task.due_date && new Date(task.due_date) < new Date() && !task.completed;
-  
   const config = task.priority ? priorityConfig[task.priority] : priorityConfig.low;
 
-  // Intercept element click events to prevent parent page routing transitions.
   const handleToggle = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     onToggleComplete?.(task.id, !task.completed);
   };
 
-  // Render list layout variant if viewMode is set to 'list'.
   if (viewMode === "list") {
     return (
       <Link to={`/tasks/${task.id}`} className="block group">
         <Card className={`transition-all hover:border-primary/20 hover:bg-slate-50 dark:hover:bg-gray-800/60 relative ${task.completed ? "opacity-60" : ""}`}>
           <div className="p-4">
             <div className="flex items-center gap-4">
-              {/* Checkbox button component with click propagation interception. */}
               <button onClick={handleToggle} className="flex-shrink-0">
                 <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${task.completed ? "bg-primary border-primary" : "border-slate-300 dark:border-gray-600 group-hover:border-primary"}`}>
                   {task.completed && <CheckCircle size={14} className="text-white" />}
@@ -90,7 +83,6 @@ const TaskCard = ({ task, viewMode, onToggleComplete }: TaskCardProps) => {
     );
   }
 
-  // Fallback to standard grid card layout rendering.
   return (
     <Link to={`/tasks/${task.id}`} className="block h-full group">
       <motion.div whileHover={{ y: -5 }} className="h-full">
@@ -122,7 +114,6 @@ const TaskCard = ({ task, viewMode, onToggleComplete }: TaskCardProps) => {
               </p>
             </div>
 
-            {/* Task properties section displaying deadlines and priority level fields. */}
             <div className="pt-4 border-t border-slate-200 dark:border-gray-700 space-y-3">
               {task.due_date && (
                 <div className="flex items-center justify-between text-xs font-medium text-slate-500">

@@ -93,3 +93,23 @@ pm audit step in .github/workflows/preflights.yml to prevent breaking updates (l
   - `chatHandler.ts`: Cleaned up redundant instructional comments.
   - **Verification**: Executed static syntax analysis (`npm run lint`), typescript compiler checks (`npx tsc --noEmit`), and test runners (`npm run test:run`) to ensure zero regressions.
 - **Outcome:** The core intelligence pipeline and RAG services are significantly cleaner, strictly typed, and functionally identical to before.
+
+### July 17, 2026: Codebase Refactoring — Category 5 (Shared UI Components)
+- **Objective:** Execute Category 5 of the full codebase refactoring plan to clean up shared UI components.
+- **Action:**
+  - `Card.tsx`: Extracted redundant header action JSX into a unified `renderAction` helper.
+  - `Logo.tsx`: Removed unused `React` import and annotated with direct types instead of `React.FC`.
+  - `Loader.tsx`: Hoisted `punchlines` static array outside of the component to avoid re-creation on every render.
+  - `NoteCard.tsx`: Hoisted `stripHtml` helper outside of the component render function.
+  - Cleaned up excessive comments down to high-signal only in all Category 5 files (`Card.tsx`, `Logo.tsx`, `Loader.tsx`, `NoteCard.tsx`, `TaskCard.tsx`, `Sidebar.tsx`, `Layout.tsx`, `TiptapEditor.tsx`).
+  - Verified stability using the validation suite (`npm run lint`, `npx tsc --noEmit`, `npm run test:run`, `npm run build`).
+- **Outcome:** Shared UI components are cleaner, more readable, and verified with zero build or lint issues.
+
+### July 17, 2026: TiptapEditor setContent Type Safety Resolution
+- **Objective:** Fix the TypeScript compilation error where `false` was passed directly as the second argument to `editor.commands.setContent()`.
+- **Action:**
+  - **TiptapEditor.tsx**: Changed the call from `editor.commands.setContent(content || '', false)` to `editor.commands.setContent(content || '', { emitUpdate: false })` to conform to the new Tiptap `SetContentOptions` object signature.
+  - **Verification**: Verified using `npm run build` (which runs `tsc` followed by `vite build`) to confirm compilation succeeds with zero errors.
+- **Outcome:** Type safety is restored and the build successfully compiles without any errors.
+
+

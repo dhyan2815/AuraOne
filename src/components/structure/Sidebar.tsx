@@ -1,5 +1,3 @@
-// Sidebar Navigation Component — Renders a responsive sidebar for desktop screens and adapts to a bottom menu on mobile.
-
 import { useState, useEffect } from "react";
 import { NavLink, useNavigate, Link } from "react-router-dom";
 import {
@@ -19,7 +17,6 @@ import { useAuth } from "../../hooks/useAuth";
 import toast from "react-hot-toast";
 import Logo from "./Logo";
 
-// Main navigation items map containing paths, icons, and text labels.
 const navItems = [
   { path: "/dashboard", icon: <LayoutDashboard size={20} />, label: "Dashboard" },
   { path: "/notes", icon: <FileText size={20} />, label: "Notes" },
@@ -29,17 +26,14 @@ const navItems = [
   { path: "/knowledge", icon: <Brain size={20} />, label: "Knowledge" },
 ];
 
-// Compile class lists conditionally based on active route and sidebar collapse state.
 const navLinkClass = (isActive: boolean, isCollapsed: boolean) =>
   isActive
     ? `mx-1 flex items-center ${isCollapsed ? 'justify-center' : 'gap-2.5'} rounded-full bg-gradient-to-r from-indigo-500 to-purple-400 px-3.5 py-2.5 text-white shadow-lg shadow-indigo-500/20 transition-all font-bold`
     : `mx-1 flex items-center ${isCollapsed ? 'justify-center' : 'gap-2.5'} rounded-full px-3.5 py-2.5 text-text-variant transition-all hover:bg-primary/5 hover:text-primary`;
 
-// Timing configuration for sidebar collapse transitions.
 const sidebarTransition = { type: "spring", stiffness: 200, damping: 25 };
 
 const Sidebar = () => {
-  // Read collapse settings from local storage, defaulting to expanded mode.
   const [isCollapsed, setIsCollapsed] = useState(() => {
     const saved = localStorage.getItem("sidebar-collapsed");
     return saved === "true";
@@ -49,12 +43,10 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const [userName, setUserName] = useState("User");
 
-  // Keep collapse setting synced with local storage on state change.
   useEffect(() => {
     localStorage.setItem("sidebar-collapsed", isCollapsed.toString());
   }, [isCollapsed]);
 
-  // Extract display name or prefix from authenticated user context.
   useEffect(() => {
     if (user) {
       const name = user.user_metadata?.name || user.email?.split("@")[0] || "User";
@@ -62,7 +54,6 @@ const Sidebar = () => {
     }
   }, [user]);
 
-  // Log user out, notify success, and redirect to the login screen.
   const handleLogout = async () => {
     await logout();
     toast.success("Logged out successfully");
@@ -71,7 +62,6 @@ const Sidebar = () => {
 
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
 
-  // Compact navigation items shown directly in the mobile bottom bar.
   const mobileNavItems = [
     { path: "/dashboard", icon: <LayoutDashboard size={22} />, label: "Dashboard" },
     { path: "/notes", icon: <FileText size={22} />, label: "Notes" },
@@ -82,7 +72,6 @@ const Sidebar = () => {
 
   return (
     <>
-      {/* Desktop Sidebar Panel */}
       <motion.aside 
         className="hidden flex-shrink-0 md:block" 
         animate={{ width: isCollapsed ? "80px" : "224px" }}
@@ -102,7 +91,6 @@ const Sidebar = () => {
               boxShadow: "0 0 30px 0 rgba(129,140,248,0.06)",
             }}
           >
-            {/* Desktop Collapse Toggle Control Button */}
             <button
               onClick={() => setIsCollapsed(!isCollapsed)}
               className="absolute -right-3 top-[106px] z-50 flex h-6 w-6 items-center justify-center rounded-full border border-white/10 bg-background shadow-md transition-all hover:scale-110 hover:bg-primary/10 hover:text-primary active:scale-95 text-text"
@@ -117,7 +105,6 @@ const Sidebar = () => {
             </button>
 
             <div className="flex flex-col h-full w-full overflow-hidden">
-              {/* Brand Logo Wrapper */}
               <div className={`mb-6 px-4 transition-all duration-300 ${isCollapsed ? "scale-75 items-center justify-center pl-4" : ""}`}>
                 <Logo iconOnly iconClassName="h-8 w-8 drop-shadow-md" />
                 <AnimatePresence>
@@ -134,7 +121,6 @@ const Sidebar = () => {
                 </AnimatePresence>
               </div>
 
-              {/* Desktop Nav Items */}
               <nav className="flex-1 space-y-1.5 px-3">
                 {navItems.map((item) => (
                   <NavLink
@@ -160,7 +146,6 @@ const Sidebar = () => {
                 ))}
               </nav>
 
-              {/* Desktop Footer Control Buttons */}
               <div className="mt-auto px-3 space-y-4">
                 <NavLink 
                   to="/settings" 
@@ -182,7 +167,6 @@ const Sidebar = () => {
                   </AnimatePresence>
                 </NavLink>
 
-                {/* Profile Card and Logout Trigger */}
                 <div className={`mx-1 rounded-2xl border border-primary/10 bg-primary/5 p-3 transition-all duration-300 ${isCollapsed ? "px-1.5" : "px-3"}`}>
                   <div className={`flex items-center ${isCollapsed ? "flex-col gap-3 justify-center" : "gap-3"}`}>
                     <Link 
@@ -225,7 +209,6 @@ const Sidebar = () => {
         </motion.div>
       </motion.aside>
 
-      {/* Mobile Bottom Navigation Bar */}
       <div className="fixed bottom-0 left-0 right-0 z-40 block border-t border-white/10 glass bg-background/80 backdrop-blur-lg px-4 py-2 md:hidden shadow-lg">
         <div className="flex items-center justify-around">
           {mobileNavItems.map((item) => (
@@ -244,7 +227,6 @@ const Sidebar = () => {
             </NavLink>
           ))}
           
-          {/* More Menu Toggle button */}
           <button
             onClick={() => setMoreMenuOpen(!moreMenuOpen)}
             className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-200 ${
@@ -259,11 +241,9 @@ const Sidebar = () => {
         </div>
       </div>
 
-      {/* Mobile "More" Menu Overlay Popover */}
       <AnimatePresence>
         {moreMenuOpen && (
           <>
-            {/* Click-outside popover backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -271,7 +251,6 @@ const Sidebar = () => {
               className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm md:hidden"
               onClick={() => setMoreMenuOpen(false)}
             />
-            {/* Popover Options Card */}
             <motion.div
               initial={{ opacity: 0, y: 100, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
