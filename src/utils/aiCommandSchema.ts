@@ -96,11 +96,6 @@ export const AICommandSchema = z.discriminatedUnion("action", [
 
 // Export generated TypeScript types inferred from the Zod schemas.
 export type AICommand = z.infer<typeof AICommandSchema>;
-export type CreateData = z.infer<typeof CreateDataSchema>;
-export type UpdateData = z.infer<typeof UpdateDataSchema>;
-export type DeleteData = z.infer<typeof DeleteDataSchema>;
-export type ReadData = z.infer<typeof ReadDataSchema>;
-export type ChatData = z.infer<typeof ChatDataSchema>;
 
 // Validate incoming AI JSON command structure and raise detailed error messages on mismatch.
 export const validateAICommand = (input: unknown): AICommand => {

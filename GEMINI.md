@@ -61,3 +61,12 @@ pm audit step in .github/workflows/preflights.yml to prevent breaking updates (l
   - Cleaned up excessive instructional inline comments from all 6 config/build files (`api.ts`, `vite.config.ts`, `vitest.config.ts`, `eslint.config.js`, `tailwind.config.js`, `postcss.config.js`, and `index.html`) to improve readability.
   - Verified stability using the validation suite (`npm run lint`, `npx tsc`, `npm run build`).
 - **Outcome:** The configuration layer is leaner, strictly typed, and verified to be behaviorally consistent with 0 lint, type, or build errors.
+
+### July 17, 2026: Codebase Refactoring — Category 2 (Utilities & Schemas)
+- **Objective:** Execute Category 2 of the full codebase refactoring plan to clean up utilities and schemas.
+- **Action:**
+  - Audited `src/utils/aiCommandSchema.ts` and `src/utils/performance.ts`.
+  - Removed 5 unused type exports (`CreateData`, `UpdateData`, etc.) from `aiCommandSchema.ts` to remove dead code.
+  - Confirmed `PerformanceMonitor` and `perfMonitor` were unused and deleted `src/utils/performance.ts` and its test `tests/unit/performance.test.ts` as dormant/dead infrastructure.
+  - Verified stability using the validation suite (`npm run lint`, `npx tsc`, `npm run test:run`).
+- **Outcome:** Removed dead utility code and types. The validation suite passes without errors.
