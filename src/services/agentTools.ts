@@ -6,8 +6,6 @@ import { createEvent, getEvents } from '../hooks/useEvents';
 import { retrieveContext } from './ragRetrievalService';
 import * as chrono from 'chrono-node';
 
-import * as chrono from 'chrono-node';
-
 export const AGENT_TOOLS = [
   {
     name: 'search_knowledge_base',

@@ -89,7 +89,7 @@ export async function callGeminiWithTools(
   }
   contents.push({ role: 'user', parts: [{ text: prompt }] });
 
-  const response = await fetch(
+  const response = await fetchWithTimeout(
     `${AI_CONFIG.gemini.apiUrl}/models/${AI_CONFIG.gemini.model}:generateContent?key=${AI_CONFIG.gemini.apiKey}`,
     {
       method: 'POST',
@@ -129,7 +129,7 @@ export async function callOpenRouterAPI(prompt: string, systemPrompt?: string): 
     const activeModel = AI_CONFIG.openRouter.model || 'openrouter/free';
     const activeSystemPrompt = systemPrompt || 'You are Aura, a professional and helpful assistant.';
     
-    const response = await fetch(AI_CONFIG.openRouter.apiUrl, {
+    const response = await fetchWithTimeout(AI_CONFIG.openRouter.apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
