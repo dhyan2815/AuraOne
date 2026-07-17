@@ -79,3 +79,17 @@ pm audit step in .github/workflows/preflights.yml to prevent breaking updates (l
   - Reduced over-commenting to high-signal only across the three hook files, improving code density and readability while preserving function signatures.
   - Verified stability using the validation suite (`npm run lint`, `npx tsc`, `npm run test:run`).
 - **Outcome:** Data hooks are leaner and DRY-er. The validation suite passes without errors.
+
+### July 17, 2026: Codebase Refactoring — Category 4 (AI/RAG Services)
+- **Objective:** Execute Category 4 of the full codebase refactoring plan to clean up AI and RAG services.
+- **Action:**
+  - `llmService.ts`: Extracted `fetchWithTimeout` helper to eliminate ~30 lines of duplication across all API functions. Simplified redundant `LOCATION` constants. Removed useless try/catch.
+  - `aiService.ts`: Verified `processAIRequest` was completely unused and safely deleted `src/services/aiService.ts` and its test file `tests/unit/aiService.test.ts`. `AI_CONFIG` and `SERVICE_CONFIG` were previously moved to `llmService.ts`.
+  - `agentOrchestrator.ts`: Extracted brain mode prompt building into `getSystemPrompt` to fix a DRY violation.
+  - `agentTools.ts`: Refactored `list_items` handler from an `if/else-if` chain to a streamlined type-keyed lookup mapping.
+  - `agentPrompts.ts`: Removed dead `TOOL_USAGE_INSTRUCTIONS` export.
+  - `ragIngestionService.ts`: Collapsed 3 identical ingestion `for` loops in `ingestAllForUser` into a single data-driven loop.
+  - `ragEmbeddingService.ts`: Extracted a shared `requireApiKey` guard.
+  - `chatHandler.ts`: Cleaned up redundant instructional comments.
+  - **Verification**: Executed static syntax analysis (`npm run lint`), typescript compiler checks (`npx tsc --noEmit`), and test runners (`npm run test:run`) to ensure zero regressions.
+- **Outcome:** The core intelligence pipeline and RAG services are significantly cleaner, strictly typed, and functionally identical to before.

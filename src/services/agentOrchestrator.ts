@@ -21,7 +21,12 @@ export interface SourceCitation {
   similarity: number;
 }
 
-// Process user queries using a multi-step Reason + Act loop with parallel tool executions.
+const getSystemPrompt = (isBrainMode?: boolean) => {
+  return isBrainMode 
+    ? `${AGENT_SYSTEM_PROMPT}\n\n[BRAIN MODE ENABLED]: Use deep reasoning and analyze context thoroughly.`
+    : AGENT_SYSTEM_PROMPT;
+};
+
 export async function processAgenticRequest(
   userQuery: string,
   userId: string,
@@ -47,10 +52,7 @@ export async function processAgenticRequest(
       }
     });
 
-    // Augment the system prompt if deep-reasoning Brain Mode is toggled.
-    const systemPrompt = options?.isBrainMode 
-      ? `${AGENT_SYSTEM_PROMPT}\n\n[BRAIN MODE ENABLED]: Use deep reasoning and analyze context thoroughly.` 
-      : AGENT_SYSTEM_PROMPT;
+    const systemPrompt = getSystemPrompt(options?.isBrainMode);
 
     let currentPrompt = buildAugmentedPrompt(initialContext, userQuery);
     let iterations = 0;
@@ -111,10 +113,7 @@ export async function processAgenticRequest(
     };
 
   } catch {
-    // Fall back to OpenRouter reasoning models on API rate limit or context failure.
-    const systemPromptFallback = options?.isBrainMode 
-      ? `${AGENT_SYSTEM_PROMPT}\n\n[BRAIN MODE ENABLED]: Use deep reasoning.` 
-      : AGENT_SYSTEM_PROMPT;
+    const systemPromptFallback = getSystemPrompt(options?.isBrainMode);
     const fallbackResponse = await callOpenRouterAPI(userQuery, systemPromptFallback);
     return {
       message: fallbackResponse,

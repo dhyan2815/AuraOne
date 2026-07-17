@@ -5,7 +5,6 @@ import { updateSessionName } from './chatSessionService';
 import { User } from '@supabase/supabase-js';
 import { processAgenticRequest } from './agentOrchestrator';
 
-// Data shape for single chat message records stored in Supabase.
 export type Message = {
   id?: string; // Optional message UUID.
   session_id: string; // Parent session UUID.
@@ -19,7 +18,6 @@ export type Message = {
   };
 };
 
-// Fetch chat logs sorted oldest to newest for a specific session ID.
 export const getMessages = async (sessionId: string): Promise<Message[]> => {
   const { data, error } = await supabase
     .from('chat_messages')
@@ -33,7 +31,6 @@ export const getMessages = async (sessionId: string): Promise<Message[]> => {
   return data || [];
 };
 
-// Insert a message row into the chat_messages table.
 export const addMessage = async (message: Omit<Message, 'id' | 'created_at'>): Promise<Message> => {
   const { data, error } = await supabase
     .from('chat_messages')
@@ -47,7 +44,6 @@ export const addMessage = async (message: Omit<Message, 'id' | 'created_at'>): P
   return data;
 };
 
-// Truncate the first chat message to make a concise session label.
 const generateSessionName = (firstMessage: string): string => {
   const cleanMessage = firstMessage.trim().replace(/\s+/g, ' ');
   if (cleanMessage.length <= 40) {
@@ -56,7 +52,6 @@ const generateSessionName = (firstMessage: string): string => {
   return cleanMessage.substring(0, 37) + '...';
 };
 
-// Save user message, query the ReAct agent, handle session name triggers, and capture service errors.
 export const handleSendMessage = async (
   input: string,
   user: User,
@@ -88,7 +83,6 @@ export const handleSendMessage = async (
       // Silent fail: keep going if session counting fails.
     }
 
-    // Name the session using the first message if this is the initial exchange.
     if (messages && messages.length === 1) {
       const sessionName = generateSessionName(content);
       await updateSessionName(selectedSession, sessionName);
@@ -111,7 +105,6 @@ export const handleSendMessage = async (
     });
     
   } catch (aiError) {
-    // Dissect error message to pinpoint the malfunctioning node.
     let source = 'Neural Core';
     let detail = 'I am currently experiencing a disruption in my cognitive sync.';
     
@@ -128,7 +121,6 @@ export const handleSendMessage = async (
       }
     }
 
-    // Format error banner containing debugging telemetry.
     const errorMessage = `[SYSTEM ERROR @ ${source}]: ${detail}
  
 FALLBACK: I couldn't process your request "${content.substring(0, 20)}${content.length > 20 ? '...' : ''}" at this time. Please try again in a few moments or switch to Brain Mode. ⚠️`;

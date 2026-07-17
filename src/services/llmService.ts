@@ -11,21 +11,31 @@ export const SERVICE_CONFIG = {
   BACKOFF_MS: 2000,
 };
 
+
+
+async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs: number) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(url, { ...init, signal: controller.signal });
+    clearTimeout(timeoutId);
+    return response;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    throw error;
+  }
+}
+
 // Dispatch a plaintext content generation request to the Gemini API.
 export async function callGeminiAPI(prompt: string, systemPrompt?: string): Promise<string> {
-  const LOCATION = "src/services/llmService.ts:callGeminiAPI";
   if (!AI_CONFIG.gemini.enabled) {
-    throw new Error(`[${LOCATION}] Gemini API not configured`);
+    throw new Error(`[llmService] Gemini API not configured`);
   }
-
-  // Set up an abort controller to prevent hanging request.
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), SERVICE_CONFIG.TIMEOUT_MS);
 
   try {
     const fullPrompt = systemPrompt ? `${systemPrompt}\n\nUser: ${prompt}\n\nAura:` : prompt;
 
-    const response = await fetch(
+    const response = await fetchWithTimeout(
       `${AI_CONFIG.gemini.apiUrl}/models/${AI_CONFIG.gemini.model}:generateContent?key=${AI_CONFIG.gemini.apiKey}`,
       {
         method: 'POST',
@@ -37,29 +47,26 @@ export async function callGeminiAPI(prompt: string, systemPrompt?: string): Prom
             maxOutputTokens: 2000,
           },
         }),
-        signal: controller.signal,
-      }
+      },
+      SERVICE_CONFIG.TIMEOUT_MS
     );
-
-    clearTimeout(timeoutId);
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(`[${LOCATION}] Gemini API error: ${response.status} - ${errorData.error?.message || ''}`);
+      throw new Error(`[llmService] Gemini API error: ${response.status} - ${errorData.error?.message || ''}`);
     }
 
     const data = await response.json();
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
     
     if (!text) {
-      throw new Error(`[${LOCATION}] No response candidate from Gemini`);
+      throw new Error(`[llmService] No response candidate from Gemini`);
     }
 
     return text.trim();
   } catch (error) {
-    clearTimeout(timeoutId);
     if (error instanceof Error && error.name === 'AbortError') {
-      throw new Error(`[${LOCATION}] Gemini Hub Timeout`);
+      throw new Error(`[llmService] Gemini Hub Timeout`);
     }
     throw error;
   }
@@ -71,69 +78,52 @@ export async function callGeminiWithTools(
   tools: Array<{ name: string; description: string; parameters: Record<string, unknown> }>, 
   systemPrompt?: string
 ): Promise<{ parts: Array<{ text?: string; functionCall?: { name: string; args: Record<string, unknown> } }> }> {
-  const LOCATION = "src/services/llmService.ts:callGeminiWithTools";
   if (!AI_CONFIG.gemini.enabled) {
-    throw new Error(`[${LOCATION}] Gemini API not configured`);
+    throw new Error(`[llmService] Gemini API not configured`);
   }
 
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), SERVICE_CONFIG.TIMEOUT_MS);
-
-  try {
-    const contents = [];
-    if (systemPrompt) {
-      // Prepend system instructions to user prompt for backward compatibility.
-      contents.push({ role: 'user', parts: [{ text: `SYSTEM INSTRUCTION: ${systemPrompt}` }] });
-    }
-    contents.push({ role: 'user', parts: [{ text: prompt }] });
-
-    const response = await fetch(
-      `${AI_CONFIG.gemini.apiUrl}/models/${AI_CONFIG.gemini.model}:generateContent?key=${AI_CONFIG.gemini.apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents,
-          tools: [{ function_declarations: tools }],
-          tool_config: {
-            function_calling_config: {
-              mode: "AUTO", // Allow model to choose when to invoke tools.
-            },
-          },
-          generationConfig: {
-            temperature: 0.1,
-          },
-        }),
-        signal: controller.signal,
-      }
-    );
-
-    clearTimeout(timeoutId);
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(`[${LOCATION}] Gemini Tool API error: ${response.status} - ${errorData.error?.message || ''}`);
-    }
-
-    const data = await response.json();
-    return data.candidates?.[0]?.content;
-  } catch (error) {
-    clearTimeout(timeoutId);
-    throw error;
+  const contents = [];
+  if (systemPrompt) {
+    // Prepend system instructions to user prompt for backward compatibility.
+    contents.push({ role: 'user', parts: [{ text: `SYSTEM INSTRUCTION: ${systemPrompt}` }] });
   }
+  contents.push({ role: 'user', parts: [{ text: prompt }] });
+
+  const response = await fetch(
+    `${AI_CONFIG.gemini.apiUrl}/models/${AI_CONFIG.gemini.model}:generateContent?key=${AI_CONFIG.gemini.apiKey}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents,
+        tools: [{ function_declarations: tools }],
+        tool_config: {
+          function_calling_config: {
+            mode: "AUTO", // Allow model to choose when to invoke tools.
+          },
+        },
+        generationConfig: {
+          temperature: 0.1,
+        },
+      }),
+    },
+    SERVICE_CONFIG.TIMEOUT_MS
+  );
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(`[llmService] Gemini Tool API error: ${response.status} - ${errorData.error?.message || ''}`);
+  }
+
+  const data = await response.json();
+  return data.candidates?.[0]?.content;
 }
 
 // Call OpenRouter API as a fallback when Gemini is unavailable or rate-limited.
 export async function callOpenRouterAPI(prompt: string, systemPrompt?: string): Promise<string> {
-  const LOCATION = "src/services/llmService.ts:callOpenRouterAPI";
-  
   if (!AI_CONFIG.openRouter.enabled) {
-    throw new Error(`[${LOCATION}] Open Router API not configured`);
+    throw new Error(`[llmService] Open Router API not configured`);
   }
-
-  // Extend fallback timeout limit as reasoning models might take longer.
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), SERVICE_CONFIG.TIMEOUT_MS * 3);
 
   try {
     const activeModel = AI_CONFIG.openRouter.model || 'openrouter/free';
@@ -155,10 +145,7 @@ export async function callOpenRouterAPI(prompt: string, systemPrompt?: string): 
         ],
         temperature: 0.7,
       }),
-      signal: controller.signal,
-    });
-
-    clearTimeout(timeoutId);
+    }, SERVICE_CONFIG.TIMEOUT_MS * 3);
 
     if (!response.ok) {
       throw new Error(`[llmService] Open Router HTTP ${response.status}`);
@@ -173,7 +160,6 @@ export async function callOpenRouterAPI(prompt: string, systemPrompt?: string): 
 
     return text.trim();
   } catch (error) {
-    clearTimeout(timeoutId);
     if (error instanceof Error && error.name === 'AbortError') {
       throw new Error(`[llmService] Reasoning Matrix Timeout`);
     }

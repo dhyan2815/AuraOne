@@ -16,7 +16,6 @@ export const ingestItem = async (
   try {
     let chunks: chunkingService.ChunkData[] = [];
 
-    // Fetch and chunk the target entity based on its type.
     if (sourceType === 'note') {
       const note = await getNoteById(sourceId);
       if (note) chunks = chunkingService.chunkNote(note);
@@ -28,17 +27,13 @@ export const ingestItem = async (
       if (event) chunks = chunkingService.chunkEvent(event);
     }
 
-    // Terminate pipeline early if no data or content could be parsed.
     if (chunks.length === 0) return;
 
-    // Remove obsolete vector chunks associated with this database record.
     await removeItem(sourceId);
 
-    // Call the embedding API to generate vectors for all chunks.
     const contents = chunks.map(c => c.content);
     const embeddings = await embeddingService.embedBatch(contents);
 
-    // Map content chunks to pgvector database columns.
     const rows = chunks.map((chunk, i) => ({
       user_id: userId,
       source_type: chunk.sourceType,
@@ -49,7 +44,6 @@ export const ingestItem = async (
       metadata: chunk.metadata,
     }));
 
-    // Upsert the vector records back into Supabase.
     const { error } = await supabase.from('knowledge_chunks').upsert(rows);
     if (error) throw error;
 
@@ -76,13 +70,11 @@ export const silentRemove = (id: string) => {
   removeItem(id).catch(err => console.error("RAG Removal Error:", err));
 };
 
-// Orchestrate a full RAG synchronization for all of a user's database records.
 export const ingestAllForUser = async (
   userId: string,
   onProgress?: (pct: number) => void
 ) => {
   try {
-    // Query notes, tasks, and calendar events in parallel.
     const [notes, tasks, events] = await Promise.all([
       getNotes(userId),
       getTasks(userId),
@@ -92,7 +84,6 @@ export const ingestAllForUser = async (
     const totalItems = notes.length + tasks.length + events.length;
     let processedItems = 0;
 
-    // Helper function to update percentage progress callback.
     const reportProgress = () => {
       processedItems++;
       if (onProgress) {
@@ -100,22 +91,17 @@ export const ingestAllForUser = async (
       }
     };
 
-    // Sequential RAG ingestion for Notes.
-    for (const note of notes) {
-      await ingestItem(userId, 'note', note.id);
-      reportProgress();
-    }
+    const collections = [
+      { type: 'note' as const, items: notes },
+      { type: 'task' as const, items: tasks },
+      { type: 'event' as const, items: events },
+    ];
 
-    // Sequential RAG ingestion for Tasks.
-    for (const task of tasks) {
-      await ingestItem(userId, 'task', task.id);
-      reportProgress();
-    }
-
-    // Sequential RAG ingestion for Events.
-    for (const event of events) {
-      await ingestItem(userId, 'event', event.id);
-      reportProgress();
+    for (const collection of collections) {
+      for (const item of collection.items) {
+        await ingestItem(userId, collection.type, item.id);
+        reportProgress();
+      }
     }
 
   } catch (error) {

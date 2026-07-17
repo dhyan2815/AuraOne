@@ -16,12 +16,14 @@ interface BatchEmbeddingResponse {
   }>;
 }
 
-// Convert a single block of text into a vector representation.
-export const embedText = async (text: string): Promise<number[]> => {
-  // Ensure we have access to the API key before calling.
+const requireApiKey = () => {
   if (!API_CONFIG.GEMINI_API_KEY) {
     throw new Error('Gemini API key is missing');
   }
+};
+
+export const embedText = async (text: string): Promise<number[]> => {
+  requireApiKey();
 
   const url = `${API_CONFIG.GEMINI_API_URL}/models/${API_CONFIG.GEMINI_EMBEDDING_MODEL}:embedContent?key=${API_CONFIG.GEMINI_API_KEY}`;
 
@@ -37,11 +39,10 @@ export const embedText = async (text: string): Promise<number[]> => {
         content: {
           parts: [{ text }],
         },
-        outputDimensionality: 768, // Hardcode output dimensionality to match pgvector.
+        outputDimensionality: 768,
       }),
     });
 
-    // Check for HTTP errors and parse response message.
     if (!response.ok) {
       const error = await response.json();
       throw new Error(`Embedding API error: ${error.error?.message || response.statusText}`);
@@ -55,13 +56,9 @@ export const embedText = async (text: string): Promise<number[]> => {
   }
 };
 
-// Convert a list of text segments into vectors, matching Gemini's 100-item batch limit.
 export const embedBatch = async (texts: string[]): Promise<number[][]> => {
-  if (!API_CONFIG.GEMINI_API_KEY) {
-    throw new Error('Gemini API key is missing');
-  }
+  requireApiKey();
 
-  // Split target list into chunks of 100 to stay within API rate constraints.
   const chunks = [];
   for (let i = 0; i < texts.length; i += 100) {
     chunks.push(texts.slice(i, i + 100));
@@ -69,7 +66,6 @@ export const embedBatch = async (texts: string[]): Promise<number[][]> => {
 
   const allEmbeddings: number[][] = [];
 
-  // Call the API sequentially for each chunk list.
   for (const chunk of chunks) {
     const url = `${API_CONFIG.GEMINI_API_URL}/models/${API_CONFIG.GEMINI_EMBEDDING_MODEL}:batchEmbedContents?key=${API_CONFIG.GEMINI_API_KEY}`;
 
