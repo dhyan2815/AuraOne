@@ -52,3 +52,12 @@ pm audit step in .github/workflows/preflights.yml to prevent breaking updates (l
   - **Verification**: Executed static syntax analysis (`npm run lint`), typescript compiler checks (`npx tsc --noEmit`), test runners (`npm run test:run`), and production bundling (`npm run build`) to ensure 100% build validity and no regressions.
 - **Outcome:** The entire codebase (~65 files) is fully annotated with high-signal GPS-style intent documentation while successfully passing all linters, TypeScript compilations, automated unit tests, and production build pipelines.
 
+### July 17, 2026: Codebase Refactoring — Category 1 (Config & Build Tooling)
+- **Objective:** Execute Phase 1 of the full codebase refactoring plan to clean up configuration and build tooling files.
+- **Action:**
+  - Removed dead `isProduction` checks and an empty `validateApiKeys()` production block from `src/config/api.ts`.
+  - Removed the redundant `export { API_CONFIG as default };` from `src/config/api.ts`.
+  - Removed a conflicting and redundant `test` config block from `vite.config.ts`.
+  - Cleaned up excessive instructional inline comments from all 6 config/build files (`api.ts`, `vite.config.ts`, `vitest.config.ts`, `eslint.config.js`, `tailwind.config.js`, `postcss.config.js`, and `index.html`) to improve readability.
+  - Verified stability using the validation suite (`npm run lint`, `npx tsc`, `npm run build`).
+- **Outcome:** The configuration layer is leaner, strictly typed, and verified to be behaviorally consistent with 0 lint, type, or build errors.
