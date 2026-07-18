@@ -112,4 +112,10 @@ pm audit step in .github/workflows/preflights.yml to prevent breaking updates (l
   - **Verification**: Verified using `npm run build` (which runs `tsc` followed by `vite build`) to confirm compilation succeeds with zero errors.
 - **Outcome:** Type safety is restored and the build successfully compiles without any errors.
 
-
+### July 18, 2026: Codebase Refactoring — Category 6 (Dashboard Widgets)
+- **Objective:** Execute Category 6 of the full codebase refactoring plan to clean up dashboard widget components.
+- **Action:**
+  - `CalendarWidget.tsx`, `NewsWidget.tsx`, `TasksWidget.tsx`: Cleaned up redundant/commentary inline comments to improve code density and readability.
+  - `WeatherWidget.tsx`: Hoisted `WeatherIcon` outside the component to prevent re-creation on every render cycle, and cleaned up redundant comments.
+  - **Verification**: Executed static syntax analysis (`npm run lint`), typescript compiler checks (`npx tsc --noEmit`), and production bundling (`npm run build`).
+- **Outcome:** Dashboard widgets are cleaner, more readable, and verified with zero build or lint issues.

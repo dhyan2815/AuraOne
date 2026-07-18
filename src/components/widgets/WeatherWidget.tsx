@@ -16,7 +16,6 @@ import {
 import { API_CONFIG } from "../../config/api";
 import { motion, AnimatePresence } from "framer-motion";
 
-// Interface representing the structured weather metrics displayed in the UI.
 interface WeatherData {
   location: string;
   temperature: number;
@@ -27,12 +26,21 @@ interface WeatherData {
   forecast: Array<{ day: string; temp: number; condition: string }>;
 }
 
-// Interface representing weather elements returned in forecast list payloads.
 interface ApiForecastItem {
-  dt: number; // Unix timestamp in seconds.
+  dt: number;
   main: { temp: number; feels_like: number };
   weather: { main: string }[];
 }
+
+const WeatherIcon = ({ condition, className }: { condition: string; className?: string }) => {
+  switch (condition) {
+    case "Clear": return <Sun className={className} />;
+    case "Clouds": return <Cloud className={className} />;
+    case "Rain": return <CloudRain className={className} />;
+    case "Snow": return <CloudSnow className={className} />;
+    default: return <CloudSun className={className} />;
+  }
+};
 
 const WeatherWidget = () => {
   const [weather, setWeather] = useState<WeatherData | null>(null);
@@ -40,23 +48,20 @@ const WeatherWidget = () => {
   const [error, setError] = useState<string | null>(null);
   const [locationDenied, setLocationDenied] = useState(false);
 
-  // Retrieve user latitude/longitude and call OpenWeatherMap API endpoints.
   const fetchWeather = async () => {
     setLoading(true);
     setError(null);
     try {
       if (!navigator.geolocation) throw new Error("Geolocation not supported");
 
-      // Request browser geolocation access.
       const position = await new Promise<GeolocationPosition>((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(resolve, () => {
-          setLocationDenied(true); // Flag permission denial.
+          setLocationDenied(true);
           reject(new Error("location_denied"));
         }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 });
       });
 
       const { latitude, longitude } = position.coords;
-      // Parallel fetch current conditions and 5-day forecasts.
       const [cur, fore] = await Promise.all([
         fetch(`${API_CONFIG.WEATHER_CURRENT_API_URL}?lat=${latitude}&lon=${longitude}&units=metric&appid=${API_CONFIG.WEATHER_API_KEY}`),
         fetch(`${API_CONFIG.WEATHER_FORECAST_API_URL}?lat=${latitude}&lon=${longitude}&units=metric&appid=${API_CONFIG.WEATHER_API_KEY}`),
@@ -71,14 +76,13 @@ const WeatherWidget = () => {
       const curData = await cur.json();
       const foreData = await fore.json();
 
-      // Reduce 3-hour interval reports to distinct daily forecast lines.
       const dailyForecast: ApiForecastItem[] = foreData.list
         .reduce((acc: ApiForecastItem[], item: ApiForecastItem) => {
           const d = new Date(item.dt * 1000).toLocaleDateString();
           if (!acc.find((x) => new Date(x.dt * 1000).toLocaleDateString() === d)) acc.push(item);
           return acc;
         }, [])
-        .slice(0, 3); // Take the first 3 days.
+        .slice(0, 3);
 
       setWeather({
         location: curData.name,
@@ -86,7 +90,7 @@ const WeatherWidget = () => {
         feelsLike: Math.round(curData.main.feels_like),
         condition: curData.weather[0].main,
         humidity: curData.main.humidity,
-        windSpeed: Math.round(curData.wind.speed * 3.6), // Convert wind speed m/s to km/h.
+        windSpeed: Math.round(curData.wind.speed * 3.6),
         forecast: dailyForecast.map((d: ApiForecastItem) => ({
           day: new Date(d.dt * 1000).toLocaleDateString("en-US", { weekday: "short" }),
           temp: Math.round(d.main.temp),
@@ -103,18 +107,6 @@ const WeatherWidget = () => {
 
   useEffect(() => { fetchWeather(); }, []);
 
-  // Utility component to match weather condition strings to Lucide icon components.
-  const WeatherIcon = ({ condition, className }: { condition: string; className?: string }) => {
-    switch (condition) {
-      case "Clear": return <Sun className={className} />;
-      case "Clouds": return <Cloud className={className} />;
-      case "Rain": return <CloudRain className={className} />;
-      case "Snow": return <CloudSnow className={className} />;
-      default: return <CloudSun className={className} />;
-    }
-  };
-
-  // Render loading feedback overlay.
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center h-44 gap-4">
@@ -126,7 +118,6 @@ const WeatherWidget = () => {
     );
   }
 
-  // Render location permission denial guidance.
   if (locationDenied) {
     return (
       <div className="flex flex-col items-center justify-center h-44 text-center gap-3">
@@ -143,7 +134,6 @@ const WeatherWidget = () => {
     );
   }
 
-  // Render generic API/error feedback message.
   if (error || !weather) {
     return (
       <div className="flex items-center justify-center h-44">
@@ -160,7 +150,6 @@ const WeatherWidget = () => {
         animate={{ opacity: 1 }}
         className="flex items-center justify-between h-full"
       >
-        {/* Left: main info panel displaying current temp, feels-like, and stats. */}
         <div>
           <div className="flex items-center gap-1.5 mb-2">
             <MapPin size={14} className="text-primary" />
@@ -179,13 +168,11 @@ const WeatherWidget = () => {
             </div>
           </div>
 
-          {/* Extra details (humidity and wind speed). */}
           <div className="flex gap-5 mt-4 text-xs text-text-variant">
             <span className="flex items-center gap-1"><Droplets size={12} className="text-primary/60" />{weather.humidity}%</span>
             <span className="flex items-center gap-1"><Wind size={12} className="text-primary/60" />{weather.windSpeed} km/h</span>
           </div>
 
-          {/* Three-day weather forecast layout cards. */}
           <div className="flex gap-6 mt-6">
             {weather.forecast.map((d, i) => (
               <div key={i} className="flex flex-col items-center gap-1.5">
@@ -197,7 +184,6 @@ const WeatherWidget = () => {
           </div>
         </div>
 
-        {/* Right: large condition icon shown only on desktop. */}
         <div className="hidden md:block opacity-20">
           <WeatherIcon condition={weather.condition} className="w-24 h-24 text-primary" />
         </div>
