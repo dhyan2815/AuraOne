@@ -7,6 +7,7 @@ import { Eye, EyeOff, CheckCircle, ShieldCheck, RotateCw } from "lucide-react";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import Logo from "../components/structure/Logo";
+import AuthLayout from "../components/structure/AuthLayout";
 
 const ResetPassword = () => {
   // Track routing navigation functions and credential property forms.
@@ -57,14 +58,11 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="login min-h-screen text-aurora-on-surface flex items-center justify-center px-4 py-8 relative overflow-hidden">
-      {/* Background Animated Gradient Mesh */}
-      <div className="aurora-mesh fixed inset-0 z-[-1]" aria-hidden="true" />
-
+    <AuthLayout variant="centered">
       <motion.div 
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="w-full max-w-md relative z-10 mx-auto"
+        className="w-full relative z-10 mx-auto"
       >
         <div className="glass-panel p-6 sm:p-10 rounded-2xl sm:rounded-[2.5rem] border border-primary/5 shadow-2xl shadow-primary/5 space-y-6 sm:space-y-8">
           {/* Logo */}
@@ -180,7 +178,7 @@ const ResetPassword = () => {
            <p className="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.5em] text-primary/30">AuraOne Security Interface</p>
         </div>
       </motion.div>
-    </div>
+    </AuthLayout>
   );
 };
 

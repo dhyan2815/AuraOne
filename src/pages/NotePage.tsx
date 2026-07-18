@@ -55,19 +55,21 @@ const NotePage = () => {
           setTitle("Untitled Note");
           setContent("");
           setTags([]);
-          setNote(null);
-        } else if (id) {
-          const foundNote = await getNoteById(id);
-          if (foundNote) {
-            setNote(foundNote);
-            setTitle(foundNote.title || "Untitled Note");
-            setTags(foundNote.tags || []);
-            setContent(foundNote.content || "");
-          } else {
-            toast.error("Note not found");
-            navigate("/notes");
-          }
+          return setNote(null);
         }
+
+        if (!id) return;
+
+        const foundNote = await getNoteById(id);
+        if (!foundNote) {
+          toast.error("Note not found");
+          return navigate("/notes");
+        }
+
+        setNote(foundNote);
+        setTitle(foundNote.title || "Untitled Note");
+        setTags(foundNote.tags || []);
+        setContent(foundNote.content || "");
       } catch {
         toast.error("Failed to load note");
         navigate("/notes");
@@ -94,18 +96,14 @@ const NotePage = () => {
       setAutoSaving(true);
       if (!note?.id || id === 'new') {
         const newNote = await createNote(user.id, noteData);
-        if (!isAutoSave) {
-          toast.success("Note Created");
-        }
+        if (!isAutoSave) toast.success("Note Created");
         setLastSaved(new Date());
-        navigate(`/notes/${newNote.id}`, { replace: true });
-      } else {
-        await updateNote(note.id, noteData);
-        if (!isAutoSave) {
-          toast.success("Note Updated");
-        }
-        setLastSaved(new Date());
+        return navigate(`/notes/${newNote.id}`, { replace: true });
       }
+
+      await updateNote(note.id, noteData);
+      if (!isAutoSave) toast.success("Note Updated");
+      setLastSaved(new Date());
     } catch {
       if (!isAutoSave) {
         toast.error("Failed to save note");
@@ -152,10 +150,10 @@ const NotePage = () => {
   };
 
   const addTag = () => {
-    if (newTag.trim() && !tags.includes(newTag.trim())) {
-      setTags([...tags, newTag.trim()]);
-      setNewTag("");
-    }
+    const trimmed = newTag.trim();
+    if (!trimmed || tags.includes(trimmed)) return;
+    setTags([...tags, trimmed]);
+    setNewTag("");
   };
 
   const removeTag = (tagToRemove: string) => {

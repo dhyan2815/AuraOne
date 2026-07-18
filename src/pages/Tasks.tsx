@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { Plus, Check, Flag, Calendar, Clock, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getTasks, updateTask, deleteTask, Task } from "../hooks/useTasks";
+import EmptyState from "../components/ui/EmptyState";
 import { useAuth } from "../hooks/useAuth";
 import toast from "react-hot-toast";
 
@@ -213,23 +214,13 @@ const Tasks = () => {
 
       {/* ── Task Groups ── */}
       {tasks.length === 0 ? (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.98 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="flex-1 flex flex-col items-center justify-center py-24 rounded-[3rem] border-2 border-dashed border-primary/10 glass transition-colors duration-500"
-        >
-          <div className="w-20 h-20 rounded-3xl bg-primary/10 flex items-center justify-center text-primary/40 mb-8 border border-primary/5">
-            <Plus size={40} strokeWidth={1} />
-          </div>
-          <h2 className="text-2xl font-black text-text tracking-tight">No Tasks Found</h2>
-          <p className="text-sm text-text-variant mt-3 max-w-xs text-center leading-relaxed font-medium">Create your first task to start organizing your daily goals.</p>
-          <button
-            onClick={() => navigate("/tasks/new")}
-            className="mt-10 flex items-center gap-3 px-8 py-4 rounded-2xl glass border border-primary/10 text-Primary hover:text-Primary hover:border-Primary/20 transition-all active:scale-95 shadow-2xl shadow-primary/10"          >
-            <Plus size={18} />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em]">Create New Task</span>
-          </button>
-        </motion.div>
+        <EmptyState
+          icon={<Plus size={28} className="sm:w-[32px] sm:h-[32px]" />}
+          title="No Tasks Found"
+          description="Create your first task to start organizing your daily goals."
+          actionLink="/tasks/new"
+          actionLabel="+ Create New Task"
+        />
       ) : (
         <div className="space-y-4">
           <Group dot="bg-red-500 shadow-red-500/40"     label="High Priority" list={highPriority} />

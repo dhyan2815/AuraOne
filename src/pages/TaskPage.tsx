@@ -1,6 +1,6 @@
 // Render the task creation and editor form, managing priorities, due dates, completion toggles, and overdue flags.
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import toast from 'react-hot-toast';
 import {
@@ -59,25 +59,27 @@ const TaskPage = () => {
           setDueTime("");
           setPriority("medium");
           setCompleted(false);
-          setCreatedAt(new Date().toISOString());
-        } else if (id) {
-          const foundTask = await getTaskById(id);
-          if (foundTask) {
-            setTitle(foundTask.title);
-            setDescription(foundTask.description || "");
-            if (foundTask.due_date) {
-              const dateObj = new Date(foundTask.due_date);
-              setDueDate(format(dateObj, 'yyyy-MM-dd'));
-              setDueTime(format(dateObj, 'HH:mm'));
-            }
-            setPriority(foundTask.priority || "medium");
-            setCompleted(foundTask.completed || false);
-            setCreatedAt(foundTask.created_at);
-          } else {
-            toast.error("Objective not found");
-            navigate("/tasks");
-          }
+          return setCreatedAt(new Date().toISOString());
         }
+
+        if (!id) return;
+
+        const foundTask = await getTaskById(id);
+        if (!foundTask) {
+          toast.error("Objective not found");
+          return navigate("/tasks");
+        }
+
+        setTitle(foundTask.title);
+        setDescription(foundTask.description || "");
+        if (foundTask.due_date) {
+          const dateObj = new Date(foundTask.due_date);
+          setDueDate(format(dateObj, 'yyyy-MM-dd'));
+          setDueTime(format(dateObj, 'HH:mm'));
+        }
+        setPriority(foundTask.priority || "medium");
+        setCompleted(foundTask.completed || false);
+        setCreatedAt(foundTask.created_at);
       } catch {
         toast.error("Uplink failed");
         navigate("/tasks");
@@ -115,10 +117,13 @@ const TaskPage = () => {
       if (id === "new") {
         await createTask(user.id, taskData);
         toast.success("Task Saved");
-      } else if (id) {
-        await updateTask(id, taskData);
-        toast.success("Task Updated");
+        return navigate("/tasks");
       }
+
+      if (!id) return;
+
+      await updateTask(id, taskData);
+      toast.success("Task Updated");
       navigate("/tasks");
     } catch {
       toast.error("Transmission interruption");
@@ -144,14 +149,15 @@ const TaskPage = () => {
   };
 
   // Check if the current date is past the task's configured due date and time.
-  const isOverdue = dueDate && !completed && (() => {
+  const isOverdue = useMemo(() => {
+    if (!dueDate || completed) return false;
     try {
       const targetDate = dueTime ? new Date(`${dueDate}T${dueTime}`) : new Date(`${dueDate}T23:59:59`);
       return targetDate < new Date();
     } catch {
       return false;
     }
-  })();
+  }, [dueDate, dueTime, completed]);
 
   if (loading) {
     return (

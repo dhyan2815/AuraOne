@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
-import Logo from "../components/structure/Logo";
+import AuthLayout from "../components/structure/AuthLayout";
 
 const SignUp = () => {
     // Access navigation utilities, current path location parameters, and auth signup dispatch methods.
@@ -25,18 +25,6 @@ const SignUp = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState("");
     const [isSigningUp, setIsSigningUp] = useState(false);
-    const [isScrolled, setIsScrolled] = useState(false);
-
-    // Bind scroll listener events to dynamically adjust navigation backdrop layouts.
-    useEffect(() => {
-        const handleScroll = () => {
-            setIsScrolled(window.scrollY > 50);
-        };
-        window.addEventListener("scroll", handleScroll);
-        
-        // Remove scroll event listeners on unmounting.
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, []);
 
     // Scroll viewport context down to auto-align on the signup form container.
     const scrollToSignUpForm = () => {
@@ -86,43 +74,11 @@ const SignUp = () => {
     };
 
   return (
-    <div className="signup min-h-screen text-aurora-on-surface" style={{ scrollBehavior: "smooth" }}>
-      {/* Background Animated Gradient Mesh */}
-      <div className="aurora-mesh fixed inset-0 z-[-1]" aria-hidden="true" />
-
-      {/* Navigation */}
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${isScrolled ? 'glass py-3 border-b border-primary/5' : 'bg-transparent py-6'}`}>
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 flex items-center justify-between">
-          <Link
-            to="/"
-            className="hover:opacity-80 transition-opacity cursor-pointer inline-block"
-          >
-            <Logo iconClassName="w-8 h-8 sm:w-10 sm:h-10" iconOnly />
-          </Link>
-
-          <div className="flex items-center space-x-4 sm:space-x-8">
-            <Link
-              to="/login"
-              className="text-xs sm:text-sm font-bold text-aurora-on-surface-variant hover:text-primary transition-colors uppercase tracking-widest"
-            >
-              Sign In
-            </Link>
-            <Link
-              to="/"
-              className="btn-aurora-secondary px-4 sm:px-8 py-2 sm:py-3 text-xs sm:text-sm"
-            >
-              Back to Home
-            </Link>
-          </div>
-        </div>
-      </nav>
-
-      {/* Main Content */}
-      <section className="pt-28 pb-16 sm:pt-40 sm:pb-32">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6">
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-            {/* Left Content */}
-            <motion.div 
+    <AuthLayout
+      navActionLabel="Sign In"
+      navActionTo="/login"
+      leftContent={
+        <motion.div 
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
@@ -156,10 +112,10 @@ const SignUp = () => {
                   </div>
                 ))}
               </div>
-            </motion.div>
-
-            {/* Right Content - Form */}
-            <motion.div
+        </motion.div>
+      }
+    >
+      <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.2 }}
@@ -259,18 +215,7 @@ const SignUp = () => {
                 <div className="absolute -top-10 -left-10 w-40 h-40 bg-primary/10 blur-[60px] -z-10 rounded-full" />
               </div>
             </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Enhanced Footer */}
-      <footer className="py-10 sm:py-20 border-t border-primary/5">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 flex flex-col sm:flex-row justify-between items-center gap-6 sm:gap-8">
-          <Logo iconClassName="w-8 h-8" iconOnly />
-          <p className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-primary/40 text-center sm:text-left">&copy; 2026 AuraOne. Developed by Dhyan Patel</p>
-        </div>
-      </footer>
-    </div>
+    </AuthLayout>
   );
 };
 

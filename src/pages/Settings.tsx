@@ -31,9 +31,12 @@ const Settings = () => {
 
   const [isEditingName, setIsEditingName] = useState(false);
   const [newName, setNewName] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [showPasswords, setShowPasswords] = useState({ new: false, confirm: false });
+  const [passwordForm, setPasswordForm] = useState({
+    newPassword: "",
+    confirmPassword: "",
+    showNew: false,
+    showConfirm: false,
+  });
   const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   // Synchronize component profile state when authenticated user data changes.
@@ -64,6 +67,7 @@ const Settings = () => {
 
   // Perform client validation check and submit new user password values to auth settings.
   const handleChangePassword = async () => {
+    const { newPassword, confirmPassword } = passwordForm;
     if (!user || !newPassword || !confirmPassword) { toast.error("Complete all protocols"); return; }
     if (newPassword !== confirmPassword) { toast.error("Encryption mismatch"); return; }
     if (newPassword.length < 8) { toast.error("Entropy insufficient (8+ chars)"); return; }
@@ -74,8 +78,7 @@ const Settings = () => {
       if (error) {
         toast.error(error.message || "Security update failed");
       } else {
-        setNewPassword("");
-        setConfirmPassword("");
+        setPasswordForm(prev => ({ ...prev, newPassword: "", confirmPassword: "" }));
         toast.success("Security matrix updated");
       }
     } catch {
@@ -213,17 +216,17 @@ const Settings = () => {
                   <label className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-text-variant opacity-60 ml-1">New Access Key</label>
                   <div className="relative">
                     <input
-                      type={showPasswords.new ? "text" : "password"}
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
+                      type={passwordForm.showNew ? "text" : "password"}
+                      value={passwordForm.newPassword}
+                      onChange={(e) => setPasswordForm(prev => ({ ...prev, newPassword: e.target.value }))}
                       className="w-full input-aurora py-3 px-4 sm:py-4 sm:px-6 pr-12 sm:pr-14 text-sm"
                       placeholder="New password…"
                     />
                     <button
-                      onClick={() => setShowPasswords(p => ({ ...p, new: !p.new }))}
+                      onClick={() => setPasswordForm(prev => ({ ...prev, showNew: !prev.showNew }))}
                       className="absolute right-4 top-1/2 -translate-y-1/2 text-text-variant hover:text-primary transition-colors"
                     >
-                      {showPasswords.new ? <EyeOff size={16} className="sm:w-[18px] sm:h-[18px]" /> : <Eye size={16} className="sm:w-[18px] sm:h-[18px]" />}
+                      {passwordForm.showNew ? <EyeOff size={16} className="sm:w-[18px] sm:h-[18px]" /> : <Eye size={16} className="sm:w-[18px] sm:h-[18px]" />}
                     </button>
                   </div>
                 </div>
@@ -231,17 +234,17 @@ const Settings = () => {
                   <label className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-text-variant opacity-60 ml-1">Confirm Protocol</label>
                   <div className="relative">
                     <input
-                      type={showPasswords.confirm ? "text" : "password"}
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      type={passwordForm.showConfirm ? "text" : "password"}
+                      value={passwordForm.confirmPassword}
+                      onChange={(e) => setPasswordForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
                       className="w-full input-aurora py-3 px-4 sm:py-4 sm:px-6 pr-12 sm:pr-14 text-sm"
                       placeholder="Repeat new password…"
                     />
                     <button
-                      onClick={() => setShowPasswords(p => ({ ...p, confirm: !p.confirm }))}
+                      onClick={() => setPasswordForm(prev => ({ ...prev, showConfirm: !prev.showConfirm }))}
                       className="absolute right-4 top-1/2 -translate-y-1/2 text-text-variant hover:text-primary transition-colors"
                     >
-                      {showPasswords.confirm ? <EyeOff size={16} className="sm:w-[18px] sm:h-[18px]" /> : <Eye size={16} className="sm:w-[18px] sm:h-[18px]" />}
+                      {passwordForm.showConfirm ? <EyeOff size={16} className="sm:w-[18px] sm:h-[18px]" /> : <Eye size={16} className="sm:w-[18px] sm:h-[18px]" />}
                     </button>
                   </div>
                 </div>
@@ -252,7 +255,7 @@ const Settings = () => {
                 </div>
                 <button
                   onClick={handleChangePassword}
-                  disabled={isChangingPassword || !newPassword || !confirmPassword}
+                  disabled={isChangingPassword || !passwordForm.newPassword || !passwordForm.confirmPassword}
                   className="btn-aurora w-full py-3 text-[9px] sm:text-[10px] tracking-[0.2em] shadow-xl shadow-secondary/20 bg-gradient-to-r from-secondary to-primary uppercase flex items-center justify-center gap-2 rounded-xl sm:rounded-2xl"
                 >
                   {isChangingPassword ? <RotateCw className="animate-spin" size={12} /> : <Shield size={12} strokeWidth={3} />}

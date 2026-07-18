@@ -5,13 +5,12 @@ import { PlusIcon, Search, FileText, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { listenToNotes, getNotes, Note } from "../hooks/useNotes";
+import EmptyState from "../components/ui/EmptyState";
 import { useAuth } from "../hooks/useAuth";
 import { RealtimeChannel } from "@supabase/supabase-js";
 
-// Filter configuration options available for cataloguing note tags.
 const FILTERS = ["All", "Personal", "Work", "Ideas"];
 
-// Map tag categories to corresponding styling theme badges.
 const TAG_BADGE: Record<string, { bg: string; text: string }> = {
   Ideas:    { bg: "bg-indigo-500/10",  text: "text-indigo-500" },
   Work:     { bg: "bg-pink-500/10",    text: "text-pink-500" },
@@ -19,7 +18,6 @@ const TAG_BADGE: Record<string, { bg: string; text: string }> = {
   General:  { bg: "bg-primary/10",   text: "text-primary" },
 };
 
-// Strip HTML tags from a text string to extract pure content for card descriptions.
 const stripHtml = (html: string | null) => {
   if (!html) return '';
   const tmp = document.createElement('div');
@@ -141,26 +139,13 @@ const Notes = () => {
       {/* ── Notes Grid ── */}
       <AnimatePresence mode="wait">
         {filtered.length === 0 ? (
-          <motion.div
-            key="empty"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            className="flex flex-col items-center justify-center py-20 sm:py-24 gap-4 text-center glass rounded-2xl sm:rounded-[2rem] border-dashed border-primary/20 p-6"
-          >
-            <div className="w-14 h-14 sm:w-16 sm:h-16 bg-primary/10 rounded-full flex items-center justify-center text-primary/40 mb-2">
-              <FileText size={28} className="sm:w-[32px] sm:h-[32px]" />
-            </div>
-            <p className="text-lg sm:text-xl font-bold text-text">Notebook Empty</p>
-            <p className="text-xs sm:text-sm text-text-variant max-w-xs mx-auto">
-              Create your first note to start building your knowledge base.
-            </p>
-            <Link to="/notes/new" className="mt-2 sm:mt-4">
-              <button className="btn-aurora px-8 sm:px-10 py-2.5 sm:py-3 text-xs">
-                + Create New Note
-              </button>
-            </Link>
-          </motion.div>
+          <EmptyState
+            icon={<FileText size={28} className="sm:w-[32px] sm:h-[32px]" />}
+            title="Notebook Empty"
+            description="Create your first note to start building your knowledge base."
+            actionLink="/notes/new"
+            actionLabel="+ Create New Note"
+          />
         ) : (
           <motion.section
             key="grid"

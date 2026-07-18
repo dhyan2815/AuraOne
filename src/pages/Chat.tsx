@@ -1,12 +1,13 @@
 // Render the primary AI Chat interface, managing live conversation threads, real-time database updates, session configuration, and deep agent tool insights.
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import ReactMarkdown from "react-markdown";
-import { Send, Plus, Paperclip, ExternalLink, Database, Search, Wrench, ChevronDown, ChevronUp, Trash2, Pencil, Check, X, Menu } from "lucide-react";
+import { Send, Paperclip, Database, Menu } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import {
   getSessions, createNewSession, Session, deleteSession, updateSessionName
 } from "../services/chatSessionService";
+import SessionSidebar from "../components/chat/SessionSidebar";
+import ChatMessage from "../components/chat/ChatMessage";
 import {
   getMessages, handleSendMessage, Message,
 } from "../services/chatHandler";
@@ -43,12 +44,9 @@ const Chat = () => {
   const [isBrainMode, setIsBrainMode] = useState(false);
   const [thinkingStep, setThinkingStep] = useState(0);
   
-  // Track lists of historical chat sessions and metadata expansion states.
+  // Track lists of historical chat sessions.
   const [sessions, setSessions] = useState<Session[]>([]);
   const [selectedSession, setSelectedSession] = useState<string | null>(null);
-  const [expandedMetadata, setExpandedMetadata] = useState<Record<string, boolean>>({});
-  const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
-  const [editSessionName, setEditSessionName] = useState("");
   const [showSessionsMobile, setShowSessionsMobile] = useState(false);
   
   // Store DOM references to auto-scroll message logs and auto-resize text inputs.
@@ -212,10 +210,6 @@ const Chat = () => {
     } catch { toast.error("Initialization failed"); }
   };
 
-  const toggleMetadata = (id: string) => {
-    setExpandedMetadata(prev => ({ ...prev, [id]: !prev[id] }));
-  };
-
   const handleDeleteSession = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
     try {
@@ -231,29 +225,14 @@ const Chat = () => {
     }
   };
 
-  const handleStartEdit = (e: React.MouseEvent, s: Session) => {
-    e.stopPropagation();
-    setEditingSessionId(s.id);
-    setEditSessionName(s.name || "New Chat");
-  };
-
-  const handleSaveEdit = async (e: React.MouseEvent | React.KeyboardEvent) => {
-    e.stopPropagation();
-    if (!editingSessionId || !editSessionName.trim()) return;
+  const handleRenameSession = async (id: string, newName: string) => {
     try {
-      await updateSessionName(editingSessionId, editSessionName);
-      setSessions(prev => prev.map(s => s.id === editingSessionId ? { ...s, name: editSessionName } : s));
-      setEditingSessionId(null);
+      await updateSessionName(id, newName);
+      setSessions(prev => prev.map(s => s.id === id ? { ...s, name: newName } : s));
       toast.success("Session renamed");
     } catch {
       toast.error("Failed to rename session");
     }
-  };
-
-  const handleCancelEdit = (e: React.MouseEvent | React.KeyboardEvent) => {
-    e.stopPropagation();
-    setEditingSessionId(null);
-    setEditSessionName("");
   };
 
   if (authLoading) {
@@ -269,108 +248,16 @@ const Chat = () => {
 
   return (
     <div className="fixed inset-0 bottom-[55px] z-10 flex flex-col gap-4 overflow-hidden md:relative md:inset-auto md:bottom-auto md:z-0 md:h-[100dvh] lg:grid lg:grid-cols-[18rem_1fr] lg:p-6">
-      {/* Mobile Sidebar backdrop */}
-      <AnimatePresence>
-        {showSessionsMobile && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setShowSessionsMobile(false)}
-            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
-          />
-        )}
-      </AnimatePresence>
-
-      {/* ── Sidebar ── */}
-      <aside 
-        className={`flex min-h-0 shrink-0 flex-col gap-4 z-50 fixed inset-y-0 left-0 w-[85vw] max-w-[320px] p-5 bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl border-r border-primary/10 shadow-2xl transition-transform duration-300 ease-in-out lg:relative lg:flex lg:w-full lg:translate-x-0 lg:p-0 lg:bg-transparent lg:border-none lg:shadow-none ${
-          showSessionsMobile ? "translate-x-0" : "-translate-x-full"
-        }`}
-      >
-        <div className="flex items-center justify-between lg:hidden mb-4">
-          <span className="text-xs font-black uppercase tracking-widest text-primary">Chat History</span>
-          <button 
-            onClick={() => setShowSessionsMobile(false)} 
-            className="p-2 rounded-xl hover:bg-primary/10 text-text-variant active:scale-95 transition-colors bg-primary/5"
-          >
-            <X size={18} />
-          </button>
-        </div>
-
-        <motion.button
-          whileHover={{ scale: 1.01 }}
-          whileTap={{ scale: 0.99 }}
-          onClick={() => {
-            handleNewSession();
-            setShowSessionsMobile(false);
-          }}
-          className="bg-primary shadow-lg shadow-primary/10 w-full py-3 px-4 rounded-xl flex items-center justify-center gap-2 group transition-all duration-300 flex-shrink-0"
-        >
-          <Plus size={16} className="text-white" strokeWidth={2.5} />
-          <span className="font-bold text-white text-xs tracking-wide">New Chat</span>
-        </motion.button>
-
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-primary/10 glass shadow-sm">
-          <div className="px-4 py-3 border-b border-primary/5 bg-primary/5">
-            <h3 className="text-[11px] font-bold text-text-variant uppercase tracking-wider opacity-70">History</h3>
-          </div>
-          <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-3">
-            <div className="space-y-1.5">
-              {sessions.map((s) => (
-                <motion.div
-                  key={s.id}
-                  whileHover={{ x: 4 }}
-                  onClick={() => {
-                    if (editingSessionId !== s.id) {
-                      setSelectedSession(s.id);
-                      setShowSessionsMobile(false);
-                    }
-                  }}
-                  className={`px-3 py-3 rounded-xl cursor-pointer group flex items-center justify-between gap-3 transition-all ${
-                    selectedSession === s.id 
-                      ? "bg-primary/10 border border-primary/20 text-primary" 
-                      : "hover:bg-primary/5 text-text-variant border border-transparent"
-                  }`}
-                >
-                  {editingSessionId === s.id ? (
-                    <div className="flex items-center gap-2 w-full" onClick={(e) => e.stopPropagation()}>
-                      <input
-                        autoFocus
-                        value={editSessionName}
-                        onChange={(e) => setEditSessionName(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') handleSaveEdit(e);
-                          if (e.key === 'Escape') handleCancelEdit(e);
-                        }}
-                        className="bg-transparent border-b border-primary text-xs font-bold outline-none flex-1 w-full text-text"
-                      />
-                      <button onClick={handleSaveEdit} className="text-green-500 hover:text-green-600 transition-colors">
-                        <Check size={14} />
-                      </button>
-                      <button onClick={handleCancelEdit} className="text-red-500 hover:text-red-600 transition-colors">
-                        <X size={14} />
-                      </button>
-                    </div>
-                  ) : (
-                    <>
-                      <p className="text-xs font-bold truncate flex-1">{s.name || "New Chat"}</p>
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={(e) => handleStartEdit(e, s)} className="p-1 hover:text-primary transition-colors">
-                          <Pencil size={12} />
-                        </button>
-                        <button onClick={(e) => handleDeleteSession(e, s.id)} className="p-1 hover:text-red-500 transition-colors">
-                          <Trash2 size={12} />
-                        </button>
-                      </div>
-                    </>
-                  )}
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </aside>
+      <SessionSidebar
+        sessions={sessions}
+        selectedSession={selectedSession}
+        onSelectSession={setSelectedSession}
+        onNewSession={handleNewSession}
+        onDeleteSession={handleDeleteSession}
+        onRenameSession={handleRenameSession}
+        showSessionsMobile={showSessionsMobile}
+        setShowSessionsMobile={setShowSessionsMobile}
+      />
 
       {/* ── Main Chat ── */}
       <section className="relative flex flex-1 flex-col h-full min-h-0 overflow-hidden rounded-3xl border border-primary/10 bg-white dark:bg-slate-900 shadow-2xl shadow-primary/5 isolation-auto">
@@ -421,81 +308,7 @@ const Chat = () => {
             ) : (
               <div className="mx-auto max-w-3xl space-y-8">
                 {messages.map((msg, idx) => (
-                  <motion.div
-                    key={msg.id || idx}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className={`flex items-start gap-4 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}
-                  >
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                      msg.role === "ai" ? "bg-gradient-to-tr from-primary to-secondary text-white" : "glass border border-primary/20 text-primary"
-                    }`}>
-                      {msg.role === "ai" ? <Logo iconOnly iconClassName="w-4 h-4 filter brightness-0 invert" /> : <span className="text-[11px] font-bold">{displayName[0]}</span>}
-                    </div>
-                    
-                    <div className="flex flex-col gap-2 max-w-[85%]">
-                      <div className={`px-4 py-2.5 text-sm leading-relaxed ${
-                        msg.role === "user" 
-                          ? "bg-white dark:bg-primary text-black dark:text-white border border-primary/10 rounded-2xl rounded-tr-sm shadow-md" 
-                          : "bg-white dark:bg-slate-800 border border-primary/5 text-black dark:text-white rounded-2xl rounded-tl-sm"
-                      }`}>
-                        <div className="whitespace-pre-wrap break-words prose prose-sm max-w-none dark:prose-invert">
-                          <ReactMarkdown>{msg.content}</ReactMarkdown>
-                        </div>
-                      </div>
-
-                      {/* Metadata / Sources UI */}
-                      {msg.role === "ai" && msg.metadata && (
-                        <div className="mt-1">
-                          <button 
-                            onClick={() => toggleMetadata(msg.id || idx.toString())}
-                            className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-primary hover:opacity-80 transition-all mb-2"
-                          >
-                            {msg.metadata.sources?.length ? <Search size={10} /> : <Wrench size={10} />}
-                            {msg.metadata.sources?.length ? `${msg.metadata.sources.length} Context Sources` : 'Agent Insights'}
-                            {expandedMetadata[msg.id || idx.toString()] ? <ChevronUp size={10} /> : <ChevronDown size={10} />}
-                          </button>
-                          
-                          <AnimatePresence>
-                            {expandedMetadata[msg.id || idx.toString()] && (
-                              <motion.div
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: "auto" }}
-                                exit={{ opacity: 0, height: 0 }}
-                                className="space-y-2 overflow-hidden"
-                              >
-                                {msg.metadata.toolsUsed && msg.metadata.toolsUsed.length > 0 && (
-                                  <div className="flex flex-wrap gap-2 mb-3">
-                                    {msg.metadata.toolsUsed.map((tool: string, ti: number) => (
-                                      <div key={ti} className="px-2 py-1 rounded bg-primary/5 border border-primary/10 flex items-center gap-1.5">
-                                        <Wrench size={10} className="text-primary" />
-                                        <span className="text-[9px] font-bold text-text-variant opacity-70">{tool}</span>
-                                      </div>
-                                    ))}
-                                  </div>
-                                )}
-                                
-                                {msg.metadata.sources && msg.metadata.sources.map((source: { id: string; sourceType: string; title: string; content: string; similarity: number }, si: number) => (
-                                  <div key={si} className="p-3 rounded-xl bg-white/5 border border-white/5 flex gap-3 group">
-                                    <Database size={14} className="text-primary/40 shrink-0 mt-0.5" />
-                                    <div className="flex-1 min-w-0">
-                                      <p className="text-[10px] font-bold text-text-variant uppercase mb-1">
-                                        {source.sourceType} • {(source.similarity * 100).toFixed(0)}% Match
-                                      </p>
-                                      <p className="text-xs text-text opacity-70 line-clamp-2 italic">"{source.content}"</p>
-                                    </div>
-                                    <button className="opacity-0 group-hover:opacity-100 transition-all p-1 text-text-variant hover:text-primary">
-                                      <ExternalLink size={12} />
-                                    </button>
-                                  </div>
-                                ))}
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-                        </div>
-                      )}
-                    </div>
-                  </motion.div>
+                  <ChatMessage key={msg.id || idx} msg={msg} displayName={displayName} />
                 ))}
 
                 {loading && (

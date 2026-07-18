@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
-import Logo from "../components/structure/Logo";
+import AuthLayout from "../components/structure/AuthLayout";
 
 
 const Login = () => {
@@ -25,18 +25,6 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoggingIn, setIsLoggingIn] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
-
-  // Bind a scrolling event handler to toggle custom navigation styling classes on scroll.
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    window.addEventListener("scroll", handleScroll);
-    
-    // Tear down scrolling event listeners on unmount.
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   // Scroll the page viewport down to center on the credential login form elements.
   const scrollToLoginForm = () => {
@@ -82,43 +70,11 @@ const Login = () => {
   };
 
   return (
-    <div className="login min-h-screen text-aurora-on-surface" style={{ scrollBehavior: "smooth" }}>
-      {/* Background Animated Gradient Mesh */}
-      <div className="aurora-mesh fixed inset-0 z-[-1]" aria-hidden="true" />
-
-      {/* Navigation */}
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${isScrolled ? 'glass py-3 border-b border-primary/5' : 'bg-transparent py-6'}`}>
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 flex items-center justify-between">
-          <Link
-            to="/"
-            className="hover:opacity-80 transition-opacity cursor-pointer inline-block"
-          >
-            <Logo iconClassName="w-8 h-8 sm:w-10 sm:h-10" iconOnly />
-          </Link>
-
-          <div className="flex items-center space-x-4 sm:space-x-8">
-            <Link
-              to="/signup"
-              className="text-xs sm:text-sm font-bold text-aurora-on-surface-variant hover:text-primary transition-colors uppercase tracking-widest"
-            >
-              Sign Up
-            </Link>
-            <Link
-              to="/"
-              className="btn-aurora-secondary px-4 sm:px-8 py-2 sm:py-3 text-xs sm:text-sm"
-            >
-              Back to Home
-            </Link>
-          </div>
-        </div>
-      </nav>
-
-      {/* Main Content */}
-      <section className="pt-28 pb-16 sm:pt-40 sm:pb-32">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6">
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-            {/* Left Content */}
-            <motion.div 
+    <AuthLayout
+      navActionLabel="Sign Up"
+      navActionTo="/signup"
+      leftContent={
+        <motion.div 
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
@@ -134,10 +90,10 @@ const Login = () => {
                   Your workspace is preserved in the light. Seamlessly continue your flow across every device.
                 </p>
               </div>
-            </motion.div>
-
-            {/* Right Content - Form */}
-            <motion.div
+        </motion.div>
+      }
+    >
+      <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.2 }}
@@ -227,20 +183,8 @@ const Login = () => {
                 <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-secondary/10 blur-[60px] -z-10 rounded-full" />
               </div>
             </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Enhanced Footer */}
-      <footer className="py-10 sm:py-20 border-t border-primary/5">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 flex flex-col sm:flex-row justify-between items-center gap-6 sm:gap-8">
-          <Logo iconClassName="w-8 h-8" iconOnly />
-          <p className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-primary/40 text-center sm:text-left">&copy; 2026 AuraOne. Developed by Dhyan Patel</p>
-        </div>
-      </footer>
-    </div>
+    </AuthLayout>
   );
-
 };
 
 export default Login;

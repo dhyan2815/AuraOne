@@ -8,38 +8,44 @@ import LandingPicture from "../assets/LandingImage.png";
 // import Card from "../components/ui/Card";
 import Logo from "../components/structure/Logo";
 
+// List of client testimonials displayed dynamically.
+const TESTIMONIALS = [
+    {
+        name: "Rajesh Verma",
+        role: "Product Manager",
+        content: "AuraOne has completely transformed how I manage my daily tasks and notes. The AI assistant is incredibly intuitive and saves me hours every week.",
+        rating: 4
+    },
+    {
+        name: "Anjali Sharma",
+        role: "Software Developer",
+        content: "The real-time sync across all my devices is flawless. I can start a task on my phone and finish it on my laptop without any hassle.",
+        rating: 4
+    },
+    {
+        name: "Amit Patel",
+        role: "Marketing Director",
+        content: "The calendar integration and smart reminders have made me so much more organized. AuraOne is exactly what I needed for my busy schedule.",
+        rating: 5
+    },
+    {
+        name: "Dhairya Kumar",
+        role: "Freelance Writer",
+        content: "The rich text editor for notes is fantastic, and the AI chat feature helps me brainstorm ideas quickly. This is productivity software done right.",
+        rating: 4
+    }
+];
+
+const FEATURES = [
+    { icon: <Calendar className="w-5 h-5 sm:w-6 sm:h-6" />, title: "Events Calendar", description: "Orchestrate your time with a weightless scheduling experience designed for clarity and temporal flow." },
+    { icon: <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6" />, title: "Tasks & Notes Management", description: "Precision management. Organize your objectives with intuitive focus systems and dynamic priority tiers." },
+    { icon: <MessageSquare className="w-5 h-5 sm:w-6 sm:h-6" />, title: "Aura Assistant", description: "Your neural companion. Advanced AI intelligence that anticipates your needs and streamlines your workflow." },
+];
+
 const LandingPage = () => {
     // Track page scrolling offsets for navigation styling and active testimonial ratings display.
     const [isScrolled, setIsScrolled] = useState(false);
     const [currentTestimonial, setCurrentTestimonial] = useState(0);
-
-    // List of client testimonials displayed dynamically.
-    const testimonials = [
-        {
-            name: "Rajesh Verma",
-            role: "Product Manager",
-            content: "AuraOne has completely transformed how I manage my daily tasks and notes. The AI assistant is incredibly intuitive and saves me hours every week.",
-            rating: 4
-        },
-        {
-            name: "Anjali Sharma",
-            role: "Software Developer",
-            content: "The real-time sync across all my devices is flawless. I can start a task on my phone and finish it on my laptop without any hassle.",
-            rating: 4
-        },
-        {
-            name: "Amit Patel",
-            role: "Marketing Director",
-            content: "The calendar integration and smart reminders have made me so much more organized. AuraOne is exactly what I needed for my busy schedule.",
-            rating: 5
-        },
-        {
-            name: "Dhairya Kumar",
-            role: "Freelance Writer",
-            content: "The rich text editor for notes is fantastic, and the AI chat feature helps me brainstorm ideas quickly. This is productivity software done right.",
-            rating: 4
-        }
-    ];
 
     // Bind scroll event listeners to style navigation headers based on offsets.
     useEffect(() => {
@@ -56,13 +62,13 @@ const LandingPage = () => {
     useEffect(() => {
         const interval = setInterval(() => {
             setCurrentTestimonial((prevIndex) =>
-                (prevIndex + 1) % testimonials.length
+                (prevIndex + 1) % TESTIMONIALS.length
             );
         }, 4000);
 
         // Terminate active timer intervals on unmount.
         return () => clearInterval(interval);
-    }, [testimonials.length]);
+    }, []);
 
     // Smoothly scroll the window context down to the Features block element.
     const scrollToFeatures = () => {
@@ -191,11 +197,7 @@ const LandingPage = () => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-                        {[
-                            { icon: <Calendar className="w-5 h-5 sm:w-6 sm:h-6" />, title: "Events Calendar", description: "Orchestrate your time with a weightless scheduling experience designed for clarity and temporal flow." },
-                            { icon: <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6" />, title: "Tasks & Notes Management", description: "Precision management. Organize your objectives with intuitive focus systems and dynamic priority tiers." },
-                            { icon: <MessageSquare className="w-5 h-5 sm:w-6 sm:h-6" />, title: "Aura Assistant", description: "Your neural companion. Advanced AI intelligence that anticipates your needs and streamlines your workflow." },
-                        ].map((feature, index) => (
+                        {FEATURES.map((feature, index) => (
                             <motion.div
                                 key={index}
                                 whileHover={{ y: -8 }}
@@ -229,26 +231,26 @@ const LandingPage = () => {
                             >
                                 <div className="flex justify-center gap-1 opacity-60">
                                     {[...Array(5)].map((_, i) => (
-                                        <Star key={i} className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${i < testimonials[currentTestimonial].rating ? 'text-primary fill-primary' : 'text-primary/20'}`} />
+                                        <Star key={i} className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${i < TESTIMONIALS[currentTestimonial].rating ? 'text-primary fill-primary' : 'text-primary/20'}`} />
                                     ))}
                                 </div>
                                 <blockquote className="text-xl sm:text-3xl lg:text-5xl font-black italic tracking-tighter leading-tight text-text px-2 sm:px-4">
-                                    "{testimonials[currentTestimonial].content}"
+                                    "{TESTIMONIALS[currentTestimonial].content}"
                                 </blockquote>
                                 <div className="flex items-center justify-center gap-3 sm:gap-4">
                                     <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/10 border border-primary/10 flex items-center justify-center font-black text-primary shadow-xl text-sm sm:text-base">
-                                        {testimonials[currentTestimonial].name.charAt(0)}
+                                        {TESTIMONIALS[currentTestimonial].name.charAt(0)}
                                     </div>
                                     <div className="text-left">
-                                        <p className="font-bold text-sm sm:text-lg text-text">{testimonials[currentTestimonial].name}</p>
-                                        <p className="text-[8px] sm:text-[10px] font-black text-primary uppercase tracking-[0.3em] opacity-80">{testimonials[currentTestimonial].role}</p>
+                                        <p className="font-bold text-sm sm:text-lg text-text">{TESTIMONIALS[currentTestimonial].name}</p>
+                                        <p className="text-[8px] sm:text-[10px] font-black text-primary uppercase tracking-[0.3em] opacity-80">{TESTIMONIALS[currentTestimonial].role}</p>
                                     </div>
                                 </div>
                             </motion.div>
                         </AnimatePresence>
 
                         <div className="flex justify-center gap-2">
-                            {testimonials.map((_, i) => (
+                            {TESTIMONIALS.map((_, i) => (
                                 <button
                                     key={i}
                                     onClick={() => setCurrentTestimonial(i)}
