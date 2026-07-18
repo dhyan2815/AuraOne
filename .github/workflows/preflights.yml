@@ -1,18 +1,3 @@
-# Preflight Checks
-# This workflow acts as a quality gate before code is merged or deployed.
-# It runs on every push and pull request targeting the main branch.
-#
-# Checks performed:
-# - Installs project dependencies
-# - Validates TypeScript compilation
-# - Runs ESLint for code quality
-# - Executes automated tests with coverage
-# - Verifies production build succeeds
-# - Performs an npm security audit
-#
-# The workflow helps catch bugs, build failures, lint issues,
-# type errors, test regressions, and known vulnerabilities early.
-
 name: AuraOne Preflight Checks
 
 on:
@@ -25,30 +10,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Pull down git repository files onto CI workspace.
       - uses: actions/checkout@v4
 
-      # Set up NodeJS v20 runtime environment caching package managers.
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
 
-      # Install exact package dependencies using npm clean install.
       - run: npm ci
       
-      # Verify TypeScript compilation safety without generating build files.
       - run: npx tsc --noEmit
       
-      # Run static code analysis to audit syntax rules.
       - run: npm run lint
       
-      # Run all automated test suites measuring code coverage.
       - run: npm run test:run -- --coverage
       
-      # Verify production compile bundling operations complete successfully.
       - run: npm run build
       
-      # Check dependency libraries for known security vulnerability issues.
       - run: npm audit --audit-level=moderate
         continue-on-error: true

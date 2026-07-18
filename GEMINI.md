@@ -133,3 +133,12 @@ pm audit step in .github/workflows/preflights.yml to prevent breaking updates (l
     - `LandingPage.tsx`: Hoisted `TESTIMONIALS` and `FEATURES` static arrays outside the component render function.
   - **Verification:** Executed static syntax analysis (`npm run lint`), typescript compiler checks (`npx tsc --noEmit`), and production bundling (`npm run build`) to ensure no regressions.
 - **Outcome:** Page components are more modular, DRY-er, and simpler to read. The codebase is fully verified with zero build or lint issues.
+
+### July 18, 2026: Codebase Refactoring — Category 8 (Tests & CI)
+- **Objective:** Execute Category 8 of the full codebase refactoring plan to clean up test utilities and CI configuration.
+- **Action:**
+  - Audited test files for duplicated Supabase mock setup patterns.
+  - Extracted shared `createMockWithError` factory into `tests/unit/mockHelpers.ts` to reduce boilerplate across `useNotes.test.ts`, `useTasks.test.ts`, and `useEvents.test.ts`.
+  - Cleaned up excessive comments from test setup (`setup.ts`), E2E tests (`chat.spec.ts`), integration tests (`ai-fallback.test.ts`), hook unit tests, and GitHub Actions CI workflow (`preflights.yml`) to improve density and readability.
+  - **Verification**: Executed the full validation suite (`npm run lint`, `npx tsc --noEmit`, `npm run test:run`, `npm run build`) which passed successfully.
+- **Outcome:** The testing layer and CI configurations are leaner and DRY-er. The codebase is fully verified with zero build or test issues.

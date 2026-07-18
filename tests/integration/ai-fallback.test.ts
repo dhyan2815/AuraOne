@@ -1,23 +1,17 @@
-// Verify integration fallback behaviors, ensuring fetch errors trigger proper retries, network switches, and JSON parsing.
-
 import { describe, it, expect, vi, beforeEach, afterEach, Mock } from 'vitest';
 
-// Reference variable to cache and restore the standard global fetch API.
 let originalFetch: typeof fetch;
 
 describe('AI Fallback Chain', () => {
-  // Capture the native environment fetch reference and overwrite it with a clean Vitest mock before each run.
   beforeEach(() => {
     originalFetch = global.fetch;
     global.fetch = vi.fn();
   });
 
-  // Re-establish native fetch APIs on completed test iterations.
   afterEach(() => {
     global.fetch = originalFetch;
   });
 
-  // Confirm standard successful API responses resolve correctly without throwing or retrying.
   it('should handle successful API responses', async () => {
     (global.fetch as Mock).mockResolvedValue({
       ok: true,

@@ -1,10 +1,7 @@
-// Verify the authentication hook capabilities, checking default user profiles, loading gates, and integration actions.
-
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useAuth } from '../../src/hooks/useAuth';
 
-// Stub Supabase database client authentication endpoints (sessions, signIn, signUp, onAuthStateChange listeners) prior to loading hooks.
 vi.mock('../../src/services/supabase', () => ({
   supabase: {
     auth: {
