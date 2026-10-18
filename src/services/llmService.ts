@@ -72,51 +72,70 @@ export async function callGeminiAPI(prompt: string, systemPrompt?: string): Prom
   }
 }
 
-// Call Gemini API with tool definitions to perform function calling.
-export async function callGeminiWithTools(
-  prompt: string, 
-  tools: Array<{ name: string; description: string; parameters: Record<string, unknown> }>, 
-  systemPrompt?: string
-): Promise<{ parts: Array<{ text?: string; functionCall?: { name: string; args: Record<string, unknown> } }> }> {
+// One Gemini conversation turn: user text, model output (text and/or function calls), or function results.
+export type GeminiPart = {
+  text?: string;
+  functionCall?: { name: string; args: Record<string, unknown> };
+  functionResponse?: { name: string; response: Record<string, unknown> };
+};
+export type GeminiContent = { role: 'user' | 'model'; parts: GeminiPart[] };
+
+// Stream one model turn over SSE, calling onText per token; returns the merged parts (text + any function calls).
+export async function streamGeminiWithTools(
+  contents: GeminiContent[],
+  tools: Array<{ name: string; description: string; parameters: Record<string, unknown> }>,
+  systemPrompt: string,
+  onText?: (chunk: string) => void
+): Promise<GeminiPart[]> {
   if (!AI_CONFIG.gemini.enabled) {
     throw new Error(`[llmService] Gemini API not configured`);
   }
 
-  const contents = [];
-  if (systemPrompt) {
-    // Prepend system instructions to user prompt for backward compatibility.
-    contents.push({ role: 'user', parts: [{ text: `SYSTEM INSTRUCTION: ${systemPrompt}` }] });
-  }
-  contents.push({ role: 'user', parts: [{ text: prompt }] });
-
   const response = await fetchWithTimeout(
-    `${AI_CONFIG.gemini.apiUrl}/models/${AI_CONFIG.gemini.model}:generateContent?key=${AI_CONFIG.gemini.apiKey}`,
+    `${AI_CONFIG.gemini.apiUrl}/models/${AI_CONFIG.gemini.model}:streamGenerateContent?alt=sse&key=${AI_CONFIG.gemini.apiKey}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        systemInstruction: { parts: [{ text: systemPrompt }] },
         contents,
         tools: [{ function_declarations: tools }],
-        tool_config: {
-          function_calling_config: {
-            mode: "AUTO", // Allow model to choose when to invoke tools.
-          },
-        },
-        generationConfig: {
-          temperature: 0.1,
-        },
+        tool_config: { function_calling_config: { mode: 'AUTO' } },
+        generationConfig: { temperature: 0.2 },
       }),
     },
-    SERVICE_CONFIG.TIMEOUT_MS
+    SERVICE_CONFIG.TIMEOUT_MS * 2
   );
 
-  if (!response.ok) {
+  if (!response.ok || !response.body) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(`[llmService] Gemini Tool API error: ${response.status} - ${errorData.error?.message || ''}`);
+    throw new Error(`[llmService] Gemini Stream error: ${response.status} - ${errorData.error?.message || ''}`);
   }
 
-  const data = await response.json();
-  return data.candidates?.[0]?.content;
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  const calls: GeminiPart[] = [];
+  let text = '';
+  let buffer = '';
+
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop() ?? '';
+    for (const line of lines) {
+      if (!line.startsWith('data:')) continue;
+      const json = line.slice(5).trim();
+      if (!json) continue;
+      for (const part of JSON.parse(json).candidates?.[0]?.content?.parts ?? []) {
+        if (part.functionCall) calls.push({ functionCall: part.functionCall });
+        else if (part.text) { text += part.text; onText?.(part.text); }
+      }
+    }
+  }
+
+  return [...(text ? [{ text }] : []), ...calls];
 }
 
 // Call OpenRouter API as a fallback when Gemini is unavailable or rate-limited.
