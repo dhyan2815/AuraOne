@@ -2,18 +2,35 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import { ChevronUp, ChevronDown } from "lucide-react";
-import { Message } from "../../services/chatHandler";
+import toast from "react-hot-toast";
+import { Message, resolvePendingAction } from "../../services/chatHandler";
+import { performDelete } from "../../services/agentTools";
+import StepTrace from "./StepTrace";
 
 interface ChatMessageProps {
   msg: Message;
   displayName: string;
+  onResolved?: () => void; // Refetch after a confirm card is resolved.
 }
 
-const ChatMessage: React.FC<ChatMessageProps> = ({ msg }) => {
+const ChatMessage: React.FC<ChatMessageProps> = ({ msg, onResolved }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const isUser = msg.role === "user";
   const tools = msg.metadata?.toolsUsed ?? [];
   const sources = msg.metadata?.sources ?? [];
+  const steps = msg.metadata?.steps ?? [];
+  const pending = msg.metadata?.pendingActions ?? [];
+
+  const resolve = async (a: (typeof pending)[number], ok: boolean) => {
+    try {
+      if (ok) await performDelete(a);
+      await resolvePendingAction(msg, a.id, ok ? "confirmed" : "cancelled");
+      toast.success(ok ? `Deleted ${a.label}` : "Cancelled");
+      onResolved?.();
+    } catch {
+      toast.error("Action failed");
+    }
+  };
 
   return (
     <motion.div
@@ -21,6 +38,8 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ msg }) => {
       animate={{ opacity: 1, y: 0 }}
       className={`flex max-w-[680px] flex-col gap-2 ${isUser ? "self-end" : "self-start"}`}
     >
+      {!isUser && <StepTrace steps={steps} />}
+
       {/* Tool steps and context sources, shown only where the message carries them */}
       {!isUser && (tools.length > 0 || sources.length > 0) && (
         <div className="flex flex-wrap items-center gap-1.5">
@@ -71,6 +90,20 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ msg }) => {
           <ReactMarkdown>{msg.content}</ReactMarkdown>
         </div>
       </div>
+
+      {pending.map((a) => (
+        <div key={a.id} className="flex items-center gap-2 rounded-[22px] bg-step px-[18px] py-3 text-[15px]">
+          <span className="flex-1">Delete {a.type} <b>{a.label}</b>?</span>
+          {a.status === "pending" || !a.status ? (
+            <>
+              <button onClick={() => resolve(a, true)} className="lm-btn">Delete</button>
+              <button onClick={() => resolve(a, false)} className="lm-btn lm-btn-ghost">Cancel</button>
+            </>
+          ) : (
+            <span className="text-ink2">{a.status}</span>
+          )}
+        </div>
+      ))}
     </motion.div>
   );
 };

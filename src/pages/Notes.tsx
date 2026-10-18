@@ -14,6 +14,15 @@ const FILTERS = ["All", "Personal", "Work", "Ideas"];
 
 const stripHtml = (html: string | null) => {
   if (!html) return '';
+  // Agent-written notes are raw markdown: drop the syntax so the card shows plain text.
+  if (!/^\s*</.test(html)) {
+    return html
+      .replace(/^\s*(-{3,}|\*{3,})\s*$/gm, ' ')
+      .replace(/^\s*(#{1,6}|[-*+]|\d+\.|>)\s+/gm, '')
+      .replace(/(\*+|~~|`)/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
   const tmp = document.createElement('div');
   tmp.innerHTML = html;
   return tmp.textContent || tmp.innerText || '';

@@ -3,7 +3,8 @@
 import { supabase } from './supabase';
 import { updateSessionName } from './chatSessionService';
 import { User } from '@supabase/supabase-js';
-import { processAgenticRequest } from './agentOrchestrator';
+import { processAgenticRequest, AgentStep, AgentEvent } from './agentOrchestrator';
+import type { PendingAction } from './agentTools';
 
 export type Message = {
   id?: string; // Optional message UUID.
@@ -15,6 +16,8 @@ export type Message = {
   metadata?: {
     sources?: Array<{ id: string; sourceType: string; title: string; content: string; similarity: number }>;
     toolsUsed?: string[];
+    steps?: AgentStep[];
+    pendingActions?: PendingAction[];
   };
 };
 
@@ -57,6 +60,7 @@ export const handleSendMessage = async (
   user: User,
   selectedSession: string,
   isBrainMode: boolean,
+  onEvent?: (e: AgentEvent) => void,
 ) => {
   if (!input.trim() || !user || !selectedSession) {
     return;
@@ -90,7 +94,8 @@ export const handleSendMessage = async (
 
     // 3. Process the query using the ReAct agent and log the AI's reply.
     const agentResponse = await processAgenticRequest(content, user.id, {
-      isBrainMode
+      isBrainMode,
+      onEvent
     });
     
     await addMessage({
@@ -100,7 +105,9 @@ export const handleSendMessage = async (
       content: agentResponse.message,
       metadata: {
         sources: agentResponse.sources,
-        toolsUsed: agentResponse.toolsUsed
+        toolsUsed: agentResponse.toolsUsed,
+        steps: agentResponse.steps,
+        pendingActions: agentResponse.pendingActions
       }
     });
     
@@ -135,4 +142,14 @@ FALLBACK: I couldn't process your request "${content.substring(0, 20)}${content.
       // Catch error silently if writing the system error itself fails.
     }
   }
+};
+
+// Mark a pending action resolved in the stored message so the confirm card survives reloads.
+export const resolvePendingAction = async (msg: Message, actionId: string, status: 'confirmed' | 'cancelled') => {
+  const pendingActions = (msg.metadata?.pendingActions ?? []).map(a => (a.id === actionId ? { ...a, status } : a));
+  const { error } = await supabase
+    .from('chat_messages')
+    .update({ metadata: { ...msg.metadata, pendingActions } })
+    .eq('id', msg.id);
+  if (error) throw error;
 };

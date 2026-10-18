@@ -13,6 +13,8 @@ import {
 } from "../services/chatHandler";
 import { supabase } from "../services/supabase";
 import toast from "react-hot-toast";
+import type { AgentEvent, AgentStep } from "../services/agentOrchestrator";
+import StepTrace from "../components/chat/StepTrace";
 
 // Prompt suggestions displayed in empty state.
 const SUGGESTIONS = [
@@ -20,15 +22,6 @@ const SUGGESTIONS = [
   { icon: "🗺️", title: "Roadmap",  sub: "Structure Q4 rollout.", prompt: "Create a detailed, structured roadmap for our Q4 product rollout." },
   { icon: "✉️", title: "Draft",    sub: "Write follow-up sync.", prompt: "Draft a professional follow-up communication for our recent synchronization meeting." },
   { icon: "💡", title: "Ideas",    sub: "List 5 neural features.", prompt: "List 5 innovative neural features and capabilities we could implement in the platform." },
-];
-
-// Steps for loading sequence animations.
-const HANDSHAKE_STEPS = [
-  "Analyzing context...",
-  "Searching knowledge base...",
-  "Thinking through plan...",
-  "Applying tool calls...",
-  "Synthesizing response...",
 ];
 
 const Chat = () => {
@@ -40,7 +33,8 @@ const Chat = () => {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [isBrainMode, setIsBrainMode] = useState(false);
-  const [thinkingStep, setThinkingStep] = useState(0);
+  const [liveSteps, setLiveSteps] = useState<AgentStep[]>([]);
+  const [draft, setDraft] = useState("");
   
   // Track lists of historical chat sessions.
   const [sessions, setSessions] = useState<Session[]>([]);
@@ -72,19 +66,12 @@ const Chat = () => {
     }, 50);
   };
 
-  // Cycle through handshake loader steps periodically while waiting for the AI backend.
-  useEffect(() => {
-    let interval: ReturnType<typeof setInterval>;
-    if (loading) {
-      setThinkingStep(0);
-      interval = setInterval(() => {
-        setThinkingStep((prev) => (prev + 1) % HANDSHAKE_STEPS.length);
-      }, 1500);
-    } else {
-      setThinkingStep(0);
-    }
-    return () => clearInterval(interval);
-  }, [loading]);
+  // Fold streamed agent events into the live trace and the answer draft.
+  const onAgentEvent = useCallback((e: AgentEvent) => {
+    if (e.type === "token") setDraft((d) => d + e.text);
+    else if (e.type === "reset_draft") setDraft("");
+    else setLiveSteps((s) => [...s, e]);
+  }, []);
 
   // Retrieve user-owned chat sessions from database storage.
   const fetchSessions = useCallback(async () => {
@@ -174,10 +161,12 @@ const Chat = () => {
     setMessages(prev => [...prev, tempUserMsg]);
     
     setInput("");
+    setLiveSteps([]);
+    setDraft("");
     setLoading(true);
     
     try {
-      await handleSendMessage(msg, user, selectedSession, currentBrainMode);
+      await handleSendMessage(msg, user, selectedSession, currentBrainMode, onAgentEvent);
       const [updatedSessions, updatedMessages] = await Promise.all([
         getSessions(user.id),
         getMessages(selectedSession)
@@ -291,16 +280,15 @@ const Chat = () => {
             ) : (
               <>
                 {messages.map((msg, idx) => (
-                  <ChatMessage key={msg.id || idx} msg={msg} displayName={displayName} />
+                  <ChatMessage key={msg.id || idx} msg={msg} displayName={displayName} onResolved={fetchMessages} />
                 ))}
 
                 {loading && (
-                  <div className="max-w-[680px] self-start rounded-[22px] bg-step px-[18px] py-3.5 text-[15px]" role="status">
-                    <b className="mb-1 flex items-center gap-2">
-                      <span className="lm-blob lm-pulse inline-block h-3 w-3" style={{ animation: undefined }} />
-                      Aura is working
-                    </b>
-                    {HANDSHAKE_STEPS[thinkingStep]}
+                  <div className="flex max-w-[680px] flex-col gap-2 self-start" role="status">
+                    <StepTrace steps={liveSteps} live />
+                    <div className="rounded-[26px] bg-water px-5 py-3.5 text-[17px] text-ink">
+                      {draft || <span className="text-ink2">Aura is thinking…</span>}
+                    </div>
                   </div>
                 )}
               </>
