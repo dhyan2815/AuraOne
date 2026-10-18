@@ -5,7 +5,6 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.5.3-3178C6?logo=typescript)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4.1-06B6D4?logo=tailwindcss)
 ![Vitest](https://img.shields.io/badge/Tests-Vitest-6E9F18?logo=vitest)
-[![Coverage](https://img.shields.io/badge/coverage-29%25-yellow)](#)
 
 **Sick of app overload?** AuraOne puts your tasks, notes, events, and news in one smart, AI-powered hub. **One app, zero chaos—just pure focus.**
 
@@ -15,8 +14,9 @@ An intelligent personal assistant designed for comprehensive task management, no
 
 ### Core Features
 - **User Authentication** - Secure Supabase authentication with email/password
-- **Aura Assistant** - AI-powered functional chat-based assistant with Brain Mode
-- **Note Management** - Rich text editor with tags and organization
+- **Aura Assistant** - Streaming ReAct agent with tool calls over your own data, Command and Brain modes
+- **Knowledge Base** - Personal RAG over your notes, tasks and events (Explorer and Playground views)
+- **Note Management** - TipTap rich text editor with markdown and tags
 - **Task Management** - Priority-based task tracking with due dates
 - **Event Scheduling** - Interactive calendar with event management
 - **News Aggregation** - Real-time news from multiple sources
@@ -26,7 +26,8 @@ An intelligent personal assistant designed for comprehensive task management, no
 ### User Experience
 - Responsive design optimized for desktop, tablet, and mobile
 - Real-time updates with Supabase live synchronization
-- Smooth animations powered by Framer Motion
+- "Living Map" visual design with Framer Motion page transitions
+- Public landing page, login, sign up and password reset
 - WCAG compliant with keyboard navigation
 
 ## 🚀 Quick Start
@@ -34,7 +35,7 @@ An intelligent personal assistant designed for comprehensive task management, no
 ### Prerequisites
 - Node.js 18+ and npm
 - Supabase account (for authentication and database)
-- API keys for Gemini, OpenRouter, OpenWeatherMap, NewsData.io
+- API keys for Gemini (required); OpenRouter, OpenWeatherMap, NewsData.io (optional)
 
 ### Installation
 
@@ -47,8 +48,8 @@ cd AuraOne
 npm install
 
 # Set up environment variables
-cp .env.example .env
-# Edit .env with your API keys
+cp .env.example .env.local
+# Edit .env.local with your API keys
 
 # Start development server
 npm run dev
@@ -56,16 +57,18 @@ npm run dev
 
 ### Environment Variables
 
-Create a `.env` file with:
+Create a `.env.local` file with:
 
 ```env
 VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 VITE_GEMINI_API_KEY=your_gemini_api_key
-VITE_OPENROUTER_API_KEY=your_openrouter_api_key
-VITE_OPENWEATHERMAP_API_KEY=your_weather_api_key
-VITE_NEWSDATA_API_KEY=your_news_api_key
+VITE_OPENROUTER_API_KEY=your_openrouter_api_key   # fallback
+VITE_WEATHER_API_KEY=your_openweathermap_api_key  # optional
+VITE_NEWS_API_KEY=your_newsdata_api_key           # optional
 ```
+
+The Knowledge Base needs the pgvector schema in `supabase/migrations/`.
 
 ## 🏗️ Architecture
 
@@ -87,55 +90,55 @@ VITE_NEWSDATA_API_KEY=your_news_api_key
 - **Frontend**: React 18.3.1, TypeScript 5.5.3, Vite 5.4.2
 - **Styling**: Tailwind CSS 3.4.1, Framer Motion 11.0.8
 - **Backend**: Supabase (Authentication, PostgreSQL, Realtime)
-- **AI**: Google Gemini API (Primary), Open Router (Fallback)
+- **AI**: Google Gemini 2.5 Flash (primary, streaming), OpenRouter (fallback), `gemini-embedding-001` for RAG
 - **APIs**: OpenWeatherMap, NewsData.io
-- **UI Components**: Radix UI, Lucide React Icons
+- **UI Components**: Radix UI, Lucide React Icons, Sonner / react-hot-toast
+- **Editor**: TipTap 3
+- **Validation**: Zod 4, chrono-node (natural-language dates)
 
 ### AI Service Architecture
 AuraOne features a robust, multi-model AI infrastructure that ensures high availability and intelligent workspace management:
 
-- **Primary Model**: Google Gemini for ultra-fast response generation
-- **Fallback Model**: Open Router providing seamless continuity if Gemini limits are reached
-- **Brain Mode**: Deep reasoning capabilities for complex strategic planning
-- **Command Mode**: Natural language to JSON command parsing for CRUD operations
-- **Automatic Fallback**: Intelligent try/catch logic that transparently routes requests
+- **ReAct loop**: `agentOrchestrator` streams Gemini function calls, executes tools, feeds results back until a final answer
+- **Tools** (`agentTools.ts`, Zod-validated): `search_knowledge_base`, `list_items`, `create_task`, `update_task`, `create_note`, `update_note`, `schedule_event`, `update_event`, `get_agenda`, `find_free_slots`, `delete_item`
+- **Step trace**: live thinking / tool call / tool result steps shown in chat
+- **Delete confirmation**: `delete_item` only returns a pending action; the UI must confirm before anything is removed
+- **RAG**: notes, tasks and events are chunked, embedded (768-dim) and retrieved with citations
+- **Brain Mode**: deeper reasoning for complex planning
+- **Fallback**: OpenRouter takes over transparently if Gemini fails or is rate limited
 
 ### Project Structure
 
 ```
 src/
-├── components/              # Reusable UI components
-│   ├── structure/           # Layout components (Sidebar, Layout)
-│   ├── ui/                  # Base UI components (Card, Loader)
-│   ├── widgets/             # Dashboard widgets
-│   ├── tasks/              # Task-specific components
-│   ├── notes/              # Note-specific components
-│   └── editor/              # TipTap rich text editor
-├── pages/                   # Route components
-├── hooks/                   # Custom React hooks
-│   ├── useAuth.ts          # Authentication hook
-│   ├── useTasks.ts         # Task CRUD operations
-│   ├── useNotes.ts         # Note CRUD operations
-│   └── useEvents.ts        # Event CRUD operations
-├── services/                # External service integrations
-│   ├── aiService.ts        # Unified AI service
-│   ├── chatHandler.ts      # Chat orchestrator
-│   ├── chatSessionService.ts
-│   └── supabase.ts         # Supabase client
-├── config/                  # Configuration files
-│   └── api.ts              # API configuration
-└── utils/                  # Utility functions
-    └── aiCommandSchema.ts  # Zod validation schemas
+├── components/
+│   ├── chat/                # ChatMessage, SessionSidebar, StepTrace
+│   ├── editor/              # TipTap rich text editor
+│   ├── structure/           # Layout, TopBar, AuthLayout, SiteFooter
+│   ├── ui/                  # Card, Dialog, Loader, EmptyState, ...
+│   └── widgets/             # Weather, Tasks, Calendar, News
+├── pages/                   # Landing, auth, Dashboard, Notes, Tasks, Calendar, Chat, KnowledgeBase, Settings
+├── hooks/                   # useAuth, useTasks, useNotes, useEvents
+├── services/
+│   ├── agentOrchestrator.ts # Streaming ReAct loop
+│   ├── agentTools.ts        # Tool registry (CRUD + agenda)
+│   ├── agentPrompts.ts
+│   ├── llmService.ts        # Gemini streaming + OpenRouter fallback
+│   ├── rag*Service.ts       # Chunking, embedding, ingestion, retrieval
+│   ├── chatHandler.ts / chatSessionService.ts
+│   └── supabase.ts
+├── config/api.ts            # API configuration
+└── utils/aiCommandSchema.ts # Zod schemas
 ```
 
 ## 🧪 Testing
 
 ```bash
-# Run all tests
+# Run all tests (watch)
 npm test
 
-# Run tests in watch mode
-npm test -- --watch
+# Single run
+npm run test:run
 
 # Run tests with coverage
 npm test -- --coverage
@@ -145,9 +148,10 @@ npm test -- --coverage
 
 ```
 tests/
-└── 2025-05-11-ai-assistant-response-testing/
-    ├── ai-service.test.ts   # Main test suite (57 tests)
-    └── setup.ts             # Test mocks
+├── unit/          # hooks and agentTools
+├── integration/   # AI fallback
+├── e2e/           # chat.spec.ts
+└── 2026-05-11-ai-assistant-response-testing/
 ```
 
 ## 🎯 Features in Detail
@@ -159,18 +163,19 @@ tests/
 - News widget with source attribution
 
 ### Aura Assistant
-- **Command Mode**: Natural language to CRUD operations
+- **Command Mode**: Agent tool calls for full CRUD on tasks, notes and events
   - Create tasks: "Remind me to buy groceries tomorrow"
   - Read notes: "Show all my notes"
   - Update events: "Reschedule meeting to 3pm"
-  - Delete items: "Remove the old task"
+  - Delete items: "Remove the old task" (asks for confirmation first)
+  - Plan: "What's on my agenda Friday?", "Find a free slot tomorrow"
 - **Brain Mode**: Deep reasoning for complex queries
   - Multi-step analysis
   - Strategic planning
   - Creative tasks
 
 ### Notes Management
-- TipTap rich text editor with formatting
+- TipTap rich text editor with markdown rendering
 - Custom tagging system
 - Full-text search and filtering
 - Real-time sync across devices
