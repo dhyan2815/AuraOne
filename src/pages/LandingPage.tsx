@@ -84,7 +84,7 @@ const LandingPage = () => {
 
                 {/* Hero */}
                 <section className="grid items-center gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
-                    <div className="lm-lobe flex flex-col justify-center !w-auto !min-h-[480px] lg:!min-h-[620px] lg:!pl-[132px] lg:!pr-[72px] lg:!py-[72px]">
+                    <div className="lm-lobe flex flex-col justify-center !w-auto !min-h-[480px] lg:!min-h-[calc(620px*var(--unzoom))] lg:!pl-[calc(132px*var(--unzoom))] lg:!pr-[calc(72px*var(--unzoom))] lg:!py-[calc(72px*var(--unzoom))]">
                         <h1 style={{ fontSize: "clamp(56px, 8.4vw, 128px)" }}>One map for your whole day</h1>
                         <p>Tasks, notes, events and news in one place, with Aura to add, move and find anything in plain words.</p>
                         <div className="lm-acts">

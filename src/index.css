@@ -66,6 +66,12 @@
     color-scheme: dark;
   }
 
+  /* Sizes are authored in px, so scale the whole UI down on desktop
+     (≈ browser zoom 90%). Phones/tablets keep full size for readability. */
+  @media (min-width: 1024px) {
+    html { zoom: 0.9; }
+  }
+
   body {
     @apply text-ink bg-water;
     margin: 0;
@@ -140,11 +146,12 @@
     position: relative;
     background: rgb(var(--c));
     color: rgb(var(--on));
-    margin: 4px 0 0 -84px;
-    padding: 40px 64px 64px 108px;
+    /* --unzoom keeps the blob at its pre-zoom size; content still scales */
+    margin: 4px 0 0 calc(-1 * var(--gut, 24px));
+    padding: calc(40px * var(--unzoom, 1)) calc(64px * var(--unzoom, 1)) calc(64px * var(--unzoom, 1)) calc(var(--gut, 24px) + 84px * var(--unzoom, 1));
     border-radius: 0 62% 48% 0 / 0 70% 58% 0;
-    width: min(1000px, 84%);
-    min-height: 220px;
+    width: min(calc(1000px * var(--unzoom, 1)), 84%);
+    min-height: calc(220px * var(--unzoom, 1));
     animation: lm-drift 9s ease-in-out infinite alternate;
   }
   .lm-lobe h1 {
@@ -415,11 +422,12 @@
 }
 
 /* Page content shell shared by every routed page. */
-.lm-main { padding: 0 24px 96px; }
+/* --gut: side gutter; on wide screens grows so content stays ≤1440px while lobes still touch the left edge. */
+.lm-main { --gut: max(24px, calc((100vw * var(--unzoom, 1) - 1440px) / 2)); padding: 0 var(--gut) 96px; }
 @media (min-width: 768px) { .lm-main { padding-bottom: 40px; } }
 @media (max-width: 760px) {
-  .lm-main { padding-left: 16px; padding-right: 16px; }
-  .lm-lobe { margin-left: -40px; padding: 28px 32px 48px 56px; width: 100%; }
+  .lm-main { --gut: 16px; }
+  .lm-lobe { padding: 28px 32px 48px calc(var(--gut) + 40px); width: 100%; }
   .lm-lobe p { font-size: 17px; }
 }
 
@@ -465,3 +473,11 @@
   to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 }
 .lm-swell { animation: lm-swell .5s cubic-bezier(.3, 1.45, .5, 1) both; }
+
+/* html zoom (base layer) also shrinks vh, so full-height layouts compensate.
+   Unlayered so it beats Tailwind's min-h-screen / h-screen utilities. */
+@media (min-width: 1024px) {
+  :root { --unzoom: calc(1 / 0.9); }
+  body, .min-h-screen { min-height: calc(100vh / 0.9); }
+  .h-screen { height: calc(100vh / 0.9); }
+}

@@ -52,7 +52,7 @@ const Layout = () => {
         )}
       </AnimatePresence>
 
-      <main className="mx-auto max-w-[1440px]">
+      <main>
         <motion.div
           key={pathname}
           className="lm-main min-w-0"
