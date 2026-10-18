@@ -82,8 +82,8 @@ const LandingPage = () => {
     const [weekday, ...dateRest] = today.replace(",", "").split(" ");
 
     return (
-        <div className="sec-today min-h-screen bg-water font-sans text-ink">
-            <div className="mx-auto max-w-[1440px] overflow-x-clip">
+        <div className="sec-today min-h-screen overflow-x-clip bg-water font-sans text-ink [--gut:max(24px,calc((100vw*var(--unzoom,1)-1440px)/2))]">
+            <div className="mx-auto max-w-[1440px]">
                 {/* Header */}
                 <header className="flex flex-wrap items-center gap-2 px-4 py-4 md:px-6">
                     <Link to="/" className="mr-4" aria-label="AuraOne home"><Logo textOnly /></Link>
@@ -94,19 +94,19 @@ const LandingPage = () => {
                         <a className="lm-cap" href="#voices" style={{ "--c": "var(--notes)" } as React.CSSProperties}><i />Stories</a>
                     </nav>
                     <div className="ml-auto flex gap-2">
-                        <Link to="/login" className="lm-btn lm-btn-soft">Log in</Link>
-                        <Link to="/signup" className="lm-btn">Sign up free</Link>
+                        <Link to="/login" viewTransition className="lm-btn lm-btn-soft">Log in</Link>
+                        <Link to="/signup" viewTransition className="lm-btn">Sign up free</Link>
                     </div>
                 </header>
 
                 {/* Hero */}
                 <section className="grid items-center gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
-                    <div className="lm-lobe flex flex-col justify-center !w-auto !min-h-[480px] lg:!min-h-[calc(620px*var(--unzoom))] lg:!pl-[calc(132px*var(--unzoom))] lg:!pr-[calc(72px*var(--unzoom))] lg:!py-[calc(72px*var(--unzoom))]">
+                    <div className="lm-lobe flex flex-col justify-center !w-auto !min-h-[480px] lg:!min-h-[calc(620px*var(--unzoom))] lg:!pl-[calc(var(--gut)+108px*var(--unzoom))] lg:!pr-[calc(72px*var(--unzoom))] lg:!py-[calc(72px*var(--unzoom))]" style={{ viewTransitionName: "auth-lobe" }}>
                         <h1 style={{ fontSize: "clamp(56px, 8.4vw, 128px)" }}>One map for your whole day</h1>
                         <p>Tasks, notes, events and news in one place, with Aura to add, move and find anything in plain words.</p>
                         <div className="lm-acts">
-                            <Link to="/signup" className="lm-btn">Create your free account</Link>
-                            <Link to="/login" className="lm-btn lm-btn-ghost">Log in</Link>
+                            <Link to="/signup" viewTransition className="lm-btn">Create your free account</Link>
+                            <Link to="/login" viewTransition className="lm-btn lm-btn-ghost">Log in</Link>
                         </div>
                     </div>
 

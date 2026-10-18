@@ -46,13 +46,13 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
   return (
     <div className={`${sec} min-h-screen bg-water text-ink`}>
     <div className="grid min-h-screen lg:grid-cols-[minmax(0,1fr)_minmax(0,560px)]">
-      <div className="flex min-h-[320px] flex-col rounded-b-[50%_22%] bg-sec px-8 pb-14 pt-7 text-[#1F211E] lg:rounded-b-none lg:rounded-r-[52%_46%] lg:py-10 lg:pl-12 lg:pr-24 lg:pb-16 [&_*]:text-[#1F211E]">
-        <Link to="/" aria-label="AuraOne home">
+      <div className="flex min-h-[320px] flex-col rounded-b-[50%_22%] bg-sec px-8 pb-14 pt-7 text-[#1F211E] lg:rounded-b-none lg:rounded-r-[52%_46%] lg:py-10 lg:pl-12 lg:pr-24 lg:pb-16 [&_*]:text-[#1F211E] lm-lobe-in" style={{ viewTransitionName: "auth-lobe" }}>
+        <Link to="/" viewTransition aria-label="AuraOne home">
           <Logo textOnly />
         </Link>
-        <div className="mt-auto">{leftContent}</div>
+        <div className="lm-stagger mt-auto">{leftContent}</div>
       </div>
-      <div className="flex flex-col justify-center px-5 py-8 lg:px-14 lg:py-14">{children}</div>
+      <div className="flex flex-col justify-center px-5 py-8 lg:px-14 lg:py-14" style={{ viewTransitionName: "auth-form" }}>{children}</div>
     </div>
     <div className="mx-auto max-w-[1440px]">
     <FeaturesOverview />

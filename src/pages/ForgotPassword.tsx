@@ -67,7 +67,7 @@ const ForgotPassword = () => {
                 {isSending && <RotateCw className="animate-spin" size={16} />}
                 {isSending ? "Sending…" : "Send reset link"}
               </button>
-              <Link to="/login" className="font-semibold underline">Back to log in</Link>
+              <Link to="/login" viewTransition className="font-semibold underline">Back to log in</Link>
             </motion.form>
           ) : (
             <motion.div
@@ -88,7 +88,7 @@ const ForgotPassword = () => {
               >
                 Send again
               </button>
-              <Link to="/login" className="font-semibold underline">Back to log in</Link>
+              <Link to="/login" viewTransition className="font-semibold underline">Back to log in</Link>
             </motion.div>
           )}
         </AnimatePresence>

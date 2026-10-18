@@ -93,7 +93,7 @@ const SignUp = () => {
         </>
       }
     >
-      <form onSubmit={handleSignUp} className="grid gap-4" autoComplete="off" aria-label="Create account">
+      <form onSubmit={handleSignUp} className="lm-stagger grid gap-4" autoComplete="off" aria-label="Create account">
         <h2 className="text-[44px] font-extrabold leading-none" style={{ letterSpacing: "-.045em", fontStretch: "75%" }}>Create your account</h2>
 
         {error && (
@@ -167,7 +167,7 @@ const SignUp = () => {
 
         <p className="lm-muted !text-[15px]">
           Already have an account?{" "}
-          <Link to="/login" className="font-semibold text-ink underline">Log in</Link>
+          <Link to="/login" viewTransition className="font-semibold text-ink underline">Log in</Link>
         </p>
       </form>
     </AuthLayout>

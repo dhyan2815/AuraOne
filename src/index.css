@@ -561,6 +561,18 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* Auth lobe sweeps in from the left edge. */
+@keyframes lm-lobe-in {
+  from { opacity: 0; transform: translateX(-6%); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.lm-lobe-in { animation: lm-lobe-in .7s cubic-bezier(.2, .8, .3, 1) both; }
+
+/* Route changes via <Link viewTransition>: lobe morphs, form cross-fades. */
+::view-transition-group(auth-lobe) { animation-duration: .6s; animation-timing-function: cubic-bezier(.2, .8, .3, 1); }
+::view-transition-old(auth-form), ::view-transition-new(auth-form) { animation-duration: .35s; }
+::view-transition-old(auth-lobe), ::view-transition-new(auth-lobe) { height: 100%; }
+
 /* Children of a staggered page rise in sequence. */
 .lm-stagger > * { animation: lm-rise .5s cubic-bezier(.2, .8, .3, 1) both; }
 .lm-stagger > *:nth-child(2) { animation-delay: 70ms; }
@@ -593,4 +605,16 @@
   :root { --unzoom: calc(1 / 0.9); }
   body, .min-h-screen { min-height: calc(100vh / 0.9); }
   .h-screen { height: calc(100vh / 0.9); }
+}
+
+/* Landing nav anchors: eased smooth scroll, and sections fade up as they enter the viewport. */
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; scroll-padding-top: 16px; }
+  @supports (animation-timeline: view()) {
+    .sec-today section[id] {
+      animation: lm-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 35%;
+    }
+  }
 }

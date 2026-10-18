@@ -80,7 +80,7 @@ const Login = () => {
         </>
       }
     >
-      <form onSubmit={handleLogin} className="grid gap-[18px]" autoComplete="off" aria-label="Log in">
+      <form onSubmit={handleLogin} className="lm-stagger grid gap-[18px]" autoComplete="off" aria-label="Log in">
         <h2 className="text-[44px] font-extrabold leading-none" style={{ letterSpacing: "-.045em", fontStretch: "75%" }}>Log in</h2>
 
         {error && (
@@ -126,7 +126,7 @@ const Login = () => {
         </div>
 
         <div className="flex justify-end text-[15px] font-semibold">
-          <Link to="/forgot-password" className="underline">Forgot password?</Link>
+          <Link to="/forgot-password" viewTransition className="underline">Forgot password?</Link>
         </div>
 
         <button type="submit" disabled={isLoggingIn} className="lm-btn w-full !py-[15px]">
@@ -145,7 +145,7 @@ const Login = () => {
 
         <p className="lm-muted !text-[15px]">
           New to AuraOne?{" "}
-          <Link to="/signup" className="font-semibold text-ink underline">Create an account</Link>
+          <Link to="/signup" viewTransition className="font-semibold text-ink underline">Create an account</Link>
         </p>
       </form>
     </AuthLayout>
