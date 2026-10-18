@@ -7,14 +7,6 @@ const ch = (name) => `rgb(var(--${name}) / <alpha-value>)`
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   darkMode: 'class',
-  safelist: [
-    'border-primary/10',
-    'focus:ring-primary/20',
-    'text-text/30',
-    'text-primary/50',
-    'bg-primary/20',
-    'bg-primary/40',
-  ],
   theme: {
     extend: {
       colors: {
@@ -33,34 +25,6 @@ export default {
         know: ch('know'),
         set: ch('set'),
         sec: ch('c'),
-
-        // Legacy keys, remapped to the new tokens until every page is migrated.
-        primary: 'rgb(var(--color-primary) / <alpha-value>)',
-        secondary: 'rgb(var(--color-secondary) / <alpha-value>)',
-        tertiary: 'rgb(var(--color-tertiary) / <alpha-value>)',
-        cta: '#F97316',
-        background: 'rgb(var(--color-background) / <alpha-value>)',
-        text: {
-          DEFAULT: 'rgb(var(--color-text) / <alpha-value>)',
-          variant: 'rgb(var(--color-text-variant) / <alpha-value>)',
-        },
-        'on-surface': 'rgb(var(--color-text) / <alpha-value>)',
-        'on-surface-variant': 'rgb(var(--color-text-variant) / <alpha-value>)',
-        'aurora-on-surface': 'rgb(var(--color-text) / <alpha-value>)',
-        'aurora-on-surface-variant': 'rgb(var(--color-text-variant) / <alpha-value>)',
-
-        error: {
-          DEFAULT: '#ba1a1a',
-          container: '#ffdad6',
-        },
-        success: {
-          DEFAULT: '#10b981',
-          container: '#d1fae5',
-        },
-        warning: {
-          DEFAULT: '#f59e0b',
-          container: '#fef3c7',
-        },
       },
       fontFamily: {
         sans: ['Archivo', 'system-ui', 'sans-serif'],

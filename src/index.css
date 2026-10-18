@@ -33,13 +33,6 @@
     /* Active section colour; overridden by .sec-* wrappers. */
     --c: var(--today);
 
-    /* Legacy aliases kept until every page is migrated. */
-    --color-primary: 31 33 30;
-    --color-secondary: 74 78 71;
-    --color-tertiary: 74 78 71;
-    --color-background: 238 241 236;
-    --color-text: 31 33 30;
-    --color-text-variant: 74 78 71;
   }
 
   .dark {
@@ -50,12 +43,6 @@
     --step: 44 49 42;
     --set: 74 81 70;
 
-    --color-primary: 238 241 234;
-    --color-secondary: 180 186 176;
-    --color-tertiary: 180 186 176;
-    --color-background: 20 23 19;
-    --color-text: 238 241 234;
-    --color-text-variant: 180 186 176;
   }
 
   .sec-today { --c: var(--today); }
@@ -137,6 +124,7 @@
     letter-spacing: -0.055em;
     line-height: 0.92;
     font-stretch: 72%;
+    word-spacing: 0.14em;
   }
 
   .lm-num {
@@ -166,6 +154,7 @@
     letter-spacing: -0.055em;
     line-height: 0.92;
     font-stretch: 72%;
+    word-spacing: 0.14em;
   }
   .lm-lobe p { font-size: 19px; margin-top: 12px; max-width: 540px; }
   .lm-lobe .lm-seg { background: rgb(255 255 255 / 0.55); }
@@ -417,35 +406,6 @@
     color: rgb(var(--ink2));
   }
   .ProseMirror code { background: rgb(var(--step)); border-radius: 8px; padding: 2px 6px; }
-
-  .display-lg { @apply lm-display text-5xl; }
-  .headline-sm { @apply text-2xl; font-weight: 750; }
-
-  /* ---- Legacy aliases: map old aurora classes to the new look until pages are migrated. ---- */
-  .glass, .glass-panel {
-    background: rgb(var(--sheet));
-    border-radius: 28px;
-    display: block;
-  }
-  .input-aurora {
-    @apply lm-input;
-  }
-  .btn-aurora-primary {
-    @apply lm-btn;
-  }
-  .btn-aurora-secondary {
-    @apply lm-btn lm-btn-soft;
-  }
-  .section-header {
-    @apply text-[11px] font-bold uppercase tracking-[0.16em] text-ink2;
-    margin: 0;
-  }
-  .aurora-glow { box-shadow: none; }
-  .aurora-mesh { background: rgb(var(--water)); }
-
-  /* Layout wrappers for core app pages. */
-  .app-page { @apply w-full max-w-7xl mx-auto px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8; }
-  .app-page-tight { @apply w-full max-w-5xl mx-auto px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8; }
 
   .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
   .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
