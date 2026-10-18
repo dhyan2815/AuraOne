@@ -27,7 +27,7 @@ export default {
         sec: ch('c'),
       },
       fontFamily: {
-        sans: ['Archivo', 'system-ui', 'sans-serif'],
+        sans: ['"Bricolage Grotesque"', 'system-ui', 'sans-serif'],
       },
       spacing: {
         '7': '28px',
