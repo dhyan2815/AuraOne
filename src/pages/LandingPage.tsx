@@ -43,6 +43,25 @@ const PARTS = [
     { title: "Knowledge", color: "know", text: "Your notes, tasks and events, chunked and embedded so Aura answers from what you actually wrote.", radius: "48% 52% 40% 60% / 40% 44% 56% 60%" },
 ];
 
+// How the product works, in three steps.
+const STEPS = [
+    { n: "01", title: "Sign up free", text: "Create an account in seconds. Your workspace syncs in real time across every device." },
+    { n: "02", title: "Fill your day", text: "Add tasks, write notes and schedule events yourself, or just tell Aura in plain words." },
+    { n: "03", title: "Ask Aura", text: "Command Mode changes your data. Brain Mode answers from your own notes, tasks and events." },
+];
+
+// Facts about what powers AuraOne.
+const FACTS = [
+    { k: "ReAct", v: "agent loop with tool calls over your own data" },
+    { k: "RAG", v: "personal knowledge base built from what you write" },
+    { k: "Realtime", v: "Supabase auth and sync on every device" },
+    { k: "Light + dark", v: "follows your system, switch any time" },
+];
+
+// Footer link groups.
+const FOOT_PRODUCT = [["Aura", "#aura"], ["Features", "#parts"], ["How it works", "#how"], ["Stories", "#voices"]];
+const FOOT_ACCOUNT = [["Sign up", "/signup"], ["Log in", "/login"], ["Forgot password", "/forgot-password"]];
+
 const LandingPage = () => {
     // Track the active testimonial and the selected demo sentence.
     const [currentTestimonial, setCurrentTestimonial] = useState(0);
@@ -74,6 +93,7 @@ const LandingPage = () => {
                     <nav className="hidden gap-1.5 md:flex" aria-label="Sections">
                         <a className="lm-cap" href="#aura" style={{ "--c": "var(--aura)" } as React.CSSProperties}><i />Aura</a>
                         <a className="lm-cap" href="#parts" style={{ "--c": "var(--tasks)" } as React.CSSProperties}><i />Features</a>
+                        <a className="lm-cap" href="#how" style={{ "--c": "var(--events)" } as React.CSSProperties}><i />How it works</a>
                         <a className="lm-cap" href="#voices" style={{ "--c": "var(--notes)" } as React.CSSProperties}><i />Stories</a>
                     </nav>
                     <div className="ml-auto flex gap-2">
@@ -154,6 +174,34 @@ const LandingPage = () => {
                     </div>
                 </section>
 
+                {/* How it works */}
+                <section className="px-4 pt-24 md:px-6 md:pt-36" id="how">
+                    <h2 className="lm-display max-w-[900px] text-[clamp(44px,5.6vw,84px)]">Up and running in three steps</h2>
+                    <div className="mt-10 grid gap-5 md:grid-cols-3">
+                        {STEPS.map((st) => (
+                            <div key={st.n} className="lm-sheet !p-8">
+                                <span className="lm-display text-[56px]">{st.n}</span>
+                                <h3 className="mt-2 text-2xl font-extrabold">{st.title}</h3>
+                                <p className="mt-2 text-lg">{st.text}</p>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+
+                {/* Under the hood */}
+                <section className="px-4 pt-24 md:px-6 md:pt-36" id="about">
+                    <h2 className="lm-display max-w-[900px] text-[clamp(44px,5.6vw,84px)]">An assistant, not a chat box</h2>
+                    <p className="mt-4 max-w-[680px] text-xl">Aura runs a ReAct agent loop with validated create, read, update and delete actions, grounded by your own knowledge base. Gemini answers first, with OpenRouter as fallback.</p>
+                    <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                        {FACTS.map((f) => (
+                            <div key={f.k} className="rounded-3xl bg-sheet p-6">
+                                <p className="lm-display text-[34px]">{f.k}</p>
+                                <p className="lm-muted mt-1.5">{f.v}</p>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+
                 {/* Voices */}
                 <section className="px-4 pt-24 md:px-6 md:pt-36" id="voices">
                     <h2 className="lm-display max-w-[900px] text-[clamp(44px,5.6vw,84px)]">From early users</h2>
@@ -181,12 +229,41 @@ const LandingPage = () => {
                         <Link to="/login" className="lm-btn lm-btn-ghost !bg-white/60 !text-[#1F211E]">I have an account</Link>
                     </div>
                     <p className="mt-16 font-extrabold leading-[.8] md:mt-20" style={{ fontSize: "clamp(90px, 17vw, 250px)", letterSpacing: "-.07em", fontStretch: "62%" }}>AuraOne</p>
-                    <div className="mt-6 flex flex-wrap gap-6 font-semibold">
-                        <span>Built by Dhyan Patel</span>
-                        <a href="https://dhyan-patel.notion.site/about-dhyan" target="_blank" rel="noopener noreferrer" className="underline">Developer profile</a>
-                        <span className="md:ml-auto">&copy; 2026 AuraOne</span>
-                    </div>
                 </section>
+
+                {/* Footer */}
+                <footer className="px-4 pb-10 pt-16 md:px-6">
+                    <div className="grid gap-10 md:grid-cols-[1.6fr_1fr_1fr_1fr]">
+                        <div>
+                            <Logo textOnly />
+                            <p className="lm-muted mt-3 max-w-[340px]">One personal hub for tasks, notes, events and news, with Aura to act on all of it.</p>
+                        </div>
+                        <nav aria-label="Product">
+                            <p className="font-extrabold">Product</p>
+                            <ul className="mt-3 grid gap-2">
+                                {FOOT_PRODUCT.map(([label, href]) => <li key={label}><a href={href} className="lm-muted hover:underline">{label}</a></li>)}
+                            </ul>
+                        </nav>
+                        <nav aria-label="Account">
+                            <p className="font-extrabold">Account</p>
+                            <ul className="mt-3 grid gap-2">
+                                {FOOT_ACCOUNT.map(([label, to]) => <li key={label}><Link to={to} className="lm-muted hover:underline">{label}</Link></li>)}
+                            </ul>
+                        </nav>
+                        <nav aria-label="Developer">
+                            <p className="font-extrabold">Developer</p>
+                            <ul className="mt-3 grid gap-2">
+                                <li><a href="https://dhyan-patel.notion.site/about-dhyan" target="_blank" rel="noopener noreferrer" className="lm-muted hover:underline">Dhyan Patel</a></li>
+                                <li><a href="https://github.com/dhyan2815/AuraOne" target="_blank" rel="noopener noreferrer" className="lm-muted hover:underline">Source on GitHub</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                    <div className="lm-muted mt-12 flex flex-wrap gap-x-6 gap-y-2 border-t border-current/10 pt-6">
+                        <span>&copy; 2026 AuraOne. All rights reserved.</span>
+                        <span>Built by Dhyan Patel</span>
+                        <span className="md:ml-auto">Release 1.4.2</span>
+                    </div>
+                </footer>
             </div>
         </div>
     );
