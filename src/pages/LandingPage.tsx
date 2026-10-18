@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Logo from "../components/structure/Logo";
+import SiteFooter from "../components/structure/SiteFooter";
 
 // List of client testimonials displayed dynamically.
 const TESTIMONIALS = [
@@ -57,10 +58,6 @@ const FACTS = [
     { k: "Realtime", v: "Supabase auth and sync on every device" },
     { k: "Light + dark", v: "follows your system, switch any time" },
 ];
-
-// Footer link groups.
-const FOOT_PRODUCT = [["Aura", "#aura"], ["Features", "#parts"], ["How it works", "#how"], ["Stories", "#voices"]];
-const FOOT_ACCOUNT = [["Sign up", "/signup"], ["Log in", "/login"], ["Forgot password", "/forgot-password"]];
 
 const LandingPage = () => {
     // Track the active testimonial and the selected demo sentence.
@@ -231,39 +228,7 @@ const LandingPage = () => {
                     <p className="mt-16 font-extrabold leading-[.8] md:mt-20" style={{ fontSize: "clamp(90px, 17vw, 250px)", letterSpacing: "-.07em", fontStretch: "62%" }}>AuraOne</p>
                 </section>
 
-                {/* Footer */}
-                <footer className="px-4 pb-10 pt-16 md:px-6">
-                    <div className="grid gap-10 md:grid-cols-[1.6fr_1fr_1fr_1fr]">
-                        <div>
-                            <Logo textOnly />
-                            <p className="lm-muted mt-3 max-w-[340px]">One personal hub for tasks, notes, events and news, with Aura to act on all of it.</p>
-                        </div>
-                        <nav aria-label="Product">
-                            <p className="font-extrabold">Product</p>
-                            <ul className="mt-3 grid gap-2">
-                                {FOOT_PRODUCT.map(([label, href]) => <li key={label}><a href={href} className="lm-muted hover:underline">{label}</a></li>)}
-                            </ul>
-                        </nav>
-                        <nav aria-label="Account">
-                            <p className="font-extrabold">Account</p>
-                            <ul className="mt-3 grid gap-2">
-                                {FOOT_ACCOUNT.map(([label, to]) => <li key={label}><Link to={to} className="lm-muted hover:underline">{label}</Link></li>)}
-                            </ul>
-                        </nav>
-                        <nav aria-label="Developer">
-                            <p className="font-extrabold">Developer</p>
-                            <ul className="mt-3 grid gap-2">
-                                <li><a href="https://dhyan-patel.notion.site/about-dhyan" target="_blank" rel="noopener noreferrer" className="lm-muted hover:underline">Dhyan Patel</a></li>
-                                <li><a href="https://github.com/dhyan2815/AuraOne" target="_blank" rel="noopener noreferrer" className="lm-muted hover:underline">Source on GitHub</a></li>
-                            </ul>
-                        </nav>
-                    </div>
-                    <div className="lm-muted mt-12 flex flex-wrap gap-x-6 gap-y-2 border-t border-current/10 pt-6">
-                        <span>&copy; 2026 AuraOne. All rights reserved.</span>
-                        <span>Built by Dhyan Patel</span>
-                        <span className="md:ml-auto">Release 1.4.2</span>
-                    </div>
-                </footer>
+                <SiteFooter />
             </div>
         </div>
     );
