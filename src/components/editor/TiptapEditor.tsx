@@ -14,7 +14,7 @@ interface TiptapEditorProps {
 const contentType = (c: string) => (/^\s*</.test(c) ? 'html' : 'markdown');
 
 // Agent markdown indents list items 4 spaces under a heading line, which CommonMark reads as paragraph text; dedent them.
-const normalize = (c: string) => (contentType(c) === 'markdown' ? c.replace(/^[ 	]+(?=([-*+]|\d+\.)\s)/gm, '') : c);
+const normalize = (c: string) => (contentType(c) === 'markdown' ? c.replace(/^[ \t]+(?=([-*+]|\d+\.)\s)/gm, '') : c);
 
 const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
   const editor = useEditor({
