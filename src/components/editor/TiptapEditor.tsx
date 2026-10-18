@@ -2,6 +2,7 @@
 
 import { useEditor, useEditorState, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import { Markdown } from '@tiptap/markdown';
 import { useEffect } from 'react';
 
 interface TiptapEditorProps {
@@ -9,16 +10,23 @@ interface TiptapEditorProps {
   onChange: (content: string) => void;
 }
 
+// Notes saved by the editor are HTML; notes written by the AI agent are raw markdown.
+const contentType = (c: string) => (/^\s*</.test(c) ? 'html' : 'markdown');
+
+// Agent markdown indents list items 4 spaces under a heading line, which CommonMark reads as paragraph text; dedent them.
+const normalize = (c: string) => (contentType(c) === 'markdown' ? c.replace(/^[ 	]+(?=([-*+]|\d+\.)\s)/gm, '') : c);
+
 const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
   const editor = useEditor({
-    extensions: [StarterKit],
-    content: content,
+    extensions: [StarterKit, Markdown],
+    content: normalize(content),
+    contentType: contentType(content),
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },
     editorProps: {
       attributes: {
-        class: 'ProseMirror prose max-w-none focus:outline-none text-ink',
+        class: 'ProseMirror max-w-none focus:outline-none text-ink',
       },
     }
   });
@@ -27,7 +35,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
     if (!editor) return;
     const current = editor.getHTML();
     if (content !== current) {
-      editor.commands.setContent(content || '', { emitUpdate: false });
+      editor.commands.setContent(normalize(content || ''), { emitUpdate: false, contentType: contentType(content) });
     }
   }, [content, editor]);
 
