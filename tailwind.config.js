@@ -1,6 +1,8 @@
 import animate from 'tailwindcss-animate'
 import typography from '@tailwindcss/typography'
 
+const ch = (name) => `rgb(var(--${name}) / <alpha-value>)`
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
@@ -16,6 +18,23 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Living Map tokens.
+        water: ch('water'),
+        sheet: ch('sheet'),
+        ink: ch('ink'),
+        ink2: ch('ink2'),
+        step: ch('step'),
+        alert: ch('alert'),
+        today: ch('today'),
+        tasks: ch('tasks'),
+        events: ch('events'),
+        notes: ch('notes'),
+        aura: ch('aura'),
+        know: ch('know'),
+        set: ch('set'),
+        sec: ch('c'),
+
+        // Legacy keys, remapped to the new tokens until every page is migrated.
         primary: 'rgb(var(--color-primary) / <alpha-value>)',
         secondary: 'rgb(var(--color-secondary) / <alpha-value>)',
         tertiary: 'rgb(var(--color-tertiary) / <alpha-value>)',
@@ -44,7 +63,7 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Archivo', 'system-ui', 'sans-serif'],
       },
       spacing: {
         '7': '28px',
@@ -61,16 +80,15 @@ export default {
         xl: '1.5rem',
         '2xl': '2rem',
         '3xl': '3rem',
+        sheet: '28px',
         full: '9999px',
       },
-      boxShadow: {
-        'aurora-glow': '0 0 30px rgba(73, 83, 188, 0.08)',
-        'aurora-glow-lg': '0 0 50px rgba(73, 83, 188, 0.12)',
+      transitionTimingFunction: {
+        spring: 'cubic-bezier(.3,1.45,.5,1)',
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',
         'slide-up': 'slideUp 0.4s ease-out',
-        'aurora-float': 'auroraFloat 10s ease-in-out infinite',
       },
       keyframes: {
         fadeIn: {
@@ -80,11 +98,6 @@ export default {
         slideUp: {
           '0%': { transform: 'translateY(20px)', opacity: '0' },
           '100%': { transform: 'translateY(0)', opacity: '1' },
-        },
-        auroraFloat: {
-          '0%, 100%': { transform: 'translate(0, 0) scale(1)' },
-          '33%': { transform: 'translate(2%, 4%) scale(1.05)' },
-          '66%': { transform: 'translate(-1%, -2%) scale(0.98)' },
         },
       },
     },

@@ -1,56 +1,86 @@
-/* Global styles and CSS custom properties — Configures baseline resets, theme tokens, and custom UI components. */
+/* Global styles — Living Map design tokens, baseline resets and shared UI primitives (lobe, sheet, btn, chip, check, seg, input, row, cap). */
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-  /* Enforce standard box-sizing rules across all elements. */
   *,
   *::before,
   *::after {
     box-sizing: border-box;
   }
 
-  /* Define CSS custom properties for Light Theme (RGB format for opacity manipulation). */
+  /* Theme tokens as space-separated RGB channels so Tailwind alpha utilities work. */
   :root {
-    --color-primary: 37 99 235;
-    --color-secondary: 59 130 246;
-    --color-tertiary: 139 92 246;
-    --color-background: 248 250 252;
-    --color-text: 30 41 59;
-    --color-text-variant: 100 116 139;
+    --water: 238 241 236;
+    --sheet: 255 255 255;
+    --ink: 31 33 30;
+    --ink2: 74 78 71;
+    --step: 226 230 223;
+    --alert: 200 50 31;
+    --on: 31 33 30;
+
+    /* Section colours are identical in both themes. */
+    --today: 127 203 90;
+    --tasks: 243 221 26;
+    --events: 90 169 238;
+    --notes: 255 138 115;
+    --aura: 227 190 250;
+    --know: 106 211 194;
+    --set: 213 217 209;
+
+    /* Active section colour; overridden by .sec-* wrappers. */
+    --c: var(--today);
+
+    /* Legacy aliases kept until every page is migrated. */
+    --color-primary: 31 33 30;
+    --color-secondary: 74 78 71;
+    --color-tertiary: 74 78 71;
+    --color-background: 238 241 236;
+    --color-text: 31 33 30;
+    --color-text-variant: 74 78 71;
   }
 
-  /* Define CSS custom properties for Dark Theme. */
   .dark {
-    --color-primary: 129 140 248;
-    --color-secondary: 167 139 250;
-    --color-tertiary: 192 132 252;
-    --color-background: 2 6 23;
-    --color-text: 248 250 252;
-    --color-text-variant: 148 163 184;
+    --water: 20 23 19;
+    --sheet: 31 35 30;
+    --ink: 238 241 234;
+    --ink2: 180 186 176;
+    --step: 44 49 42;
+    --set: 74 81 70;
+
+    --color-primary: 238 241 234;
+    --color-secondary: 180 186 176;
+    --color-tertiary: 180 186 176;
+    --color-background: 20 23 19;
+    --color-text: 238 241 234;
+    --color-text-variant: 180 186 176;
   }
 
-  /* Set baseline HTML layout, antialiasing, and default color-schemes. */
+  .sec-today { --c: var(--today); }
+  .sec-tasks { --c: var(--tasks); }
+  .sec-events { --c: var(--events); }
+  .sec-notes { --c: var(--notes); }
+  .sec-aura { --c: var(--aura); }
+  .sec-know { --c: var(--know); }
+  .sec-set { --c: var(--set); }
+  .dark .sec-set { --on: 238 241 234; }
+
   html {
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
-    @apply antialiased;
+    font-family: "Archivo", system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     min-height: 100%;
     color-scheme: light;
   }
 
-  /* Sync HTML color-scheme with dark mode status. */
   html.dark {
     color-scheme: dark;
   }
 
-  /* Configure standard body text, background transitions, and scroll behavior. */
   body {
-    @apply text-text bg-background;
-    background-attachment: fixed;
+    @apply text-ink bg-water;
     margin: 0;
     padding: 0;
     line-height: 1.5;
@@ -59,25 +89,29 @@
     transition: background-color 0.3s ease, color 0.3s ease;
   }
 
-  /* Define viewport boundary for the React application container. */
   #root {
     min-height: 100vh;
   }
 
-  /* Reset heading typography margins and apply font sizing styles. */
   h1, h2, h3, h4, h5, h6 {
-    @apply font-bold tracking-tight text-text;
+    @apply text-ink;
     margin: 0;
+    font-weight: 750;
+    letter-spacing: -0.03em;
   }
 
-  /* Reset default block spacing. */
   p, ul, ol, blockquote, figure {
     margin: 0;
     padding: 0;
   }
+
+  /* Section focus ring uses the active section colour. */
+  :focus-visible {
+    outline: 3px solid rgb(var(--c));
+    outline-offset: 2px;
+  }
 }
 
-/* Custom scrollbars for WebKit browsers. */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -88,131 +122,375 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-primary/20 rounded-full hover:bg-primary/40 transition-colors;
+  @apply bg-ink/20 rounded-full hover:bg-ink/40 transition-colors;
 }
 
-/* Custom scrollbar fallback configuration for Firefox. */
 * {
-  scrollbar-color: rgba(37, 99, 235, 0.2) transparent;
+  scrollbar-color: rgb(var(--ink) / 0.2) transparent;
   scrollbar-width: thin;
 }
 
 @layer components {
-  /* Style the Tiptap ProseMirror editor text container. */
-  .ProseMirror {
-    @apply min-h-[300px] w-full max-w-full p-4 outline-none text-base;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    color: var(--color-text);
+  /* Condensed display type used for lobe headings and big numbers. */
+  .lm-display {
+    font-weight: 800;
+    letter-spacing: -0.055em;
+    line-height: 0.92;
+    font-stretch: 72%;
   }
 
-  /* Define paragraph, header, list, and blockquote spacing styles inside ProseMirror. */
-  .ProseMirror p { @apply mb-3 leading-relaxed; }
-  .ProseMirror h1 { @apply text-3xl mb-3 font-bold mt-4; }
-  .ProseMirror h2 { @apply text-2xl mb-3 font-bold mt-4; }
-  .ProseMirror h3 { @apply text-xl mb-3 font-bold mt-4; }
+  .lm-num {
+    font-weight: 800;
+    letter-spacing: -0.05em;
+    line-height: 1;
+    font-stretch: 65%;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Coloured organic hero blob bleeding off the left edge. */
+  .lm-lobe {
+    position: relative;
+    background: rgb(var(--c));
+    color: rgb(var(--on));
+    margin: 4px 0 0 -84px;
+    padding: 40px 64px 64px 108px;
+    border-radius: 0 62% 48% 0 / 0 70% 58% 0;
+    width: min(1000px, 84%);
+    min-height: 220px;
+    animation: lm-drift 9s ease-in-out infinite alternate;
+  }
+  .lm-lobe h1 {
+    color: inherit;
+    font-size: clamp(48px, 7vw, 104px);
+    font-weight: 800;
+    letter-spacing: -0.055em;
+    line-height: 0.92;
+    font-stretch: 72%;
+  }
+  .lm-lobe p { font-size: 19px; margin-top: 12px; max-width: 540px; }
+  .lm-lobe .lm-seg { background: rgb(255 255 255 / 0.55); }
+  .lm-lobe .lm-seg button[aria-pressed="true"],
+  .lm-lobe .lm-seg .on { background: rgb(31 33 30); color: #fff; }
+  .lm-lobe .lm-btn { background: rgb(31 33 30); color: #fff; }
+  .lm-lobe .lm-btn-ghost { background: rgb(255 255 255 / 0.6); color: rgb(31 33 30); }
+  .lm-lobe .lm-input { background: rgb(255 255 255 / 0.6); color: rgb(31 33 30); }
+  .lm-lobe .lm-input::placeholder { color: rgb(31 33 30 / 0.55); }
+
+  .lm-acts { display: flex; gap: 8px; margin-top: 22px; flex-wrap: wrap; align-items: center; }
+
+  /* Lifts sheets over the lobe. */
+  .lm-lift { margin-top: -32px; position: relative; }
+
+  .lm-sheet {
+    background: rgb(var(--sheet));
+    border-radius: 28px;
+    padding: 22px 24px;
+    min-width: 0;
+  }
+  .lm-sheet-title {
+    font-size: 22px;
+    font-weight: 750;
+    letter-spacing: -0.03em;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .lm-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgb(var(--c));
+    display: inline-block;
+    flex: none;
+  }
+
+  .lm-btn {
+    @apply inline-flex items-center justify-center gap-2 font-semibold transition-transform active:scale-[.96] disabled:opacity-50 disabled:pointer-events-none;
+    background: rgb(var(--ink));
+    color: rgb(var(--water));
+    padding: 12px 22px;
+    border-radius: 999px;
+    font-weight: 650;
+    white-space: nowrap;
+    border: 0;
+    cursor: pointer;
+  }
+  .lm-btn-ghost { background: rgb(var(--sheet)); color: rgb(var(--ink)); }
+  .lm-btn-soft { background: rgb(var(--step)); color: rgb(var(--ink)); }
+  .lm-btn-danger { background: rgb(var(--alert)); color: #fff; }
+  .lm-btn-sm { padding: 8px 16px; font-size: 14px; }
+
+  .lm-chip {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: rgb(var(--step));
+    color: rgb(var(--ink));
+    white-space: nowrap;
+  }
+  .lm-chip-h { background: rgb(var(--alert)); color: #fff; }
+  .lm-chip-a { background: rgb(var(--aura)); color: rgb(31 33 30); }
+  .lm-chip-c { background: rgb(var(--c)); color: rgb(31 33 30); }
+
+  .lm-check {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgb(var(--step));
+    flex: none;
+    display: grid;
+    place-items: center;
+    transition: background-color .2s;
+  }
+  .lm-check::after {
+    content: "";
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: rgb(31 33 30);
+    transform: scale(0);
+    transition: transform .4s cubic-bezier(.3, 1.6, .5, 1);
+  }
+  .lm-check.done { background: rgb(var(--today)); }
+  .lm-check.done::after { transform: scale(1); }
+
+  .lm-strike { text-decoration: line-through; color: rgb(var(--ink2)); }
+
+  .lm-input {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    background: rgb(var(--step));
+    color: rgb(var(--ink));
+    border: 0;
+    border-radius: 16px;
+    padding: 13px 16px;
+    outline: none;
+    font-size: 16px;
+    transition: box-shadow .15s;
+  }
+  .lm-input::placeholder { color: rgb(var(--ink2)); }
+  .lm-input:focus { box-shadow: 0 0 0 3px rgb(var(--c)); outline: none; }
+  .lm-input[aria-invalid="true"] { box-shadow: 0 0 0 3px rgb(var(--alert)); }
+  textarea.lm-input { resize: vertical; }
+
+  .lm-field { display: grid; gap: 6px; font-weight: 650; font-size: 15px; }
+
+  .lm-seg {
+    display: inline-flex;
+    background: rgb(var(--step));
+    border-radius: 999px;
+    padding: 4px;
+    max-width: 100%;
+  }
+  .lm-seg button {
+    padding: 7px 15px;
+    border-radius: 999px;
+    font-weight: 650;
+    font-size: 14px;
+    white-space: nowrap;
+    transition: background-color .2s;
+  }
+  .lm-seg button[aria-pressed="true"],
+  .lm-seg .on { background: rgb(var(--c)); color: rgb(31 33 30); }
+
+  .lm-row { display: flex; align-items: center; gap: 12px; padding: 11px 0; }
+  .lm-row + .lm-row { box-shadow: 0 -1px 0 rgb(var(--step)); }
+
+  .lm-muted { color: rgb(var(--ink2)); font-size: 14px; }
+
+  /* Top-bar capsules and round buttons. */
+  .lm-cap {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 16px;
+    border-radius: 999px;
+    font-weight: 650;
+    font-size: 15px;
+    background: rgb(var(--sheet));
+    transition: transform .35s cubic-bezier(.3, 1.45, .5, 1);
+  }
+  .lm-cap:hover { transform: translateY(-2px); }
+  .lm-cap i { width: 10px; height: 10px; border-radius: 50%; background: rgb(var(--c)); }
+  .lm-cap.on { background: rgb(var(--c)); color: rgb(31 33 30); }
+  .lm-cap.on i { background: rgb(31 33 30); }
+
+  .lm-round {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgb(var(--sheet));
+    color: rgb(var(--ink));
+    font-weight: 800;
+    font-size: 20px;
+    display: grid;
+    place-items: center;
+    flex: none;
+    transition: transform .2s;
+  }
+  .lm-round:active { transform: scale(.96); }
+
+  .lm-kbd {
+    margin-left: auto;
+    font-weight: 700;
+    font-size: 13px;
+    background: rgb(var(--step));
+    padding: 2px 8px;
+    border-radius: 999px;
+    color: rgb(var(--ink));
+  }
+
+  /* Blob used by loaders and empty states. */
+  .lm-blob {
+    background: rgb(var(--c));
+    border-radius: 62% 38% 54% 46% / 52% 60% 40% 48%;
+    animation: lm-drift 9s ease-in-out infinite alternate;
+  }
+  .lm-pulse { animation: lm-pulse 1.6s ease-in-out infinite; }
+
+  .lm-skel {
+    background: rgb(var(--step));
+    border-radius: 999px;
+    animation: lm-pulse 1.6s ease-in-out infinite;
+  }
+
+  .lm-error {
+    background: rgb(var(--alert) / 0.12);
+    color: rgb(var(--alert));
+    border-radius: 20px;
+    padding: 14px 18px;
+    font-weight: 600;
+  }
+  .dark .lm-error { color: #ff8f7d; }
+
+  /* Dialog with curved coloured header. */
+  .lm-dialog {
+    background: rgb(var(--sheet));
+    border-radius: 32px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgb(0 0 0 / 0.25);
+  }
+  .lm-dialog-head {
+    background: rgb(var(--c));
+    color: rgb(31 33 30);
+    padding: 24px 28px 36px;
+    border-radius: 0 0 50% 14% / 0 0 36px 20px;
+  }
+  .lm-dialog-head h2 { color: inherit; font-size: 28px; font-stretch: 78%; font-weight: 800; letter-spacing: -0.045em; }
+  .lm-dialog-danger .lm-dialog-head { background: rgb(var(--alert)); color: #fff; }
+
+  /* Toast pills. */
+  .lm-toast {
+    background: rgb(31 33 30) !important;
+    color: #fff !important;
+    border-radius: 999px !important;
+    padding: 10px 18px !important;
+    font-weight: 600;
+  }
+
+  /* Tiptap editor surface. */
+  .ProseMirror {
+    @apply min-h-[300px] w-full max-w-full p-4 outline-none;
+    font-size: 18px;
+    line-height: 1.7;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    color: rgb(var(--ink));
+  }
+  .ProseMirror p { @apply mb-3; }
+  .ProseMirror h1 { @apply text-3xl mb-3 mt-4; font-weight: 800; letter-spacing: -0.04em; }
+  .ProseMirror h2 { @apply text-2xl mb-3 mt-4; font-weight: 800; letter-spacing: -0.035em; }
+  .ProseMirror h3 { @apply text-xl mb-3 mt-4; font-weight: 750; }
   .ProseMirror ul, .ProseMirror ol { @apply pl-6 mb-3; }
   .ProseMirror ul { @apply list-disc; }
   .ProseMirror ol { @apply list-decimal; }
   .ProseMirror blockquote {
-    @apply pl-4 border-l-4 border-slate-300 dark:border-slate-700 text-slate-500 dark:text-slate-400 italic my-3;
+    background: rgb(var(--water));
+    border-radius: 20px;
+    padding: 14px 20px;
+    margin: 12px 0;
+    color: rgb(var(--ink2));
   }
+  .ProseMirror code { background: rgb(var(--step)); border-radius: 8px; padding: 2px 6px; }
 
-  /* Typography utilities. */
-  .display-lg { @apply text-5xl font-extrabold tracking-tighter leading-tight; }
-  .headline-sm { @apply text-2xl font-bold; }
+  .display-lg { @apply lm-display text-5xl; }
+  .headline-sm { @apply text-2xl; font-weight: 750; }
 
-  /* Premium Glass Morphism components with light/dark adaptive backdrops. */
-  .glass {
-    background: rgba(255, 255, 255, 0.4);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+  /* ---- Legacy aliases: map old aurora classes to the new look until pages are migrated. ---- */
+  .glass, .glass-panel {
+    background: rgb(var(--sheet));
+    border-radius: 28px;
     display: block;
   }
-
-  .dark .glass {
-    background: rgba(15, 23, 42, 0.45);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-  }
-
-  .glass-panel {
-    background: rgba(255, 255, 255, 0.5);
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    display: block;
-  }
-
-  .dark .glass-panel {
-    background: rgba(15, 23, 42, 0.65);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-  }
-
-  /* Styling for Aurora text and input fields. */
   .input-aurora {
-    @apply w-full max-w-full bg-white/60 dark:bg-slate-900/60 border border-primary/10 dark:border-white/10 rounded-xl px-4 py-3 text-sm font-medium text-text placeholder:text-text/30 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all;
-    box-sizing: border-box;
-    display: block;
+    @apply lm-input;
   }
-
-  /* Primary call-to-action button styled with gradients and micro-interactions. */
   .btn-aurora-primary {
-    @apply inline-flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-500 text-white font-bold py-3 px-6 rounded-2xl shadow-lg hover:opacity-90 transition-all active:scale-[0.98];
-    white-space: nowrap;
-    border: none;
-    cursor: pointer;
+    @apply lm-btn;
   }
-
-  /* Secondary button styled with subtle glass-morphism borders. */
   .btn-aurora-secondary {
-    @apply inline-flex items-center justify-center gap-2 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm border border-primary/10 dark:border-white/10 text-text font-bold py-3 px-6 rounded-2xl hover:bg-white/80 dark:hover:bg-slate-700/80 transition-all;
-    white-space: nowrap;
-    cursor: pointer;
+    @apply lm-btn lm-btn-soft;
   }
-
-  /* Compact section headers for sidebars and settings categorizations. */
   .section-header {
-    @apply text-[10px] font-black uppercase tracking-[0.2em] text-primary/50;
+    @apply text-[11px] font-bold uppercase tracking-[0.16em] text-ink2;
     margin: 0;
   }
-
-  /* Glowing ambient shadow wrapper. */
-  .aurora-glow {
-    @apply shadow-[0_0_20px_rgba(99,102,241,0.3)] dark:shadow-[0_0_30px_rgba(99,102,241,0.5)];
-  }
-
-  /* Mesh gradient background representing light and dark ambient orbits. */
-  .aurora-mesh {
-    background: 
-      radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
-      radial-gradient(circle at 80% 30%, rgba(168, 85, 247, 0.15) 0%, transparent 50%),
-      radial-gradient(circle at 50% 70%, rgba(232, 105, 172, 0.10) 0%, transparent 50%),
-      linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.95) 100%);
-    background-attachment: fixed;
-  }
-
-  .dark .aurora-mesh {
-    background: 
-      radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.22) 0%, transparent 60%),
-      radial-gradient(circle at 80% 30%, rgba(168, 85, 247, 0.20) 0%, transparent 60%),
-      radial-gradient(circle at 50% 70%, rgba(236, 72, 153, 0.16) 0%, transparent 70%),
-      linear-gradient(135deg, rgba(2, 6, 23, 1) 0%, rgba(15, 23, 42, 1) 100%);
-  }
+  .aurora-glow { box-shadow: none; }
+  .aurora-mesh { background: rgb(var(--water)); }
 
   /* Layout wrappers for core app pages. */
   .app-page { @apply w-full max-w-7xl mx-auto px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8; }
   .app-page-tight { @apply w-full max-w-5xl mx-auto px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8; }
-  
-  /* Compact custom-scrollbar rules for sidebar elements. */
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-  }
+
+  .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
+  .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    @apply bg-primary/20 rounded-full hover:bg-primary/40 transition-colors;
+    @apply bg-ink/20 rounded-full hover:bg-ink/40 transition-colors;
+  }
+}
+
+/* Page content shell shared by every routed page. */
+.lm-main { padding: 0 24px 96px; }
+@media (min-width: 768px) { .lm-main { padding-bottom: 40px; } }
+@media (max-width: 760px) {
+  .lm-main { padding-left: 16px; padding-right: 16px; }
+  .lm-lobe { margin-left: -40px; padding: 28px 32px 48px 56px; width: 100%; }
+  .lm-lobe p { font-size: 17px; }
+}
+
+@keyframes lm-drift {
+  from { border-radius: 0 62% 48% 0 / 0 70% 58% 0; }
+  to { border-radius: 0 54% 56% 0 / 0 62% 66% 0; }
+}
+@keyframes lm-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.06); opacity: .75; }
+}
+@keyframes lm-rise {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes lm-toast-in {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Children of a staggered page rise in sequence. */
+.lm-stagger > * { animation: lm-rise .5s cubic-bezier(.2, .8, .3, 1) both; }
+.lm-stagger > *:nth-child(2) { animation-delay: 70ms; }
+.lm-stagger > *:nth-child(3) { animation-delay: 140ms; }
+.lm-stagger > *:nth-child(4) { animation-delay: 210ms; }
+.lm-stagger > *:nth-child(n+5) { animation-delay: 280ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 150ms !important;
   }
 }
