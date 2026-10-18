@@ -52,7 +52,9 @@ const Layout = () => {
         )}
       </AnimatePresence>
 
-      <main>
+      <div aria-hidden="true" className="lm-lobe-br" />
+
+      <main className="relative z-[1]">
         <motion.div
           key={pathname}
           className="lm-main min-w-0"

@@ -148,22 +148,35 @@
     color: rgb(var(--on));
     /* --unzoom keeps the blob at its pre-zoom size; content still scales */
     margin: 4px 0 0 calc(-1 * var(--gut, 24px));
-    padding: calc(40px * var(--unzoom, 1)) calc(64px * var(--unzoom, 1)) calc(64px * var(--unzoom, 1)) calc(var(--gut, 24px) + 84px * var(--unzoom, 1));
+    padding: calc(24px * var(--unzoom, 1)) calc(56px * var(--unzoom, 1)) calc(40px * var(--unzoom, 1)) calc(var(--gut, 24px) + 84px * var(--unzoom, 1));
     border-radius: 0 62% 48% 0 / 0 70% 58% 0;
     width: min(calc(1000px * var(--unzoom, 1)), 84%);
-    min-height: calc(220px * var(--unzoom, 1));
+    min-height: calc(150px * var(--unzoom, 1));
     animation: lm-drift 9s ease-in-out infinite alternate;
+  }
+  /* Mirrored counterpart pinned just above the bottom-right corner, bleeding off the right edge. */
+  .lm-lobe-br {
+    position: fixed;
+    right: 0;
+    bottom: 5vh;
+    z-index: 0;
+    pointer-events: none;
+    background: rgb(var(--c));
+    width: min(calc(520px * var(--unzoom, 1)), 38vw);
+    height: calc(200px * var(--unzoom, 1));
+    border-radius: 62% 0 0 48% / 70% 0 0 58%;
+    animation: lm-drift-br 9s ease-in-out infinite alternate;
   }
   .lm-lobe h1 {
     color: inherit;
-    font-size: clamp(48px, 7vw, 104px);
+    font-size: clamp(40px, 5.6vw, 80px);
     font-weight: 800;
     letter-spacing: -0.055em;
     line-height: 0.92;
     font-stretch: 72%;
     word-spacing: 0.14em;
   }
-  .lm-lobe p { font-size: 19px; margin-top: 12px; max-width: 540px; }
+  .lm-lobe p { font-size: 17px; margin-top: 8px; max-width: 540px; }
   .lm-lobe .lm-seg { background: rgb(255 255 255 / 0.55); }
   .lm-lobe .lm-seg button[aria-pressed="true"],
   .lm-lobe .lm-seg .on { background: rgb(31 33 30); color: #fff; }
@@ -172,7 +185,7 @@
   .lm-lobe .lm-input { background: rgb(255 255 255 / 0.6); color: rgb(31 33 30); }
   .lm-lobe .lm-input::placeholder { color: rgb(31 33 30 / 0.55); }
 
-  .lm-acts { display: flex; gap: 8px; margin-top: 22px; flex-wrap: wrap; align-items: center; }
+  .lm-acts { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; align-items: center; }
 
   /* Lifts sheets over the lobe. */
   .lm-lift { margin-top: -32px; position: relative; }
@@ -180,7 +193,7 @@
   .lm-sheet {
     background: rgb(var(--sheet));
     border-radius: 28px;
-    padding: 22px 24px;
+    padding: 18px 20px;
     min-width: 0;
   }
   .lm-sheet-title {
@@ -427,13 +440,18 @@
 @media (min-width: 768px) { .lm-main { padding-bottom: 40px; } }
 @media (max-width: 760px) {
   .lm-main { --gut: 16px; }
-  .lm-lobe { padding: 28px 32px 48px calc(var(--gut) + 40px); width: 100%; }
-  .lm-lobe p { font-size: 17px; }
+  .lm-lobe { padding: 20px 28px 32px calc(var(--gut) + 40px); width: 100%; }
+  .lm-lobe p { font-size: 16px; }
+  .lm-lobe-br { width: 28vw; height: 120px; }
 }
 
 @keyframes lm-drift {
   from { border-radius: 0 62% 48% 0 / 0 70% 58% 0; }
   to { border-radius: 0 54% 56% 0 / 0 62% 66% 0; }
+}
+@keyframes lm-drift-br {
+  from { border-radius: 62% 0 0 48% / 70% 0 0 58%; }
+  to { border-radius: 54% 0 0 56% / 62% 0 0 66%; }
 }
 @keyframes lm-pulse {
   0%, 100% { transform: scale(1); opacity: 1; }
