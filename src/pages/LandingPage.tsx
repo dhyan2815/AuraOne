@@ -3,6 +3,9 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { AnimatePresence, motion, useReducedMotion, useScroll } from "framer-motion";
+import Lenis from "lenis";
+import "lenis/dist/lenis.css";
 import Logo from "../components/structure/Logo";
 import SiteFooter from "../components/structure/SiteFooter";
 
@@ -37,11 +40,20 @@ const DEMO_LINES = [
     { say: "what did I decide about chunk overlap?", mode: "Brain", steps: ["search_knowledge", "3 notes", "0.82 match"], reply: "You settled on 512-token chunks with 64 overlap, from your note Chunking strategies." },
 ];
 
+// radius and r2 are the two blob shapes each tile drifts between.
 const PARTS = [
-    { title: "Tasks", color: "tasks", text: "High, medium and low priority with due dates, completed in one tap.", radius: "48% 52% 40% 60% / 40% 44% 56% 60%" },
-    { title: "Notes", color: "notes", text: "A rich text editor with tags, searchable by you and by Aura.", radius: "56% 44% 58% 42% / 52% 60% 40% 48%" },
-    { title: "Events", color: "events", text: "A month calendar with today's schedule, created in plain words.", radius: "40% 60% 46% 54% / 58% 40% 60% 42%" },
-    { title: "Knowledge", color: "know", text: "Your notes, tasks and events, chunked and embedded so Aura answers from what you actually wrote.", radius: "48% 52% 40% 60% / 40% 44% 56% 60%" },
+    { title: "Tasks", color: "tasks", text: "High, medium and low priority with due dates, completed in one tap.", radius: "48% 52% 40% 60% / 40% 44% 56% 60%", r2: "58% 42% 52% 48% / 52% 58% 42% 48%" },
+    { title: "Notes", color: "notes", text: "A rich text editor with tags, searchable by you and by Aura.", radius: "56% 44% 58% 42% / 52% 60% 40% 48%", r2: "44% 56% 46% 54% / 44% 48% 52% 56%" },
+    { title: "Events", color: "events", text: "A month calendar with today's schedule, created in plain words.", radius: "40% 60% 46% 54% / 58% 40% 60% 42%", r2: "52% 48% 56% 44% / 46% 54% 46% 54%" },
+    { title: "Knowledge", color: "know", text: "Your notes, tasks and events, chunked and embedded so Aura answers from what you actually wrote.", radius: "48% 52% 40% 60% / 40% 44% 56% 60%", r2: "40% 60% 54% 46% / 56% 42% 58% 44%" },
+];
+
+// Header anchors; c is the section colour reused by the scroll-spy pill and progress rail.
+const NAV = [
+    { id: "aura", label: "Aura", c: "--aura" },
+    { id: "parts", label: "Features", c: "--tasks" },
+    { id: "how", label: "How it works", c: "--events" },
+    { id: "voices", label: "Stories", c: "--notes" },
 ];
 
 // How the product works, in three steps.
@@ -59,10 +71,185 @@ const FACTS = [
     { k: "Light + dark", v: "follows your system, switch any time" },
 ];
 
-const LandingPage = () => {
-    // Track the active testimonial and the selected demo sentence.
-    const [currentTestimonial, setCurrentTestimonial] = useState(0);
+// "Say it. Aura does it." demo: steps pop in, the reply types out, then it moves to the next sentence until the visitor picks one.
+const AuraDemo = () => {
+    const reduce = useReducedMotion();
     const [pick, setPick] = useState(0);
+    const [auto, setAuto] = useState(true);
+    const [typed, setTyped] = useState(0);
+    const cur = DEMO_LINES[pick];
+
+    // Type the reply once its steps have shown.
+    useEffect(() => {
+        if (reduce) { setTyped(cur.reply.length); return; }
+        setTyped(0);
+        let iv = 0;
+        const start = window.setTimeout(() => {
+            let n = 0;
+            iv = window.setInterval(() => {
+                setTyped(++n);
+                if (n >= cur.reply.length) clearInterval(iv);
+            }, 22);
+        }, 200 + cur.steps.length * 180);
+        return () => { clearTimeout(start); clearInterval(iv); };
+    }, [pick, reduce, cur]);
+
+    // Advance on our own after a typed reply, until the visitor takes over.
+    useEffect(() => {
+        if (reduce || !auto || typed < cur.reply.length) return;
+        const id = window.setTimeout(() => setPick((p) => (p + 1) % DEMO_LINES.length), 3200);
+        return () => clearTimeout(id);
+    }, [typed, auto, reduce, cur]);
+
+    return (
+        <div className="mt-10 grid gap-5 md:grid-cols-2">
+            <div className="grid content-start gap-2.5">
+                {DEMO_LINES.map((l, i) => (
+                    <button
+                        key={l.say}
+                        aria-pressed={i === pick}
+                        onClick={() => { setPick(i); setAuto(false); }}
+                        className={`lm-tile rounded-3xl px-[22px] py-[18px] text-left text-[19px] font-semibold active:scale-[.98] ${i === pick ? "bg-aura text-[#1F211E]" : "bg-sheet"}`}
+                    >
+                        “{l.say}”
+                    </button>
+                ))}
+            </div>
+            <div className="rounded-[32px] bg-ink p-7 text-water">
+                <p className="sr-only" aria-live="polite">{cur.mode} mode: {cur.reply}</p>
+                <div aria-hidden>
+                    <p className="text-sm opacity-75">Aura · {cur.mode} mode</p>
+                    <div className="mb-5 mt-3.5 flex flex-wrap gap-2">
+                        {cur.steps.map((s, i) => (
+                            <motion.span
+                                key={`${pick}-${s}`}
+                                className="lm-chip lm-chip-a"
+                                initial={reduce ? false : { opacity: 0, y: 8, scale: 0.9 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                transition={{ delay: 0.15 + i * 0.18, type: "spring", stiffness: 380, damping: 24 }}
+                            >
+                                {s}
+                            </motion.span>
+                        ))}
+                    </div>
+                    {/* The full reply sits invisible underneath so the panel never changes height while typing. */}
+                    <p className="grid text-[26px] font-semibold leading-[1.3]" style={{ letterSpacing: "-.02em" }}>
+                        <span className="invisible col-start-1 row-start-1">{cur.reply}</span>
+                        <span className="col-start-1 row-start-1">
+                            {cur.reply.slice(0, typed)}
+                            {typed < cur.reply.length && <span className="ml-0.5 inline-block h-[1em] w-[3px] translate-y-[3px] animate-pulse bg-current" />}
+                        </span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// Hero Today list that replays what Aura does: ticks a task, then moves the review from 10:00 to 10:30.
+const TodayRows = () => {
+    const reduce = useReducedMotion();
+    const [moved, setMoved] = useState(true);
+    const [done, setDone] = useState(false);
+
+    useEffect(() => {
+        if (reduce) return;
+        let ids: number[] = [];
+        const run = () => {
+            setMoved(false);
+            setDone(false);
+            ids = [
+                window.setTimeout(() => setDone(true), 1400),
+                window.setTimeout(() => setMoved(true), 3000),
+                window.setTimeout(run, 8000),
+            ];
+        };
+        run();
+        return () => ids.forEach(clearTimeout);
+    }, [reduce]);
+
+    return (
+        <div className="lm-sheet !bg-water">
+            <div className="lm-row">
+                <span className="relative h-[1.4em] w-14 flex-none overflow-hidden font-bold">
+                    <AnimatePresence initial={false}>
+                        <motion.span
+                            key={moved ? "10:30" : "10:00"}
+                            className="absolute left-0 top-0"
+                            initial={{ y: "100%", opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: "-100%", opacity: 0 }}
+                            transition={{ duration: 0.35, ease: [0.2, 0.8, 0.3, 1] }}
+                        >
+                            {moved ? "10:30" : "10:00"}
+                        </motion.span>
+                    </AnimatePresence>
+                </span>
+                Design review
+                <AnimatePresence>
+                    {moved && (
+                        <motion.span
+                            className="lm-chip lm-chip-a ml-auto"
+                            initial={reduce ? false : { scale: 0, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0, opacity: 0 }}
+                            transition={{ type: "spring", stiffness: 420, damping: 20 }}
+                        >
+                            moved by Aura
+                        </motion.span>
+                    )}
+                </AnimatePresence>
+            </div>
+            <div className="lm-row"><span className={`lm-check ${done ? "done" : ""}`} /><span className={`lm-sl ${done ? "done" : ""}`}>Write up the chunking notes</span><span className="lm-chip lm-chip-h ml-auto">High</span></div>
+            <div className="lm-row"><span className="lm-check" />Buy groceries<span className="lm-muted ml-auto">Sun</span></div>
+        </div>
+    );
+};
+
+// Feature tile: morphs between two blob shapes and nudges its content toward the cursor.
+const PartTile = ({ p, i }: { p: (typeof PARTS)[number]; i: number }) => (
+    <div
+        className="lm-tile lm-morph min-h-[300px] px-8 py-12 text-[#1F211E] md:px-16 md:py-14"
+        style={{ background: `rgb(var(--${p.color}))`, borderRadius: p.radius, "--r1": p.radius, "--r2": p.r2, "--d": `${-i * 3}s` } as React.CSSProperties}
+        onPointerMove={(e) => {
+            const r = e.currentTarget.getBoundingClientRect();
+            e.currentTarget.style.setProperty("--px", String((e.clientX - r.left) / r.width - 0.5));
+            e.currentTarget.style.setProperty("--py", String((e.clientY - r.top) / r.height - 0.5));
+        }}
+        onPointerLeave={(e) => {
+            e.currentTarget.style.setProperty("--px", "0");
+            e.currentTarget.style.setProperty("--py", "0");
+        }}
+    >
+        <div className="lm-par">
+            <h3 className="lm-display text-[44px] !leading-none !text-[#1F211E]">{p.title}</h3>
+            <p className="mt-2.5 max-w-[420px] text-lg">{p.text}</p>
+        </div>
+    </div>
+);
+
+const LandingPage = () => {
+    // Track the active testimonial and the section nearest the viewport middle.
+    const [currentTestimonial, setCurrentTestimonial] = useState(0);
+    const [active, setActive] = useState("top");
+    const { scrollYProgress } = useScroll();
+
+    // Inertia scroll for the whole page (and eased anchor jumps); native scroll when motion is reduced.
+    useEffect(() => {
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        const lenis = new Lenis({ autoRaf: true, anchors: { offset: -72 } });
+        return () => lenis.destroy();
+    }, []);
+
+    // Scroll-spy: the section crossing the 40–45% band of the viewport is the active one.
+    useEffect(() => {
+        const io = new IntersectionObserver(
+            (es) => es.forEach((e) => e.isIntersecting && setActive(e.target.id)),
+            { rootMargin: "-40% 0px -55% 0px" },
+        );
+        document.querySelectorAll("section[id]").forEach((el) => io.observe(el));
+        return () => io.disconnect();
+    }, []);
 
     // Spin up an interval timer to cycle testimonials automatically every 4 seconds.
     useEffect(() => {
@@ -77,21 +264,25 @@ const LandingPage = () => {
     }, []);
 
     const t = TESTIMONIALS[currentTestimonial];
-    const cur = DEMO_LINES[pick];
     const today = new Date().toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" });
     const [weekday, ...dateRest] = today.replace(",", "").split(" ");
 
     return (
         <div className="sec-today min-h-screen overflow-x-clip bg-water font-sans text-ink [--gut:max(24px,calc((100vw*var(--unzoom,1)-1440px)/2))]">
+            {/* Scroll progress rail, tinted by the section in view */}
+            <motion.div
+                aria-hidden
+                className="fixed inset-x-0 top-0 z-50 h-[3px] origin-left transition-colors duration-500"
+                style={{ scaleX: scrollYProgress, background: `rgb(var(${NAV.find((n) => n.id === active)?.c ?? "--today"}))` }}
+            />
             <div className="mx-auto max-w-[1440px]">
                 {/* Header */}
-                <header className="flex flex-wrap items-center gap-2 px-4 py-4 md:px-6">
+                <header className="sticky top-0 z-40 flex flex-wrap items-center gap-2 bg-water/85 px-4 py-4 backdrop-blur md:px-6">
                     <Link to="/" className="mr-4" aria-label="AuraOne home"><Logo textOnly /></Link>
                     <nav className="hidden gap-1.5 md:flex" aria-label="Sections">
-                        <a className="lm-cap" href="#aura" style={{ "--c": "var(--aura)" } as React.CSSProperties}><i />Aura</a>
-                        <a className="lm-cap" href="#parts" style={{ "--c": "var(--tasks)" } as React.CSSProperties}><i />Features</a>
-                        <a className="lm-cap" href="#how" style={{ "--c": "var(--events)" } as React.CSSProperties}><i />How it works</a>
-                        <a className="lm-cap" href="#voices" style={{ "--c": "var(--notes)" } as React.CSSProperties}><i />Stories</a>
+                        {NAV.map((n) => (
+                            <a key={n.id} className={`lm-cap ${active === n.id ? "on" : ""}`} href={`#${n.id}`} aria-current={active === n.id ? "location" : undefined} style={{ "--c": `var(${n.c})` } as React.CSSProperties}><i />{n.label}</a>
+                        ))}
                     </nav>
                     <div className="ml-auto flex gap-2">
                         <Link to="/login" viewTransition className="lm-btn lm-btn-soft">Log in</Link>
@@ -100,7 +291,7 @@ const LandingPage = () => {
                 </header>
 
                 {/* Hero */}
-                <section className="grid items-center gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
+                <section id="top" className="grid items-center gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
                     <div className="lm-lobe flex flex-col justify-center !w-auto !min-h-[480px] lg:!min-h-[calc(620px*var(--unzoom))] lg:!pl-[calc(var(--gut)+108px*var(--unzoom))] lg:!pr-[calc(72px*var(--unzoom))] lg:!py-[calc(72px*var(--unzoom))]" style={{ viewTransitionName: "auth-lobe" }}>
                         <h1 style={{ fontSize: "clamp(56px, 8.4vw, 128px)" }}>One map for your whole day</h1>
                         <p>Tasks, notes, events and news in one place, with Aura to add, move and find anything in plain words.</p>
@@ -119,11 +310,7 @@ const LandingPage = () => {
                         <div className="rounded-r-[60%] rounded-bl-none bg-today px-7 pb-9 pt-6 text-[#1F211E]" style={{ borderRadius: "0 60% 48% 0 / 0 70% 58% 0" }}>
                             <div className="lm-display text-[52px]">{weekday}<br />{dateRest.join(" ")}</div>
                         </div>
-                        <div className="lm-sheet !bg-water">
-                            <div className="lm-row"><span className="w-14 flex-none font-bold">10:30</span>Design review<span className="lm-chip lm-chip-a ml-auto">moved by Aura</span></div>
-                            <div className="lm-row"><span className="lm-check" />Write up the chunking notes<span className="lm-chip lm-chip-h ml-auto">High</span></div>
-                            <div className="lm-row"><span className="lm-check" />Buy groceries<span className="lm-muted ml-auto">Sun</span></div>
-                        </div>
+                        <TodayRows />
                     </div>
                 </section>
 
@@ -131,43 +318,14 @@ const LandingPage = () => {
                 <section className="px-4 pt-24 md:px-6 md:pt-36" id="aura">
                     <h2 className="lm-display max-w-[900px] text-[clamp(44px,5.6vw,84px)]">Say it. Aura does it.</h2>
                     <p className="mt-4 max-w-[620px] text-xl">Aura reads and changes your own tasks, notes and events. Pick a sentence and see what it would do.</p>
-                    <div className="mt-10 grid gap-5 md:grid-cols-2">
-                        <div className="grid content-start gap-2.5">
-                            {DEMO_LINES.map((l, i) => (
-                                <button
-                                    key={l.say}
-                                    aria-pressed={i === pick}
-                                    onClick={() => setPick(i)}
-                                    className={`lm-tile rounded-3xl px-[22px] py-[18px] text-left text-[19px] font-semibold active:scale-[.98] ${i === pick ? "bg-aura text-[#1F211E]" : "bg-sheet"}`}
-                                >
-                                    “{l.say}”
-                                </button>
-                            ))}
-                        </div>
-                        <div className="rounded-[32px] bg-ink p-7 text-water" aria-live="polite">
-                            <p className="text-sm opacity-75">Aura · {cur.mode} mode</p>
-                            <div className="mb-5 mt-3.5 flex flex-wrap gap-2">
-                                {cur.steps.map((s) => <span key={s} className="lm-chip lm-chip-a">{s}</span>)}
-                            </div>
-                            <p className="text-[26px] font-semibold leading-[1.3]" style={{ letterSpacing: "-.02em" }}>{cur.reply}</p>
-                        </div>
-                    </div>
+                    <AuraDemo />
                 </section>
 
                 {/* Parts */}
                 <section className="px-4 pt-24 md:px-6 md:pt-36" id="parts">
                     <h2 className="lm-display max-w-[900px] text-[clamp(44px,5.6vw,84px)]">Every part of your day, in its own colour</h2>
                     <div className="mt-10 grid gap-5 md:grid-cols-2">
-                        {PARTS.map((p) => (
-                            <div
-                                key={p.title}
-                                className="lm-tile min-h-[300px] px-8 py-12 text-[#1F211E] md:px-16 md:py-14"
-                                style={{ background: `rgb(var(--${p.color}))`, borderRadius: p.radius }}
-                            >
-                                <h3 className="lm-display text-[44px] !leading-none !text-[#1F211E]">{p.title}</h3>
-                                <p className="mt-2.5 max-w-[420px] text-lg">{p.text}</p>
-                            </div>
-                        ))}
+                        {PARTS.map((p, i) => <PartTile key={p.title} p={p} i={i} />)}
                     </div>
                 </section>
 

@@ -607,6 +607,19 @@
   .h-screen { height: calc(100vh / 0.9); }
 }
 
+/* Landing feature tiles: idle blob morph between --r1 and --r2, content nudged by the cursor (--px/--py). */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes lm-morph {
+    0%, 100% { border-radius: var(--r1); }
+    50% { border-radius: var(--r2); }
+  }
+  .lm-morph { animation: lm-morph 11s ease-in-out var(--d, 0s) infinite; }
+  .lm-par {
+    transform: translate(calc(var(--px, 0) * 14px), calc(var(--py, 0) * 10px));
+    transition: transform .3s cubic-bezier(.2, .8, .3, 1);
+  }
+}
+
 /* Landing nav anchors: eased smooth scroll, and sections fade up as they enter the viewport. */
 @media (prefers-reduced-motion: no-preference) {
   html { scroll-behavior: smooth; scroll-padding-top: 16px; }
