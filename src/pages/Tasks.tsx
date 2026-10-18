@@ -5,6 +5,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { Plus, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getTasks, updateTask, deleteTask, Task } from "../hooks/useTasks";
+import Count from "../components/ui/Count";
 import EmptyState from "../components/ui/EmptyState";
 import { useAuth } from "../hooks/useAuth";
 import toast from "react-hot-toast";
@@ -68,11 +69,16 @@ const Tasks = () => {
   };
   const rowVariant = { hidden: { opacity: 0, x: -12 }, show: { opacity: 1, x: 0 } };
 
-  const TaskRow = ({ task }: { task: Task }) => {
+  // Plain render function (not a component) so rows keep identity across renders and can animate between groups.
+  const renderRow = (task: Task) => {
     const done = !!task.completed;
     return (
       <motion.div
+        key={task.id}
+        layout="position"
+        layoutId={`task-${task.id}`}
         variants={rowVariant}
+        exit={{ opacity: 0, x: 24, transition: { duration: 0.2 } }}
         onClick={() => navigate(`/tasks/${task.id}`)}
         className="group grid cursor-pointer grid-cols-[24px_minmax(0,1fr)_auto_36px] items-center gap-3.5 rounded-[18px] px-2 py-3.5 hover:bg-water sm:grid-cols-[24px_minmax(0,1fr)_90px_90px_36px]"
       >
@@ -81,11 +87,15 @@ const Tasks = () => {
           onClick={(e) => handleToggle(task.id, task.completed, e)}
           className={`lm-check ${done ? "done" : ""}`}
           aria-label={`${done ? "Reopen" : "Complete"} ${task.title}`}
-        />
+        >
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <motion.path d="M5 12.5l4.5 4.5L19 7" initial={false} animate={{ pathLength: done ? 1 : 0 }} transition={{ duration: 0.3 }} />
+          </svg>
+        </button>
 
         {/* Content */}
         <div className="min-w-0">
-          <span className={`block truncate font-semibold ${done ? "lm-strike" : ""}`}>{task.title}</span>
+          <span className={`lm-sl block truncate font-semibold ${done ? "done" : ""}`}>{task.title}</span>
           <span className="lm-muted block truncate">{task.description || (task.due_date ? "" : "No deadline")}</span>
         </div>
 
@@ -115,11 +125,11 @@ const Tasks = () => {
     );
   };
 
-  interface GroupProps { color: string; label: string; list: Task[]; }
-  const Group = ({ color, label, list }: GroupProps) => (
+  const renderGroup = (color: string, label: string, list: Task[]) => (
     <AnimatePresence mode="popLayout">
       {list.length > 0 && (
         <motion.div
+          key={label}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.98 }}
@@ -130,7 +140,9 @@ const Tasks = () => {
             {label}
           </h3>
           <motion.div variants={stagger} initial="hidden" animate="show">
-            {list.map((t) => <TaskRow key={t.id} task={t} />)}
+            <AnimatePresence mode="popLayout">
+              {list.map(renderRow)}
+            </AnimatePresence>
           </motion.div>
         </motion.div>
       )}
@@ -143,7 +155,7 @@ const Tasks = () => {
     <div className="sec-tasks">
       <section className="lm-lobe">
         <h1>Tasks</h1>
-        <p>{openCount} open · {highPriority.length} high priority.</p>
+        <p><Count n={openCount} /> open · <Count n={highPriority.length} /> high priority.</p>
         <div className="lm-acts">
           <button onClick={() => navigate("/tasks/new")} className="lm-btn">
             <Plus size={16} strokeWidth={3} /> New task
@@ -177,9 +189,9 @@ const Tasks = () => {
           <p className="px-2 py-10 text-[19px]">Nothing here. Try another filter, or tell Aura “add a task…”.</p>
         ) : (
           <div>
-            <Group color="rgb(var(--alert))" label="High priority" list={highPriority} />
-            <Group color="rgb(var(--tasks))" label="In progress" list={activeFlow} />
-            <Group color="rgb(var(--today))" label="Completed" list={achieved} />
+            {renderGroup("rgb(var(--alert))", "High priority", highPriority)}
+            {renderGroup("rgb(var(--tasks))", "In progress", activeFlow)}
+            {renderGroup("rgb(var(--today))", "Completed", achieved)}
           </div>
         )}
       </div>

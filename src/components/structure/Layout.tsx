@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { useOutlet, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import TopBar from './TopBar';
 import { sectionFor } from './sections';
@@ -23,6 +23,15 @@ const Layout = () => {
   const { pathname } = useLocation();
   const section = sectionFor(pathname);
   const reduceMotion = useReducedMotion();
+  const outlet = useOutlet();
+
+  // Navigation direction by route depth: deeper slides in from the right, back from the left.
+  const depth = pathname.split('/').filter(Boolean).length;
+  const nav = useRef({ path: pathname, depth, dir: 0 });
+  if (nav.current.path !== pathname) {
+    nav.current = { path: pathname, depth, dir: Math.sign(depth - nav.current.depth) };
+  }
+  const dir = nav.current.dir;
 
   // Skip the colour flood on first paint; only section changes flood.
   const lastSection = useRef(section.key);
@@ -33,6 +42,15 @@ const Layout = () => {
       if (!reduceMotion) setFlood(section.key);
     }
   }, [section.key, reduceMotion]);
+
+  const pageVariants = {
+    initial: (d: number) => ({ opacity: 0, x: reduceMotion ? 0 : d * 48, y: reduceMotion || d ? 0 : 24 }),
+    animate: {
+      opacity: 1, x: 0, y: 0,
+      transition: { duration: reduceMotion ? 0.15 : 0.5, ease: [0.2, 0.8, 0.3, 1], delay: flood ? 0.3 : 0 },
+    },
+    exit: (d: number) => ({ opacity: 0, x: reduceMotion ? 0 : -d * 32, transition: { duration: 0.18, ease: 'easeIn' } }),
+  };
 
   return (
     <div className={`${section.cls} min-h-screen overflow-x-hidden bg-water text-ink transition-colors duration-300`}>
@@ -55,15 +73,19 @@ const Layout = () => {
       <div aria-hidden="true" className="lm-lobe-br" />
 
       <main className="relative z-[1]">
-        <motion.div
-          key={pathname}
-          className="lm-main min-w-0"
-          initial={{ opacity: 0, y: reduceMotion ? 0 : 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduceMotion ? 0.15 : 0.5, ease: [0.2, 0.8, 0.3, 1], delay: flood ? 0.3 : 0 }}
-        >
-          <Outlet />
-        </motion.div>
+        <AnimatePresence mode="popLayout" custom={dir}>
+          <motion.div
+            key={pathname}
+            className="lm-main min-w-0"
+            custom={dir}
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+          >
+            {outlet}
+          </motion.div>
+        </AnimatePresence>
       </main>
     </div>
   );

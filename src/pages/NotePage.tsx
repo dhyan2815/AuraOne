@@ -179,21 +179,36 @@ const NotePage = () => {
             <ArrowLeft size={16} /> All notes
           </button>
           <span className="ml-auto flex items-center gap-2 text-sm font-semibold" role="status">
-            {autoSaving ? (
-              <>
-                <RotateCw size={12} className="animate-spin" /> Saving…
-              </>
-            ) : lastSaved ? (
-              <>
-                <i className="h-2 w-2 rounded-full bg-today" /> Saved · {format(lastSaved, "HH:mm")}
-              </>
-            ) : (
-              <span className="opacity-70">Ready</span>
-            )}
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.span
+                key={autoSaving ? "saving" : lastSaved ? "saved" : "ready"}
+                className="inline-flex items-center gap-2"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.15 }}
+              >
+                {autoSaving ? (
+                  <>
+                    <RotateCw size={12} className="animate-spin" /> Saving…
+                  </>
+                ) : lastSaved ? (
+                  <>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <motion.path d="M5 12.5l4.5 4.5L19 7" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.3, delay: 0.1 }} />
+                    </svg>
+                    Saved · {format(lastSaved, "HH:mm")}
+                  </>
+                ) : (
+                  <span className="opacity-70">Ready</span>
+                )}
+              </motion.span>
+            </AnimatePresence>
           </span>
         </div>
 
-        <input
+        <motion.input
+          layoutId={id && id !== "new" ? `note-title-${id}` : undefined}
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}

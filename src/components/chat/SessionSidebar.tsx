@@ -86,7 +86,7 @@ const SessionSidebar: React.FC<SessionSidebarProps> = ({
           </button>
         </h2>
 
-        <div className="custom-scrollbar grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)] content-start gap-1 overflow-y-auto">
+        <div className="lm-stagger custom-scrollbar grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)] content-start gap-1 overflow-y-auto">
           {sessions.map((s) => (
             <div
               key={s.id}

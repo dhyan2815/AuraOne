@@ -266,8 +266,34 @@
   }
   .lm-check.done { background: rgb(var(--today)); }
   .lm-check.done::after { transform: scale(1); }
+  /* Drawn tick replaces the dot when the button carries an svg. */
+  .lm-check svg { position: absolute; color: rgb(31 33 30); }
+  .lm-check { position: relative; }
+  .lm-check:has(svg)::after { display: none; }
 
   .lm-strike { text-decoration: line-through; color: rgb(var(--ink2)); }
+
+  /* Strike-through that draws left to right. */
+  .lm-sl { position: relative; transition: color .3s; }
+  .lm-sl::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    height: 2px;
+    width: 100%;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform .35s cubic-bezier(.2, .8, .3, 1);
+  }
+  .lm-sl.done { color: rgb(var(--ink2)); }
+  .lm-sl.done::after { transform: scaleX(1); }
+
+  /* Card hover: lift plus a section-tinted glow. */
+  .lm-card-hover { transition: transform .25s cubic-bezier(.2, .8, .3, 1), box-shadow .25s; }
+  .lm-card-hover:hover { transform: translateY(-4px); box-shadow: 0 16px 32px -14px rgb(var(--c) / .55); }
+  .lm-card-hover:active { transform: translateY(-1px) scale(.99); }
 
   .lm-input {
     display: block;
@@ -283,7 +309,7 @@
     transition: box-shadow .15s;
   }
   .lm-input::placeholder { color: rgb(var(--ink2)); }
-  .lm-input:focus { box-shadow: 0 0 0 3px rgb(var(--c)); outline: none; }
+  .lm-input:focus { box-shadow: 0 0 0 3px rgb(var(--c)); outline: none; animation: lm-focus .3s cubic-bezier(.3, 1.45, .5, 1); }
   .lm-input[aria-invalid="true"] { box-shadow: 0 0 0 3px rgb(var(--alert)); }
   textarea.lm-input { resize: vertical; }
 
@@ -400,6 +426,20 @@
     border-radius: 999px !important;
     padding: 10px 18px !important;
     font-weight: 600;
+    position: relative;
+    overflow: hidden;
+  }
+  /* Time-left bar along the bottom edge. */
+  .lm-toast::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 3px;
+    width: 100%;
+    background: rgb(var(--c, var(--today)));
+    transform-origin: left;
+    animation: lm-toast-bar 3s linear forwards;
   }
 
   /* Tiptap editor surface. */
@@ -460,6 +500,14 @@
 @keyframes lm-rise {
   from { opacity: 0; transform: translateY(24px); }
   to { opacity: 1; transform: translateY(0); }
+}
+@keyframes lm-focus {
+  from { box-shadow: 0 0 0 0 rgb(var(--c)); transform: scale(.985); }
+  to { box-shadow: 0 0 0 3px rgb(var(--c)); transform: scale(1); }
+}
+@keyframes lm-toast-bar {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
 }
 @keyframes lm-toast-in {
   from { opacity: 0; transform: translateY(24px); }

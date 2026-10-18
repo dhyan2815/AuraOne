@@ -5,6 +5,7 @@ import { PlusIcon, Search, FileText } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { listenToNotes, getNotes, Note } from "../hooks/useNotes";
+import Count from "../components/ui/Count";
 import EmptyState from "../components/ui/EmptyState";
 import { useAuth } from "../hooks/useAuth";
 import { RealtimeChannel } from "@supabase/supabase-js";
@@ -54,17 +55,14 @@ const Notes = () => {
     return matchSearch && matchFilter;
   });
 
-  const container = {
-    hidden: { opacity: 0 },
-    show: { opacity: 1, transition: { staggerChildren: 0.05 } },
-  };
+  // Cards reveal as they scroll into view; delay staggers across each row.
   const cardVariant = { hidden: { opacity: 0, y: 15 }, show: { opacity: 1, y: 0 } };
 
   return (
     <div className="sec-notes">
       <section className="lm-lobe">
         <h1>Notes</h1>
-        <p>{notes.length} {notes.length === 1 ? "note" : "notes"} · every one searchable by Aura.</p>
+        <p><Count n={notes.length} /> {notes.length === 1 ? "note" : "notes"} · every one searchable by Aura.</p>
         <div className="lm-acts">
           <Link to="/notes/new" className="lm-btn">
             <PlusIcon size={16} strokeWidth={3} /> New note
@@ -121,25 +119,32 @@ const Notes = () => {
           ) : (
             <motion.section
               key="grid"
-              variants={container}
-              initial="hidden"
-              animate="show"
               className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-3 md:grid-cols-2"
             >
-              {filtered.map((note) => {
+              <AnimatePresence mode="popLayout">
+              {filtered.map((note, i) => {
                 const dateStr = note.created_at
                   ? new Date(note.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })
                   : "";
 
                 return (
-                  <motion.div key={note.id} variants={cardVariant}>
+                  <motion.div
+                    key={note.id}
+                    layout
+                    variants={cardVariant}
+                    initial="hidden"
+                    whileInView="show"
+                    exit={{ opacity: 0, scale: 0.96 }}
+                    viewport={{ once: true, margin: "-8%" }}
+                    transition={{ delay: (i % 3) * 0.05 }}
+                  >
                     <Link
                       to={`/notes/${note.id}`}
-                      className="flex min-h-[220px] flex-col gap-2.5 rounded-sheet bg-sheet p-[22px_24px] transition-transform hover:-translate-y-1"
+                      className="lm-card-hover flex min-h-[220px] flex-col gap-2.5 rounded-sheet bg-sheet p-[22px_24px]"
                     >
-                      <h3 className="text-[26px] font-extrabold leading-none" style={{ letterSpacing: "-.04em", fontStretch: "78%" }}>
+                      <motion.h3 layoutId={`note-title-${note.id}`} className="text-[26px] font-extrabold leading-none" style={{ letterSpacing: "-.04em", fontStretch: "78%" }}>
                         {note.title || "Untitled note"}
-                      </h3>
+                      </motion.h3>
                       <p className="line-clamp-3 whitespace-pre-wrap text-base text-ink2">
                         {stripHtml(note.content) || "No content provided…"}
                       </p>
@@ -153,6 +158,7 @@ const Notes = () => {
                   </motion.div>
                 );
               })}
+              </AnimatePresence>
             </motion.section>
           )}
         </AnimatePresence>

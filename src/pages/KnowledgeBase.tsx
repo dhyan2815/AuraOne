@@ -195,9 +195,10 @@ const KnowledgeBase = () => {
                   </div>
                 ) : chunks.length > 0 ? (
                   <div>
-                    {chunks.map((chunk) => (
+                    {chunks.map((chunk, i) => (
                       <ChunkCard
                         key={chunk.id}
+                        index={Math.min(i, 8)}
                         id={chunk.id}
                         sourceType={chunk.source_type}
                         content={chunk.content}
