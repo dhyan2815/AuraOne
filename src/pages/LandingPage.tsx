@@ -1,11 +1,8 @@
-// Render the public LandingPage marketing interface, presenting platform feature modules, customer testimonials, and subscription CTAs.
+// Render the public LandingPage marketing interface in the Living Map style: hero lobe, "Say it. Aura does it." demo, feature parts, testimonials and close.
 
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Calendar, CheckCircle, MessageSquare, ArrowRight, ChevronDown, Star } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import LandingPicture from "../assets/LandingImage.png";
-// import Card from "../components/ui/Card";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import Logo from "../components/structure/Logo";
 
 // List of client testimonials displayed dynamically.
@@ -14,49 +11,42 @@ const TESTIMONIALS = [
         name: "Rajesh Verma",
         role: "Product Manager",
         content: "AuraOne has completely transformed how I manage my daily tasks and notes. The AI assistant is incredibly intuitive and saves me hours every week.",
-        rating: 4
     },
     {
         name: "Anjali Sharma",
         role: "Software Developer",
         content: "The real-time sync across all my devices is flawless. I can start a task on my phone and finish it on my laptop without any hassle.",
-        rating: 4
     },
     {
         name: "Amit Patel",
         role: "Marketing Director",
         content: "The calendar integration and smart reminders have made me so much more organized. AuraOne is exactly what I needed for my busy schedule.",
-        rating: 5
     },
     {
         name: "Dhairya Kumar",
         role: "Freelance Writer",
         content: "The rich text editor for notes is fantastic, and the AI chat feature helps me brainstorm ideas quickly. This is productivity software done right.",
-        rating: 4
     }
 ];
 
-const FEATURES = [
-    { icon: <Calendar className="w-5 h-5 sm:w-6 sm:h-6" />, title: "Events Calendar", description: "Orchestrate your time with a weightless scheduling experience designed for clarity and temporal flow." },
-    { icon: <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6" />, title: "Tasks & Notes Management", description: "Precision management. Organize your objectives with intuitive focus systems and dynamic priority tiers." },
-    { icon: <MessageSquare className="w-5 h-5 sm:w-6 sm:h-6" />, title: "Aura Assistant", description: "Your neural companion. Advanced AI intelligence that anticipates your needs and streamlines your workflow." },
+// Example sentences for the interactive demo — local UI state only, nothing is sent to Aura.
+const DEMO_LINES = [
+    { say: "remind me to buy groceries tomorrow", mode: "Command", steps: ["create_task", "due: tomorrow", "priority: medium"], reply: "Added Buy groceries to tomorrow's list." },
+    { say: "push my review by half an hour", mode: "Command", steps: ["read_events", "update_event", "10:00 → 10:30"], reply: "Your review now starts at 10:30." },
+    { say: "what did I decide about chunk overlap?", mode: "Brain", steps: ["search_knowledge", "3 notes", "0.82 match"], reply: "You settled on 512-token chunks with 64 overlap, from your note Chunking strategies." },
+];
+
+const PARTS = [
+    { title: "Tasks", color: "tasks", text: "High, medium and low priority with due dates, completed in one tap.", radius: "48% 52% 40% 60% / 40% 44% 56% 60%" },
+    { title: "Notes", color: "notes", text: "A rich text editor with tags, searchable by you and by Aura.", radius: "56% 44% 58% 42% / 52% 60% 40% 48%" },
+    { title: "Events", color: "events", text: "A month calendar with today's schedule, created in plain words.", radius: "40% 60% 46% 54% / 58% 40% 60% 42%" },
+    { title: "Knowledge", color: "know", text: "Your notes, tasks and events, chunked and embedded so Aura answers from what you actually wrote.", radius: "48% 52% 40% 60% / 40% 44% 56% 60%" },
 ];
 
 const LandingPage = () => {
-    // Track page scrolling offsets for navigation styling and active testimonial ratings display.
-    const [isScrolled, setIsScrolled] = useState(false);
+    // Track the active testimonial and the selected demo sentence.
     const [currentTestimonial, setCurrentTestimonial] = useState(0);
-
-    // Bind scroll event listeners to style navigation headers based on offsets.
-    useEffect(() => {
-        const handleScroll = () => {
-            setIsScrolled(window.scrollY > 50);
-        };
-        window.addEventListener('scroll', handleScroll);
-        
-        // Clean up window scrolling listeners on component unmount.
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
+    const [pick, setPick] = useState(0);
 
     // Spin up an interval timer to cycle testimonials automatically every 4 seconds.
     useEffect(() => {
@@ -70,254 +60,134 @@ const LandingPage = () => {
         return () => clearInterval(interval);
     }, []);
 
-    // Smoothly scroll the window context down to the Features block element.
-    const scrollToFeatures = () => {
-        const featuresElement = document.getElementById('features');
-        if (featuresElement) {
-            featuresElement.scrollIntoView({ behavior: 'smooth' });
-        }
-    };
-
-    // Smoothly scroll the viewport back to the top of the page.
-    const scrollToTop = () => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
+    const t = TESTIMONIALS[currentTestimonial];
+    const cur = DEMO_LINES[pick];
+    const today = new Date().toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" });
+    const [weekday, ...dateRest] = today.replace(",", "").split(" ");
 
     return (
-        <div className="min-h-screen font-sans text-text bg-background transition-colors duration-500">
+        <div className="sec-today min-h-screen bg-water font-sans text-ink">
+            <div className="mx-auto max-w-[1440px] overflow-x-clip">
+                {/* Header */}
+                <header className="flex flex-wrap items-center gap-2 px-4 py-4 md:px-6">
+                    <Link to="/" className="mr-4" aria-label="AuraOne home"><Logo textOnly /></Link>
+                    <nav className="hidden gap-1.5 md:flex" aria-label="Sections">
+                        <a className="lm-cap" href="#aura" style={{ "--c": "var(--aura)" } as React.CSSProperties}><i />Aura</a>
+                        <a className="lm-cap" href="#parts" style={{ "--c": "var(--tasks)" } as React.CSSProperties}><i />Features</a>
+                        <a className="lm-cap" href="#voices" style={{ "--c": "var(--notes)" } as React.CSSProperties}><i />Stories</a>
+                    </nav>
+                    <div className="ml-auto flex gap-2">
+                        <Link to="/login" className="lm-btn lm-btn-soft">Log in</Link>
+                        <Link to="/signup" className="lm-btn">Sign up free</Link>
+                    </div>
+                </header>
 
-            {/* Navigation */}
-            <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'py-3 bg-background/80 backdrop-blur-lg border-b border-primary/10 shadow-lg shadow-primary/5' : 'py-6 bg-transparent'}`}>
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">
-                    <button
-                        onClick={scrollToTop}
-                        className="hover:opacity-80 transition-opacity cursor-pointer inline-block"
-                    >
-                        <Logo iconClassName="w-8 h-8 sm:w-10 sm:h-10" textClassName="text-xl sm:text-2xl" />
-                    </button>
-
-                    <div className="hidden md:flex items-center space-x-8">
-                        <button onClick={scrollToFeatures} className="text-sm font-bold text-text-variant hover:text-primary transition-colors">Features</button>
-                        <button onClick={scrollToTop} className="text-sm font-bold text-text-variant hover:text-primary transition-colors">About</button>
-                        <Link to="/signup" className="text-sm font-bold text-text-variant hover:text-primary transition-colors">Pricing</Link>
+                {/* Hero */}
+                <section className="grid items-center gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
+                    <div className="lm-lobe flex flex-col justify-center !w-auto !min-h-[480px] lg:!min-h-[620px] lg:!pl-[132px] lg:!pr-[72px] lg:!py-[72px]">
+                        <h1 style={{ fontSize: "clamp(56px, 8.4vw, 128px)" }}>One map for your whole day</h1>
+                        <p>Tasks, notes, events and news in one place, with Aura to add, move and find anything in plain words.</p>
+                        <div className="lm-acts">
+                            <Link to="/signup" className="lm-btn">Create your free account</Link>
+                            <Link to="/login" className="lm-btn lm-btn-ghost">Log in</Link>
+                        </div>
                     </div>
 
-                    <div className="flex items-center space-x-3 sm:space-x-4">
-                        <Link
-                            to="/login"
-                            className="text-xs sm:text-sm font-bold text-text-variant hover:text-primary transition-colors px-1 sm:px-2"
-                        >
-                            Log In
-                        </Link>
-                        <Link
-                            to="/signup"
-                            className="bg-primary text-white font-black py-2 px-4 sm:py-2.5 sm:px-6 rounded-full shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all uppercase tracking-widest text-[9px] sm:text-[10px]"
-                        >
-                            Sign Up
-                        </Link>
+                    <div className="mx-4 grid gap-3.5 rounded-[32px] bg-sheet p-5 lg:mr-6" aria-label="AuraOne Today screen">
+                        <div className="flex gap-1.5">
+                            <span className="lm-cap on" style={{ "--c": "var(--today)" } as React.CSSProperties}><i />Today</span>
+                            <span className="lm-cap !bg-step" style={{ "--c": "var(--tasks)" } as React.CSSProperties}><i />Tasks</span>
+                            <span className="lm-cap !bg-step" style={{ "--c": "var(--aura)" } as React.CSSProperties}><i />Aura</span>
+                        </div>
+                        <div className="rounded-r-[60%] rounded-bl-none bg-today px-7 pb-9 pt-6 text-[#1F211E]" style={{ borderRadius: "0 60% 48% 0 / 0 70% 58% 0" }}>
+                            <div className="lm-display text-[52px]">{weekday}<br />{dateRest.join(" ")}</div>
+                        </div>
+                        <div className="lm-sheet !bg-water">
+                            <div className="lm-row"><span className="w-14 flex-none font-bold">10:30</span>Design review<span className="lm-chip lm-chip-a ml-auto">moved by Aura</span></div>
+                            <div className="lm-row"><span className="lm-check" />Write up the chunking notes<span className="lm-chip lm-chip-h ml-auto">High</span></div>
+                            <div className="lm-row"><span className="lm-check" />Buy groceries<span className="lm-muted ml-auto">Sun</span></div>
+                        </div>
                     </div>
-                </div>
-            </nav>
+                </section>
 
-            {/* Hero Section */}
-            <section className="relative pt-32 pb-16 sm:pt-48 sm:pb-32 overflow-hidden">
-                <div className="absolute inset-0 bg-grid-slate-500/5 dark:bg-grid-white/5 [mask-image:linear-gradient(to_bottom,white,transparent)]"></div>
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
-                    <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-                        <motion.div
-                            initial={{ opacity: 0, x: -30 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.8 }}
-                            className="space-y-6 sm:space-y-8 z-10 text-center lg:text-left"
-                        >
-                            <h1 className="text-3xl sm:text-5xl lg:text-7xl font-extrabold tracking-tighter leading-tight text-text">
-                                Your Workspace,<br />
-                                Redefined in <span className="text-primary italic">Light</span>.
-                            </h1>
-                            <p className="text-base sm:text-lg lg:text-xl text-text-variant font-medium leading-relaxed max-w-xl mx-auto lg:mx-0">
-                                Experience productivity as a sanctuary. AuraOne harmonizes tasks, notes, and AI intelligence within a breathtaking luminous environment.
-                            </p>
-
-                            <div className="flex flex-col sm:flex-row gap-4 pt-2 justify-center lg:justify-start max-w-md mx-auto lg:mx-0">
-                                <Link
-                                    to="/signup"
-                                    className="inline-flex items-center justify-center bg-primary text-white font-black py-3.5 px-8 sm:py-4 sm:px-10 rounded-2xl group text-xs sm:text-sm shadow-xl shadow-primary/20 hover:shadow-primary/30 hover:bg-primary/90 transition-all uppercase tracking-[0.2em]"
-                                >
-                                    Start Your Flow
-                                    <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
-                                </Link>
+                {/* Say it. Aura does it. */}
+                <section className="px-4 pt-24 md:px-6 md:pt-36" id="aura">
+                    <h2 className="lm-display max-w-[900px] text-[clamp(44px,5.6vw,84px)]">Say it. Aura does it.</h2>
+                    <p className="mt-4 max-w-[620px] text-xl">Aura reads and changes your own tasks, notes and events. Pick a sentence and see what it would do.</p>
+                    <div className="mt-10 grid gap-5 md:grid-cols-2">
+                        <div className="grid content-start gap-2.5">
+                            {DEMO_LINES.map((l, i) => (
                                 <button
-                                    onClick={scrollToFeatures}
-                                    className="inline-flex items-center justify-center glass border border-primary/10 text-text font-black py-3.5 px-8 sm:py-4 sm:px-10 rounded-2xl group text-xs sm:text-sm shadow-xl shadow-primary/5 hover:border-primary/20 transition-all uppercase tracking-[0.2em]"
+                                    key={l.say}
+                                    aria-pressed={i === pick}
+                                    onClick={() => setPick(i)}
+                                    className={`rounded-3xl px-[22px] py-[18px] text-left text-[19px] font-semibold transition-transform active:scale-[.98] ${i === pick ? "bg-aura text-[#1F211E]" : "bg-sheet"}`}
                                 >
-                                    The Capability
-                                    <ChevronDown className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-y-1 transition-transform" />
+                                    “{l.say}”
                                 </button>
-                            </div>
-
-                            <div className="flex items-center justify-center lg:justify-start gap-8 sm:gap-12 pt-6 sm:pt-8">
-                                <div className="text-center">
-                                    <p className="text-3xl sm:text-4xl font-black text-primary">99%</p>
-                                    <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] text-text-variant opacity-60">Consistency</p>
-                                </div>
-                                <div className="text-center">
-                                    <p className="text-3xl sm:text-4xl font-black text-cta">4.9</p>
-                                    <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] text-text-variant opacity-60">Synthesis</p>
-                                </div>
-                            </div>
-                        </motion.div>
-
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 1, ease: "easeOut" }}
-                            className="relative"
-                        >
-                            <div className="absolute -inset-8 sm:-inset-16 bg-gradient-to-tr from-primary/30 to-tertiary/20 blur-[80px] sm:blur-[120px] rounded-full pointer-events-none opacity-50"></div>
-                            <div className="glass p-2 sm:p-3 rounded-2xl sm:rounded-[3rem] shadow-2xl relative z-10 border border-primary/10 overflow-hidden transform hover:scale-[1.01] transition-transform duration-700">
-                                <img
-                                    src={LandingPicture}
-                                    alt="Luminous Interface"
-                                    className="w-full h-auto rounded-xl sm:rounded-[2.5rem] shadow-inner"
-                                />
-                            </div>
-                        </motion.div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Features Section */}
-            <section id="features" className="py-16 sm:py-32 relative bg-primary/5 dark:bg-slate-900/40 border-y border-primary/5">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6">
-                    <div className="text-center mb-12 sm:mb-24 space-y-3 sm:space-y-4">
-                        <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.4em] text-primary">Foundational Modules</p>
-                        <h2 className="text-3xl sm:text-4xl lg:text-6xl font-extrabold tracking-tighter text-text">
-                            Crafted for the Modern Mind.
-                        </h2>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-                        {FEATURES.map((feature, index) => (
-                            <motion.div
-                                key={index}
-                                whileHover={{ y: -8 }}
-                                className="group"
-                            >
-                            <div className="glass h-full p-6 sm:p-8 rounded-2xl sm:rounded-3xl border border-primary/10 group-hover:border-primary/30 group-hover:bg-primary/5 group-hover:shadow-2xl group-hover:shadow-primary/5 transition-all duration-300">
-                                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-primary/10 border border-primary/10 rounded-xl sm:rounded-2xl flex items-center justify-center mb-6 sm:mb-8 shadow-inner group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-500 text-primary">
-                                    {feature.icon}
-                                </div>
-                                <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-text group-hover:text-primary transition-colors">{feature.title}</h3>
-                                <p className="text-xs sm:text-sm text-text-variant font-medium leading-relaxed">{feature.description}</p>
-                            </div>
-                            </motion.div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* Testimonials */}
-            <section className="py-16 sm:py-32 overflow-hidden bg-background">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
-                    <div className="max-w-4xl mx-auto text-center space-y-8 sm:space-y-12">
-                        <AnimatePresence mode="wait">
-                            <motion.div
-                                key={currentTestimonial}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, scale: 0.95 }}
-                                transition={{ duration: 0.6 }}
-                                className="space-y-6 sm:space-y-10"
-                            >
-                                <div className="flex justify-center gap-1 opacity-60">
-                                    {[...Array(5)].map((_, i) => (
-                                        <Star key={i} className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${i < TESTIMONIALS[currentTestimonial].rating ? 'text-primary fill-primary' : 'text-primary/20'}`} />
-                                    ))}
-                                </div>
-                                <blockquote className="text-xl sm:text-3xl lg:text-5xl font-black italic tracking-tighter leading-tight text-text px-2 sm:px-4">
-                                    "{TESTIMONIALS[currentTestimonial].content}"
-                                </blockquote>
-                                <div className="flex items-center justify-center gap-3 sm:gap-4">
-                                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/10 border border-primary/10 flex items-center justify-center font-black text-primary shadow-xl text-sm sm:text-base">
-                                        {TESTIMONIALS[currentTestimonial].name.charAt(0)}
-                                    </div>
-                                    <div className="text-left">
-                                        <p className="font-bold text-sm sm:text-lg text-text">{TESTIMONIALS[currentTestimonial].name}</p>
-                                        <p className="text-[8px] sm:text-[10px] font-black text-primary uppercase tracking-[0.3em] opacity-80">{TESTIMONIALS[currentTestimonial].role}</p>
-                                    </div>
-                                </div>
-                            </motion.div>
-                        </AnimatePresence>
-
-                        <div className="flex justify-center gap-2">
-                            {TESTIMONIALS.map((_, i) => (
-                                <button
-                                    key={i}
-                                    onClick={() => setCurrentTestimonial(i)}
-                                    className={`h-1.5 transition-all duration-500 rounded-full ${i === currentTestimonial ? 'w-8 sm:w-10 bg-primary shadow-lg shadow-primary/30' : 'w-3 sm:w-4 bg-primary/20 hover:bg-primary/40'}`}
-                                />
                             ))}
                         </div>
+                        <div className="rounded-[32px] bg-ink p-7 text-water" aria-live="polite">
+                            <p className="text-sm opacity-75">Aura · {cur.mode} mode</p>
+                            <div className="mb-5 mt-3.5 flex flex-wrap gap-2">
+                                {cur.steps.map((s) => <span key={s} className="lm-chip lm-chip-a">{s}</span>)}
+                            </div>
+                            <p className="text-[26px] font-semibold leading-[1.3]" style={{ letterSpacing: "-.02em" }}>{cur.reply}</p>
+                        </div>
                     </div>
-                </div>
-            </section>
+                </section>
 
-            {/* CTA Section */}
-            <section className="py-20 sm:py-40 relative bg-primary/5 dark:bg-slate-900/40 border-t border-primary/5">
-                <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-                    <div className="glass p-8 sm:p-20 rounded-2xl sm:rounded-[3rem] shadow-2xl border border-primary/10 relative overflow-hidden group">
-                        <div className="absolute -inset-48 bg-gradient-to-tr from-primary/10 to-transparent blur-[100px] pointer-events-none opacity-30 group-hover:opacity-50 transition-opacity"></div>
-                        <h2 className="text-3xl sm:text-5xl font-extrabold mb-6 sm:mb-8 tracking-tighter text-text relative z-10">
-                            Join <span className="text-primary bold">Aura</span>.
-                        </h2>
-                        <p className="text-base sm:text-lg lg:text-xl text-text-variant font-medium mb-8 sm:mb-12 max-w-2xl mx-auto relative z-10">
-                            Elevate your digital presence. Start your journey into the Luminous Workspace today.
-                        </p>
-                        <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center relative z-10 max-w-xs sm:max-w-none mx-auto">
-                            <Link
-                                to="/signup"
-                                className="bg-primary text-white font-black py-3.5 sm:py-4 px-8 sm:px-12 rounded-2xl text-xs sm:text-sm shadow-xl shadow-primary/20 hover:bg-primary/90 transition-all uppercase tracking-[0.2em]"
+                {/* Parts */}
+                <section className="px-4 pt-24 md:px-6 md:pt-36" id="parts">
+                    <h2 className="lm-display max-w-[900px] text-[clamp(44px,5.6vw,84px)]">Every part of your day, in its own colour</h2>
+                    <div className="mt-10 grid gap-5 md:grid-cols-2">
+                        {PARTS.map((p) => (
+                            <div
+                                key={p.title}
+                                className="min-h-[300px] px-8 py-12 text-[#1F211E] md:px-16 md:py-14"
+                                style={{ background: `rgb(var(--${p.color}))`, borderRadius: p.radius }}
                             >
-                                Sign Up
-                            </Link>
-                            <Link
-                                to="/login"
-                                className="glass border border-primary/20 text-text font-black py-3.5 sm:py-4 px-8 sm:px-12 rounded-2xl text-xs sm:text-sm shadow-xl hover:border-primary/40 transition-all uppercase tracking-[0.2em]"
-                            >
-                                Login
-                            </Link>
+                                <h3 className="lm-display text-[44px] !leading-none !text-[#1F211E]">{p.title}</h3>
+                                <p className="mt-2.5 max-w-[420px] text-lg">{p.text}</p>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+
+                {/* Voices */}
+                <section className="px-4 pt-24 md:px-6 md:pt-36" id="voices">
+                    <h2 className="lm-display max-w-[900px] text-[clamp(44px,5.6vw,84px)]">From early users</h2>
+                    <div className="lm-sheet mt-10 !p-8 md:!px-14 md:!py-12">
+                        <p className="max-w-[900px] text-[26px] font-semibold leading-[1.3] md:text-[30px]" style={{ letterSpacing: "-.02em" }}>“{t.content}”</p>
+                        <div className="mt-5 flex items-center gap-2.5">
+                            <span className="grid h-[42px] w-[42px] place-items-center rounded-full bg-ink font-extrabold text-water">{t.name.charAt(0)}</span>
+                            <div>
+                                <b>{t.name}</b><br />
+                                <span className="lm-muted">{t.role}</span>
+                            </div>
+                            <div className="ml-auto flex gap-2">
+                                <button className="lm-round !bg-step" aria-label="Previous story" onClick={() => setCurrentTestimonial((currentTestimonial + TESTIMONIALS.length - 1) % TESTIMONIALS.length)}><ChevronLeft size={20} /></button>
+                                <button className="lm-round !bg-step" aria-label="Next story" onClick={() => setCurrentTestimonial((currentTestimonial + 1) % TESTIMONIALS.length)}><ChevronRight size={20} /></button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
 
-            {/* Footer */}
-            <footer className="py-12 sm:py-20 border-t border-primary/5 bg-background">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12 mb-12 sm:mb-16">
-                        <div className="col-span-1 md:col-span-2 space-y-4 sm:space-y-6 text-center md:text-left flex flex-col items-center md:items-start">
-                            <Logo iconClassName="w-8 h-8" textClassName="text-xl sm:text-2xl" />
-                            <p className="text-xs sm:text-sm text-text-variant max-w-sm font-medium leading-relaxed opacity-70">
-                                Curating focus in a world of distraction. Built with love for the dreamers and the doers.
-                            </p>
-                        </div>
-
-                        <div className="space-y-4 sm:space-y-6 text-center md:text-left">
-                            <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.4em] text-primary opacity-60">Architect</p>
-                            <ul className="space-y-3 sm:space-y-4 font-bold text-xs sm:text-sm">
-                                <li><button onClick={scrollToFeatures} className="text-text-variant hover:text-primary transition-colors">Experience</button></li>
-                                <li><Link to="/login" className="text-text-variant hover:text-primary transition-colors">Join Us</Link></li>
-                                <li><a href="https://dhyan-patel.notion.site/about-dhyan" target="_blank" rel="noopener noreferrer" className="text-text-variant hover:text-primary transition-colors">Developer Profile</a></li>
-                            </ul>
-                        </div>
+                {/* Close */}
+                <section className="mx-4 mt-24 bg-today px-8 pb-12 pt-16 text-[#1F211E] md:mx-6 md:mt-36 md:px-[72px] md:pt-24" style={{ borderRadius: "0 48% 0 0 / 0 60% 0 0" }}>
+                    <h2 className="lm-display !text-[#1F211E] text-[clamp(56px,8vw,120px)]">Start with today</h2>
+                    <div className="lm-acts">
+                        <Link to="/signup" className="lm-btn !bg-[#1F211E] !text-white">Create your free account</Link>
+                        <Link to="/login" className="lm-btn lm-btn-ghost !bg-white/60 !text-[#1F211E]">I have an account</Link>
                     </div>
-
-                    <div className="pt-8 border-t border-primary/5 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
-                        <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-text-variant opacity-40">&copy; 2026 AuraOne Intelligence. All rights reserved.</p>
-                        <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-primary opacity-40">System Release 1.4.2</p>
+                    <p className="mt-16 font-extrabold leading-[.8] md:mt-20" style={{ fontSize: "clamp(90px, 17vw, 250px)", letterSpacing: "-.07em", fontStretch: "62%" }}>AuraOne</p>
+                    <div className="mt-6 flex flex-wrap gap-6 font-semibold">
+                        <span>Built by Dhyan Patel</span>
+                        <a href="https://dhyan-patel.notion.site/about-dhyan" target="_blank" rel="noopener noreferrer" className="underline">Developer profile</a>
+                        <span className="md:ml-auto">&copy; 2026 AuraOne</span>
                     </div>
-                </div>
-            </footer>
+                </section>
+            </div>
         </div>
     );
 };

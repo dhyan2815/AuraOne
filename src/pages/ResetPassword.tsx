@@ -2,11 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "../services/supabase";
-import { useNavigate } from "react-router-dom";
-import { Eye, EyeOff, CheckCircle, ShieldCheck, RotateCw } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
+import { Eye, EyeOff, RotateCw } from "lucide-react";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
-import Logo from "../components/structure/Logo";
 import AuthLayout from "../components/structure/AuthLayout";
 
 const ResetPassword = () => {
@@ -57,127 +56,105 @@ const ResetPassword = () => {
     setIsResetting(false);
   };
 
+  const mismatch = confirmPassword.length > 0 && newPassword !== confirmPassword;
+
   return (
-    <AuthLayout variant="centered">
-      <motion.div 
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        className="w-full relative z-10 mx-auto"
-      >
-        <div className="glass-panel p-6 sm:p-10 rounded-2xl sm:rounded-[2.5rem] border border-primary/5 shadow-2xl shadow-primary/5 space-y-6 sm:space-y-8">
-          {/* Logo */}
-          <div className="flex flex-col items-center text-center space-y-3">
-            <Logo iconOnly iconClassName="w-12 h-12 sm:w-16 sm:h-16 drop-shadow-xl p-2.5 sm:p-3" />
-            <div className="space-y-1">
-              <h1 className="text-2xl sm:text-3xl font-black text-aurora-on-surface tracking-tighter">Key Re-encryption</h1>
-              <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] text-primary/40">Secure Access Protocol</p>
-            </div>
-          </div>
+    <AuthLayout variant="centered" color="know" blob="br">
+      <div className="grid gap-4 rounded-[36px] bg-sheet p-8 sm:p-11">
+        <AnimatePresence mode="wait">
+          {!resetSuccess ? (
+            <motion.form
+              key="form"
+              onSubmit={handleResetPassword}
+              aria-label="Choose a new password"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              className="grid gap-4"
+              autoComplete="off"
+            >
+              <h1 className="lm-display text-5xl">Choose a new password</h1>
+              <p>At least 6 characters. You'll be able to log in right after.</p>
 
-          <AnimatePresence mode="wait">
-            {!resetSuccess ? (
-              <motion.form
-                key="form"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                onSubmit={handleResetPassword}
-                className="space-y-6"
-                autoComplete="off"
-              >
-                <div className="space-y-4">
-                  <div className="space-y-3">
-                    <label className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-primary/40 ml-2">New Encryption Key</label>
-                    <div className="relative group">
-                      <ShieldCheck className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/30 group-focus-within:text-primary transition-colors" size={16} />
-                      <input
-                        type={showPassword ? "text" : "password"}
-                        placeholder="••••••••"
-                        className="input-aurora w-full pl-14 pr-12 py-3.5 text-xs sm:text-sm font-bold"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        required
-                        autoComplete="new-password"
-                      />
-                      <button
-                        type="button"
-                        className="absolute right-4 top-1/2 transform -translate-y-1/2 text-primary/30 hover:text-primary transition-colors"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <label className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-primary/40 ml-2">Parity Confirmation</label>
-                    <div className="relative group">
-                      <ShieldCheck className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/30 group-focus-within:text-primary transition-colors" size={16} />
-                      <input
-                        type={showConfirmPassword ? "text" : "password"}
-                        placeholder="••••••••"
-                        className="input-aurora w-full pl-14 pr-12 py-3.5 text-xs sm:text-sm font-bold"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        required
-                        autoComplete="new-password"
-                      />
-                      <button
-                        type="button"
-                        className="absolute right-4 top-1/2 transform -translate-y-1/2 text-primary/30 hover:text-primary transition-colors"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      >
-                        {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                      </button>
-                    </div>
-                  </div>
+              <div className="lm-field">
+                <label htmlFor="new-password">New password</label>
+                <div className="relative">
+                  <input
+                    id="new-password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    className="lm-input pr-12"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    required
+                    autoComplete="new-password"
+                  />
+                  <button
+                    type="button"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-ink2 transition-colors hover:text-ink"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
                 </div>
+              </div>
 
-                <button
-                  type="submit"
-                  className="btn-aurora-primary w-full py-3.5 sm:py-4 text-xs font-black uppercase tracking-[0.2em] shadow-xl shadow-primary/20 flex items-center justify-center gap-3 disabled:opacity-50"
-                  disabled={isResetting}
-                >
-                  {isResetting ? <RotateCw className="animate-spin" size={16} /> : <div className="aurora-glow"><ShieldCheck size={16} /></div>}
-                  {isResetting ? "Updating Key..." : "Finalize Re-encryption"}
-                </button>
-              </motion.form>
-            ) : (
-              <motion.div
-                key="success"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="text-center space-y-6 sm:space-y-8"
-              >
-                <div className="flex justify-center">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl sm:rounded-[2rem] glass border border-success/20 flex items-center justify-center text-success">
-                    <CheckCircle size={32} className="aurora-glow sm:w-[40px] sm:h-[40px]" />
-                  </div>
+              <div className="lm-field">
+                <label htmlFor="confirm-password">Confirm new password</label>
+                <div className="relative">
+                  <input
+                    id="confirm-password"
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    className="lm-input pr-12"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                    autoComplete="new-password"
+                    aria-invalid={mismatch}
+                    aria-describedby={mismatch ? "pw-mismatch" : undefined}
+                  />
+                  <button
+                    type="button"
+                    aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-ink2 transition-colors hover:text-ink"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
                 </div>
-                
-                <div className="space-y-2 sm:space-y-3">
-                  <h2 className="text-xl sm:text-2xl font-black text-aurora-on-surface tracking-tight">Key Applied Successfully</h2>
-                  <p className="text-xs sm:text-sm font-medium text-aurora-on-surface-variant leading-relaxed">
-                    Your neural encryption key has been updated across the matrix.
-                  </p>
-                </div>
+              </div>
+              {mismatch && (
+                <p id="pw-mismatch" role="alert" className="text-[15px] font-semibold text-alert">
+                  Passwords don't match yet.
+                </p>
+              )}
 
-                <button
-                  onClick={() => navigate("/login")}
-                  className="btn-aurora-primary w-full py-3.5 sm:py-4 text-xs font-black uppercase tracking-[0.2em] shadow-xl shadow-primary/20"
-                >
-                  Go to Matrix
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-
-        {/* Footer Credit */}
-        <div className="mt-6 sm:mt-8 text-center">
-           <p className="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.5em] text-primary/30">AuraOne Security Interface</p>
-        </div>
-      </motion.div>
+              <button type="submit" className="lm-btn w-full !py-[15px]" disabled={isResetting}>
+                {isResetting && <RotateCw className="animate-spin" size={16} />}
+                {isResetting ? "Updating…" : "Update password"}
+              </button>
+              <Link to="/login" className="font-semibold underline">Back to log in</Link>
+            </motion.form>
+          ) : (
+            <motion.div
+              key="success"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="grid gap-4"
+            >
+              <h1 className="lm-display text-5xl">Password updated</h1>
+              <p role="status" className="rounded-[20px] bg-today px-[18px] py-3.5 font-semibold text-[#1F211E]">
+                Your password has been changed.
+              </p>
+              <button onClick={() => navigate("/login")} className="lm-btn w-full !py-[15px]">
+                Go to log in
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </AuthLayout>
   );
 };
