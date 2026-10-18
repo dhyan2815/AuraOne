@@ -105,7 +105,7 @@ const NewsWidget = () => {
               href={item.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="lm-row"
+              className="lm-row lm-row-link"
             >
               <span className="line-clamp-2 min-w-0 flex-1">{item.title}</span>
               <span className="lm-muted ml-auto flex-none">{item.source}</span>

@@ -120,12 +120,12 @@ const SessionSidebar: React.FC<SessionSidebarProps> = ({
                 <>
                   <p className="min-w-0 flex-1 truncate">{s.name || "New Chat"}</p>
                   <div className="flex items-center gap-1 opacity-100 transition-opacity lg:opacity-0 lg:group-hover:opacity-100 lg:group-focus-within:opacity-100">
-                    <button onClick={(e) => handleStartEdit(e, s)} className="p-1" aria-label="Rename session">
+                    <button onClick={(e) => handleStartEdit(e, s)} className="rounded-full p-1 transition hover:bg-ink/10" aria-label="Rename session">
                       <Pencil size={14} />
                     </button>
                     <button
                       onClick={(e) => { e.stopPropagation(); setPendingDelete(s); }}
-                      className="p-1"
+                      className="rounded-full p-1 transition hover:bg-alert/15 hover:text-alert"
                       aria-label="Delete session"
                     >
                       <Trash2 size={14} />

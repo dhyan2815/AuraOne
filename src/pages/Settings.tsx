@@ -261,7 +261,7 @@ const Settings = () => {
               { name: 'Cloud Sync', path: null }
             ].map(f => (
               f.path ? (
-                <Link to={f.path} key={f.name} className="lm-row font-semibold">
+                <Link to={f.path} key={f.name} className="lm-row lm-row-link font-semibold">
                   {f.name}
                   <ChevronRight size={16} className="ml-auto text-ink2" />
                 </Link>

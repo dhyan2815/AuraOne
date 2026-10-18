@@ -23,7 +23,7 @@ export const FeaturesOverview = () => (
         <h2 className="lm-display max-w-[760px] text-[clamp(36px,4.4vw,64px)]">One hub for your whole day</h2>
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {OVERVIEW.map((o) => (
-                <div key={o.title} className="rounded-3xl p-6 text-[#1F211E]" style={{ background: `rgb(var(--${o.color}))` }}>
+                <div key={o.title} className="lm-tile rounded-3xl p-6 text-[#1F211E]" style={{ background: `rgb(var(--${o.color}))` }}>
                     <h3 className="lm-display text-[32px] !leading-none !text-[#1F211E]">{o.title}</h3>
                     <p className="mt-2 text-base">{o.text}</p>
                 </div>
@@ -49,13 +49,13 @@ const SiteFooter = () => (
             <nav aria-label="Product">
                 <p className="font-extrabold">Product</p>
                 <ul className="mt-3 grid gap-2">
-                    {PRODUCT.map(([label, href]) => <li key={label}><a href={href} className="lm-muted hover:underline">{label}</a></li>)}
+                    {PRODUCT.map(([label, href]) => <li key={label}><a href={href} className="lm-muted transition-colors hover:text-ink hover:underline">{label}</a></li>)}
                 </ul>
             </nav>
             <nav aria-label="Account">
                 <p className="font-extrabold">Account</p>
                 <ul className="mt-3 grid gap-2">
-                    {ACCOUNT.map(([label, to]) => <li key={label}><Link to={to} className="lm-muted hover:underline">{label}</Link></li>)}
+                    {ACCOUNT.map(([label, to]) => <li key={label}><Link to={to} className="lm-muted transition-colors hover:text-ink hover:underline">{label}</Link></li>)}
                 </ul>
             </nav>
             <nav aria-label="Developer">

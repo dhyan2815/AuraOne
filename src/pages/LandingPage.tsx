@@ -138,7 +138,7 @@ const LandingPage = () => {
                                     key={l.say}
                                     aria-pressed={i === pick}
                                     onClick={() => setPick(i)}
-                                    className={`rounded-3xl px-[22px] py-[18px] text-left text-[19px] font-semibold transition-transform active:scale-[.98] ${i === pick ? "bg-aura text-[#1F211E]" : "bg-sheet"}`}
+                                    className={`lm-tile rounded-3xl px-[22px] py-[18px] text-left text-[19px] font-semibold active:scale-[.98] ${i === pick ? "bg-aura text-[#1F211E]" : "bg-sheet"}`}
                                 >
                                     “{l.say}”
                                 </button>
@@ -161,7 +161,7 @@ const LandingPage = () => {
                         {PARTS.map((p) => (
                             <div
                                 key={p.title}
-                                className="min-h-[300px] px-8 py-12 text-[#1F211E] md:px-16 md:py-14"
+                                className="lm-tile min-h-[300px] px-8 py-12 text-[#1F211E] md:px-16 md:py-14"
                                 style={{ background: `rgb(var(--${p.color}))`, borderRadius: p.radius }}
                             >
                                 <h3 className="lm-display text-[44px] !leading-none !text-[#1F211E]">{p.title}</h3>
@@ -176,7 +176,7 @@ const LandingPage = () => {
                     <h2 className="lm-display max-w-[900px] text-[clamp(44px,5.6vw,84px)]">Up and running in three steps</h2>
                     <div className="mt-10 grid gap-5 md:grid-cols-3">
                         {STEPS.map((st) => (
-                            <div key={st.n} className="lm-sheet !p-8">
+                            <div key={st.n} className="lm-sheet lm-tile !p-8">
                                 <span className="lm-display text-[56px]">{st.n}</span>
                                 <h3 className="mt-2 text-2xl font-extrabold">{st.title}</h3>
                                 <p className="mt-2 text-lg">{st.text}</p>
@@ -191,7 +191,7 @@ const LandingPage = () => {
                     <p className="mt-4 max-w-[680px] text-xl">Aura runs a ReAct agent loop with validated create, read, update and delete actions, grounded by your own knowledge base. Gemini answers first, with OpenRouter as fallback.</p>
                     <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
                         {FACTS.map((f) => (
-                            <div key={f.k} className="rounded-3xl bg-sheet p-6">
+                            <div key={f.k} className="lm-tile rounded-3xl bg-sheet p-6">
                                 <p className="lm-display text-[34px]">{f.k}</p>
                                 <p className="lm-muted mt-1.5">{f.v}</p>
                             </div>

@@ -75,7 +75,7 @@ const ChunkCard: React.FC<ChunkCardProps> = ({
       initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.05 }}
-      className="group grid grid-cols-[72px_minmax(0,1fr)] gap-4 py-4 sm:grid-cols-[84px_minmax(0,1fr)] [&+&]:shadow-[0_-1px_0_rgb(var(--step))]"
+      className="group rounded-2xl transition-colors hover:bg-sheet grid grid-cols-[72px_minmax(0,1fr)] gap-4 py-4 sm:grid-cols-[84px_minmax(0,1fr)] [&+&]:shadow-[0_-1px_0_rgb(var(--step))]"
     >
       <div>
         {similarity !== undefined ? (
