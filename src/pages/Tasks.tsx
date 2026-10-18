@@ -1,8 +1,8 @@
 // Render the Tasks listing workspace, allowing users to organize todo items, toggle completion states, and filter tasks by due date or urgency levels.
 
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
-import { Plus, Check, Flag, Calendar, Clock, Trash2 } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
+import { Plus, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getTasks, updateTask, deleteTask, Task } from "../hooks/useTasks";
 import EmptyState from "../components/ui/EmptyState";
@@ -11,13 +11,6 @@ import toast from "react-hot-toast";
 
 // Filter headers displayed on the task management control bar.
 const FILTERS = ["All", "Today", "Upcoming", "Completed"];
-
-// Color styling badges mapped according to task priority flags.
-const PRIORITY_STYLE: Record<string, string> = {
-  high:   "bg-red-500/10 text-red-500 border-red-500/20",
-  medium: "bg-amber-500/10 text-amber-500 border-amber-500/20",
-  low:    "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
-};
 
 const Tasks = () => {
   // Track checklist arrays, filter configurations, and page router navigation.
@@ -77,80 +70,66 @@ const Tasks = () => {
 
   const TaskRow = ({ task }: { task: Task }) => {
     const done = !!task.completed;
-    const priorityClass = task.priority ? PRIORITY_STYLE[task.priority] ?? PRIORITY_STYLE.low : PRIORITY_STYLE.low;
     return (
       <motion.div
         variants={rowVariant}
         onClick={() => navigate(`/tasks/${task.id}`)}
-        className={`glass rounded-xl sm:rounded-2xl p-3 sm:p-4 flex items-center gap-3 sm:gap-5 group cursor-pointer hover:translate-x-1.5 transition-all duration-300 border border-primary/5 ${done ? "opacity-50 grayscale" : ""}`}
+        className="group grid cursor-pointer grid-cols-[24px_minmax(0,1fr)_auto_36px] items-center gap-3.5 rounded-[18px] px-2 py-3.5 hover:bg-water sm:grid-cols-[24px_minmax(0,1fr)_90px_90px_36px]"
       >
-        {/* Circular checkbox */}
+        {/* Round checkbox */}
         <button
           onClick={(e) => handleToggle(task.id, task.completed, e)}
-          className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center flex-shrink-0 border-2 transition-all duration-500 shadow-lg ${
-            done ? "bg-primary border-primary shadow-primary/20" : "border-primary/30 group-hover:border-primary group-hover:shadow-primary/10"
-          }`}
-        >
-          {done && <Check size={10} className="text-white" strokeWidth={4} />}
-        </button>
+          className={`lm-check ${done ? "done" : ""}`}
+          aria-label={`${done ? "Reopen" : "Complete"} ${task.title}`}
+        />
 
         {/* Content */}
-        <div className="flex-1 min-w-0">
-          <h4 className={`font-bold text-text text-xs sm:text-base leading-snug truncate ${done ? "line-through opacity-60" : ""}`}>
-            {task.title}
-          </h4>
-          <div className="flex items-center gap-3 mt-1 sm:mt-1.5 flex-wrap">
-            {task.due_date && (
-              <span className="text-[9px] sm:text-xs font-black uppercase tracking-widest text-text-variant/60 flex items-center gap-1 sm:gap-1.5">
-                <Calendar size={10} className="text-primary" />{new Date(task.due_date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-              </span>
-            )}
-            {!task.due_date && (
-              <span className="text-[9px] sm:text-xs font-black uppercase tracking-widest text-text-variant/40 flex items-center gap-1 sm:gap-1.5">
-                <Clock size={10} className="text-primary/40" />No Deadline
-              </span>
-            )}
-            {task.description && (
-              <span className="text-[9px] px-2.5 py-0.5 rounded-full glass border-primary/5 text-text-variant font-bold truncate max-w-[100px] hidden sm:block">
-                {task.description}
-              </span>
-            )}
-          </div>
+        <div className="min-w-0">
+          <span className={`block truncate font-semibold ${done ? "lm-strike" : ""}`}>{task.title}</span>
+          <span className="lm-muted block truncate">{task.description || (task.due_date ? "" : "No deadline")}</span>
         </div>
 
-        {/* Priority Badge */}
-        {task.priority && !done && (
-          <span className={`px-2.5 py-1 rounded-lg sm:rounded-xl text-[8px] sm:text-[10px] font-black uppercase tracking-[0.15em] flex items-center gap-1 border ${priorityClass}`}>
-            <Flag size={8} strokeWidth={3} />{task.priority}
-          </span>
-        )}
+        {/* Priority chip */}
+        <span className="justify-self-start">
+          {task.priority && !done && (
+            <span className={`lm-chip ${task.priority === "high" ? "lm-chip-h" : ""}`}>
+              {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+            </span>
+          )}
+        </span>
+
+        {/* Due date */}
+        <span className="lm-muted hidden sm:block">
+          {task.due_date ? new Date(task.due_date).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : ""}
+        </span>
 
         {/* Delete */}
         <button
           onClick={(e) => handleDelete(task.id, e)}
-          className="p-1.5 text-text-variant/40 hover:text-red-500 transition-colors opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+          className="grid h-8 w-8 place-items-center rounded-full text-ink2 opacity-100 transition hover:bg-alert/10 hover:text-alert sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100"
+          aria-label={`Delete ${task.title}`}
         >
-          <Trash2 size={14} className="sm:w-[16px] sm:h-[16px]" />
+          <Trash2 size={16} />
         </button>
       </motion.div>
     );
   };
 
-  interface GroupProps { dot: string; label: string; list: Task[]; }
-  const Group = ({ dot, label, list }: GroupProps) => (
+  interface GroupProps { color: string; label: string; list: Task[]; }
+  const Group = ({ color, label, list }: GroupProps) => (
     <AnimatePresence mode="popLayout">
       {list.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.98 }}
-          className="mb-6 sm:mb-10"
+          className="mb-4"
         >
-          <div className="flex items-center gap-3 mb-4 sm:mb-5 px-2 sm:px-4">
-            <div className={`w-2 h-2 rounded-full shadow-lg ${dot}`} />
-            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-text-variant/60">{label}</h3>
-          </div>
-          <motion.div variants={stagger} initial="hidden" animate="show" className="space-y-2 sm:space-y-3">
+          <h3 className="mb-1 mt-3 flex items-center gap-2.5 px-2 text-sm font-bold text-ink2">
+            <span className="lm-dot !h-2.5 !w-2.5" style={{ background: color }} />
+            {label}
+          </h3>
+          <motion.div variants={stagger} initial="hidden" animate="show">
             {list.map((t) => <TaskRow key={t.id} task={t} />)}
           </motion.div>
         </motion.div>
@@ -158,76 +137,52 @@ const Tasks = () => {
     </AnimatePresence>
   );
 
+  const openCount = tasks.filter((t) => !t.completed).length;
+
   return (
-    <div className="app-page">
-      {/* ── Hero & Controls ── */}
-      <section className="flex flex-col gap-5 sm:gap-6 mb-6 sm:mb-10">
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 sm:gap-6">
-          <motion.div 
-            initial={{ opacity: 0, x: -25 }} 
-            animate={{ opacity: 1, x: 0 }} 
-            transition={{ duration: 0.6 }}
-            className="flex flex-col gap-1"
-          >
-            <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
-              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-text" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Tasks</h1>
-              <div className="px-3 py-1 bg-primary/10 text-primary rounded-lg text-[9px] font-black tracking-widest uppercase border border-primary/20 shadow-lg shadow-primary/5 transition-colors duration-500">
-                {tasks.filter((t) => !t.completed).length} IN PROGRESS
-              </div>
-            </div>
-            <p className="text-xs sm:text-sm text-text-variant font-medium mt-1 leading-relaxed max-w-xl">Stay organized and keep track of your daily goals and priorities.</p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="flex items-stretch gap-3 sm:gap-4 flex-col sm:flex-row"
-          >
-            {/* Filter tabs */}
-            <div className="flex items-center gap-1 rounded-[1.25rem] border border-primary/10 glass p-1 shadow-sm transition-colors duration-500 overflow-x-auto no-scrollbar max-w-full">
-              {FILTERS.map((f) => (
-                <button
-                  key={f}
-                  onClick={() => setActiveFilter(f)}
-                  className={`px-4 sm:px-5 py-2 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all duration-300 whitespace-nowrap ${
-                    activeFilter === f
-                      ? "bg-primary text-white shadow-xl shadow-primary/20 scale-[1.05] z-10"
-                      : "text-text-variant hover:text-primary"
-                  }`}
-                >
-                  {f}
-                </button>
-              ))}
-            </div>
-
-            <button
-              onClick={() => navigate("/tasks/new")}
-              className="flex items-center justify-center gap-3 px-5 sm:px-6 py-3 rounded-xl sm:rounded-2xl glass border border-primary/10 text-primary hover:text-primary hover:border-primary/20 transition-all active:scale-95 shadow-lg shadow-primary/10 whitespace-nowrap"
-            >
-              <Plus size={14} strokeWidth={4} />
-              <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em]">ADD TASK</span>
-            </button>
-          </motion.div>
+    <div className="sec-tasks">
+      <section className="lm-lobe">
+        <h1>Tasks</h1>
+        <p>{openCount} open · {highPriority.length} high priority.</p>
+        <div className="lm-acts">
+          <button onClick={() => navigate("/tasks/new")} className="lm-btn">
+            <Plus size={16} strokeWidth={3} /> New task
+          </button>
+          <Link to="/chat" className="lm-btn lm-btn-ghost">Ask Aura to plan them</Link>
         </div>
       </section>
 
-      {/* ── Task Groups ── */}
-      {tasks.length === 0 ? (
-        <EmptyState
-          icon={<Plus size={28} className="sm:w-[32px] sm:h-[32px]" />}
-          title="No Tasks Found"
-          description="Create your first task to start organizing your daily goals."
-          actionLink="/tasks/new"
-          actionLabel="+ Create New Task"
-        />
-      ) : (
-        <div className="space-y-4">
-          <Group dot="bg-red-500 shadow-red-500/40"     label="High Priority" list={highPriority} />
-          <Group dot="bg-primary shadow-primary/40"     label="In Progress"    list={activeFlow} />
-          <Group dot="bg-text-variant shadow-lg"   label="Completed Tasks"     list={achieved} />
+      <div className="lm-lift lm-sheet">
+        {/* Filter tabs */}
+        <div className="mb-2 flex flex-wrap items-center gap-2.5">
+          <div className="lm-seg" role="group" aria-label="Filter">
+            {FILTERS.map((f) => (
+              <button key={f} onClick={() => setActiveFilter(f)} aria-pressed={activeFilter === f}>
+                {f}
+              </button>
+            ))}
+          </div>
         </div>
-      )}
+
+        {/* Task groups */}
+        {tasks.length === 0 ? (
+          <EmptyState
+            icon={<Plus size={28} />}
+            title="No tasks yet"
+            description="Create your first task to start organizing your daily goals."
+            actionLink="/tasks/new"
+            actionLabel="+ Create new task"
+          />
+        ) : filtered.length === 0 ? (
+          <p className="px-2 py-10 text-[19px]">Nothing here. Try another filter, or tell Aura “add a task…”.</p>
+        ) : (
+          <div>
+            <Group color="rgb(var(--alert))" label="High priority" list={highPriority} />
+            <Group color="rgb(var(--tasks))" label="In progress" list={activeFlow} />
+            <Group color="rgb(var(--today))" label="Completed" list={achieved} />
+          </div>
+        )}
+      </div>
     </div>
   );
 };

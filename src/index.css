@@ -498,3 +498,10 @@
 /* Keep toasts clear of the phone bottom nav. */
 .lm-toaster { bottom: 24px !important; }
 @media (max-width: 767px) { .lm-toaster { bottom: 96px !important; } }
+
+/* Dialog swell: spring-in over 500ms. */
+@keyframes lm-swell {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(.88); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+.lm-swell { animation: lm-swell .5s cubic-bezier(.3, 1.45, .5, 1) both; }

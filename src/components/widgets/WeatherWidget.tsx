@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import {
-  MapPin,
   MapPinOff,
   Sun,
   Cloud,
@@ -11,7 +10,6 @@ import {
   CloudSun,
   Droplets,
   Wind,
-  RotateCw,
 } from "lucide-react";
 import { API_CONFIG } from "../../config/api";
 import { motion, AnimatePresence } from "framer-motion";
@@ -109,83 +107,51 @@ const WeatherWidget = () => {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center h-44 gap-4">
-        <div className="w-12 h-12 glass rounded-2xl flex items-center justify-center">
-            <RotateCw className="text-primary animate-spin" size={20} strokeWidth={3} />
-        </div>
-        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary animate-pulse">Syncing Atmosphere…</p>
+      <div className="grid gap-3" role="status" aria-label="Loading weather">
+        <div className="lm-skel h-14 w-28 !bg-white/50" />
+        <div className="lm-skel h-5 w-48 !bg-white/50" />
+        <div className="lm-skel h-12 w-full !bg-white/50" />
       </div>
     );
   }
 
   if (locationDenied) {
     return (
-      <div className="flex flex-col items-center justify-center h-44 text-center gap-3">
-        <MapPinOff size={32} className="text-text-variant opacity-50" />
-        <p className="text-sm font-bold text-text">Location access needed</p>
-        <p className="text-xs text-text-variant max-w-[200px]">Allow location to illuminate your local weather.</p>
-        <button
-          onClick={fetchWeather}
-          className="mt-2 bg-primary text-white text-xs font-bold px-5 py-2 rounded-full hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20"
-        >
-          Enable Access
+      <div className="flex flex-col items-start gap-2">
+        <MapPinOff size={28} />
+        <p className="font-bold">Location access needed</p>
+        <p className="max-w-[240px] text-sm">Allow location to see your local weather.</p>
+        <button onClick={fetchWeather} className="lm-btn lm-btn-sm !bg-[#1F211E] !text-white">
+          Enable access
         </button>
       </div>
     );
   }
 
   if (error || !weather) {
-    return (
-      <div className="flex items-center justify-center h-44">
-        <p className="text-xs text-error font-semibold">{error || "No data"}</p>
-      </div>
-    );
+    return <p className="lm-error !bg-white/50 !text-[#C8321F]">{error || "No data"}</p>;
   }
 
   return (
     <AnimatePresence mode="wait">
-      <motion.div
-        key="weather"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="flex items-center justify-between h-full"
-      >
-        <div>
-          <div className="flex items-center gap-1.5 mb-2">
-            <MapPin size={14} className="text-primary" />
-            <span className="text-xs font-bold tracking-wide text-text-variant uppercase">
-              {weather.location}
+      <motion.div key="weather" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+        <b className="lm-num block text-[72px]">{weather.temperature}°</b>
+        <p className="mt-1 font-semibold">
+          {weather.location} · {weather.condition.toLowerCase()} · feels like {weather.feelsLike}°
+        </p>
+        <p className="mt-1 flex gap-4 text-sm">
+          <span className="flex items-center gap-1"><Droplets size={13} />{weather.humidity}%</span>
+          <span className="flex items-center gap-1"><Wind size={13} />{weather.windSpeed} km/h</span>
+        </p>
+
+        <div className="mt-3.5 grid grid-cols-3 gap-1.5 text-center font-semibold">
+          {weather.forecast.map((d, i) => (
+            <span key={i} className="rounded-2xl bg-white/50 py-2">
+              {d.day}
+              <WeatherIcon condition={d.condition} className="mx-auto my-1 h-5 w-5" />
+              {d.temp}°
             </span>
-          </div>
-
-          <div className="flex items-baseline gap-3">
-            <span className="text-5xl font-bold tracking-tighter text-text">
-              {weather.temperature}°
-            </span>
-            <div className="flex flex-col">
-              <span className="text-xl font-semibold text-text">{weather.condition}</span>
-              <span className="text-text-variant text-xs">Feels like {weather.feelsLike}°</span>
-            </div>
-          </div>
-
-          <div className="flex gap-5 mt-4 text-xs text-text-variant">
-            <span className="flex items-center gap-1"><Droplets size={12} className="text-primary/60" />{weather.humidity}%</span>
-            <span className="flex items-center gap-1"><Wind size={12} className="text-primary/60" />{weather.windSpeed} km/h</span>
-          </div>
-
-          <div className="flex gap-6 mt-6">
-            {weather.forecast.map((d, i) => (
-              <div key={i} className="flex flex-col items-center gap-1.5">
-                <span className="text-[10px] font-bold text-text-variant uppercase tracking-widest">{d.day}</span>
-                <WeatherIcon condition={d.condition} className="w-5 h-5 text-primary/60" />
-                <span className="text-sm font-bold text-text">{d.temp}°</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="hidden md:block opacity-20">
-          <WeatherIcon condition={weather.condition} className="w-24 h-24 text-primary" />
+          ))}
         </div>
       </motion.div>
     </AnimatePresence>

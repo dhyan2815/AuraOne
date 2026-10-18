@@ -5,7 +5,7 @@ import { format, isSameDay, startOfMonth, endOfMonth, eachDayOfInterval, getDay,
 import { getEvents, createEvent, Event } from "../../hooks/useEvents";
 import { useAuth } from "../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
-import { Clock, Plus, X, ChevronRight } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const DAYS_OF_WEEK = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -61,11 +61,11 @@ const CalendarWidget = () => {
   };
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="grid grid-cols-7 gap-y-2 text-center mb-6">
+    <div className="flex h-full flex-col">
+      <div className="mb-5 grid grid-cols-7 gap-1.5 text-center">
         {DAYS_OF_WEEK.map((d) => (
-          <span key={d} className="text-[9px] font-black text-text-variant uppercase tracking-[0.2em] py-1 opacity-50">
-            {d}
+          <span key={d} className="lm-muted py-1 font-semibold">
+            {d.charAt(0)}
           </span>
         ))}
         {calendarDays.map((day, i) => {
@@ -77,37 +77,39 @@ const CalendarWidget = () => {
             <button
               key={day.toISOString()}
               onClick={() => setSelectedDate(day)}
-              className={`relative mx-auto w-8 h-8 flex items-center justify-center rounded-xl text-xs font-black transition-all duration-300 ${
-                today && !selected
-                  ? "bg-primary text-white shadow-lg shadow-primary/30"
+              aria-label={format(day, "PPPP")}
+              aria-pressed={selected}
+              className={`relative rounded-[14px] py-2.5 text-sm font-semibold transition-colors ${
+                today
+                  ? "bg-today text-[#1F211E]"
                   : selected
-                  ? "bg-primary text-white shadow-xl shadow-primary/40 ring-2 ring-primary/20 scale-110"
-                  : "text-text hover:bg-primary/10 hover:scale-105"
+                  ? "bg-step"
+                  : "hover:bg-step"
               }`}
             >
               {format(day, "d")}
-              {marked && !selected && !today && (
-                <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-tertiary rounded-full shadow-[0_0_5px_rgba(139,92,246,0.6)]" />
+              {marked && (
+                <span className="mx-auto mt-0.5 block h-1.5 w-1.5 rounded-full bg-events" />
               )}
             </button>
           );
         })}
       </div>
 
-      <div className="border-t border-primary/10 pt-6 flex-1">
+      <div className="flex-1 border-t border-step pt-4">
         <AnimatePresence mode="wait">
           {showAddForm ? (
             <motion.form
               key="form"
-              initial={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.97 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
+              exit={{ opacity: 0, scale: 0.97 }}
               onSubmit={handleAddEvent}
-              className="space-y-3 glass border border-primary/10 rounded-2xl p-5 shadow-2xl shadow-primary/5"
+              className="sec-events grid gap-3"
             >
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">New Event</span>
-                <button type="button" onClick={() => setShowAddForm(false)} className="p-1.5 rounded-xl hover:bg-primary/10 transition-colors text-text-variant active:scale-90">
+              <div className="flex items-center justify-between">
+                <span className="font-bold">New event</span>
+                <button type="button" onClick={() => setShowAddForm(false)} className="lm-round !h-8 !w-8 !bg-step" aria-label="Cancel">
                   <X size={14} />
                 </button>
               </div>
@@ -117,71 +119,43 @@ const CalendarWidget = () => {
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
                 placeholder="Event name…"
-                className="input-aurora w-full py-3 px-4 text-xs font-bold"
+                className="lm-input"
               />
               <input
                 required
                 type="time"
                 value={newTime}
                 onChange={(e) => setNewTime(e.target.value)}
-                className="input-aurora w-full py-3 px-4 text-xs font-bold"
+                className="lm-input"
               />
-              <button 
-                type="submit" 
-                className="w-full mt-2 py-3 rounded-2xl bg-gradient-to-r from-primary to-secondary text-white font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
-              >
-                Add
-              </button>
+              <button type="submit" className="lm-btn">Add</button>
             </motion.form>
           ) : eventsForSelected.length === 0 ? (
             <motion.div
               key="empty"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="flex flex-col items-center justify-center py-6 gap-3 text-center"
+              className="flex flex-col items-start gap-2 py-2"
             >
-                <div className="w-12 h-12 rounded-2xl glass flex items-center justify-center border border-primary/5">
-                    <Clock size={20} className="text-primary/30" strokeWidth={2.5} />
-                </div>
-                <div className="space-y-1">
-                    <p className="text-xs font-black uppercase tracking-[0.2em] text-text">Daily Agenda</p>
-                    <p className="text-[9px] font-bold text-text-variant opacity-60 uppercase tracking-widest">No events logged on {format(selectedDate, "MMM d")}</p>
-                </div>
-                <button
-                    onClick={() => setShowAddForm(true)}
-                    className="text-[10px] font-black text-primary hover:text-primary/80 flex items-center gap-2 transition-all uppercase tracking-[0.3em] bg-primary/5 px-5 py-2.5 rounded-xl border border-primary/10 mt-2"
-                >
-                    <Plus size={14} strokeWidth={3} /> Initial Event
-                </button>
+              <p className="font-bold">Nothing on {format(selectedDate, "MMM d")}</p>
+              <button onClick={() => setShowAddForm(true)} className="lm-btn lm-btn-soft lm-btn-sm">
+                <Plus size={14} strokeWidth={3} /> Add event
+              </button>
             </motion.div>
           ) : (
-            <motion.div key="events" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-              {eventsForSelected.map((event, idx) => (
-                <motion.div
+            <motion.div key="events" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              {eventsForSelected.map((event) => (
+                <div
                   key={event.id}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: idx * 0.05 }}
                   onClick={() => navigate(`/events?date=${selectedDate.toISOString().split("T")[0]}`)}
-                  className="flex items-center gap-5 group cursor-pointer glass p-3.5 rounded-2xl border border-primary/5 hover:border-primary/20 hover:shadow-xl transition-all"
+                  className="lm-row cursor-pointer"
                 >
-                  <div className="w-1 h-10 bg-primary/20 rounded-full group-hover:bg-primary transition-all duration-500 group-hover:w-1.5" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-text group-hover:text-primary transition-colors leading-tight line-clamp-1">{event.title}</p>
-                    <p className="text-[9px] text-text-variant flex items-center gap-1.5 mt-1.5 uppercase tracking-[0.2em] font-black opacity-60">
-                      <Clock size={10} strokeWidth={3} className="text-primary" />
-                      {format(new Date(event.start_time), "p")}
-                    </p>
-                  </div>
-                  <ChevronRight size={14} className="text-primary opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-                </motion.div>
+                  <span className="w-[72px] flex-none font-bold tabular-nums">{format(new Date(event.start_time), "p")}</span>
+                  <span className="min-w-0 flex-1 truncate font-medium">{event.title}</span>
+                </div>
               ))}
-              <button
-                onClick={() => setShowAddForm(true)}
-                className="w-full mt-4 flex items-center justify-center gap-3 py-3.5 rounded-2xl glass border border-primary/10 text-primary hover:text-primary hover:border-primary/20 transition-all active:scale-95 shadow-lg shadow-primary/10"
-              >
-                <Plus size={16} strokeWidth={4} />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em]">Add Event</span>
+              <button onClick={() => setShowAddForm(true)} className="lm-btn lm-btn-soft lm-btn-sm mt-3">
+                <Plus size={14} strokeWidth={3} /> Add event
               </button>
             </motion.div>
           )}
@@ -192,4 +166,3 @@ const CalendarWidget = () => {
 };
 
 export default CalendarWidget;
-
