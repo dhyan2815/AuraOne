@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>AuraOne · Today</title>
+
+
+</head>
+<body>
+<x-dc>
+<helmet>
+
+<style>
+body{margin:0}
+.wrap{max-width:1440px;margin:0 auto}
+.g{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr) minmax(0,1fr)}
+.wx{background:var(--events);color:#1F211E}
+.fc{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin-top:14px;text-align:center;font-weight:650}
+.fc span{background:rgba(255,255,255,.5);border-radius:16px;padding:8px 0}
+.news img{width:100%;height:150px;object-fit:cover;border-radius:20px;background:var(--step);display:block}
+.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;text-align:center;font-weight:650}
+.week span{padding:10px 0;border-radius:14px}
+.week .on{background:var(--today);color:#1F211E}
+.ev{position:relative}.ev::after{content:"";display:block;width:6px;height:6px;border-radius:50%;background:var(--events);margin:4px auto 0}
+@media (max-width:1000px){.g{grid-template-columns:1fr}}
+</style>
+</helmet>
+<div class="lm" data-theme="{{theme}}">
+<div class="wrap">
+<header class="bar">
+<span class="mark">AuraOne</span>
+<nav class="caps" aria-label="Main"><a class="cap on" href="Dashboard.dc.html" style="--c:var(--today)" aria-current="page"><i></i>Today</a><a class="cap" href="Tasks.dc.html" style="--c:var(--tasks)"><i></i>Tasks</a><a class="cap" href="Notes.dc.html" style="--c:var(--notes)"><i></i>Notes</a><a class="cap" href="Events.dc.html" style="--c:var(--events)"><i></i>Events</a><a class="cap" href="Aura.dc.html" style="--c:var(--aura)"><i></i>Aura</a><a class="cap" href="Knowledge.dc.html" style="--c:var(--know)"><i></i>Knowledge</a></nav>
+<a class="askpill" href="Aura.dc.html">Ask Aura to add, move or find… <span class="kbd">/</span></a><a class="round" href="Dialogs.dc.html" aria-label="New task">+</a><a class="avatar" href="Settings.dc.html" aria-label="Settings">D</a>
+</header>
+<main class="main">
+<section class="lobe" style="--c:var(--today)">
+<h1>{{greeting}}, Dhyan</h1>
+<p>Saturday 17 October · {{openCount}} tasks open, 2 events, Aura made 3 changes this morning.</p>
+<div class="acts"><a class="btn" href="Aura.dc.html">Ask Aura</a><a class="btn ghost" href="Tasks.dc.html">Open tasks</a></div>
+</section>
+<div class="cols g lift">
+<div class="sheet" style="--c:var(--tasks)">
+<h2><span class="dot"></span>Tasks<a class="muted end" href="Tasks.dc.html" style="font-weight:600">All 12</a></h2>
+<sc-for list="{{tasks}}" as="t" hint-placeholder-count="4">
+<div class="row"><button class="{{t.checkCls}}" aria-label="Complete {{t.title}}" sc-camel-on-click="{{t.toggle}}"></button><span class="{{t.lblCls}}">{{t.title}}</span><span class="{{t.chipCls}}">{{t.pri}}</span><span class="muted" style="width:44px;text-align:right">{{t.due}}</span></div>
+</sc-for>
+<h2 style="--c:var(--events);margin-top:18px"><span class="dot"></span>Next up</h2>
+<div class="row"><span class="t">10:30</span>Portfolio review with Mehul<span class="chip a end">moved by Aura</span></div>
+<div class="row"><span class="t">16:00</span>Gym, leg day<span class="muted end">Satellite</span></div>
+</div>
+<div style="display:grid;gap:20px;align-content:start">
+<div class="sheet" style="--c:var(--aura)"><h2><span class="dot"></span>Aura today</h2>
+<div class="row"><span class="t">09:12</span><span>Created <b>Buy groceries</b></span></div>
+<div class="row"><span class="t">09:40</span><span>Moved <b>Portfolio review</b> to 10:30</span></div>
+<div class="row"><span class="t">11:05</span><span>Found 3 notes on <b>chunking</b></span></div>
+<a class="btn soft" href="Aura.dc.html" style="margin-top:10px">Open conversation</a></div>
+<div class="sheet"><h2>October</h2><div class="week"><span class="muted">M</span><span class="muted">T</span><span class="muted">W</span><span class="muted">T</span><span class="muted">F</span><span class="muted">S</span><span class="muted">S</span><span>12</span><span>13</span><span class="ev">14</span><span>15</span><span>16</span><span class="on ev">17</span><span>18</span></div></div>
+</div>
+<div style="display:grid;gap:20px;align-content:start">
+<div class="sheet wx"><b class="big">31°</b><p style="font-weight:600">Ahmedabad · clear · 24° tonight</p><div class="fc"><span>Sun<br>32°</span><span>Mon<br>30°</span><span>Tue<br>29°</span><span>Wed<br>31°</span><span>Thu<br>33°</span></div></div>
+<div class="sheet news"><h2>News</h2><div style="height:150px;border-radius:20px;background:var(--step);display:grid;place-items:center" class="muted">[NewsData.io article image]</div><p style="font-weight:700;font-size:17px;margin-top:12px">ISRO schedules next Gaganyaan test flight</p><p class="muted">The Hindu · 2h ago</p><div class="row" style="margin-top:6px"><span>RBI holds repo rate at 5.5%</span><span class="muted end">Mint</span></div></div>
+</div>
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;dark&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false},&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:1100}}">
+class Component extends DCLogic {
+  constructor(p){super(p);this.state={done:[false,false,false,true]};}
+  renderVals(){
+    const T=[["Finish RAG chunking write-up","High","Today"],["Buy groceries","Medium","Sun"],["Reply to Anjali","Low","Mon"],["Renew Supabase key","Low","Done"]];
+    const d=this.state.done;
+    return {
+      theme:this.props.dark?'dark':'light', greeting:'Good morning',
+      openCount:d.filter(x=>!x).length,
+      tasks:T.map((t,i)=>({title:t[0],pri:t[1],due:t[2],
+        checkCls:d[i]?'check done':'check', lblCls:d[i]?'strike':'',
+        chipCls:t[1]==='High'?'chip h end':'chip end',
+        toggle:()=>{const n=d.slice();n[i]=!n[i];this.setState({done:n});}}))
+    };
+  }
+}
+</script>
+
+
+</body></html>

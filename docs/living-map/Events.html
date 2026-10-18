@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>AuraOne · Events</title>
+
+
+</head>
+<body>
+<x-dc>
+<helmet>
+
+<style>
+body{margin:0}
+.wrap{max-width:1440px;margin:0 auto}
+.g{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}
+.calhead{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.dow{font-size:13px;font-weight:700;color:var(--ink2);text-align:center;padding-bottom:4px}
+.day{min-height:84px;border-radius:18px;padding:8px 10px;background:var(--water);font-weight:650;font-variant-numeric:tabular-nums;display:flex;flex-direction:column;gap:4px}
+.day.blank{background:none}
+.day.today{background:var(--events);color:#1F211E}
+.day .e{font-size:12px;font-weight:650;background:var(--sheet);color:var(--ink);border-radius:999px;padding:1px 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.day.today .e{background:rgba(255,255,255,.7);color:#1F211E}
+.slot{display:grid;grid-template-columns:60px minmax(0,1fr);gap:12px;padding:12px 0}
+.slot+.slot{box-shadow:0 -1px 0 var(--step)}
+.blk{background:var(--events);color:#1F211E;border-radius:18px;padding:10px 14px}
+.blk.a{background:var(--aura)}
+@media (max-width:1000px){.g{grid-template-columns:1fr}.day{min-height:52px}.day .e{display:none}}
+</style>
+</helmet>
+<div class="lm" data-theme="{{theme}}">
+<div class="wrap">
+<header class="bar">
+<span class="mark">AuraOne</span>
+<nav class="caps" aria-label="Main"><a class="cap" href="Dashboard.dc.html" style="--c:var(--today)"><i></i>Today</a><a class="cap" href="Tasks.dc.html" style="--c:var(--tasks)"><i></i>Tasks</a><a class="cap" href="Notes.dc.html" style="--c:var(--notes)"><i></i>Notes</a><a class="cap on" href="Events.dc.html" style="--c:var(--events)" aria-current="page"><i></i>Events</a><a class="cap" href="Aura.dc.html" style="--c:var(--aura)"><i></i>Aura</a><a class="cap" href="Knowledge.dc.html" style="--c:var(--know)"><i></i>Knowledge</a></nav>
+<a class="askpill" href="Aura.dc.html">Ask Aura to add, move or find… <span class="kbd">/</span></a><a class="round" href="Dialogs.dc.html" aria-label="New task">+</a><a class="avatar" href="Settings.dc.html" aria-label="Settings">D</a>
+</header>
+<main class="main">
+<section class="lobe" style="--c:var(--events)">
+<h1>October</h1>
+<p>6 events this month · next: Portfolio review, 10:30 today.</p>
+<div class="acts"><a class="btn" href="Dialogs.dc.html">New event</a><a class="btn ghost" href="Aura.dc.html">“Add dinner Wednesday at 7”</a></div>
+</section>
+<div class="cols g lift">
+<div class="sheet">
+<div class="calhead"><button class="round" style="background:var(--step)" aria-label="Previous month">‹</button><b style="font-size:20px">October 2026</b><button class="round" style="background:var(--step)" aria-label="Next month">›</button><div class="seg end" style="--c:var(--events)"><button class="on">Month</button><button>Week</button><button>Day</button></div></div>
+<div class="cal"><span class="dow">Mon</span><span class="dow">Tue</span><span class="dow">Wed</span><span class="dow">Thu</span><span class="dow">Fri</span><span class="dow">Sat</span><span class="dow">Sun</span>
+<sc-for list="{{days}}" as="d" hint-placeholder-count="35"><div class="{{d.cls}}"><span>{{d.n}}</span><sc-if value="{{d.ev}}" hint-placeholder-val="{{false}}"><span class="e">{{d.ev}}</span></sc-if></div></sc-for>
+</div>
+</div>
+<div class="sheet" style="--c:var(--events)">
+<h2>Saturday 17</h2>
+<div class="slot"><span class="t">10:30</span><div class="blk a"><b>Portfolio review with Mehul</b><br>Google Meet · 45 min · moved by Aura</div></div>
+<div class="slot"><span class="t">16:00</span><div class="blk"><b>Gym, leg day</b><br>Cult Fit, Satellite · 1h</div></div>
+<div class="slot"><span class="t">20:00</span><span class="muted" style="align-self:center">Free evening</span></div>
+<h2 style="margin-top:18px">Coming up</h2>
+<div class="row"><span class="t">Wed 22</span>Dinner with family, 19:00</div>
+<div class="row"><span class="t">Wed 28</span>Hackathon kickoff, 10:00</div>
+</div>
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;dark&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false},&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:1000}}">
+class Component extends DCLogic {
+  renderVals(){
+    const ev={3:"Team standup",10:"Dentist",14:"Mock interview",17:"Portfolio review",22:"Dinner",28:"Hackathon"};
+    const days=[];
+    for(let i=0;i<3;i++)days.push({cls:'day blank',n:'',ev:''});
+    for(let n=1;n<=31;n++)days.push({cls:n===17?'day today':'day',n,ev:ev[n]||''});
+    while(days.length%7)days.push({cls:'day blank',n:'',ev:''});
+    return { theme:this.props.dark?'dark':'light', days };
+  }
+}
+</script>
+
+
+</body></html>

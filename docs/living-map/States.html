@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>AuraOne · States</title>
+
+
+</head>
+<body>
+<x-dc>
+<helmet>
+
+<style>
+body{margin:0}
+.stage{width:1440px;height:900px;padding:40px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:1fr 1fr;gap:24px}
+.cell{background:var(--sheet);border-radius:32px;padding:26px 28px;display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden}
+.cell h3{font-size:15px;font-weight:700;color:var(--ink2)}
+.empty{flex:1;display:flex;flex-direction:column;justify-content:center;gap:10px}
+.blobm{width:120px;height:96px;background:var(--c);border-radius:44% 56% 60% 40%/50% 42% 58% 50%}
+.empty b{font-size:28px;font-weight:800;letter-spacing:-.04em;font-stretch:76%;line-height:1}
+.sk{background:var(--step);border-radius:999px;height:16px}
+.loader{flex:1;display:grid;place-items:center;text-align:center}
+.pulse{width:96px;height:96px;background:var(--today);border-radius:44% 56% 60% 40%/50% 42% 58% 50%;margin:0 auto 14px}
+.toast{display:flex;gap:12px;align-items:center;background:#1F211E;color:#fff;border-radius:999px;padding:12px 14px 12px 20px;font-weight:600}
+.toast u{margin-left:auto;cursor:pointer}
+.toast i{width:12px;height:12px;border-radius:50%;flex:none}
+.err{background:var(--alert);color:#fff;border-radius:24px;padding:16px 18px}
+.off{display:flex;gap:10px;align-items:center;background:var(--step);border-radius:999px;padding:10px 16px;font-weight:600}
+</style>
+</helmet>
+<div class="lm" data-theme="{{theme}}">
+<div class="stage">
+<div class="cell" style="--c:var(--tasks)"><h3>Empty · Tasks</h3><div class="empty"><div class="blobm" aria-hidden="true"></div><b>Nothing to do. Nice.</b><p>Add a task, or tell Aura “remind me to…”.</p><div class="acts" style="margin-top:4px"><button class="btn">New task</button></div></div></div>
+<div class="cell" style="--c:var(--notes)"><h3>Empty · Notes search</h3><div class="empty"><div class="blobm" aria-hidden="true"></div><b>No notes match “kubernetes”</b><p>Try a tag, or ask Aura to search everything.</p><div class="acts" style="margin-top:4px"><button class="btn soft">Clear search</button></div></div></div>
+<div class="cell"><h3>Loading · app start</h3><div class="loader"><div><div class="pulse" aria-hidden="true"></div><b style="font-size:22px">Mapping your day…</b><p class="muted">Syncing tasks, notes and events</p></div></div></div>
+<div class="cell"><h3>Loading · list skeleton</h3><div class="sk" style="width:60%;height:28px"></div><div class="sk" style="width:90%"></div><div class="sk" style="width:75%"></div><div class="sk" style="width:84%"></div><div class="sk" style="width:50%"></div></div>
+<div class="cell"><h3>Toasts</h3><div class="toast" role="status"><i style="background:var(--today)"></i>Task completed<u>Undo</u></div><div class="toast" role="status"><i style="background:var(--aura)"></i>Aura moved Portfolio review to 10:30</div><div class="toast" role="status"><i style="background:var(--events)"></i>Event saved · Wed 22</div></div>
+<div class="cell"><h3>Errors</h3><div class="err" role="alert"><b>Aura couldn't reach Gemini.</b><br>Switched to OpenRouter; your answer is on its way.</div><div class="err" role="alert" style="background:var(--step);color:var(--ink);box-shadow:inset 0 0 0 2px var(--alert)"><b>Couldn't save the note.</b> Check your connection. <u>Retry</u></div><div class="off"><i class="dot" style="--c:var(--tasks)"></i>Offline · changes will sync when you're back</div></div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;dark&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false},&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  renderVals(){ return { theme: this.props.dark ? 'dark' : 'light' }; }
+}
+</script>
+
+
+</body></html>

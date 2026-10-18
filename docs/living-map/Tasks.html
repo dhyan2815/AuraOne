@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>AuraOne · Tasks</title>
+
+
+</head>
+<body>
+<x-dc>
+<helmet>
+
+<style>
+body{margin:0}
+.wrap{max-width:1440px;margin:0 auto}
+.g{grid-template-columns:minmax(0,1fr) 340px}
+.tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.search{background:var(--step);border-radius:999px;padding:10px 18px;border:0;min-width:260px;margin-left:auto;outline:none}
+.trow{display:grid;grid-template-columns:24px minmax(0,1fr) 90px 90px 40px;gap:14px;align-items:center;padding:14px 8px;border-radius:18px}
+.trow:hover{background:var(--water)}
+.trow+.trow{box-shadow:0 -1px 0 var(--step)}
+.stamp{font-size:13px;font-weight:700}
+.stamp u{cursor:pointer}
+.bar2{display:flex;gap:4px;height:12px;margin:12px 0}
+.bar2 i{border-radius:999px}
+@media (max-width:1000px){.g{grid-template-columns:1fr}.trow{grid-template-columns:24px minmax(0,1fr) 80px}.trow .hide{display:none}}
+</style>
+</helmet>
+<div class="lm" data-theme="{{theme}}">
+<div class="wrap">
+<header class="bar">
+<span class="mark">AuraOne</span>
+<nav class="caps" aria-label="Main"><a class="cap" href="Dashboard.dc.html" style="--c:var(--today)"><i></i>Today</a><a class="cap on" href="Tasks.dc.html" style="--c:var(--tasks)" aria-current="page"><i></i>Tasks</a><a class="cap" href="Notes.dc.html" style="--c:var(--notes)"><i></i>Notes</a><a class="cap" href="Events.dc.html" style="--c:var(--events)"><i></i>Events</a><a class="cap" href="Aura.dc.html" style="--c:var(--aura)"><i></i>Aura</a><a class="cap" href="Knowledge.dc.html" style="--c:var(--know)"><i></i>Knowledge</a></nav>
+<a class="askpill" href="Aura.dc.html">Ask Aura to add, move or find… <span class="kbd">/</span></a><a class="round" href="Dialogs.dc.html" aria-label="New task">+</a><a class="avatar" href="Settings.dc.html" aria-label="Settings">D</a>
+</header>
+<main class="main">
+<section class="lobe" style="--c:var(--tasks)">
+<h1>Tasks</h1>
+<p>{{open}} open · 4 due this weekend · 1 high priority.</p>
+<div class="acts"><a class="btn" href="Dialogs.dc.html">New task</a><a class="btn ghost" href="Aura.dc.html">Ask Aura to plan them</a></div>
+</section>
+<div class="cols g lift">
+<div class="sheet" style="--c:var(--tasks)">
+<div class="tools">
+<div class="seg" role="tablist" aria-label="Filter"><sc-for list="{{filters}}" as="f" hint-placeholder-count="4"><button class="{{f.cls}}" sc-camel-on-click="{{f.pick}}">{{f.label}}</button></sc-for></div>
+<input class="search" placeholder="Search tasks" aria-label="Search tasks">
+</div>
+<sc-for list="{{rows}}" as="t" hint-placeholder-count="6">
+<div class="trow"><button class="{{t.checkCls}}" aria-label="Complete {{t.title}}" sc-camel-on-click="{{t.toggle}}"></button>
+<a href="TaskPage.dc.html"><span class="{{t.lblCls}}" style="font-weight:600">{{t.title}}</span><br><span class="muted">{{t.sub}}</span></a>
+<span class="{{t.chipCls}}" style="justify-self:start">{{t.pri}}</span><span class="muted hide">{{t.due}}</span><a class="muted hide" href="TaskPage.dc.html" aria-label="Open {{t.title}}">›</a></div>
+<sc-if value="{{t.done}}" hint-placeholder-val="{{false}}"><p class="stamp" style="padding:0 0 8px 46px">Completed just now · <u>Undo</u></p></sc-if>
+</sc-for>
+<sc-if value="{{empty}}" hint-placeholder-val="{{false}}"><p style="padding:40px 8px;font-size:19px">Nothing here. Try another filter, or tell Aura “add a task…”.</p></sc-if>
+</div>
+<div style="display:grid;gap:20px;align-content:start">
+<div class="sheet"><h2>This week</h2><p class="big" style="font-size:64px">5 / 12</p><p class="muted">tasks completed</p>
+<div class="bar2"><i style="flex:5;background:var(--today)"></i><i style="flex:6;background:var(--tasks)"></i><i style="flex:1;background:var(--alert)"></i></div>
+<div class="row"><span class="dot" style="--c:var(--today)"></span>Done<span class="end">5</span></div><div class="row"><span class="dot" style="--c:var(--tasks)"></span>Open<span class="end">6</span></div><div class="row"><span class="dot" style="--c:var(--alert)"></span>Overdue<span class="end">1</span></div></div>
+<div class="sheet" style="background:var(--aura);color:#1F211E"><h2>Aura suggests</h2><p>Your RAG write-up is high priority and due today. Block 2 hours after the portfolio review?</p><div class="acts" style="margin-top:14px"><button class="btn">Block 12:00–14:00</button></div></div>
+</div>
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;dark&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false},&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:1100}}">
+class Component extends DCLogic {
+  constructor(p){super(p);this.state={f:'All',done:{5:true}};}
+  renderVals(){
+    const T=[
+      ["Finish RAG chunking write-up","High","Today","Created by you · 2 subtasks"],
+      ["Buy groceries","Medium","Sun 18","Created by Aura · 09:12"],
+      ["Reply to Anjali about mock interview","Low","Mon 19","From note Mock interview answers"],
+      ["Draft LinkedIn post on the fallback chain","Medium","Tue 20","Created by you"],
+      ["Submit hackathon abstract","High","Overdue","Was due Thu 15"],
+      ["Renew Supabase project key","Low","Done","Completed Fri"]
+    ];
+    const d=this.state.done, f=this.state.f;
+    const all=T.map((t,i)=>({t,i,done:!!d[i]}));
+    const shown=all.filter(x=>f==='All'?true:f==='Today'?x.t[2]==='Today':f==='High'?x.t[1]==='High':x.done);
+    return {
+      theme:this.props.dark?'dark':'light',
+      open:all.filter(x=>!x.done).length,
+      filters:['All','Today','High','Done'].map(l=>({label:l,cls:l===f?'on':'',pick:()=>this.setState({f:l})})),
+      empty:shown.length===0,
+      rows:shown.map(({t,i,done})=>({title:t[0],pri:t[1],due:t[2],sub:t[3],done,
+        checkCls:done?'check done':'check',lblCls:done?'strike':'',
+        chipCls:t[1]==='High'?'chip h':'chip',
+        toggle:()=>this.setState({done:{...d,[i]:!done}})}))
+    };
+  }
+}
+</script>
+
+
+</body></html>

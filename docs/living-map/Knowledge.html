@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>AuraOne · Knowledge</title>
+
+
+</head>
+<body>
+<x-dc>
+<helmet>
+
+<style>
+body{margin:0}
+.wrap{max-width:1440px;margin:0 auto}
+.search{display:flex;gap:8px;background:var(--sheet);border-radius:999px;padding:6px 6px 6px 22px;max-width:760px;align-items:center}
+.search input{flex:1;border:0;background:none;outline:none;font-size:18px;padding:8px 0}
+.g{grid-template-columns:minmax(0,1fr) 340px;margin-top:20px}
+.chunk{display:grid;grid-template-columns:84px minmax(0,1fr);gap:16px;padding:16px 0}
+.chunk+.chunk{box-shadow:0 -1px 0 var(--step)}
+.sim{font-size:40px;font-weight:800;letter-spacing:-.05em;font-stretch:62%;line-height:1}
+.simbar{height:8px;border-radius:999px;background:var(--step);margin-top:8px;overflow:hidden}
+.simbar i{display:block;height:100%;background:var(--know);border-radius:999px}
+.src{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:4px}
+.stat{display:flex;justify-content:space-between;padding:8px 0;font-weight:600}
+.pg textarea{width:100%;min-height:110px;border:0;border-radius:20px;background:var(--step);padding:14px 16px;font-size:16px;outline:none}
+@media (max-width:1000px){.g{grid-template-columns:1fr}}
+</style>
+</helmet>
+<div class="lm" data-theme="{{theme}}">
+<div class="wrap">
+<header class="bar">
+<span class="mark">AuraOne</span>
+<nav class="caps" aria-label="Main"><a class="cap" href="Dashboard.dc.html" style="--c:var(--today)"><i></i>Today</a><a class="cap" href="Tasks.dc.html" style="--c:var(--tasks)"><i></i>Tasks</a><a class="cap" href="Notes.dc.html" style="--c:var(--notes)"><i></i>Notes</a><a class="cap" href="Events.dc.html" style="--c:var(--events)"><i></i>Events</a><a class="cap" href="Aura.dc.html" style="--c:var(--aura)"><i></i>Aura</a><a class="cap on" href="Knowledge.dc.html" style="--c:var(--know)" aria-current="page"><i></i>Knowledge</a></nav>
+<a class="askpill" href="Aura.dc.html">Ask Aura to add, move or find… <span class="kbd">/</span></a><a class="round" href="Dialogs.dc.html" aria-label="New task">+</a><a class="avatar" href="Settings.dc.html" aria-label="Settings">D</a>
+</header>
+<main class="main">
+<section class="lobe" style="--c:var(--know)">
+<h1>Knowledge</h1>
+<p>214 chunks from your notes, tasks and events. This is what Aura reads before it answers.</p>
+<div class="acts"><div class="seg"><sc-for list="{{tabs}}" as="t" hint-placeholder-count="2"><button class="{{t.cls}}" sc-camel-on-click="{{t.pick}}">{{t.label}}</button></sc-for></div><button class="btn">Re-index all</button></div>
+</section>
+<div class="lift">
+<form class="search" onsubmit="return false"><input value="how much overlap for chunking?" aria-label="Search your knowledge"><button class="btn">Search</button></form>
+<div class="cols g">
+<div class="sheet" style="--c:var(--know)">
+<sc-if value="{{explorer}}" hint-placeholder-val="{{true}}">
+<h2>3 matching chunks</h2>
+<div class="chunk"><div><span class="sim">.82</span><div class="simbar"><i style="width:82%"></i></div></div><div><div class="src"><span class="chip" style="background:var(--notes);color:#1F211E">Note</span><b>Chunking strategies</b><span class="muted">chunk 1 of 4</span></div><p>512-token windows with 64 overlap kept meeting notes intact; 256 split decisions away from their reasons.</p></div></div>
+<div class="chunk"><div><span class="sim">.71</span><div class="simbar"><i style="width:71%"></i></div></div><div><div class="src"><span class="chip" style="background:var(--tasks);color:#1F211E">Task</span><b>Finish RAG chunking write-up</b><span class="muted">High · due today</span></div><p>Write up why 512-token chunks with 64 overlap beat 256…</p></div></div>
+<div class="chunk"><div><span class="sim">.58</span><div class="simbar"><i style="width:58%"></i></div></div><div><div class="src"><span class="chip" style="background:var(--notes);color:#1F211E">Note</span><b>Mock interview answers</b><span class="muted">chunk 2 of 3</span></div><p>Why overlap prevents split context; fallback to OpenRouter when Gemini limits hit.</p></div></div>
+</sc-if>
+<sc-if value="{{playground}}" hint-placeholder-val="{{false}}">
+<div class="pg"><h2>Playground</h2><p class="muted" style="margin-bottom:12px">Paste text to see how it would be chunked and what it matches.</p><textarea aria-label="Text to chunk">Short event descriptions might not need chunking at all…</textarea>
+<div class="acts"><span class="chip">Chunk size 512</span><span class="chip">Overlap 64</span><button class="btn end">Run</button></div>
+<div class="chunk"><div><span class="sim">1</span></div><div><b>1 chunk · 9 tokens</b><p class="muted">Below one window. Stored whole.</p></div></div></div>
+</sc-if>
+</div>
+<div style="display:grid;gap:20px;align-content:start">
+<div class="sheet"><h2>Index</h2><div class="stat"><span>Notes</span><span>152 chunks</span></div><div class="stat"><span>Tasks</span><span>41 chunks</span></div><div class="stat"><span>Events</span><span>21 chunks</span></div><p class="muted" style="margin-top:8px">Last synced 2 min ago · Gemini embeddings</p></div>
+<div class="sheet" style="background:var(--aura);color:#1F211E"><h2>Ask with sources</h2><p>Aura cites the chunks it used, so you can open the note behind every answer.</p><a class="btn" href="Aura.dc.html" style="margin-top:12px">Ask Aura</a></div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;dark&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false},&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:1000}}">
+class Component extends DCLogic {
+  constructor(p){super(p);this.state={tab:'Explorer'};}
+  renderVals(){
+    const t=this.state.tab;
+    return {
+      theme:this.props.dark?'dark':'light',
+      explorer:t==='Explorer', playground:t==='Playground',
+      tabs:['Explorer','Playground'].map(l=>({label:l,cls:l===t?'on':'',pick:()=>this.setState({tab:l})}))
+    };
+  }
+}
+</script>
+
+
+</body></html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>AuraOne · Sign up</title>
+
+
+</head>
+<body>
+<x-dc>
+<helmet>
+
+<style>
+body{margin:0}
+.auth{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,560px);min-height:900px;max-width:1440px;margin:0 auto}
+.side{background:var(--c);color:#1F211E;border-radius:0 52% 58% 0/0 46% 62% 0;padding:40px 96px 64px 48px;display:flex;flex-direction:column}
+.side h1{font-size:clamp(56px,7vw,112px);font-weight:800;letter-spacing:-.055em;line-height:.9;font-stretch:72%;margin-top:auto;max-width:640px}
+.side ul{list-style:none;padding:0;margin:24px 0 0;display:grid;gap:10px;font-size:18px;font-weight:600}
+.side li{display:flex;gap:10px;align-items:center}
+.side li i{width:14px;height:14px;border-radius:50%;background:#1F211E}
+.form{padding:56px;display:flex;flex-direction:column;justify-content:center;gap:16px}
+.form h2{font-size:44px;font-weight:800;letter-spacing:-.045em;font-stretch:75%;line-height:1}
+.meter{display:flex;gap:4px}.meter i{flex:1;height:8px;border-radius:999px;background:var(--step)}.meter i.f{background:var(--today)}
+@media (max-width:900px){.auth{grid-template-columns:1fr}.side{min-height:320px;border-radius:0 0 50% 30%/0 0 22% 14%;padding:28px 32px 56px}.form{padding:32px 20px}}
+</style>
+</helmet>
+<div class="lm" data-theme="{{theme}}">
+<div class="auth">
+<div class="side" style="--c:var(--tasks)"><a class="mark" href="Main.dc.html">AuraOne</a><h1>Your day, mapped in a minute</h1>
+<ul><li><i></i>Tasks, notes and events in one place</li><li><i></i>Aura acts on plain sentences</li><li><i></i>Light and dark, desktop and phone</li></ul></div>
+<form class="form" onsubmit="return false" aria-label="Create account">
+<h2>Create your account</h2>
+<label class="field" style="--c:var(--tasks)">Name<input class="input" value="Dhyan Patel" autocomplete="name"></label>
+<label class="field" style="--c:var(--tasks)">Email<input class="input" type="email" value="dhyan@example.com" autocomplete="email"></label>
+<label class="field" style="--c:var(--tasks)">Password<input class="input" type="password" value="supersecret1" autocomplete="new-password"></label>
+<div class="meter" aria-hidden="true"><i class="f"></i><i class="f"></i><i class="f"></i><i></i></div>
+<p class="muted">Good password. Add a symbol to make it strong.</p>
+<label class="field" style="--c:var(--tasks)">Confirm password<input class="input" type="password" value="supersecret1" autocomplete="new-password"></label>
+<button class="btn" type="submit" style="justify-content:center;padding:15px">Create account</button>
+<p class="muted" style="font-size:15px">Already have an account? <a href="Login.dc.html" style="text-decoration:underline;color:var(--ink);font-weight:650">Log in</a></p>
+</form>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;dark&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false},&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  renderVals(){ return { theme: this.props.dark ? 'dark' : 'light' }; }
+}
+</script>
+
+
+</body></html>

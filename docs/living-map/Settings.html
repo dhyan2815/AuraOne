@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>AuraOne · Settings</title>
+
+
+</head>
+<body>
+<x-dc>
+<helmet>
+
+<style>
+body{margin:0}
+.wrap{max-width:1440px;margin:0 auto}
+.g{grid-template-columns:240px minmax(0,1fr)}
+.side a{display:block;padding:12px 16px;border-radius:18px;font-weight:600}
+.side a.on{background:var(--set);color:var(--ink)}
+.form{display:grid;gap:16px;max-width:620px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.swatches{display:flex;gap:10px}
+.sw{width:120px;border-radius:20px;padding:12px;font-weight:650;font-size:14px;display:grid;gap:8px;text-align:left}
+.sw i{height:54px;border-radius:14px;display:block}
+.sw.on{box-shadow:0 0 0 3px var(--ink)}
+.toggle{display:flex;align-items:center;justify-content:space-between;padding:14px 0}
+.toggle+.toggle{box-shadow:0 -1px 0 var(--step)}
+.sw2{width:52px;height:30px;border-radius:999px;background:var(--step);position:relative}
+.sw2::after{content:"";position:absolute;left:4px;top:4px;width:22px;height:22px;border-radius:50%;background:var(--sheet)}
+.sw2.on{background:var(--today)}.sw2.on::after{left:26px;background:#1F211E}
+.danger{background:var(--sheet);border-radius:28px;padding:22px 24px;box-shadow:inset 0 0 0 2px var(--alert)}
+@media (max-width:1000px){.g,.two{grid-template-columns:1fr}.side{display:flex;overflow-x:auto}}
+</style>
+</helmet>
+<div class="lm" data-theme="{{theme}}">
+<div class="wrap">
+<header class="bar">
+<span class="mark">AuraOne</span>
+<nav class="caps" aria-label="Main"><a class="cap" href="Dashboard.dc.html" style="--c:var(--today)"><i></i>Today</a><a class="cap" href="Tasks.dc.html" style="--c:var(--tasks)"><i></i>Tasks</a><a class="cap" href="Notes.dc.html" style="--c:var(--notes)"><i></i>Notes</a><a class="cap" href="Events.dc.html" style="--c:var(--events)"><i></i>Events</a><a class="cap" href="Aura.dc.html" style="--c:var(--aura)"><i></i>Aura</a><a class="cap" href="Knowledge.dc.html" style="--c:var(--know)"><i></i>Knowledge</a></nav>
+<a class="askpill" href="Aura.dc.html">Ask Aura to add, move or find… <span class="kbd">/</span></a><a class="round" href="Dialogs.dc.html" aria-label="New task">+</a><a class="avatar" href="Settings.dc.html" aria-label="Settings" style="box-shadow:0 0 0 3px var(--set)">D</a>
+</header>
+<main class="main">
+<section class="lobe" style="--c:var(--set)">
+<h1>Settings</h1>
+<p>Profile, appearance and account for dhyan@example.com.</p>
+</section>
+<div class="cols g lift">
+<nav class="sheet side" aria-label="Settings sections"><a class="on" href="#">Profile</a><a href="#">Appearance</a><a href="#">Notifications</a><a href="#">Account</a></nav>
+<div style="display:grid;gap:20px">
+<div class="sheet"><h2>Profile</h2><form class="form" onsubmit="return false" style="--c:var(--set)">
+<div style="display:flex;gap:16px;align-items:center"><span class="avatar" style="width:72px;height:72px;font-size:28px">D</span><button class="btn soft" type="button">Change photo</button></div>
+<div class="two"><label class="field">Name<input class="input" value="Dhyan Patel"></label><label class="field">Email<input class="input" value="dhyan@example.com"></label></div>
+<label class="field">Weather location<input class="input" value="Ahmedabad, IN"></label>
+<div><button class="btn">Save profile</button></div></form></div>
+<div class="sheet"><h2>Appearance</h2><p class="muted" style="margin-bottom:12px">Theme follows your system unless you pick one.</p>
+<div class="swatches" role="radiogroup" aria-label="Theme"><sc-for list="{{themes}}" as="t" hint-placeholder-count="3"><button class="{{t.cls}}" style="{{t.style}}" sc-camel-on-click="{{t.pick}}" role="radio"><i style="{{t.fill}}"></i>{{t.label}}</button></sc-for></div></div>
+<div class="sheet"><h2>Notifications</h2>
+<div class="toggle"><span>Remind me before events<br><span class="muted">15 minutes ahead</span></span><span class="sw2 on" role="switch" aria-checked="true"></span></div>
+<div class="toggle"><span>Daily summary from Aura<br><span class="muted">Every morning at 08:00</span></span><span class="sw2 on" role="switch" aria-checked="true"></span></div>
+<div class="toggle"><span>News in dashboard</span><span class="sw2" role="switch" aria-checked="false"></span></div></div>
+<div class="danger"><h2 style="font-size:22px;font-weight:750">Account</h2><p style="margin:6px 0 14px">Log out on this device, or delete your account and every task, note and event.</p><div class="acts" style="margin-top:0"><button class="btn soft">Log out</button><a class="btn danger" href="Dialogs.dc.html">Delete account</a></div></div>
+</div>
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;dark&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false},&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:1000}}">
+class Component extends DCLogic {
+  constructor(p){super(p);this.state={t:'System'};}
+  renderVals(){
+    const fills={System:'background:#EEF1EC;box-shadow:inset -48px 0 0 #141713',Light:'background:#EEF1EC',Dark:'background:#141713'};
+    return {
+      theme:this.props.dark?'dark':'light',
+      themes:['System','Light','Dark'].map(l=>({label:l,fill:fills[l],style:'background:var(--water)',cls:l===this.state.t?'sw on':'sw',pick:()=>this.setState({t:l})}))
+    };
+  }
+}
+</script>
+
+
+</body></html>

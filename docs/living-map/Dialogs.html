@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>AuraOne · Dialogs</title>
+
+
+</head>
+<body>
+<x-dc>
+<helmet>
+
+<style>
+body{margin:0}
+.stage{width:1440px;height:900px;background:rgba(20,23,19,.5);display:flex;gap:28px;align-items:center;justify-content:center;padding:40px}
+.dlg{background:var(--sheet);color:var(--ink);border-radius:36px;width:420px;overflow:hidden}
+.dh{background:var(--c);color:#1F211E;padding:26px 30px 34px;border-radius:0 0 54% 10%/0 0 34% 10%}
+.dh h2{font-size:40px;font-weight:800;letter-spacing:-.045em;font-stretch:74%;line-height:1}
+.dh p{margin-top:6px;font-size:15px}
+.db{padding:20px 30px 28px;display:grid;gap:14px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.foot{display:flex;gap:8px;justify-content:flex-end}
+.close{position:absolute;right:18px;top:18px}
+</style>
+</helmet>
+<div class="lm" data-theme="{{theme}}" style="background:none">
+<div class="stage">
+<div class="dlg" role="dialog" aria-modal="true" aria-labelledby="d1" style="--c:var(--tasks)">
+<div class="dh"><h2 id="d1">New task</h2><p>Or tell Aura: “remind me to…”</p></div>
+<form class="db" onsubmit="return false">
+<label class="field">Title<input class="input" value="Book train to Vadodara"></label>
+<label class="field">Description<input class="input" placeholder="Optional"></label>
+<div class="field">Priority<div class="seg"><button type="button">High</button><button type="button" class="on">Medium</button><button type="button">Low</button></div></div>
+<label class="field">Due date<input class="input" type="date" value="2026-10-19"></label>
+<div class="foot"><button class="btn soft" type="button">Cancel</button><button class="btn">Add task</button></div>
+</form></div>
+
+<div class="dlg" role="dialog" aria-modal="true" aria-labelledby="d2" style="--c:var(--events)">
+<div class="dh"><h2 id="d2">New event</h2><p>Wednesday 22 October</p></div>
+<form class="db" onsubmit="return false">
+<label class="field">Title<input class="input" value="Dinner with family"></label>
+<div class="two"><label class="field">Starts<input class="input" type="time" value="19:00"></label><label class="field">Ends<input class="input" type="time" value="21:00"></label></div>
+<label class="field">Location<input class="input" value="Home, Bopal"></label>
+<label class="field">Notes<input class="input" placeholder="Optional"></label>
+<div class="foot"><button class="btn soft" type="button">Cancel</button><button class="btn">Save event</button></div>
+</form></div>
+
+<div class="dlg" role="alertdialog" aria-modal="true" aria-labelledby="d3" style="--c:var(--notes);width:380px">
+<div class="dh" style="background:var(--alert);color:#fff"><h2 id="d3">Delete this note?</h2></div>
+<div class="db"><p><b>Chunking strategies</b> and its 4 knowledge chunks will be removed. Aura won't be able to cite it.</p>
+<div class="foot"><button class="btn soft">Keep note</button><button class="btn danger">Delete</button></div></div></div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;dark&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false},&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  renderVals(){ return { theme: this.props.dark ? 'dark' : 'light' }; }
+}
+</script>
+
+
+</body></html>
