@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>AuraOne · Notes</title>
+
+
+</head>
+<body>
+<x-dc>
+<helmet>
+
+<style>
+body{margin:0}
+.wrap{max-width:1440px;margin:0 auto}
+.tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.search{background:var(--sheet);border-radius:999px;padding:12px 20px;border:0;min-width:320px;outline:none}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tags span{padding:7px 14px;border-radius:999px;background:var(--sheet);font-weight:600;font-size:14px}
+.tags .on{background:var(--notes);color:#1F211E}
+.notes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-top:20px}
+.note{background:var(--sheet);border-radius:28px;padding:22px 24px;display:flex;flex-direction:column;gap:10px;min-height:220px}
+.note h3{font-size:26px;font-weight:800;letter-spacing:-.04em;font-stretch:78%;line-height:1}
+.note p{font-size:16px}
+.note .foot{margin-top:auto;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.note.pin{background:var(--notes);color:#1F211E}
+.note.pin .chip{background:rgba(255,255,255,.6)}
+@media (max-width:1000px){.notes{grid-template-columns:1fr}}
+</style>
+</helmet>
+<div class="lm" data-theme="{{theme}}">
+<div class="wrap">
+<header class="bar">
+<span class="mark">AuraOne</span>
+<nav class="caps" aria-label="Main"><a class="cap" href="Dashboard.dc.html" style="--c:var(--today)"><i></i>Today</a><a class="cap" href="Tasks.dc.html" style="--c:var(--tasks)"><i></i>Tasks</a><a class="cap on" href="Notes.dc.html" style="--c:var(--notes)" aria-current="page"><i></i>Notes</a><a class="cap" href="Events.dc.html" style="--c:var(--events)"><i></i>Events</a><a class="cap" href="Aura.dc.html" style="--c:var(--aura)"><i></i>Aura</a><a class="cap" href="Knowledge.dc.html" style="--c:var(--know)"><i></i>Knowledge</a></nav>
+<a class="askpill" href="Aura.dc.html">Ask Aura to add, move or find… <span class="kbd">/</span></a><a class="round" href="Dialogs.dc.html" aria-label="New task">+</a><a class="avatar" href="Settings.dc.html" aria-label="Settings">D</a>
+</header>
+<main class="main">
+<section class="lobe" style="--c:var(--notes)">
+<h1>Notes</h1>
+<p>38 notes · 9 tags · every one searchable by Aura.</p>
+<div class="acts"><a class="btn" href="NotePage.dc.html">New note</a></div>
+</section>
+<div class="lift">
+<div class="tools"><input class="search" placeholder="Search notes" aria-label="Search notes"><div class="tags"><span class="on">All</span><span>#rag</span><span>#interview</span><span>#space</span><span>#review</span><span>#career</span></div></div>
+<div class="notes">
+<a class="note pin" href="NotePage.dc.html"><h3>Chunking strategies</h3><p>512-token windows with 64 overlap kept meeting notes intact; 256 split decisions away from their reasons.</p><div class="foot"><span class="chip">#rag</span><span class="chip">#interview</span><span class="end" style="font-size:14px">Pinned · 2h ago</span></div></a>
+<a class="note" href="NotePage.dc.html"><h3>Gaganyaan reading list</h3><p>ISRO crew module tests, the orbital module brief, and the parachute drop write-up from August.</p><div class="foot"><span class="chip">#space</span><span class="muted end">Yesterday</span></div></a>
+<a class="note" href="NotePage.dc.html"><h3>Weekly review, Oct W2</h3><p>Shipped the knowledge base. Slipped on the LinkedIn post. Next week: interview deck.</p><div class="foot"><span class="chip">#review</span><span class="muted end">Mon</span></div></a>
+<a class="note" href="NotePage.dc.html"><h3>Mock interview answers</h3><p>Explain the ReAct loop in two minutes; why overlap prevents split context; fallback to OpenRouter.</p><div class="foot"><span class="chip">#career</span><span class="chip">#interview</span><span class="muted end">3 Oct</span></div></a>
+<a class="note" href="NotePage.dc.html"><h3>Supabase realtime gotchas</h3><p>Unsubscribe on unmount; row-level security blocks the channel silently if the policy is missing.</p><div class="foot"><span class="chip">#dev</span><span class="muted end">28 Sep</span></div></a>
+<a class="note" href="NotePage.dc.html"><h3>Books for November</h3><p>Designing Data-Intensive Applications, ch. 5–7. Atomic Habits re-read.</p><div class="foot"><span class="chip">#reading</span><span class="muted end">22 Sep</span></div></a>
+</div>
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;dark&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false},&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:1100}}">
+class Component extends DCLogic {
+  renderVals(){ return { theme: this.props.dark ? 'dark' : 'light' }; }
+}
+</script>
+
+
+</body></html>

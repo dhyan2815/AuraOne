@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>AuraOne · Aura</title>
+
+
+</head>
+<body>
+<x-dc>
+<helmet>
+
+<style>
+body{margin:0}
+.wrap{max-width:1440px;margin:0 auto}
+.g{grid-template-columns:280px minmax(0,1fr)}
+.sess{display:grid;gap:4px}
+.sess a{padding:12px 14px;border-radius:18px;font-weight:600}
+.sess a:hover{background:var(--water)}
+.sess a.on{background:var(--aura);color:#1F211E}
+.chat{display:flex;flex-direction:column;gap:16px;min-height:640px}
+.msg{max-width:680px;padding:14px 20px;border-radius:26px;background:var(--water);font-size:17px}
+.me{align-self:flex-end;background:#1F211E;color:#fff}
+.lm[data-theme=dark] .me{background:var(--ink);color:var(--water)}
+.steps{display:flex;gap:6px;flex-wrap:wrap}
+.steps span{font-size:13px;font-weight:700;padding:5px 12px;border-radius:999px;background:var(--aura);color:#1F211E}
+.think{border-radius:22px;padding:14px 18px;background:var(--step);font-size:15px;max-width:680px}
+.think b{display:block;margin-bottom:4px}
+.changed{display:flex;gap:10px;flex-wrap:wrap}
+.changed a{background:var(--sheet);border-radius:20px;padding:10px 14px;font-weight:600;box-shadow:inset 0 0 0 2px var(--c)}
+.composer{margin-top:auto;display:flex;gap:8px;background:var(--water);border-radius:999px;padding:6px;align-items:center}
+.composer input{flex:1;border:0;background:none;padding:10px 16px;outline:none;font-size:17px}
+.sugg{display:flex;gap:6px;flex-wrap:wrap}
+.sugg button{padding:8px 14px;border-radius:999px;background:var(--water);font-weight:600;font-size:14px}
+@media (max-width:1000px){.g{grid-template-columns:1fr}.sesswrap{display:none}}
+</style>
+</helmet>
+<div class="lm" data-theme="{{theme}}">
+<div class="wrap">
+<header class="bar">
+<span class="mark">AuraOne</span>
+<nav class="caps" aria-label="Main"><a class="cap" href="Dashboard.dc.html" style="--c:var(--today)"><i></i>Today</a><a class="cap" href="Tasks.dc.html" style="--c:var(--tasks)"><i></i>Tasks</a><a class="cap" href="Notes.dc.html" style="--c:var(--notes)"><i></i>Notes</a><a class="cap" href="Events.dc.html" style="--c:var(--events)"><i></i>Events</a><a class="cap on" href="Aura.dc.html" style="--c:var(--aura)" aria-current="page"><i></i>Aura</a><a class="cap" href="Knowledge.dc.html" style="--c:var(--know)"><i></i>Knowledge</a></nav>
+<a class="round" href="Dialogs.dc.html" aria-label="New task" style="margin-left:auto">+</a><a class="avatar" href="Settings.dc.html" aria-label="Settings">D</a>
+</header>
+<main class="main">
+<section class="lobe" style="--c:var(--aura)">
+<h1>Aura</h1>
+<p>Plain words in, real changes out. Command mode acts on your data; Brain mode reasons it through first.</p>
+<div class="acts"><div class="seg" role="radiogroup" aria-label="Mode"><sc-for list="{{modes}}" as="m" hint-placeholder-count="2"><button class="{{m.cls}}" sc-camel-on-click="{{m.pick}}">{{m.label}}</button></sc-for></div><span style="font-weight:600">Gemini · OpenRouter fallback ready</span></div>
+</section>
+<div class="cols g lift">
+<div class="sheet sesswrap"><h2>Sessions<button class="round end" style="background:var(--step);width:36px;height:36px" aria-label="New session">+</button></h2>
+<nav class="sess"><a class="on" href="#">Plan my Saturday</a><a href="#">RAG interview prep</a><a href="#">Gaganyaan reading</a><a href="#">Weekly review</a><a href="#">Groceries and errands</a></nav></div>
+<div class="sheet chat" style="--c:var(--aura)">
+<div class="msg me">push my review by half an hour and remind me about groceries</div>
+<sc-if value="{{brain}}" hint-placeholder-val="{{false}}"><div class="think"><b>Reasoning · 1.4s</b>Two requests. The review is today's 10:00 event, so move it to 10:30 and check the 16:00 gym slot still fits. Groceries has no date; tomorrow is the first free morning.</div></sc-if>
+<div class="steps"><span>read_events · 2 found</span><span>update_event · 10:00 → 10:30</span><span>create_task · Buy groceries</span></div>
+<div class="msg">Done. Portfolio review now starts at 10:30, and <b>Buy groceries</b> is on tomorrow's list at Medium priority.</div>
+<div class="changed"><a href="Events.dc.html" style="--c:var(--events)">Portfolio review · 10:30</a><a href="Tasks.dc.html" style="--c:var(--tasks)">Buy groceries · Sun</a></div>
+<div class="msg me">what did I decide about chunk overlap?</div>
+<div class="steps"><span>search_knowledge · 3 chunks · 0.82</span></div>
+<div class="msg">You settled on 512-token chunks with 64 overlap. Source: your note <a href="NotePage.dc.html" style="text-decoration:underline;font-weight:650">Chunking strategies</a>.</div>
+<div class="sugg"><button>What's left today?</button><button>Summarise my week</button><button>Move gym to 18:00</button></div>
+<form class="composer" onsubmit="return false"><input placeholder="Ask Aura to add, move or find…" aria-label="Message Aura"><button class="btn">Send</button></form>
+</div>
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;dark&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false},&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:1000}}">
+class Component extends DCLogic {
+  constructor(p){super(p);this.state={mode:'Command'};}
+  renderVals(){
+    const m=this.state.mode;
+    return {
+      theme:this.props.dark?'dark':'light',
+      brain:m==='Brain',
+      modes:['Command','Brain'].map(l=>({label:l,cls:l===m?'on':'',pick:()=>this.setState({mode:l})}))
+    };
+  }
+}
+</script>
+
+
+</body></html>

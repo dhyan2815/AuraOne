@@ -8,19 +8,14 @@ import {
   startOfWeek, endOfWeek, parse,
   isSameMonth
 } from "date-fns";
-import { ChevronLeft, ChevronRight, Plus, Clock, MapPin, X } from "lucide-react";
+import { Link } from "react-router-dom";
+import { ChevronLeft, ChevronRight, Plus, MapPin, X } from "lucide-react";
+import { LmDialog } from "../components/ui/Dialog";
 import { getEvents, createEvent, deleteEvent, listenToEvents, Event } from "../hooks/useEvents";
 import { useAuth } from "../hooks/useAuth";
 import toast from "react-hot-toast";
 import { RealtimeChannel } from "@supabase/supabase-js";
 import { motion, AnimatePresence } from "framer-motion";
-
-// Configuration offsets to cycle through unique visual accent themes for calendar events.
-const EVENT_ACCENTS = [
-  { bar: "bg-primary", dateBg: "bg-primary/10", dateNum: "text-primary", dateMon: "text-primary/60", title: "group-hover:text-primary" },
-  { bar: "bg-secondary", dateBg: "bg-secondary/10", dateNum: "text-secondary", dateMon: "text-secondary/60", title: "group-hover:text-secondary" },
-  { bar: "bg-tertiary",   dateBg: "bg-tertiary/10",   dateNum: "text-tertiary",   dateMon: "text-tertiary/60",   title: "group-hover:text-tertiary" },
-];
 
 // Array of headers representing days of the week starting from Monday.
 const DAY_HEADERS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -102,253 +97,171 @@ const Calendar = () => {
     fetchEvents();
   };
 
+  const selectedEvents = eventsForDay(selectedDate)
+    .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
+  const monthCount = events.filter((e) => isSameMonth(new Date(e.start_time), currentMonth)).length;
+  const next = upcomingEvents[0];
+
+  const EventRow = ({ ev }: { ev: Event }) => (
+    <div className="group grid grid-cols-[64px_minmax(0,1fr)_28px] items-start gap-3 py-3">
+      <span className="font-bold tabular-nums">{format(new Date(ev.start_time), "HH:mm")}</span>
+      <div className="min-w-0 rounded-[18px] bg-events px-3.5 py-2.5 text-[#1F211E]">
+        <b className="block truncate">{ev.title}</b>
+        {ev.description && (
+          <span className="flex items-center gap-1 text-sm"><MapPin size={12} />{ev.description}</span>
+        )}
+      </div>
+      <button
+        onClick={(e) => handleDeleteEvent(ev.id, e)}
+        className="grid h-7 w-7 place-items-center rounded-full text-ink2 transition hover:bg-alert/10 hover:text-alert"
+        aria-label={`Delete ${ev.title}`}
+      >
+        <X size={16} />
+      </button>
+    </div>
+  );
+
   return (
-    <div className="app-page">
-      <div className="grid max-w-7xl grid-cols-12 gap-5 mx-auto">
+    <div className="sec-events">
+      <section className="lm-lobe">
+        <h1>{format(currentMonth, "MMMM")}</h1>
+        <p>
+          {monthCount} {monthCount === 1 ? "event" : "events"} this month
+          {next ? ` · next: ${next.title}, ${format(new Date(next.start_time), "EEE d, HH:mm")}.` : "."}
+        </p>
+        <div className="lm-acts">
+          <button onClick={() => setShowForm(true)} className="lm-btn">
+            <Plus size={16} strokeWidth={3} /> New event
+          </button>
+          <Link to="/chat" className="lm-btn lm-btn-ghost">Ask Aura to add one</Link>
+        </div>
+      </section>
 
-        {/* ── Left: Calendar hero + grid ── */}
-        <div className="col-span-12 lg:col-span-8 flex flex-col gap-6">
+      <div className="lm-lift grid gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+        <div className="lm-sheet">
+          <div className="mb-3.5 flex items-center gap-2">
+            <button
+              onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
+              className="lm-round !bg-step"
+              aria-label="Previous month"
+            >
+              <ChevronLeft size={18} />
+            </button>
+            <b className="min-w-[140px] text-center text-xl">{format(currentMonth, "MMMM yyyy")}</b>
+            <button
+              onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
+              className="lm-round !bg-step"
+              aria-label="Next month"
+            >
+              <ChevronRight size={18} />
+            </button>
+          </div>
 
-          {/* Hero + Month Nav */}
-          <motion.div
-            className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"
-            initial={{ opacity: 0, x: -24 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight leading-none text-text" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                Events Calendar
-              </h1>
-              <p className="text-xs sm:text-sm text-text-variant mt-2 font-medium">
-                Manage your appointments, deadlines, and upcoming events.
-              </p>
-            </div>
-            <div className="flex items-center justify-between gap-2 rounded-xl sm:rounded-2xl border border-primary/10 glass px-3 py-2 sm:px-6 sm:py-3 shadow-xl shadow-primary/5 sm:gap-4 transition-colors duration-500">
-              <button
-                onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-                className="p-1.5 sm:p-2 hover:bg-primary/10 rounded-full transition-colors text-primary"
-              >
-                <ChevronLeft size={16} className="sm:w-[20px] sm:h-[20px]" />
-              </button>
-              <span className="text-sm sm:text-xl font-bold text-text min-w-[100px] sm:min-w-[140px] text-center">
-                {format(currentMonth, "MMMM yyyy")}
-              </span>
-              <button
-                onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-                className="p-1.5 sm:p-2 hover:bg-primary/10 rounded-full transition-colors text-primary"
-              >
-                <ChevronRight size={16} className="sm:w-[20px] sm:h-[20px]" />
-              </button>
-            </div>
-          </motion.div>
-
-          {/* Calendar Grid */}
-          <motion.div
-            className="glass shadow-2xl shadow-primary/5 rounded-2xl sm:rounded-[2.5rem] p-4 sm:p-6 lg:p-8 overflow-hidden transition-colors duration-500"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
-          >
-            {/* Day Headers */}
-            <div className="grid grid-cols-7 gap-1 sm:gap-4 mb-4 sm:mb-6">
-              {DAY_HEADERS.map((d) => (
-                <div key={d} className="text-center text-[9px] sm:text-[11px] font-bold uppercase tracking-[0.2em] text-primary/60">
-                  {d}
-                </div>
-              ))}
-            </div>
-
-            {/* Day Cells */}
-            <div className="grid grid-cols-7 gap-1.5 sm:gap-4">
-              {calendarDays.map((day) => {
-                const dayEvents = eventsForDay(day);
-                const isCurrentMonth = isSameMonth(day, currentMonth);
-                const isTodayDay = isToday(day);
-                const isSelected = isSameDay(day, selectedDate);
-                return (
-                  <div
-                    key={day.toString()}
-                    onClick={() => { setSelectedDate(day); setShowForm(true); }}
-                    className={`aspect-square relative flex flex-col items-center justify-center group cursor-pointer rounded-lg sm:rounded-2xl transition-all duration-300 ${
-                      isTodayDay
-                        ? ""
-                        : isSelected
-                        ? "bg-primary/10 ring-1 sm:ring-2 ring-primary/40 shadow-lg shadow-primary/10 scale-[1.03] sm:scale-[1.05] z-10"
-                        : "hover:bg-primary/5"
-                    }`}
-                  >
-                    {isTodayDay && (
-                      <div className="absolute inset-0.5 sm:inset-2 bg-primary rounded-lg sm:rounded-2xl shadow-lg shadow-primary/30" />
-                    )}
+          <div className="grid grid-cols-7 gap-1.5">
+            {DAY_HEADERS.map((d) => (
+              <span key={d} className="pb-1 text-center text-[13px] font-bold text-ink2">{d}</span>
+            ))}
+            {calendarDays.map((day) => {
+              const dayEvents = eventsForDay(day);
+              const isCurrentMonth = isSameMonth(day, currentMonth);
+              const isTodayDay = isToday(day);
+              const isSelected = isSameDay(day, selectedDate);
+              return (
+                <button
+                  key={day.toString()}
+                  onClick={() => { setSelectedDate(day); setShowForm(true); }}
+                  aria-label={format(day, "PPPP")}
+                  className={`flex min-h-[52px] flex-col items-stretch gap-1 rounded-[18px] p-2 text-left font-semibold tabular-nums transition-colors sm:min-h-[84px] sm:px-2.5 ${
+                    isTodayDay
+                      ? "bg-events text-[#1F211E]"
+                      : isSelected
+                      ? "bg-water ring-2 ring-events"
+                      : "bg-water hover:ring-2 hover:ring-events/50"
+                  } ${isCurrentMonth ? "" : "opacity-40"}`}
+                >
+                  <span>{format(day, "d")}</span>
+                  {dayEvents.slice(0, 2).map((ev) => (
                     <span
-                      className={`z-10 font-bold text-xs sm:text-sm transition-colors ${
-                        isTodayDay
-                          ? "text-white"
-                          : isCurrentMonth
-                          ? "text-text group-hover:text-primary"
-                          : "text-text/20"
-                      }`}
+                      key={ev.id}
+                      className={`hidden truncate rounded-full px-2 py-px text-xs font-semibold sm:block ${isTodayDay ? "bg-white/70 text-[#1F211E]" : "bg-sheet text-ink"}`}
                     >
-                      {format(day, "d")}
+                      {ev.title}
                     </span>
-                    {dayEvents.length > 0 && (
-                      <div className="absolute bottom-1 sm:bottom-3 flex gap-0.5 z-10">
-                        {dayEvents.slice(0, 3).map((_, i) => (
-                          <span
-                            key={i}
-                            className={`w-0.5 h-0.5 sm:w-1 sm:h-1 rounded-full ${isTodayDay ? "bg-white" : "bg-tertiary"}`}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </motion.div>
-
+                  ))}
+                  {dayEvents.length > 0 && (
+                    <span className="mt-auto flex gap-0.5 sm:hidden">
+                      {dayEvents.slice(0, 3).map((_, i) => (
+                        <span key={i} className={`h-1 w-1 rounded-full ${isTodayDay ? "bg-[#1F211E]" : "bg-events"}`} />
+                      ))}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
-        {/* ── Right: Upcoming Events ── */}
-        <div className="col-span-12 flex flex-col gap-6 pt-2 lg:col-span-4">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-base font-bold text-text uppercase tracking-[0.2em] text-[10px]">Upcoming Events</h3>
-            <button className="text-primary text-xs font-black uppercase hover:underline">View All</button>
-          </div>
-
-          <div className="space-y-4 pr-1">
+        <div className="lm-sheet">
+          <h2 className="lm-sheet-title">{format(selectedDate, "EEEE d")}</h2>
+          {selectedEvents.length === 0 ? (
+            <p className="lm-muted py-3">Nothing scheduled. Click a day to add an event.</p>
+          ) : (
             <AnimatePresence mode="popLayout">
-              {upcomingEvents.length === 0 ? (
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="text-sm text-text-variant px-4 py-8 text-center glass rounded-2xl"
-                >
-                  No upcoming events. Click a day to add one.
-                </motion.p>
-              ) : (
-                upcomingEvents.map((ev, idx) => {
-                  const accent = EVENT_ACCENTS[idx % EVENT_ACCENTS.length];
-                  const evDate = new Date(ev.start_time);
-                  return (
-                    <motion.div
-                      key={ev.id}
-                      layout
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, scale: 0.95 }}
-                      transition={{ delay: idx * 0.05 }}
-                      className="glass rounded-2xl p-4 flex gap-4 hover:translate-x-2 transition-transform cursor-pointer relative overflow-hidden group border border-primary/5"
-                    >
-                      {/* Accent bar */}
-                      <div className={`w-1.5 absolute left-0 top-0 h-full ${accent.bar}`} />
-
-                      {/* Date chip */}
-                      <div className={`w-12 h-12 rounded-xl ${accent.dateBg} flex flex-col items-center justify-center flex-shrink-0 transition-colors`}>
-                        <span className={`text-[10px] font-black uppercase ${accent.dateMon}`}>
-                          {format(evDate, "MMM")}
-                        </span>
-                        <span className={`text-lg font-black ${accent.dateNum}`}>
-                          {format(evDate, "dd")}
-                        </span>
-                      </div>
-
-                      <div className="flex-1 min-w-0">
-                        <h4 className={`font-bold text-text ${accent.title} transition-colors truncate`}>
-                          {ev.title}
-                        </h4>
-                        <div className="flex items-center gap-3 mt-1 flex-wrap">
-                          <span className="flex items-center gap-1 text-[0.6875rem] text-text-variant font-bold">
-                            <Clock size={11} className="text-primary" /> {format(evDate, "hh:mm a")}
-                          </span>
-                          {ev.description && (
-                            <span className="flex items-center gap-1 text-[0.6875rem] text-text-variant font-bold truncate">
-                              <MapPin size={11} className="text-primary" />{ev.description}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      <button
-                        onClick={(e) => handleDeleteEvent(ev.id, e)}
-                        className="text-text-variant hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 flex-shrink-0"
-                      >
-                        <X size={16} />
-                      </button>
-                    </motion.div>
-                  );
-                })
-              )}
-            </AnimatePresence>
-
-            {/* New Event CTA */}
-            <div className="mt-4 pt-2">
-              <button
-                onClick={() => setShowForm(true)}
-                className="w-full h-14 rounded-2xl bg-gradient-to-r from-primary via-secondary to-tertiary text-white font-black text-sm shadow-xl shadow-primary/20 flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-95 transition-all uppercase tracking-[0.2em]"
-              >
-                <Plus size={20} />
-                New Event
-              </button>
-            </div>
-
-            {/* Add Event Form for Selected Date */}
-            <AnimatePresence>
-              {showForm && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0, marginTop: 0 }}
-                  animate={{ opacity: 1, height: "auto", marginTop: 16 }}
-                  exit={{ opacity: 0, height: 0, marginTop: 0 }}
-                  className="glass rounded-[2rem] p-6 overflow-hidden border border-primary/10 shadow-xl shadow-primary/5"
-                >
-                  <div className="flex items-center justify-between mb-6">
-                    <div>
-                      <h3 className="font-bold text-text text-lg">
-                        Add Event
-                      </h3>
-                      <p className="text-[10px] text-text-variant font-black uppercase tracking-widest mt-1">
-                        {format(selectedDate, "MMMM d, yyyy")}
-                      </p>
-                    </div>
-                    <button onClick={() => setShowForm(false)} className="p-2 hover:bg-primary/5 rounded-full transition-colors text-text-variant">
-                      <X size={16} />
-                    </button>
-                  </div>
-                  <form onSubmit={handleAddEvent} className="flex flex-col gap-4">
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-text-variant ml-1">Event Title</label>
-                      <input
-                        type="text"
-                        value={newEventTitle}
-                        onChange={(e) => setNewEventTitle(e.target.value)}
-                        placeholder="Meeting, Deadline, etc..."
-                        className="w-full input-aurora py-3.5 px-5"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-text-variant ml-1">Start Time</label>
-                      <input
-                        type="time"
-                        value={newEventTime}
-                        onChange={(e) => setNewEventTime(e.target.value)}
-                        className="w-full input-aurora py-3.5 px-5"
-                      />
-                    </div>
-                    <button
-                      type="submit"
-                      className="mt-2 flex items-center justify-center gap-3 py-4 rounded-2xl bg-primary text-white hover:bg-primary/90 transition-all active:scale-95 shadow-lg shadow-primary/20"
-                    >
-                      <Plus size={18} strokeWidth={3} />
-                      <span className="text-[10px] font-black uppercase tracking-[0.2em]">Add</span>
-                    </button>
-                  </form>
+              {selectedEvents.map((ev) => (
+                <motion.div key={ev.id} layout initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, scale: 0.97 }}>
+                  <EventRow ev={ev} />
                 </motion.div>
-              )}
+              ))}
             </AnimatePresence>
-          </div>
+          )}
+
+          <h2 className="lm-sheet-title mt-5">Coming up</h2>
+          {upcomingEvents.length === 0 ? (
+            <p className="lm-muted py-2">No upcoming events.</p>
+          ) : (
+            upcomingEvents.map((ev) => (
+              <div key={ev.id} className="lm-row">
+                <span className="w-16 flex-none font-bold">{format(new Date(ev.start_time), "EEE d")}</span>
+                <span className="min-w-0 flex-1 truncate">{ev.title}, {format(new Date(ev.start_time), "HH:mm")}</span>
+              </div>
+            ))
+          )}
         </div>
       </div>
+
+      <LmDialog
+        open={showForm}
+        onOpenChange={setShowForm}
+        title="New event"
+        subtitle={format(selectedDate, "EEEE d MMMM")}
+        sec="sec-events"
+      >
+        <form onSubmit={handleAddEvent} className="grid gap-3.5">
+          <label className="lm-field">
+            Title
+            <input
+              type="text"
+              value={newEventTitle}
+              onChange={(e) => setNewEventTitle(e.target.value)}
+              placeholder="Meeting, deadline, dinner…"
+              className="lm-input"
+            />
+          </label>
+          <label className="lm-field">
+            Starts
+            <input
+              type="time"
+              value={newEventTime}
+              onChange={(e) => setNewEventTime(e.target.value)}
+              className="lm-input"
+            />
+          </label>
+          <div className="flex justify-end gap-2">
+            <button type="button" className="lm-btn lm-btn-soft" onClick={() => setShowForm(false)}>Cancel</button>
+            <button type="submit" className="lm-btn">Save event</button>
+          </div>
+        </form>
+      </LmDialog>
     </div>
   );
 };

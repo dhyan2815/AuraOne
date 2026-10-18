@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>AuraOne · Task detail</title>
+
+
+</head>
+<body>
+<x-dc>
+<helmet>
+
+<style>
+body{margin:0}
+.wrap{max-width:1440px;margin:0 auto}
+.g{grid-template-columns:minmax(0,1fr) 380px}
+.lobe h1{font-size:clamp(44px,5.6vw,84px)}
+.desc{background:var(--step);border:0;border-radius:20px;padding:16px 18px;width:100%;min-height:180px;font-size:17px;line-height:1.6;resize:vertical;outline:none}
+.meta{display:grid;grid-template-columns:120px minmax(0,1fr);gap:14px 16px;align-items:center}
+.meta dt{font-weight:650}.meta dd{margin:0}
+.sub{display:flex;gap:12px;align-items:center;padding:10px 0}
+@media (max-width:1000px){.g{grid-template-columns:1fr}}
+</style>
+</helmet>
+<div class="lm" data-theme="{{theme}}">
+<div class="wrap">
+<header class="bar">
+<span class="mark">AuraOne</span>
+<nav class="caps" aria-label="Main"><a class="cap" href="Dashboard.dc.html" style="--c:var(--today)"><i></i>Today</a><a class="cap on" href="Tasks.dc.html" style="--c:var(--tasks)" aria-current="page"><i></i>Tasks</a><a class="cap" href="Notes.dc.html" style="--c:var(--notes)"><i></i>Notes</a><a class="cap" href="Events.dc.html" style="--c:var(--events)"><i></i>Events</a><a class="cap" href="Aura.dc.html" style="--c:var(--aura)"><i></i>Aura</a><a class="cap" href="Knowledge.dc.html" style="--c:var(--know)"><i></i>Knowledge</a></nav>
+<a class="askpill" href="Aura.dc.html">Ask Aura to add, move or find… <span class="kbd">/</span></a><a class="round" href="Dialogs.dc.html" aria-label="New task">+</a><a class="avatar" href="Settings.dc.html" aria-label="Settings">D</a>
+</header>
+<main class="main">
+<section class="lobe" style="--c:var(--tasks)">
+<a href="Tasks.dc.html" style="font-weight:650">‹ All tasks</a>
+<h1 style="margin-top:14px">Finish RAG chunking write-up</h1>
+<div class="acts"><span class="chip h">High</span><span class="chip" style="background:rgba(255,255,255,.6)">Due today</span><span class="chip" style="background:rgba(255,255,255,.6)">Open</span></div>
+</section>
+<div class="cols g lift">
+<div class="sheet" style="--c:var(--tasks)">
+<h2>Details</h2>
+<label class="field" style="margin-bottom:16px">Title<input class="input" value="Finish RAG chunking write-up"></label>
+<label class="field">Description<textarea class="desc">Write up why 512-token chunks with 64 overlap beat 256. Include the retrieval test on long meeting notes and the fallback chain diagram for the interview deck.</textarea></label>
+<h2 style="margin-top:22px">Subtasks</h2>
+<div class="sub"><span class="check done"></span><span class="strike">Run retrieval test on 20 notes</span></div>
+<div class="sub"><span class="check"></span>Export fallback chain diagram</div>
+<div class="acts" style="justify-content:space-between;margin-top:24px"><a class="btn danger" href="Dialogs.dc.html">Delete task</a><div style="display:flex;gap:8px"><a class="btn soft" href="Tasks.dc.html">Cancel</a><button class="btn">Save changes</button></div></div>
+</div>
+<div style="display:grid;gap:20px;align-content:start">
+<div class="sheet" style="--c:var(--tasks)"><h2>Settings</h2>
+<dl class="meta"><dt>Status</dt><dd><div class="seg"><button class="on">Open</button><button>Done</button></div></dd>
+<dt>Priority</dt><dd><div class="seg"><button class="on">High</button><button>Medium</button><button>Low</button></div></dd>
+<dt>Due</dt><dd><input class="input" type="date" value="2026-10-17"></dd></dl></div>
+<div class="sheet" style="--c:var(--aura)"><h2><span class="dot"></span>History</h2>
+<div class="row"><span class="t">Oct 12</span>Created by you</div><div class="row"><span class="t">Oct 15</span>Aura raised priority to High</div><div class="row"><span class="t">09:30</span>Subtask completed</div></div>
+</div>
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;dark&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false},&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:1100}}">
+class Component extends DCLogic {
+  renderVals(){ return { theme: this.props.dark ? 'dark' : 'light' }; }
+}
+</script>
+
+
+</body></html>

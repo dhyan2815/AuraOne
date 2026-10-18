@@ -1,13 +1,11 @@
 // Render the Preferences and Settings page, allowing users to modify account details, update passwords, and track metadata properties.
 
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { User, Info, Eye, EyeOff, ShieldCheck, Zap, History, RotateCw, Key, Shield, ChevronRight } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Eye, EyeOff, ShieldCheck, RotateCw, ChevronRight, LogOut } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { supabase } from "../services/supabase";
 import toast from "react-hot-toast";
-import { motion } from "framer-motion";
-import Logo from "../components/structure/Logo";
 
 // Define structured properties for displaying account metadata information.
 interface UserProfile {
@@ -19,7 +17,8 @@ interface UserProfile {
 
 const Settings = () => {
   // Access credentials of the current authenticated user context.
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   
   // Track profile data, inline name editing flags, new passwords, and loader statuses.
   const [profile, setProfile] = useState<UserProfile>({
@@ -88,233 +87,190 @@ const Settings = () => {
     }
   };
 
+  // Sign out and return to the login page, same flow as the account menu.
+  const handleLogout = async () => {
+    await logout();
+    toast.success("Logged out successfully");
+    navigate("/login");
+  };
+
+  const passwordMismatch = passwordForm.confirmPassword.length > 0 && passwordForm.newPassword !== passwordForm.confirmPassword;
+
   // Format dates into readable month-day-year formats with 12-hour clock representations.
   const formatDate = (date: Date) =>
     new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" }).format(date);
 
   return (
-    <div className="app-page-tight space-y-6 sm:space-y-8">
-      {/* ── Hero ── */}
-      <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
-        <div className="flex items-center gap-3 mb-1.5">
-          <Logo iconOnly iconClassName="w-5 h-5 sm:w-6 sm:h-6" />
-          <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.4em] text-primary">Preferences</span>
-        </div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-text tracking-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Settings</h1>
-        <p className="text-xs sm:text-sm text-text-variant mt-1 font-medium italic opacity-60">Manage your profile information and account security.</p>
-      </motion.div>
+    <div className="sec-set">
+      <section className="lm-lobe">
+        <h1>Settings</h1>
+        <p>Profile, security and account for {profile.email || "your account"}.</p>
+      </section>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8">
-
-        {/* ── Main Settings ── */}
-        <div className="lg:col-span-8 flex flex-col gap-6 sm:gap-8">
-
-          {/* Profile Section */}
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.1 }}
-            className="glass rounded-2xl sm:rounded-3xl lg:rounded-[2.5rem] p-4 sm:p-6 lg:p-10 transition-colors duration-500 shadow-2xl shadow-primary/5 border border-primary/5"
-          >
-            <div className="flex items-center gap-4 sm:gap-5 mb-6 sm:mb-10 pb-4 sm:pb-6 border-b border-primary/5">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-inner flex-shrink-0">
-                <User size={20} className="sm:w-[24px] sm:h-[24px]" strokeWidth={2.5} />
+      <div className="lm-lift lm-stagger grid gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="grid content-start gap-5">
+          {/* Profile */}
+          <div className="lm-sheet">
+            <h2 className="lm-sheet-title">Profile</h2>
+            <div className="grid max-w-[620px] gap-4">
+              <div className="flex items-center gap-4">
+                <span className="grid h-[72px] w-[72px] flex-none place-items-center rounded-full bg-ink text-[28px] font-extrabold text-water">
+                  {profile.name.charAt(0).toUpperCase()}
+                </span>
+                <span className="font-semibold">{profile.name}</span>
               </div>
-              <div>
-                <h2 className="text-lg sm:text-xl font-bold text-text">User Profile</h2>
-                <p className="text-[9px] sm:text-[10px] text-text-variant font-black uppercase tracking-[0.2em] opacity-60">Your personal account details</p>
-              </div>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-10">
-              <div className="space-y-4 sm:space-y-6">
-                {/* Display Name */}
-                <div className="space-y-2">
-                  <label className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-text-variant opacity-60 ml-1">Display Name</label>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="lm-field">
+                  <label htmlFor="display-name">Name</label>
                   {isEditingName ? (
-                    <div className="flex flex-col gap-3">
+                    <div className="grid gap-2.5">
                       <input
+                        id="display-name"
                         type="text"
                         value={newName}
                         onChange={(e) => setNewName(e.target.value)}
-                        className="input-aurora py-3 px-4 sm:py-4 sm:px-6 text-sm"
+                        className="lm-input"
                         placeholder="Enter your name…"
                       />
                       <div className="flex gap-2">
-                        <button onClick={handleUpdateName} className="btn-aurora flex-1 py-2.5 sm:py-3 text-[9px] sm:text-[10px]">Save Name</button>
-                        <button onClick={() => setIsEditingName(false)} className="glass border-primary/10 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black text-text-variant hover:text-text transition-colors">Cancel</button>
+                        <button onClick={handleUpdateName} className="lm-btn lm-btn-sm flex-1">Save name</button>
+                        <button onClick={() => setIsEditingName(false)} className="lm-btn lm-btn-soft lm-btn-sm">Cancel</button>
                       </div>
                     </div>
                   ) : (
-                    <div className="flex items-center justify-between glass border-primary/5 p-4 sm:p-5 rounded-xl sm:rounded-2xl group transition-all hover:border-primary/20">
-                      <span className="text-sm sm:text-base font-bold text-text">{profile.name}</span>
-                      <button onClick={() => setIsEditingName(true)} className="text-[9px] sm:text-[10px] font-black uppercase text-primary opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all hover:scale-110">Reconfigure</button>
+                    <div className="flex items-center justify-between rounded-2xl bg-step px-4 py-[13px]">
+                      <span className="truncate">{profile.name}</span>
+                      <button onClick={() => setIsEditingName(true)} className="text-sm font-bold underline">Edit</button>
                     </div>
                   )}
                 </div>
 
-                {/* Email */}
-                <div className="space-y-2">
-                  <label className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-text-variant opacity-60 ml-1">Email Address</label>
-                  <div className="glass border-primary/5 p-4 sm:p-5 rounded-xl sm:rounded-2xl flex flex-col gap-1.5 sm:gap-2">
-                    <span className="text-xs sm:text-sm font-bold text-text-variant italic truncate">{profile.email}</span>
-                    <div className="flex items-center gap-1.5 sm:gap-2">
-                      <ShieldCheck size={12} className="text-emerald-500" />
-                      <span className="text-[8px] sm:text-[9px] font-black text-emerald-500 uppercase tracking-widest">Verified</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Timestamps */}
-              <div className="space-y-4">
-                <label className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-text-variant opacity-60 ml-1">Account Activity</label>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3 sm:gap-4 glass border-primary/5 p-3 sm:p-4 rounded-xl sm:rounded-2xl transition-all hover:bg-primary/5">
-                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:rotate-12 transition-transform flex-shrink-0">
-                      <Zap size={16} className="sm:w-[18px] sm:h-[18px]" strokeWidth={2.5} />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-text-variant opacity-50">Joined On</p>
-                      <p className="text-xs font-bold text-text truncate">{formatDate(profile.createdAt)}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 sm:gap-4 glass border-primary/5 p-3 sm:p-4 rounded-xl sm:rounded-2xl transition-all hover:bg-primary/5">
-                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:rotate-12 transition-transform flex-shrink-0">
-                      <History size={16} className="sm:w-[18px] sm:h-[18px]" strokeWidth={2.5} />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-text-variant opacity-50">Last Sign In</p>
-                      <p className="text-xs font-bold text-text truncate">{formatDate(profile.lastLogin)}</p>
-                    </div>
+                <div className="lm-field">
+                  <span>Email</span>
+                  <div className="flex items-center justify-between gap-2 rounded-2xl bg-step px-4 py-[13px]">
+                    <span className="truncate">{profile.email}</span>
+                    <span className="inline-flex flex-none items-center gap-1 text-sm font-bold text-ink2">
+                      <ShieldCheck size={14} /> Verified
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
 
-          {/* Security Card */}
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="glass rounded-2xl sm:rounded-3xl lg:rounded-[2.5rem] p-4 sm:p-6 lg:p-10 transition-colors duration-500 shadow-2xl shadow-primary/5 border border-primary/5"
-          >
-            <div className="flex items-center gap-4 sm:gap-5 mb-6 sm:mb-10 pb-4 sm:pb-6 border-b border-primary/5">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-secondary/10 flex items-center justify-center text-secondary shadow-inner flex-shrink-0">
-                <Key size={20} className="sm:w-[24px] sm:h-[24px]" strokeWidth={2.5} />
-              </div>
-              <div>
-                <h2 className="text-lg sm:text-xl font-bold text-text">Security & Password</h2>
-                <p className="text-[9px] sm:text-[10px] text-text-variant font-black uppercase tracking-[0.2em] opacity-60">Manage your account access</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-10">
-              <div className="space-y-4 sm:space-y-6">
-                <div className="space-y-2">
-                  <label className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-text-variant opacity-60 ml-1">New Access Key</label>
+          {/* Security */}
+          <div className="lm-sheet">
+            <h2 className="lm-sheet-title">Security</h2>
+            <div className="grid max-w-[620px] gap-4">
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="lm-field">
+                  <label htmlFor="new-password">New password</label>
                   <div className="relative">
                     <input
+                      id="new-password"
                       type={passwordForm.showNew ? "text" : "password"}
                       value={passwordForm.newPassword}
                       onChange={(e) => setPasswordForm(prev => ({ ...prev, newPassword: e.target.value }))}
-                      className="w-full input-aurora py-3 px-4 sm:py-4 sm:px-6 pr-12 sm:pr-14 text-sm"
+                      className="lm-input pr-12"
                       placeholder="New password…"
                     />
                     <button
+                      type="button"
+                      aria-label={passwordForm.showNew ? "Hide password" : "Show password"}
                       onClick={() => setPasswordForm(prev => ({ ...prev, showNew: !prev.showNew }))}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-text-variant hover:text-primary transition-colors"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-ink2 transition-colors hover:text-ink"
                     >
-                      {passwordForm.showNew ? <EyeOff size={16} className="sm:w-[18px] sm:h-[18px]" /> : <Eye size={16} className="sm:w-[18px] sm:h-[18px]" />}
+                      {passwordForm.showNew ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-text-variant opacity-60 ml-1">Confirm Protocol</label>
+                <div className="lm-field">
+                  <label htmlFor="confirm-password">Confirm password</label>
                   <div className="relative">
                     <input
+                      id="confirm-password"
                       type={passwordForm.showConfirm ? "text" : "password"}
                       value={passwordForm.confirmPassword}
                       onChange={(e) => setPasswordForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                      className="w-full input-aurora py-3 px-4 sm:py-4 sm:px-6 pr-12 sm:pr-14 text-sm"
+                      className="lm-input pr-12"
                       placeholder="Repeat new password…"
+                      aria-invalid={passwordMismatch}
+                      aria-describedby={passwordMismatch ? "settings-pw-mismatch" : undefined}
                     />
                     <button
+                      type="button"
+                      aria-label={passwordForm.showConfirm ? "Hide password" : "Show password"}
                       onClick={() => setPasswordForm(prev => ({ ...prev, showConfirm: !prev.showConfirm }))}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-text-variant hover:text-primary transition-colors"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-ink2 transition-colors hover:text-ink"
                     >
-                      {passwordForm.showConfirm ? <EyeOff size={16} className="sm:w-[18px] sm:h-[18px]" /> : <Eye size={16} className="sm:w-[18px] sm:h-[18px]" />}
+                      {passwordForm.showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
                   </div>
                 </div>
               </div>
-              <div className="flex flex-col justify-end gap-4 sm:gap-6">
-                <div className="glass p-4 sm:p-5 rounded-xl sm:rounded-2xl border-primary/5 bg-primary/5">
-                    <p className="text-[9px] sm:text-[10px] font-bold text-text-variant leading-relaxed">Ensure a minimum of 8 characters with alphanumeric variety to optimize encryption against brute-force intrusion.</p>
-                </div>
+              {passwordMismatch && (
+                <p id="settings-pw-mismatch" role="alert" className="text-[15px] font-semibold text-alert">
+                  Passwords don't match yet.
+                </p>
+              )}
+              <p className="lm-muted">Use at least 8 characters with a mix of letters and numbers.</p>
+              <div>
                 <button
                   onClick={handleChangePassword}
                   disabled={isChangingPassword || !passwordForm.newPassword || !passwordForm.confirmPassword}
-                  className="btn-aurora w-full py-3 text-[9px] sm:text-[10px] tracking-[0.2em] shadow-xl shadow-secondary/20 bg-gradient-to-r from-secondary to-primary uppercase flex items-center justify-center gap-2 rounded-xl sm:rounded-2xl"
+                  className="lm-btn"
                 >
-                  {isChangingPassword ? <RotateCw className="animate-spin" size={12} /> : <Shield size={12} strokeWidth={3} />}
-                  Update Password
+                  {isChangingPassword && <RotateCw className="animate-spin" size={14} />}
+                  Update password
                 </button>
               </div>
             </div>
-          </motion.div>
-        </div>
+          </div>
 
-        {/* ── Right: App Info ── */}
-        <div className="lg:col-span-4 flex flex-col gap-6">
-          <div className="glass rounded-[2.5rem] p-8 sticky top-8 border border-primary/5 transition-colors duration-500 shadow-2xl shadow-primary/5">
-            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-text mb-8 flex items-center gap-3">
-              <Info size={16} className="text-primary" strokeWidth={2.5} /> About AuraOne
-            </h3>
+          {/* Account activity */}
+          <div className="lm-sheet">
+            <h2 className="lm-sheet-title">Account activity</h2>
+            <div className="lm-row"><span className="w-28 flex-none font-bold">Joined</span>{formatDate(profile.createdAt)}</div>
+            <div className="lm-row"><span className="w-28 flex-none font-bold">Last sign in</span>{formatDate(profile.lastLogin)}</div>
+          </div>
 
-            <div className="flex items-center gap-5 mb-10 group">
-              <div className="w-16 h-16 rounded-[1.5rem] bg-primary/5 glass p-3 border border-primary/10 group-hover:rotate-6 transition-transform">
-                <Logo iconOnly iconClassName="w-full h-full" />
-              </div>
-              <div>
-                <span className="text-sm font-bold"><span className="text-indigo-500">Aura</span><span className="text-cyan-400 italic font-light">One</span></span>
-                <p className="text-[10px] font-black text-primary uppercase tracking-[0.25em] mt-1">Version 1.2.0</p>
-              </div>
-            </div>
-
-            <p className="text-xs text-text-variant leading-relaxed mb-8 font-medium">
-              A modern productivity platform built to enhance your workflow, combining tasks, notes, and AI-powered assistance.
-            </p>
-
-            <div className="space-y-3">
-              {[
-                { name: 'AI Assistant', path: '/chat' },
-                { name: 'Smart Notes', path: '/notes' },
-                { name: 'Task Management', path: '/tasks' },
-                { name: 'Calendar & Events', path: '/events' },
-                { name: 'Cloud Sync', path: null }
-              ].map(f => (
-                f.path ? (
-                  <Link to={f.path} key={f.name} className="flex items-center justify-between glass border-primary/5 px-4 py-3.5 rounded-2xl hover:bg-primary/5 transition-all group cursor-pointer">
-                    <span className="text-[10px] font-black text-text uppercase tracking-widest">{f.name}</span>
-                    <ChevronRight size={12} className="text-emerald-500 group-hover:translate-x-1 transition-transform" />
-                  </Link>
-                ) : (
-                  <div key={f.name} className="flex items-center justify-between glass border-primary/5 px-4 py-3.5 rounded-2xl transition-all opacity-80">
-                    <span className="text-[10px] font-black text-text uppercase tracking-widest">{f.name}</span>
-                    <ChevronRight size={12} className="text-emerald-500/50" />
-                  </div>
-                )
-              ))}
-            </div>
-
-            <div className="mt-10 pt-6 border-t border-primary/5 text-center">
-              <p className="text-[9px] font-black text-text-variant uppercase tracking-[0.4em] opacity-40">Designed for Productivity</p>
-            </div>
+          {/* Account */}
+          <div className="rounded-sheet bg-sheet px-6 py-[22px] shadow-[inset_0_0_0_2px_rgb(var(--alert))]">
+            <h2 className="mb-1.5 text-[22px] font-bold">Account</h2>
+            <p className="mb-3.5">Log out on this device.</p>
+            <button onClick={handleLogout} className="lm-btn lm-btn-soft">
+              <LogOut size={16} /> Log out
+            </button>
           </div>
         </div>
 
+        {/* ── Right: App Info ── */}
+        <div className="grid content-start gap-5">
+          <div className="lm-sheet">
+            <h2 className="lm-sheet-title">About AuraOne</h2>
+            <p className="lm-muted mb-3.5">Version 1.2.0</p>
+            <p className="mb-4 text-ink2">
+              A modern productivity platform built to enhance your workflow, combining tasks, notes, and AI-powered assistance.
+            </p>
+            {[
+              { name: 'AI Assistant', path: '/chat' },
+              { name: 'Smart Notes', path: '/notes' },
+              { name: 'Task Management', path: '/tasks' },
+              { name: 'Calendar & Events', path: '/events' },
+              { name: 'Cloud Sync', path: null }
+            ].map(f => (
+              f.path ? (
+                <Link to={f.path} key={f.name} className="lm-row font-semibold">
+                  {f.name}
+                  <ChevronRight size={16} className="ml-auto text-ink2" />
+                </Link>
+              ) : (
+                <div key={f.name} className="lm-row font-semibold text-ink2">{f.name}</div>
+              )
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

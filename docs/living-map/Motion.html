@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>AuraOne · Motion</title>
+
+
+</head>
+<body>
+<x-dc>
+<helmet>
+
+<style>
+body{margin:0}
+.stage{width:1440px;height:900px;padding:44px;display:grid;grid-template-rows:auto auto 1fr;gap:24px}
+.stage h1{font-size:64px;font-weight:800;letter-spacing:-.055em;font-stretch:72%;line-height:.9}
+.frames{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.fr{background:var(--sheet);border-radius:24px;height:220px;position:relative;overflow:hidden}
+.fr .bar0{position:absolute;left:14px;top:14px;display:flex;gap:6px}
+.fr .bar0 span{width:46px;height:18px;border-radius:999px;background:var(--step)}
+.fr .bar0 .y{background:var(--tasks)}
+.flood{position:absolute;background:var(--tasks);border-radius:50%}
+.cap2{font-weight:650;margin-top:8px}
+.specs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.sp{background:var(--sheet);border-radius:24px;padding:18px 20px}
+.sp b{display:block;font-size:18px;margin-bottom:6px}
+.sp code{font:inherit;font-weight:700}
+</style>
+</helmet>
+<div class="lm" data-theme="{{theme}}">
+<div class="stage">
+<h1>Motion: the map moves, the work doesn't</h1>
+<div>
+<div class="frames">
+<div><div class="fr"><div class="bar0"><span></span><span class="y"></span><span></span></div></div><p class="cap2">0 ms · press the Tasks capsule</p></div>
+<div><div class="fr"><div class="bar0"><span></span><span class="y"></span><span></span></div><div class="flood" style="left:-40px;top:-60px;width:320px;height:320px"></div></div><p class="cap2">200 ms · yellow floods out from the capsule</p></div>
+<div><div class="fr" style="background:var(--tasks)"></div><p class="cap2">450 ms · page swaps under full colour</p></div>
+<div><div class="fr"><div style="position:absolute;left:-30px;top:30px;width:240px;height:110px;background:var(--tasks);border-radius:0 62% 48% 0/0 70% 58% 0"></div><div style="position:absolute;left:14px;right:14px;bottom:14px;height:56px;border-radius:16px;background:var(--step)"></div></div><p class="cap2">850 ms · flood settles into the page lobe; sheets rise in, 70 ms apart</p></div>
+</div>
+</div>
+<div class="specs">
+<div class="sp"><b>Page change</b>Flood <code>550 ms</code> ease-out from the pressed capsule; content rises <code>24 px</code>, <code>600 ms</code>, staggered <code>70 ms</code>.</div>
+<div class="sp"><b>Lobe coastline</b>Each page lobe drifts its edge over <code>9 s</code>, alternate, barely visible. Stops while typing.</div>
+<div class="sp"><b>Dialogs &amp; controls</b>Dialogs swell from round to sheet with a spring overshoot, <code>500 ms</code>. Capsules lift <code>2 px</code> on hover; buttons press to <code>0.96</code>.</div>
+<div class="sp"><b>Reduced motion</b>No flood, no drift, no travel: pages crossfade in <code>150 ms</code>; every state is still shown.</div>
+<div class="sp"><b>Aura acting</b>Tool-step chips pop in one by one as the agent runs; the changed item flashes its lobe colour once in its list.</div>
+<div class="sp"><b>Task complete</b>Circle fills green with a spring; title strikes; “Undo” stays for 5 s before the row leaves.</div>
+<div class="sp"><b>Toasts</b>Rise from the bottom with overshoot, <code>450 ms</code>; leave after 2.2 s; never cover the bottom nav.</div>
+<div class="sp"><b>Theme switch</b>Water and sheets crossfade <code>300 ms</code>; lobe colours stay put, so you never lose your place.</div>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;dark&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false},&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  renderVals(){ return { theme: this.props.dark ? 'dark' : 'light' }; }
+}
+</script>
+
+
+</body></html>

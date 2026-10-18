@@ -13,28 +13,26 @@ createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
       <App />
       <Toaster 
-        position='top-right' 
+        position='bottom-center'
         reverseOrder={false}
+        containerClassName='lm-toaster'
         toastOptions={{
-          style: {
-            background: '#363636',
-            color: '#fff',
-          },
+          className: 'lm-toast',
           success: {
             duration: 3000,
             iconTheme: {
-              primary: '#10B981',
-              secondary: '#ffffff',
+              primary: '#7FCB5A',
+              secondary: '#1F211E',
             },
           },
           error: {
             duration: 4000,
             iconTheme: {
-              primary: '#EF4444',
-              secondary: '#FFFFFF',
+              primary: '#FF8A73',
+              secondary: '#1F211E',
             },
           },
-        }}  
+        }}
       />
     </BrowserRouter>
   </React.StrictMode>

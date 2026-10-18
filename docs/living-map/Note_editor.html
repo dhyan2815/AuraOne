@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>AuraOne · Note editor</title>
+
+
+</head>
+<body>
+<x-dc>
+<helmet>
+
+<style>
+body{margin:0}
+.wrap{max-width:1440px;margin:0 auto}
+.head{background:var(--notes);color:#1F211E;border-radius:0 0 54% 0/0 0 46% 0;padding:20px 32px 56px;margin:0 -24px}
+.head .title{font-size:clamp(44px,6vw,92px);font-weight:800;letter-spacing:-.055em;line-height:.92;font-stretch:72%;background:none;border:0;outline:none;width:100%;color:inherit;margin-top:16px}
+.g{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px;margin-top:-24px}
+.tb{display:flex;gap:4px;flex-wrap:wrap;padding:6px;background:var(--step);border-radius:999px;width:max-content;max-width:100%}
+.tb button{min-width:40px;height:40px;border-radius:999px;font-weight:800;padding:0 10px}
+.tb button:hover,.tb .on{background:var(--sheet)}
+.doc{max-width:720px;margin-top:20px}
+.doc h2{font-size:28px;font-weight:800;letter-spacing:-.03em;margin:26px 0 8px}
+.doc p,.doc li{font-size:18px;line-height:1.7}
+.doc ul{padding-left:22px;margin:8px 0}
+.doc blockquote{margin:16px 0;padding:14px 20px;border-radius:20px;background:var(--water);font-size:18px}
+.save{font-weight:650;font-size:14px;display:flex;gap:8px;align-items:center}
+.save i{width:8px;height:8px;border-radius:50%;background:var(--today)}
+@media (max-width:1000px){.g{grid-template-columns:1fr}}
+</style>
+</helmet>
+<div class="lm" data-theme="{{theme}}">
+<div class="wrap">
+<header class="bar">
+<span class="mark">AuraOne</span>
+<nav class="caps" aria-label="Main"><a class="cap" href="Dashboard.dc.html" style="--c:var(--today)"><i></i>Today</a><a class="cap" href="Tasks.dc.html" style="--c:var(--tasks)"><i></i>Tasks</a><a class="cap on" href="Notes.dc.html" style="--c:var(--notes)" aria-current="page"><i></i>Notes</a><a class="cap" href="Events.dc.html" style="--c:var(--events)"><i></i>Events</a><a class="cap" href="Aura.dc.html" style="--c:var(--aura)"><i></i>Aura</a><a class="cap" href="Knowledge.dc.html" style="--c:var(--know)"><i></i>Knowledge</a></nav>
+<a class="askpill" href="Aura.dc.html">Ask Aura to add, move or find… <span class="kbd">/</span></a><a class="round" href="Dialogs.dc.html" aria-label="New task">+</a><a class="avatar" href="Settings.dc.html" aria-label="Settings">D</a>
+</header>
+<main class="main">
+<div class="head">
+<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><a href="Notes.dc.html" style="font-weight:650">‹ All notes</a><span class="save end"><i></i>Saved · synced 2s ago</span></div>
+<input class="title" value="Chunking strategies" aria-label="Note title">
+<div class="acts" style="margin-top:10px"><span class="chip" style="background:rgba(255,255,255,.6)">#rag ×</span><span class="chip" style="background:rgba(255,255,255,.6)">#interview ×</span><button class="chip" style="background:#1F211E;color:#fff">+ Tag</button></div>
+</div>
+<div class="g">
+<div class="sheet">
+<div class="tb" role="toolbar" aria-label="Formatting"><button class="on" aria-label="Bold">B</button><button aria-label="Italic"><i>I</i></button><button aria-label="Strikethrough"><s>S</s></button><button aria-label="Heading">H2</button><button aria-label="Bulleted list">• List</button><button aria-label="Numbered list">1. List</button><button aria-label="Quote">“ ”</button><button aria-label="Code">{ }</button></div>
+<div class="doc">
+<p><b>512-token windows with 64 overlap</b> kept meeting notes intact; 256 split decisions away from their reasons.</p>
+<h2>What I tested</h2>
+<ul><li>20 long notes, 3 question types each</li><li>Top-3 retrieval, cosine similarity</li><li>Gemini embeddings, fallback to OpenRouter</li></ul>
+<blockquote>Overlap matters more than size once chunks pass ~400 tokens.</blockquote>
+<p>Next: test against event descriptions, which are short and might not need chunking at all.</p>
+</div>
+</div>
+<div style="display:grid;gap:20px;align-content:start">
+<div class="sheet" style="--c:var(--know)"><h2><span class="dot"></span>In Knowledge</h2><p>Indexed as 4 chunks. Aura cited this note 3 times this week.</p><a class="btn soft" href="Knowledge.dc.html" style="margin-top:12px">View chunks</a></div>
+<div class="sheet" style="--c:var(--tasks)"><h2><span class="dot"></span>Linked task</h2><a href="TaskPage.dc.html" style="font-weight:650">Finish RAG chunking write-up</a><p class="muted">High · due today</p></div>
+<div class="sheet"><h2>Note</h2><p class="muted">Created 12 Oct · edited 2h ago · 284 words</p><a class="btn danger" href="Dialogs.dc.html" style="margin-top:12px">Delete note</a></div>
+</div>
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;dark&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false},&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:1100}}">
+class Component extends DCLogic {
+  renderVals(){ return { theme: this.props.dark ? 'dark' : 'light' }; }
+}
+</script>
+
+
+</body></html>

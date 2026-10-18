@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>AuraOne · Log in</title>
+
+
+</head>
+<body>
+<x-dc>
+<helmet>
+
+<style>
+body{margin:0}
+.auth{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,560px);min-height:900px;max-width:1440px;margin:0 auto}
+.side{background:var(--c);color:#1F211E;border-radius:0 52% 58% 0/0 46% 62% 0;padding:40px 96px 64px 48px;display:flex;flex-direction:column}
+.side h1{font-size:clamp(56px,7vw,112px);font-weight:800;letter-spacing:-.055em;line-height:.9;font-stretch:72%;margin-top:auto;max-width:640px}
+.side p{font-size:19px;margin-top:16px;max-width:460px}
+.form{padding:64px 56px;display:flex;flex-direction:column;justify-content:center;gap:18px}
+.form h2{font-size:44px;font-weight:800;letter-spacing:-.045em;font-stretch:75%;line-height:1}
+.alt{display:flex;justify-content:space-between;font-size:15px;font-weight:600}
+@media (max-width:900px){.auth{grid-template-columns:1fr}.side{min-height:320px;border-radius:0 0 50% 30%/0 0 22% 14%;padding:28px 32px 56px}.form{padding:32px 20px}}
+</style>
+</helmet>
+<div class="lm" data-theme="{{theme}}">
+<div class="auth">
+<div class="side" style="--c:var(--today)"><a class="mark" href="Main.dc.html">AuraOne</a><h1>Welcome back to your day</h1><p>Your tasks, notes and events are where you left them. Aura picks up from your last session.</p></div>
+<form class="form" onsubmit="return false" aria-label="Log in">
+<h2>Log in</h2>
+<label class="field" style="--c:var(--today)">Email<input class="input" type="email" value="dhyan@example.com" autocomplete="email"></label>
+<label class="field" style="--c:var(--today)">Password<input class="input" type="password" value="supersecret" autocomplete="current-password"></label>
+<div class="alt"><label style="display:flex;gap:8px;align-items:center"><input type="checkbox" checked=""> Keep me signed in</label><a href="ForgotPassword.dc.html" style="text-decoration:underline">Forgot password?</a></div>
+<button class="btn" type="submit" style="justify-content:center;padding:15px">Log in</button>
+<p class="muted" style="font-size:15px">New to AuraOne? <a href="SignUp.dc.html" style="text-decoration:underline;color:var(--ink);font-weight:650">Create an account</a></p>
+</form>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;dark&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false},&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  renderVals(){ return { theme: this.props.dark ? 'dark' : 'light' }; }
+}
+</script>
+
+
+</body></html>

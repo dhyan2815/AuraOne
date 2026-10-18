@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>AuraOne · Landing</title>
+
+
+</head>
+<body>
+<x-dc>
+<helmet>
+
+<style>
+body{margin:0}
+.wrap{max-width:1440px;margin:0 auto}
+.hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:24px;align-items:center}
+.hero .lobe{width:auto;min-height:620px;padding:72px 72px 96px 132px;display:flex;flex-direction:column;justify-content:center}
+.hero .lobe h1{font-size:clamp(64px,8.4vw,128px)}
+.shot{background:var(--sheet);border-radius:32px;padding:20px;display:grid;gap:14px;margin-right:24px}
+.shot .mini{display:flex;gap:6px}
+.section{padding:140px 24px 0}
+.section h2.title{font-size:clamp(44px,5.6vw,84px);font-weight:800;letter-spacing:-.05em;line-height:.95;font-stretch:72%;max-width:900px}
+.lead{font-size:20px;max-width:620px;margin-top:16px}
+.demo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;margin-top:40px}
+.say{display:grid;gap:10px}
+.say button{text-align:left;padding:18px 22px;border-radius:24px;background:var(--sheet);font-size:19px;font-weight:600}
+.say button.sel{background:var(--aura);color:#1F211E}
+.result{background:var(--ink);color:var(--water);border-radius:32px;padding:28px}
+.result .chip{background:var(--aura);color:#1F211E}
+.parts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;margin-top:40px}
+.part{border-radius:48% 52% 40% 60%/40% 44% 56% 60%;padding:56px 64px;color:#1F211E;min-height:340px}
+.part:nth-child(2){border-radius:56% 44% 58% 42%/52% 60% 40% 48%}
+.part:nth-child(3){border-radius:40% 60% 46% 54%/58% 40% 60% 42%}
+.part h3{font-size:44px;font-weight:800;letter-spacing:-.045em;font-stretch:72%;line-height:1}
+.part p{font-size:18px;margin-top:10px;max-width:420px}
+.part .row{box-shadow:none!important;padding:6px 0;font-size:16px}
+.quote{font-size:30px;line-height:1.3;font-weight:600;letter-spacing:-.02em;max-width:900px}
+.who{display:flex;gap:10px;margin-top:20px;align-items:center}
+.close{margin:140px 24px 0;background:var(--today);color:#1F211E;border-radius:0 48% 0 0/0 60% 0 0;padding:96px 72px 48px}
+.close h2{font-size:clamp(56px,8vw,120px);font-weight:800;letter-spacing:-.055em;line-height:.9;font-stretch:72%}
+.name{font-size:clamp(90px,17vw,250px);font-weight:800;letter-spacing:-.07em;line-height:.8;font-stretch:62%;margin-top:80px}
+.foot{display:flex;flex-wrap:wrap;gap:24px;font-weight:600;margin-top:24px}
+@media (max-width:900px){.hero,.demo,.parts{grid-template-columns:1fr}.shot{margin:0}.hero .lobe{min-height:auto;padding:48px 32px 72px 64px}}
+</style>
+</helmet>
+<div class="lm" data-theme="{{theme}}">
+<div class="wrap">
+<header class="bar">
+<span class="mark">AuraOne</span>
+<nav class="caps" aria-label="Sections"><a class="cap" href="#aura" style="--c:var(--aura)"><i></i>Aura</a><a class="cap" href="#parts" style="--c:var(--tasks)"><i></i>Features</a><a class="cap" href="#voices" style="--c:var(--notes)"><i></i>Stories</a></nav>
+<div style="margin-left:auto;display:flex;gap:8px"><a class="btn soft" href="Login.dc.html">Log in</a><a class="btn" href="SignUp.dc.html">Sign up free</a></div>
+</header>
+
+<section class="hero">
+<div class="lobe" style="--c:var(--today)">
+<h1>One map for your whole day</h1>
+<p>Tasks, notes, events and news in one place, with Aura to add, move and find anything in plain words.</p>
+<div class="acts"><a class="btn" href="SignUp.dc.html">Create your free account</a><a class="btn ghost" href="Login.dc.html">Log in</a></div>
+</div>
+<div class="shot" aria-label="AuraOne Today screen">
+<div class="mini"><span class="cap on" style="--c:var(--today)"><i></i>Today</span><span class="cap" style="--c:var(--tasks);background:var(--step)"><i></i>Tasks</span><span class="cap" style="--c:var(--aura);background:var(--step)"><i></i>Aura</span></div>
+<div style="background:var(--today);color:#1F211E;border-radius:0 60% 48% 0/0 70% 58% 0;padding:24px 28px 36px"><div style="font-size:52px;font-weight:800;letter-spacing:-.05em;font-stretch:72%;line-height:.9">Saturday<br>17 October</div></div>
+<div class="sheet" style="background:var(--water)"><div class="row"><span class="t">10:30</span>Portfolio review with Mehul<span class="chip a end">moved by Aura</span></div><div class="row"><span class="check"></span>Finish RAG chunking write-up<span class="chip h end">High</span></div><div class="row"><span class="check"></span>Buy groceries<span class="muted end">Sun</span></div></div>
+</div>
+</section>
+
+<section class="section" id="aura">
+<h2 class="title">Say it. Aura does it.</h2>
+<p class="lead">Aura reads and changes your own tasks, notes and events. Pick a sentence and see what it would do.</p>
+<div class="demo">
+<div class="say"><sc-for list="{{lines}}" as="l" hint-placeholder-count="3"><button class="{{l.cls}}" sc-camel-on-click="{{l.pick}}">“{{l.say}}”</button></sc-for></div>
+<div class="result" aria-live="polite">
+<p class="muted" style="color:inherit;opacity:.75">Aura · {{cur.mode}} mode</p>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 20px"><sc-for list="{{cur.steps}}" as="s" hint-placeholder-count="2"><span class="chip">{{s}}</span></sc-for></div>
+<p style="font-size:26px;font-weight:600;letter-spacing:-.02em;line-height:1.3">{{cur.reply}}</p>
+</div>
+</div>
+</section>
+
+<section class="section" id="parts">
+<h2 class="title">Every part of your day, in its own colour</h2>
+<div class="parts">
+<div class="part" style="background:var(--tasks)"><h3>Tasks</h3><p>High, medium and low priority with due dates, completed in one tap.</p><div style="margin-top:18px"><div class="row"><span class="check"></span>Reply to Anjali about mock interview</div><div class="row"><span class="check done"></span><span class="strike">Renew Supabase project key</span></div></div></div>
+<div class="part" style="background:var(--notes)"><h3>Notes</h3><p>A rich text editor with tags, searchable by you and by Aura.</p><div style="margin-top:18px"><div class="row"><b>Chunking strategies</b><span class="chip end" style="background:rgba(255,255,255,.6)">#rag</span></div></div></div>
+<div class="part" style="background:var(--events)"><h3>Events</h3><p>A month calendar with today's schedule, created in plain words.</p><div style="margin-top:18px"><div class="row"><span class="t">16:00</span>Gym, leg day</div></div></div>
+<div class="part" style="background:var(--know)"><h3>Knowledge</h3><p>Your notes, tasks and events, chunked and embedded so Aura answers from what you actually wrote.</p><div style="margin-top:18px"><div class="row"><b style="font-size:28px">.82</b>Chunking strategies · note</div></div></div>
+</div>
+</section>
+
+<section class="section" id="voices">
+<h2 class="title">From early users</h2>
+<div class="sheet" style="margin-top:40px;padding:48px 56px">
+<p class="quote">“{{q.content}}”</p>
+<div class="who"><span class="avatar">{{q.initial}}</span><div><b>{{q.name}}</b><br><span class="muted">{{q.role}}</span></div>
+<div class="end" style="display:flex;gap:8px"><button class="round" style="background:var(--step)" aria-label="Previous story" sc-camel-on-click="{{prev}}">‹</button><button class="round" style="background:var(--step)" aria-label="Next story" sc-camel-on-click="{{next}}">›</button></div></div>
+</div>
+</section>
+
+<section class="close">
+<h2>Start with today</h2>
+<div class="acts"><a class="btn" href="SignUp.dc.html">Create your free account</a><a class="btn ghost" href="Login.dc.html">I have an account</a></div>
+<p class="name">AuraOne</p>
+<div class="foot"><span>Built by Dhyan Patel</span><a href="https://github.com/dhyan2815">GitHub</a><a href="https://linkedin.com/in/dhyan-patel">LinkedIn</a><span class="end">Gemini · OpenRouter · Supabase</span></div>
+</section>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;dark&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false},&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:3400}}">
+class Component extends DCLogic {
+  constructor(p){super(p);this.state={pick:0,q:0};}
+  renderVals(){
+    const L=[
+      {say:"remind me to buy groceries tomorrow",mode:"Command",steps:["create_task","due: tomorrow","priority: medium"],reply:"Added Buy groceries to tomorrow's list."},
+      {say:"push my review by half an hour",mode:"Command",steps:["read_events","update_event","10:00 → 10:30"],reply:"Portfolio review now starts at 10:30."},
+      {say:"what did I decide about chunk overlap?",mode:"Brain",steps:["search_knowledge","3 notes","0.82 match"],reply:"You settled on 512-token chunks with 64 overlap, from your note Chunking strategies."}
+    ];
+    const Q=[
+      {name:"Rajesh Verma",role:"Product Manager",content:"AuraOne has completely transformed how I manage my daily tasks and notes. The AI assistant is incredibly intuitive and saves me hours every week."},
+      {name:"Anjali Sharma",role:"Software Developer",content:"The real-time sync across all my devices is flawless. I can start a task on my phone and finish it on my laptop without any hassle."},
+      {name:"Amit Patel",role:"Marketing Director",content:"The calendar integration and smart reminders have made me so much more organized. AuraOne is exactly what I needed for my busy schedule."},
+      {name:"Dhairya Kumar",role:"Freelance Writer",content:"The rich text editor for notes is fantastic, and the AI chat feature helps me brainstorm ideas quickly. This is productivity software done right."}
+    ];
+    const q=Q[this.state.q];
+    return {
+      theme:this.props.dark?'dark':'light',
+      lines:L.map((l,i)=>({...l,cls:i===this.state.pick?'sel':'',pick:()=>this.setState({pick:i})})),
+      cur:L[this.state.pick],
+      q:{...q,initial:q.name[0]},
+      next:()=>this.setState({q:(this.state.q+1)%Q.length}),
+      prev:()=>this.setState({q:(this.state.q+Q.length-1)%Q.length})
+    };
+  }
+}
+</script>
+
+
+</body></html>
