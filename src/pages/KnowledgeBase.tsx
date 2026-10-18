@@ -138,16 +138,12 @@ const KnowledgeBase = () => {
     <div className="sec-know">
       <section className="lm-lobe">
         <h1>Knowledge</h1>
-        <p>{stats.total} chunks from your notes, tasks and events. This is what Aura reads before it answers.</p>
+        <p>{stats.total} chunks Aura reads before it answers.</p>
         <div className="lm-acts">
           <div className="lm-seg" role="group" aria-label="View">
             <button onClick={() => setActiveTab('explorer')} aria-pressed={activeTab === 'explorer'}>Explorer</button>
             <button onClick={() => setActiveTab('search')} aria-pressed={activeTab === 'search'}>Playground</button>
           </div>
-          <button onClick={handleSync} disabled={isSyncing} className="lm-btn">
-            <RefreshCw size={16} className={isSyncing ? 'animate-spin' : ''} />
-            {isSyncing ? `Indexing ${syncProgress}%` : 'Re-index all'}
-          </button>
         </div>
       </section>
 
@@ -251,6 +247,10 @@ const KnowledgeBase = () => {
                   <span>{s.value} {s.value === 1 ? 'chunk' : 'chunks'}</span>
                 </div>
               ))}
+              <button onClick={handleSync} disabled={isSyncing} className="lm-btn mt-3 w-full">
+                <RefreshCw size={16} className={isSyncing ? 'animate-spin' : ''} />
+                {isSyncing ? `Indexing ${syncProgress}%` : 'Re-index all'}
+              </button>
             </div>
             <div className="lm-sheet !bg-aura text-[#1F211E]">
               <h2 className="lm-sheet-title !text-[#1F211E]">Ask with sources</h2>
