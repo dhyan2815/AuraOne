@@ -13,8 +13,6 @@ import {
 } from "../services/chatHandler";
 import { supabase } from "../services/supabase";
 import toast from "react-hot-toast";
-import { motion, AnimatePresence } from "framer-motion";
-import Logo from "../components/structure/Logo";
 
 // Prompt suggestions displayed in empty state.
 const SUGGESTIONS = [
@@ -237,9 +235,11 @@ const Chat = () => {
 
   if (authLoading) {
     return (
-      <div className="flex flex-col items-center justify-center h-[calc(100vh-4rem)]">
-        <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin mb-4" />
-        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary animate-pulse">Connecting to Aura AI...</p>
+      <div className="sec-aura grid min-h-[60vh] place-items-center" role="status">
+        <div className="text-center">
+          <div className="lm-blob lm-pulse mx-auto mb-4 h-20 w-20" />
+          <p className="lm-display text-3xl">Connecting to Aura…</p>
+        </div>
       </div>
     );
   }
@@ -247,142 +247,116 @@ const Chat = () => {
   const displayName = user?.email?.split("@")[0] ?? "User";
 
   return (
-    <div className="fixed inset-0 bottom-[55px] z-10 flex flex-col gap-4 overflow-hidden md:relative md:inset-auto md:bottom-auto md:z-0 md:h-[100dvh] lg:grid lg:grid-cols-[18rem_1fr] lg:p-6">
-      <SessionSidebar
-        sessions={sessions}
-        selectedSession={selectedSession}
-        onSelectSession={setSelectedSession}
-        onNewSession={handleNewSession}
-        onDeleteSession={handleDeleteSession}
-        onRenameSession={handleRenameSession}
-        showSessionsMobile={showSessionsMobile}
-        setShowSessionsMobile={setShowSessionsMobile}
-      />
-
-      {/* ── Main Chat ── */}
-      <section className="relative flex flex-1 flex-col h-full min-h-0 overflow-hidden rounded-3xl border border-primary/10 bg-white dark:bg-slate-900 shadow-2xl shadow-primary/5 isolation-auto">
-        <div className="px-4 sm:px-6 h-14 sm:h-16 border-b border-primary/5 flex items-center justify-between bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl z-10 shrink-0">
-          <div className="flex items-center gap-3 sm:gap-4">
-            <button 
-              onClick={() => setShowSessionsMobile(true)}
-              className="lg:hidden p-2.5 rounded-xl border border-primary/10 text-text-variant hover:bg-primary/5 hover:text-primary transition-all flex items-center justify-center active:scale-95 bg-white/50 dark:bg-slate-800/50 shadow-sm"
-              title="Menu"
-            >
-              <Menu size={18} />
-            </button>
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-primary to-secondary flex items-center justify-center shadow-lg shadow-primary/20">
-              <Logo iconOnly iconClassName="w-4.5 h-4.5 sm:w-5 sm:h-5 filter brightness-0 invert" />
-            </div>
-            <div>
-              <h2 className="text-sm sm:text-md font-black text-text tracking-widest leading-none">Aura Assistant</h2>
-            </div>
+    <div className="sec-aura">
+      <section className="lm-lobe">
+        <h1>Aura</h1>
+        <p>Plain words in, real changes out. Command mode acts on your data; Brain mode reasons it through first.</p>
+        <div className="lm-acts">
+          <div className="lm-seg" role="group" aria-label="Mode">
+            <button onClick={() => setIsBrainMode(false)} aria-pressed={!isBrainMode}>Command</button>
+            <button onClick={() => setIsBrainMode(true)} aria-pressed={isBrainMode}>Brain</button>
           </div>
+          <button
+            onClick={() => setShowSessionsMobile(true)}
+            className="lm-btn lm-btn-ghost lg:hidden"
+          >
+            <Menu size={16} /> Sessions
+          </button>
         </div>
+      </section>
 
-        <div ref={scrollContainerRef} className="custom-scrollbar relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 sm:p-6 lg:p-8 pb-32 overscroll-contain touch-pan-y">
-          <AnimatePresence>
+      <div className="lm-lift grid gap-5 lg:grid-cols-[280px_minmax(0,1fr)]">
+        <SessionSidebar
+          sessions={sessions}
+          selectedSession={selectedSession}
+          onSelectSession={setSelectedSession}
+          onNewSession={handleNewSession}
+          onDeleteSession={handleDeleteSession}
+          onRenameSession={handleRenameSession}
+          showSessionsMobile={showSessionsMobile}
+          setShowSessionsMobile={setShowSessionsMobile}
+        />
+
+        {/* ── Main Chat ── */}
+        <section className="lm-sheet flex min-h-[560px] flex-col gap-4">
+          <div
+            ref={scrollContainerRef}
+            className="custom-scrollbar flex max-h-[58vh] min-h-[320px] flex-1 flex-col gap-4 overflow-y-auto overflow-x-hidden overscroll-contain"
+          >
             {messages.length === 0 && !loading ? (
-              <div className="h-full flex flex-col items-center justify-center text-center pb-20">
-                <div className="w-16 h-16 rounded-2xl glass mb-6 border border-primary/10 flex items-center justify-center">
-                  <Logo iconOnly iconClassName="w-9 h-9" />
-                </div>
-                <h2 className="text-2xl font-bold text-text">How can I assist?</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-12 w-full max-w-2xl">
-                  {SUGGESTIONS.map((s, i) => (
-                    <motion.button
-                      key={i}
-                      whileHover={{ scale: 1.02, translateY: -2 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => handleSend(s.prompt, true)}
-                      className="glass border border-primary/10 p-5 rounded-2xl text-left hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all group"
-                    >
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="text-xl group-hover:scale-110 transition-transform">{s.icon}</span>
-                        <p className="text-[11px] font-black text-primary uppercase tracking-[0.15em]">{s.title}</p>
-                      </div>
-                      <p className="text-[11px] font-medium text-text-variant leading-relaxed opacity-80">{s.sub}</p>
-                    </motion.button>
-                  ))}
-                </div>
+              <div className="my-auto py-10">
+                <p className="lm-display text-5xl">How can I assist?</p>
+                <p className="mt-2 text-ink2">Try one of these, or type your own.</p>
               </div>
             ) : (
-              <div className="mx-auto max-w-3xl space-y-8">
+              <>
                 {messages.map((msg, idx) => (
                   <ChatMessage key={msg.id || idx} msg={msg} displayName={displayName} />
                 ))}
 
                 {loading && (
-                  <div className="flex gap-4">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-primary to-secondary flex items-center justify-center">
-                      <Logo iconOnly iconClassName="w-4 h-4 filter brightness-0 invert" />
-                    </div>
-                    <div className="bg-white/50 dark:bg-slate-900/40 backdrop-blur-xl border border-primary/10 rounded-2xl rounded-tl-sm px-6 py-4 flex flex-col min-w-[240px] shadow-lg shadow-primary/5">
-                      <div className="flex gap-1.5 items-center">
-                        <div className="w-1.5 h-1.5 bg-primary rounded-full animate-[bounce_1s_infinite_0ms]" />
-                        <div className="w-1.5 h-1.5 bg-primary rounded-full animate-[bounce_1s_infinite_200ms]" />
-                        <div className="w-1.5 h-1.5 bg-primary rounded-full animate-[bounce_1s_infinite_400ms]" />
-                        <span className="ml-2 text-[10px] font-bold text-primary uppercase tracking-[0.1em] font-mono">
-                          {HANDSHAKE_STEPS[thinkingStep]}
-                        </span>
-                      </div>
-                    </div>
+                  <div className="max-w-[680px] self-start rounded-[22px] bg-step px-[18px] py-3.5 text-[15px]" role="status">
+                    <b className="mb-1 flex items-center gap-2">
+                      <span className="lm-blob lm-pulse inline-block h-3 w-3" style={{ animation: undefined }} />
+                      Aura is working
+                    </b>
+                    {HANDSHAKE_STEPS[thinkingStep]}
                   </div>
                 )}
-                <div className="h-4 w-full" />
-              </div>
+              </>
             )}
-          </AnimatePresence>
-        </div>
-
-        <div className="w-full bg-white/5 dark:bg-white/5 backdrop-blur-md p-4 pb-20 md:p-6 lg:pb-8 shrink-0 border-t border-primary/5">
-          <div className="mx-auto max-w-4xl">
-            <div className="bg-white dark:bg-slate-800 backdrop-blur-2xl border border-primary/20 rounded-2xl p-2 flex items-end gap-2 shadow-2xl shadow-primary/10 transition-all focus-within:border-primary/40 focus-within:ring-4 focus-within:ring-primary/5">
-              <div className="flex items-center self-center pl-1">
-                <button className="p-2 text-text-variant hover:text-primary hover:bg-primary/5 rounded-xl transition-all">
-                  <Paperclip size={20} />
-                </button>
-              </div>
-              
-              <textarea
-                ref={textareaRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Message Aura..."
-                rows={1}
-                className="flex-1 bg-transparent border-none py-3 text-sm font-semibold text-text outline-none resize-none min-h-[44px] max-h-[200px] custom-scrollbar"
-              />
-              
-              <div className="flex items-center gap-2 pr-1 shrink-0 self-center md:self-end md:pb-1">
-                <button 
-                  onClick={() => setIsBrainMode(!isBrainMode)} 
-                  className={`hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl border transition-all ${
-                    isBrainMode 
-                      ? 'bg-primary/10 border-primary/30 text-primary shadow-inner shadow-primary/5' 
-                      : 'bg-text-variant/5 border-transparent text-text-variant hover:bg-text-variant/10'
-                  }`}
-                >
-                  <Database size={14} className={isBrainMode ? 'animate-pulse' : ''} />
-                  <span className="text-[10px] font-black uppercase tracking-wider">Brain Mode</span>
-                  <div className={`relative w-6 h-3 rounded-full transition-all ${isBrainMode ? 'bg-primary/40' : 'bg-text-variant/20'}`}>
-                    <motion.div animate={{ x: isBrainMode ? 14 : 2 }} className="absolute top-0.5 w-2 h-2 rounded-full bg-white shadow-sm" />
-                  </div>
-                </button>
-
-                <button 
-                  onClick={handleSend} 
-                  disabled={loading || !input.trim()} 
-                  className="w-11 h-11 rounded-xl bg-primary text-white flex items-center justify-center disabled:opacity-20 disabled:grayscale transition-all hover:shadow-lg hover:shadow-primary/30 active:scale-95 shrink-0"
-                >
-                  <Send size={18} strokeWidth={3} />
-                </button>
-              </div>
-            </div>
-            <p className="text-[9px] text-center mt-3 text-text-variant uppercase font-black tracking-[0.2em] opacity-40">
-              Aura Assistant          </p>
           </div>
-        </div>
-      </section>
+
+          {/* Suggestions */}
+          {messages.length === 0 && !loading && (
+            <div className="flex flex-wrap gap-1.5">
+              {SUGGESTIONS.map((s, i) => (
+                <button
+                  key={i}
+                  onClick={() => handleSend(s.prompt, true)}
+                  title={s.sub}
+                  className="rounded-full bg-water px-3.5 py-2 text-sm font-semibold transition-transform active:scale-[.96]"
+                >
+                  {s.title}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Pill composer */}
+          <div className="flex items-end gap-2 rounded-[28px] bg-water p-1.5">
+            <button className="lm-round !h-10 !w-10 !bg-step self-center" aria-label="Attach file">
+              <Paperclip size={18} />
+            </button>
+            <textarea
+              ref={textareaRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Ask Aura to add, move or find…"
+              aria-label="Message Aura"
+              rows={1}
+              className="custom-scrollbar max-h-[200px] min-h-[44px] flex-1 resize-none border-0 bg-transparent px-2 py-3 text-[17px] text-ink outline-none placeholder:text-ink2"
+            />
+            <button
+              onClick={() => setIsBrainMode(!isBrainMode)}
+              aria-pressed={isBrainMode}
+              aria-label="Brain mode"
+              title="Brain mode"
+              className={`lm-round !h-10 !w-10 self-center ${isBrainMode ? "!bg-aura !text-[#1F211E]" : "!bg-step"}`}
+            >
+              <Database size={18} />
+            </button>
+            <button
+              onClick={handleSend}
+              disabled={loading || !input.trim()}
+              className="lm-btn self-center"
+            >
+              <Send size={16} strokeWidth={2.6} /> Send
+            </button>
+          </div>
+        </section>
+      </div>
     </div>
   );
 };

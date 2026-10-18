@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, X, Pencil, Trash2, Check } from "lucide-react";
 import { Session } from "../../services/chatSessionService";
+import { ConfirmDialog } from "../ui/Dialog";
 
 interface SessionSidebarProps {
   sessions: Session[];
@@ -25,6 +26,7 @@ const SessionSidebar: React.FC<SessionSidebarProps> = ({
   setShowSessionsMobile,
 }) => {
   const [editingSession, setEditingSession] = useState<{ id: string; name: string } | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<Session | null>(null);
 
   const handleStartEdit = (e: React.MouseEvent, s: Session) => {
     e.stopPropagation();
@@ -45,7 +47,7 @@ const SessionSidebar: React.FC<SessionSidebarProps> = ({
 
   return (
     <>
-      {/* Mobile Sidebar backdrop */}
+      {/* Mobile drawer backdrop */}
       <AnimatePresence>
         {showSessionsMobile && (
           <motion.div
@@ -53,99 +55,99 @@ const SessionSidebar: React.FC<SessionSidebarProps> = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setShowSessionsMobile(false)}
-            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
+            className="fixed inset-0 z-40 bg-[#141713]/50 lg:hidden"
           />
         )}
       </AnimatePresence>
 
       <aside
-        className={`flex min-h-0 shrink-0 flex-col gap-4 z-50 fixed inset-y-0 left-0 w-[85vw] max-w-[320px] p-5 bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl border-r border-primary/10 shadow-2xl transition-transform duration-300 ease-in-out lg:relative lg:flex lg:w-full lg:translate-x-0 lg:p-0 lg:bg-transparent lg:border-none lg:shadow-none ${
+        className={`sec-aura fixed inset-y-0 left-0 z-50 flex w-[85vw] max-w-[320px] flex-col gap-4 rounded-r-[28px] bg-sheet p-5 shadow-2xl transition-transform duration-300 ease-in-out lg:static lg:z-auto lg:w-auto lg:max-w-none lg:translate-x-0 lg:rounded-sheet lg:shadow-none ${
           showSessionsMobile ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="flex items-center justify-between lg:hidden mb-4">
-          <span className="text-xs font-black uppercase tracking-widest text-primary">Chat History</span>
+        <h2 className="lm-sheet-title !mb-0">
+          Sessions
+          <button
+            onClick={() => {
+              onNewSession();
+              setShowSessionsMobile(false);
+            }}
+            className="lm-round ml-auto !h-9 !w-9 !bg-step"
+            aria-label="New session"
+          >
+            <Plus size={18} strokeWidth={2.6} />
+          </button>
           <button
             onClick={() => setShowSessionsMobile(false)}
-            className="p-2 rounded-xl hover:bg-primary/10 text-text-variant active:scale-95 transition-colors bg-primary/5"
+            className="lm-round !h-9 !w-9 !bg-step lg:hidden"
+            aria-label="Close sessions"
           >
             <X size={18} />
           </button>
-        </div>
+        </h2>
 
-        <motion.button
-          whileHover={{ scale: 1.01 }}
-          whileTap={{ scale: 0.99 }}
-          onClick={() => {
-            onNewSession();
-            setShowSessionsMobile(false);
-          }}
-          className="bg-primary shadow-lg shadow-primary/10 w-full py-3 px-4 rounded-xl flex items-center justify-center gap-2 group transition-all duration-300 flex-shrink-0"
-        >
-          <Plus size={16} className="text-white" strokeWidth={2.5} />
-          <span className="font-bold text-white text-xs tracking-wide">New Chat</span>
-        </motion.button>
-
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-primary/10 glass shadow-sm">
-          <div className="px-4 py-3 border-b border-primary/5 bg-primary/5">
-            <h3 className="text-[11px] font-bold text-text-variant uppercase tracking-wider opacity-70">History</h3>
-          </div>
-          <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-3">
-            <div className="space-y-1.5">
-              {sessions.map((s) => (
-                <motion.div
-                  key={s.id}
-                  whileHover={{ x: 4 }}
-                  onClick={() => {
-                    if (editingSession?.id !== s.id) {
-                      onSelectSession(s.id);
-                      setShowSessionsMobile(false);
-                    }
-                  }}
-                  className={`px-3 py-3 rounded-xl cursor-pointer group flex items-center justify-between gap-3 transition-all ${
-                    selectedSession === s.id
-                      ? "bg-primary/10 border border-primary/20 text-primary"
-                      : "hover:bg-primary/5 text-text-variant border border-transparent"
-                  }`}
-                >
-                  {editingSession?.id === s.id ? (
-                    <div className="flex items-center gap-2 w-full" onClick={(e) => e.stopPropagation()}>
-                      <input
-                        autoFocus
-                        value={editingSession.name}
-                        onChange={(e) => setEditingSession({ ...editingSession, name: e.target.value })}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") handleSaveEdit(e);
-                          if (e.key === "Escape") handleCancelEdit(e);
-                        }}
-                        className="bg-transparent border-b border-primary text-xs font-bold outline-none flex-1 w-full text-text"
-                      />
-                      <button onClick={handleSaveEdit} className="text-green-500 hover:text-green-600 transition-colors">
-                        <Check size={14} />
-                      </button>
-                      <button onClick={handleCancelEdit} className="text-red-500 hover:text-red-600 transition-colors">
-                        <X size={14} />
-                      </button>
-                    </div>
-                  ) : (
-                    <>
-                      <p className="text-xs font-bold truncate flex-1">{s.name || "New Chat"}</p>
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={(e) => handleStartEdit(e, s)} className="p-1 hover:text-primary transition-colors">
-                          <Pencil size={12} />
-                        </button>
-                        <button onClick={(e) => onDeleteSession(e, s.id)} className="p-1 hover:text-red-500 transition-colors">
-                          <Trash2 size={12} />
-                        </button>
-                      </div>
-                    </>
-                  )}
-                </motion.div>
-              ))}
+        <div className="custom-scrollbar grid min-h-0 flex-1 content-start gap-1 overflow-y-auto">
+          {sessions.map((s) => (
+            <div
+              key={s.id}
+              onClick={() => {
+                if (editingSession?.id !== s.id) {
+                  onSelectSession(s.id);
+                  setShowSessionsMobile(false);
+                }
+              }}
+              className={`group flex cursor-pointer items-center justify-between gap-3 rounded-[18px] px-3.5 py-3 font-semibold transition-colors ${
+                selectedSession === s.id ? "bg-aura text-[#1F211E]" : "hover:bg-water"
+              }`}
+            >
+              {editingSession?.id === s.id ? (
+                <div className="flex w-full items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                  <input
+                    autoFocus
+                    value={editingSession.name}
+                    onChange={(e) => setEditingSession({ ...editingSession, name: e.target.value })}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleSaveEdit(e);
+                      if (e.key === "Escape") handleCancelEdit(e);
+                    }}
+                    aria-label="Session name"
+                    className="lm-input !rounded-full !px-3 !py-1.5 !text-sm"
+                  />
+                  <button onClick={handleSaveEdit} aria-label="Save name" className="flex-none"><Check size={16} /></button>
+                  <button onClick={handleCancelEdit} aria-label="Cancel rename" className="flex-none"><X size={16} /></button>
+                </div>
+              ) : (
+                <>
+                  <p className="min-w-0 flex-1 truncate">{s.name || "New Chat"}</p>
+                  <div className="flex items-center gap-1 opacity-100 transition-opacity lg:opacity-0 lg:group-hover:opacity-100 lg:group-focus-within:opacity-100">
+                    <button onClick={(e) => handleStartEdit(e, s)} className="p-1" aria-label="Rename session">
+                      <Pencil size={14} />
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setPendingDelete(s); }}
+                      className="p-1"
+                      aria-label="Delete session"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
-          </div>
+          ))}
         </div>
       </aside>
+
+      <ConfirmDialog
+        open={!!pendingDelete}
+        onOpenChange={(open) => { if (!open) setPendingDelete(null); }}
+        title="Delete this session?"
+        body={`${pendingDelete?.name || "This chat"} and its messages will be removed.`}
+        cancelLabel="Keep session"
+        onConfirm={() => {
+          if (pendingDelete) onDeleteSession({ stopPropagation: () => {} } as React.MouseEvent, pendingDelete.id);
+        }}
+      />
     </>
   );
 };
