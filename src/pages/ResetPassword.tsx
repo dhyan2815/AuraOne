@@ -135,7 +135,7 @@ const ResetPassword = () => {
                 {isResetting && <RotateCw className="animate-spin" size={16} />}
                 {isResetting ? "Updating…" : "Update password"}
               </button>
-              <Link to="/login" className="font-semibold underline">Back to log in</Link>
+              <Link to="/login" viewTransition className="font-semibold underline">Back to log in</Link>
             </motion.form>
           ) : (
             <motion.div
