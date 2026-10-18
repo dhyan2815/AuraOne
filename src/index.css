@@ -494,3 +494,7 @@
     transition-duration: 150ms !important;
   }
 }
+
+/* Keep toasts clear of the phone bottom nav. */
+.lm-toaster { bottom: 24px !important; }
+@media (max-width: 767px) { .lm-toaster { bottom: 96px !important; } }

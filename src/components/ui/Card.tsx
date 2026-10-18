@@ -34,7 +34,7 @@ const Card = ({
       </>
     );
 
-    const actionClassName = "flex items-center text-sm text-primary hover:underline";
+    const actionClassName = "flex items-center text-sm font-semibold text-ink2 hover:text-ink";
 
     if (actionHref) {
       return (
@@ -53,16 +53,16 @@ const Card = ({
 
   return (
     <div 
-      className={`glass rounded-2xl shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${className}`}
+      className={`rounded-sheet bg-sheet ${className}`}
       onClick={onClick}
     >
       {title && (
-        <div className="flex items-center justify-between px-6 py-4 border-b border-black/5">
-          <h3 className="text-xl font-semibold text-text">{title}</h3>
+        <div className="flex items-center justify-between px-6 pt-5">
+          <h3 className="lm-sheet-title mb-0">{title}</h3>
           {renderAction()}
         </div>
       )}
-      
+
       <div className="p-6">
         {children}
       </div>
