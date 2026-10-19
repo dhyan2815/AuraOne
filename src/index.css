@@ -133,10 +133,8 @@
   /* Condensed display type used for lobe headings and big numbers. */
   .lm-display {
     font-weight: 800;
-    letter-spacing: -0.035em;
-    line-height: 0.95;
-    font-stretch: 75%;
-    word-spacing: 0.1em;
+    letter-spacing: -0.01em;
+    line-height: 1.05;
   }
 
   .lm-num {
@@ -177,10 +175,8 @@
     color: inherit;
     font-size: clamp(40px, 5.6vw, 80px);
     font-weight: 800;
-    letter-spacing: -0.035em;
-    line-height: 0.95;
-    font-stretch: 79%;
-    word-spacing: 0.1em;
+    letter-spacing: -0.01em;
+    line-height: 1.05;
   }
   .lm-lobe p { font-size: 17px; margin-top: 8px; max-width: 540px; }
   .lm-lobe .lm-seg { background: rgb(255 255 255 / 0.55); }
@@ -630,4 +626,11 @@
       animation-range: entry 0% entry 35%;
     }
   }
+}
+
+/* Landing marquee: slow chip strip, two copies side by side so -50% loops seamlessly; pauses on hover. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes lm-marquee { to { transform: translateX(-50%); } }
+  .lm-marquee > div { animation: lm-marquee 28s linear infinite; }
+  .lm-marquee:hover > div { animation-play-state: paused; }
 }
