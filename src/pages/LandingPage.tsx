@@ -324,7 +324,7 @@ const LandingPage = () => {
     const { scrollYProgress: stepsP } = useScroll({ target: stepsRef, offset: ["start 85%", "end 60%"] });
     const markRef = useRef<HTMLParagraphElement>(null);
     const { scrollYProgress: markP } = useScroll({ target: markRef, offset: ["start end", "end end"] });
-    const markStretch = useTransform(markP, [0, 1], ["62%", reduce ? "62%" : "78%"]);
+    const markStretch = useTransform(markP, [0, 1], ["85%", reduce ? "85%" : "100%"]);
 
     // Inertia scroll for the whole page (and eased anchor jumps); native scroll when motion is reduced.
     useEffect(() => {
@@ -524,7 +524,7 @@ const LandingPage = () => {
                         <Magnetic><Link to="/signup" className="lm-btn !bg-[#1F211E] !text-white">Create your free account</Link></Magnetic>
                         <Link to="/login" className="lm-btn lm-btn-ghost !bg-white/60 !text-[#1F211E]">I have an account</Link>
                     </div>
-                    <motion.p ref={markRef} className="mt-16 font-extrabold leading-[.8] md:mt-20" style={{ fontSize: "clamp(90px, 17vw, 250px)", letterSpacing: "-.07em", fontStretch: markStretch }}>AuraOne</motion.p>
+                    <motion.p ref={markRef} className="mt-16 font-extrabold leading-[.8] md:mt-20" style={{ fontSize: "clamp(90px, 17vw, 250px)", letterSpacing: "-.02em", fontStretch: markStretch }}>AuraOne</motion.p>
                 </section>
 
                 <SiteFooter />
