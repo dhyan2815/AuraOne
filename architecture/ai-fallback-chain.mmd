@@ -1,54 +1,54 @@
 flowchart TD
-    Start([👤 User Prompt]) --> AIService{🤖 AI Service}
+    Start([👤 User Message]) --> Handler[📨 chatHandler]
+    Handler --> Save[💾 Save user message]
+    Save --> Agent[🤖 processAgenticRequest]
 
-    %% Mode selection
-    AIService -->|brain mode| BrainMode[🧠 Brain Mode]
-    AIService -->|normal mode| NormalMode[📋 Normal Mode]
+    Agent --> Pure{⚡ Pure action<br/>phrasing?}
+    Pure -->|no| RAG[🔍 RAG retrieveContext<br/>60s cache]
+    Pure -->|yes| Loop
+    RAG --> Cite[📎 Collect citations<br/>similarity greater than 0.7]
+    Cite --> Loop[🔁 ReAct Loop<br/>max 8 iterations]
 
-    %% Brain mode - direct to OpenRouter
-    BrainMode --> ORBrain[🌐 OpenRouter]
-    ORBrain --> BrainResult[💬 Plain Response]
+    Loop --> Stream[🌐 streamGeminiWithTools<br/>SSE]
+    Stream --> Calls{🛠️ Function<br/>calls?}
 
-    %% Normal mode flow
-    NormalMode --> Gemini[🔮 Gemini API]
-    Gemini --> Parse1{✅ Valid JSON?}
+    Calls -->|none| Final[✅ Final answer text]
+    Calls -->|yes| Think[🧠 Record thinking step]
+    Think --> Exec[⚙️ executeTool per call]
 
-    %% Gemini success
-    Parse1 -->|yes| Validate[🔍 Validate Schema]
-    Validate --> RouteCRUD{📌 Command Type?}
+    Exec --> ToolRoute{📌 Tool name}
+    ToolRoute -->|search_knowledge_base| KB[(🗃️ knowledge_chunks<br/>pgvector)]
+    ToolRoute -->|list_items / get_agenda / find_free_slots| Read[(📖 tasks / notes / events)]
+    ToolRoute -->|create_* / update_* / schedule_*| Write[(✏️ tasks / notes / events)]
+    ToolRoute -->|delete_item| Pending[⏸️ Pending confirmation<br/>no deletion yet]
 
-    RouteCRUD -->|create| CreateOp[➕ Create Handler]
-    RouteCRUD -->|read| ReadOp[📖 Read Handler]
-    RouteCRUD -->|update| UpdateOp[✏️ Update Handler]
-    RouteCRUD -->|delete| DeleteOp[🗑️ Delete Handler]
-    RouteCRUD -->|chat| ChatOp[💬 Chat Handler]
+    KB --> Append[➕ Append tool result<br/>to conversation]
+    Read --> Append
+    Write --> Clear[🧹 Invalidate RAG cache]
+    Clear --> Append
+    Pending --> Append
 
-    CreateOp --> Success1[✅ Success Response]
-    ReadOp --> Success1
-    UpdateOp --> Success1
-    DeleteOp --> Success1
-    ChatOp --> Success1
+    Append --> Loop
 
-    %% Gemini failure paths
-    Parse1 -->|no| Fallback1[🔄 Fallback to OpenRouter]
-    Fallback1 --> Parse2{✅ Valid JSON?}
+    Loop -->|iterations exhausted| Limit[⚠️ Step-limit response]
 
-    Parse2 -->|yes| RouteCRUD
-    Parse2 -->|no| FallbackChat[💬 Plain Chat Response]
+    Final --> Response[💬 Agent response:<br/>message, sources, tools, steps]
+    Limit --> Response
 
-    %% OpenRouter failure → Retry exhaustion
-    Fallback1 --> |error| Exhaustion[❌ Retry Exhaustion]
+    Agent -->|🔴 unhandled exception| Fallback[🔄 Fallback: callOpenRouterAPI]
+    Fallback --> FallbackResponse[💬 Plain-text response<br/>no tools, no citations]
 
-    %% Repair prompt flow
-    Validate -->|validation error| Repair[🔧 Repair Prompt]
-    Repair --> Gemini
-    Repair -->|after fallback fail| RepairOR[🔧 Repair → OpenRouter]
+    Response --> Persist[💾 Save AI message + metadata]
+    FallbackResponse --> Persist
+    Persist --> End([✅ Rendered in Chat UI])
 
     %% Styling
     classDef success fill:#90EE90,stroke:#333,stroke-width:2px,color:darkgreen
     classDef error fill:#FFB6C1,stroke:#DC143C,stroke-width:2px,color:black
     classDef api fill:#87CEEB,stroke:#333,stroke-width:2px,color:darkblue
+    classDef store fill:#E6E6FA,stroke:#333,stroke-width:2px,color:darkblue
 
-    class Gemini,ORBrain api
-    class Success1,BrainResult success
-    class Exhaustion error
+    class Stream,Fallback api
+    class Final,Response,End success
+    class Limit,FallbackResponse error
+    class KB,Read,Write store
