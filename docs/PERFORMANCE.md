@@ -1,6 +1,6 @@
 # Performance Monitoring and Uptime Proof
 
-Last Edited: 2026-11-01 21:09:59 IST (UTC+05:30)
+Last Edited: 2026-11-01 21:25:25 IST (UTC+05:30)
 
 ## Scope
 
@@ -32,34 +32,49 @@ The runtime monitor this document used to reference has been removed:
 
 ## Measured Build Metrics
 
-Measured at the time of this edit with `npm run build` (Vite 5.4.21, 2,764 modules transformed, built in 11.2 s):
+Measured at the time of this edit with `npm run build` (Vite 5.4.21). Since 2026-11-01, route pages load on demand (`React.lazy` in `src/App.tsx`), and stable vendor code is split into long-lived chunks (`manualChunks` in `vite.config.ts`).
 
-| Asset | Minified | Gzip |
-|-------|----------|------|
-| `dist/index.html` | 0.74 kB | 0.42 kB |
-| `dist/assets/index-*.css` | 69.82 kB | 13.18 kB |
-| `dist/assets/index-*.js` (single chunk) | **1,446.55 kB** | **442.11 kB** |
+### Before and After Code Splitting
 
-Vite warns that the chunk is larger than 500 kB. The app has no code splitting: there is no `React.lazy`, no dynamic `import()` and no `manualChunks`. Every visitor downloads the whole application on first load, including logged-out visitors on the landing page. That includes the rich-text editor, the markdown renderer and the agent code.
+| Metric | Single bundle (before) | Code split (now) |
+|--------|------------------------|------------------|
+| JS needed before the first page renders | 1,446.55 kB (442.11 kB gzip), 1 file | 574.11 kB (179.62 kB gzip), 4 files |
+| Signed-out landing page (`/`), total JS | 1,446.55 kB (442.11 kB gzip) | 616.94 kB (193.58 kB gzip), **−56% gzip** |
+| Signed-in Dashboard (`/dashboard`), JS before idle prefetch | 1,446.55 kB (442.11 kB gzip) | 639.08 kB (197.85 kB gzip), **−55% gzip** |
+| Largest chunk | 1,446.55 kB | 436.11 kB (`NotePage`, on demand) |
+| All JS combined | 1,446.55 kB (442.11 kB gzip) | 1,454.52 kB (461.41 kB gzip) in 35 files |
+| Vite chunk-size warning (> 500 kB) | Yes | No |
 
-### Bundle Composition
+The combined total is slightly larger (+19 kB gzip) because each chunk is compressed on its own, so a signed-in user who eventually opens every screen downloads about 4% more overall. In exchange, the first render needs less than half the JavaScript it used to.
 
-This is each package's share of the bundled source, measured from a source-map build. Most entries are unminified source, but packages that ship pre-minified (such as `react-dom`) are under-counted. Read the shares as relative weight, not exact output bytes.
+### First-Load Chunks
 
-| Area | Share | Needed by |
-|------|-------|-----------|
-| TipTap + ProseMirror (with linkifyjs and marked) | ~24.7% | `NotePage` only (via `TiptapEditor`) |
-| Supabase client (auth, postgrest, realtime, storage) | ~13.2% | Every route |
-| react-markdown / micromark / unified | ~11.4% | `Chat` only (via `ChatMessage`) |
-| framer-motion | ~10.4% | Imported by 17 files: pages, layout, widgets |
-| React Router (`@remix-run/router`, `react-router`, `react-router-dom`) | ~7.2% | Every route |
-| Application code (`src/`) | ~6.0% | n/a |
-| zod | ~5.8% | `agentTools.ts` |
-| date-fns | ~4.6% | Calendar, widgets, task pages |
-| react-dom | ~3.0% (under-counted) | Every route |
-| chrono-node | ~2.7% | `agentTools.ts` |
+`index.html` loads the app shell and preloads the three vendor chunks in parallel:
 
-About a third of the bundled source (the TipTap and markdown stacks together) is used by only two routes.
+| Chunk | Minified | Gzip | Contents |
+|-------|----------|------|----------|
+| `index-*.js` | 104.88 kB | 36.37 kB | App shell: `App`, `Layout`, `TopBar`, `useAuth`, Radix dropdown, react-hot-toast |
+| `react-*.js` | 164.18 kB | 53.59 kB | react, react-dom, React Router |
+| `supabase-*.js` | 176.46 kB | 46.38 kB | `@supabase/supabase-js` |
+| `motion-*.js` | 128.59 kB | 43.28 kB | framer-motion |
+| `index-*.css` | 69.78 kB | 13.14 kB | Tailwind and Living Map styles |
+
+### On-Demand Route Chunks
+
+| Chunk | Minified | Gzip | Main contents | Route |
+|-------|----------|------|---------------|-------|
+| `NotePage-*.js` | 436.11 kB | 138.98 kB | TipTap, ProseMirror, linkifyjs, marked | `/notes/:id` |
+| `Chat-*.js` | 271.00 kB | 82.26 kB | Agent services with zod and chrono-node, react-markdown stack | `/chat` |
+| `LandingPage-*.js` | 38.51 kB | 12.07 kB | Landing page | `/` (signed out) |
+| `Dashboard-*.js` | 15.30 kB | 5.27 kB | Dashboard and its widgets | `/dashboard` |
+| `parse-*.js` + `format-*.js` | 43.12 kB | 10.60 kB | date-fns (shared) | Dashboard, Calendar, task pages |
+| Every other page | < 10 kB each | | Tasks, Notes, Calendar, KnowledgeBase, Settings, TaskPage, auth pages, plus small shared and icon chunks | Their routes |
+
+### Idle Prefetch and Failed Loads
+
+After a signed-in page renders, `App.tsx` waits for `requestIdleCallback` (or a 2 s timeout where that API is missing) and then prefetches the other signed-in route chunks: about 758 kB (243 kB gzip) in the background, so later section switches don't wait on the network. Signed-out visitors never prefetch. If the background download becomes a concern on mobile data, the next step would be to prefetch on nav-link hover or focus instead.
+
+If a chunk fails to load during navigation (for example after a redeploy, when Vercel answers old asset URLs with `index.html`), the page loader reloads the tab once. A failed prefetch is ignored, so a flaky connection never reloads the page while someone is typing.
 
 ---
 
@@ -93,7 +108,7 @@ About a third of the bundled source (the TipTap and markdown stacks together) is
 
 | # | Hotspot | Location | Effect |
 |---|---------|----------|--------|
-| 1 | Single 1.45 MB JS chunk with all pages imported eagerly | `src/App.tsx` | Slow first load, especially on mobile and on the public landing page |
+| 1 | **Resolved on 2026-11-01.** This was a single 1.45 MB JS chunk with every page imported eagerly. Pages now load on demand, and first-load JS is 574 kB (180 kB gzip). | `src/App.tsx`, `vite.config.ts` | No longer applies. `NotePage` (139 kB gzip) is the largest remaining chunk, loaded on demand or by idle prefetch. |
 | 2 | Full-table reads in agent tools: `list_items`, `get_agenda` and `find_free_slots` fetch every user row (no limit or date range) and filter in the browser. `list_items` trims to 20 only after fetching. | `src/services/agentTools.ts`, `src/hooks/use*.ts` | Payload and latency grow linearly with the user's data |
 | 3 | Re-embedding on every note autosave: the 5 s idle autosave calls `updateNote`, which triggers `silentIngest` (4 network calls including an embedding), even when the content is unchanged | `src/pages/NotePage.tsx`, `src/hooks/useNotes.ts` | Embedding API usage and Supabase writes while editing |
 | 4 | Sequential full re-sync: `ingestAllForUser` indexes one item at a time, about 4 requests per item, and never batches embeddings across items | `src/services/ragIngestionService.ts` | Knowledge Sync time grows linearly with item count |
@@ -111,7 +126,7 @@ About a third of the bundled source (the TipTap and markdown stacks together) is
 
 | Priority | Change | Addresses |
 |----------|--------|-----------|
-| High | Route-level code splitting: `React.lazy` + `Suspense` for `NotePage`, `TaskPage`, `Chat`, `KnowledgeBase`, `Calendar` and `LandingPage`, optionally with `manualChunks` for vendor libraries | #1 |
+| Done | Route-level code splitting: `React.lazy` for every page, `Suspense` in `App` and `Layout`, idle prefetch and vendor `manualChunks` | #1 |
 | High | Push filters into Supabase queries (`limit`, `ilike` keyword match, date ranges) for agent tools | #2 |
 | High | Re-index a note only when its content actually changed (compare a hash or the previous value), or only on explicit save | #3 |
 | Medium | Batch embeddings across items and run ingestion with bounded concurrency in `ingestAllForUser` | #4 |

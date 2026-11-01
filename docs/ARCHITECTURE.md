@@ -1,6 +1,6 @@
 # AuraOne Architecture Documentation
 
-Last Edited: 2026-11-01 21:09:59 IST (UTC+05:30)
+Last Edited: 2026-11-01 21:25:25 IST (UTC+05:30)
 
 ## Overview
 
@@ -40,11 +40,11 @@ flowchart LR
 | Authenticated | `/knowledge` | `KnowledgeBase` (Explorer and Playground views) |
 | Authenticated | `/settings` | `Settings` |
 
-All pages are imported eagerly. The app has no route-level code splitting.
+**Code splitting.** Every page is lazy-loaded through a small `page()` wrapper around `React.lazy`, so each route ships as its own chunk. Public pages suspend at the top-level `Suspense` in `App`, which shows the full-screen `Loader`. Signed-in pages suspend inside `Layout`, which shows an inline loader in the page area and keeps the top bar visible. Once a user is signed in, the other signed-in pages are prefetched when the browser is idle. If a page chunk fails to load during navigation (usually after a redeploy, when Vercel serves `index.html` for old asset URLs), the wrapper reloads the tab once, and a 10-second `sessionStorage` guard prevents reload loops. A failed prefetch is ignored. Chunk sizes are listed in [PERFORMANCE.md](PERFORMANCE.md#measured-build-metrics).
 
 ### Layout Shell (`src/components/structure/`)
 
-- **`Layout.tsx`**: renders `TopBar`, owns the light/dark theme, animates route changes with Framer Motion (slide direction follows route depth), and plays a colour "flood" when the section changes. Motion is reduced when `prefers-reduced-motion` is set.
+- **`Layout.tsx`**: renders `TopBar`, owns the light/dark theme, animates route changes with Framer Motion (slide direction follows route depth), and plays a colour "flood" when the section changes. Motion is reduced when `prefers-reduced-motion` is set. Each page renders inside its own `Suspense` boundary, so a loading route never hides the top bar or the outgoing page.
 - **`sections.ts`**: the "Living Map" section registry. It maps each route to a colour class and nav label (Today, Tasks, Notes, Events, Aura, Knowledge, Settings).
 - **`TopBar.tsx`**: navigation, theme toggle and a Radix dropdown user menu.
 - **`AuthLayout.tsx`**, **`SiteFooter.tsx`**, **`Logo.tsx`**: auth page shell, public footer and brand mark.
@@ -313,7 +313,7 @@ The app has no global store and no React Context. `zustand` is installed but nev
 
 ## Deployment
 
-- **Frontend:** Vercel static build (`tsc && vite build` → `dist/`). `vercel.json` rewrites every path to `/index.html` for client-side routing.
+- **Frontend:** Vercel static build (`tsc && vite build` → `dist/`). `vercel.json` rewrites every path to `/index.html` for client-side routing. `vite.config.ts` puts vendor code into separate `react`, `supabase` and `motion` chunks, so app deploys don't invalidate them in browser caches.
 - **Backend:** Supabase (managed Postgres, Auth, Realtime). pgvector is enabled by the migration in `supabase/migrations/`.
 - **CI:** `.github/workflows/preflights.yml` runs on every push and on PRs to `main` (Node 20): `npm ci` → `npx tsc --noEmit` → `npm run lint` → `npm run test:run -- --coverage` → `npm run build` → `npm audit --audit-level=moderate` (non-blocking).
 
@@ -341,7 +341,7 @@ VITE_NEWS_API_KEY        # Optional - news widget
 ├── supabase/migrations/               # 20260516_knowledge_base.sql (pgvector schema + RPC)
 ├── tests/                             # unit/, integration/, e2e/, dated AI response suite
 └── src/
-    ├── App.tsx                        # Route tree + auth gate
+    ├── App.tsx                        # Lazy route tree, auth gate, idle prefetch
     ├── main.tsx                       # React root, BrowserRouter, Toaster
     ├── index.css                      # Tailwind layers + Living Map styles
     ├── components/
