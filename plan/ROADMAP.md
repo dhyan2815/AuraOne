@@ -119,7 +119,7 @@ notes / tasks / events change ──database webhook──▶ aura-index ──�
 
 **Steps**
 
-- [ ] **C1 · Warm-up: ideas inbox (week 1).** Belongs to the LinkedIn track ([§5](#5--linkedin-ideas--drafts-c1c5)), but it's small and gets you capturing ideas in AuraOne from day one.
+- **Week 1: do C1 first.** The ideas inbox lives in the LinkedIn track ([§5](#5--linkedin-ideas--drafts-c1c5)), but it's small and gets you capturing ideas in AuraOne from day one. Tick it off there.
 - [ ] **F1 · First edge function.** Install the Supabase CLI, run `supabase init` and `supabase link`, then `supabase db pull` (needs Docker) so the existing tables (`tasks`, `notes`, `events`, `chat_*`) live in `supabase/migrations/`. Create a `hello` function that reads the caller from their JWT and returns their email; call it from the app.
   *Done when:* the browser console prints your email from the function, and a `curl` without a token gets `401`.
 - [ ] **F2 · Make the agent portable.** Tools currently reach the browser Supabase client through the hooks (`src/services/agentTools.ts` → `src/hooks/use*.ts`). Change every tool from `run(args, userId)` to `run(args, ctx)`, where `ctx = { db, userId, timeZone }`. Then move `agentTools`, `agentOrchestrator`, `agentPrompts`, `llmService` and RAG retrieval into `supabase/functions/_shared/agent/`.
