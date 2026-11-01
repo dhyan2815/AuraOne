@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { useOutlet, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import TopBar from './TopBar';
+import Loader from '../ui/Loader';
 import { sectionFor } from './sections';
 
 const Layout = () => {
@@ -83,7 +84,8 @@ const Layout = () => {
             animate="animate"
             exit="exit"
           >
-            {outlet}
+            {/* Boundary sits inside the keyed page so a loading route never hides the top bar or the outgoing page. */}
+            <Suspense fallback={<Loader inline />}>{outlet}</Suspense>
           </motion.div>
         </AnimatePresence>
       </main>
