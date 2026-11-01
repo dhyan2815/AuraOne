@@ -86,7 +86,7 @@ After milestone 2, milestones 3, 4 and 5 barely depend on each other, so reorder
 - **If a session runs over, split it.** Don't leave half-done work on `main`; use a branch per session.
 - **Live with each milestone for a week** before starting the next. Real use tells you what to fix.
 - **Tick the boxes in this file** as you go.
-- **New screens follow the Living Map design** (`docs/living-map/`). To keep the nav small, Habits and Lists go in as tabs on Tasks, and Posts as a tab on Notes.
+- **New screens follow the Living Map design.** Reuse the tokens and shared `lm-` classes in `src/index.css` (lobe, sheet, btn, chip, input, row). To keep the nav small, Habits and Lists go in as tabs on Tasks, and Posts as a tab on Notes.
 
 ---
 
